@@ -30,6 +30,16 @@ class ofApp : public ofBaseApp{
 		void reloadOscSettings();
 		bool oscEnabled;
 		
+		// OSC Queue for throttled sending
+		struct OscQueueItem {
+			string address;
+			float value;
+		};
+		std::vector<OscQueueItem> oscSendQueue;
+		bool oscBatchSending = false;
+		void processOscQueue();
+		void queueOscParameter(string address, float value);
+		
 		// OSC Send Helper Functions (split to avoid compiler limits)
 		void sendOscBlock1Ch1();
 		void sendOscBlock1Ch2();

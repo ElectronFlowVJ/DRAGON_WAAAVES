@@ -43,6 +43,7 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
 	processOscMessages();
+	processOscQueue();  // Process queued OSC messages
 
 	// Check if video inputs need to be reinitialized
 	if(gui->reinitializeInputs){
@@ -2669,10 +2670,55 @@ bool ofApp::processOscResetCommands(const string& address) {
 void ofApp::sendOscParameter(string address, float value) {
     if (!oscEnabled || !gui->oscEnabled) return;
 
+    // If in batch sending mode, queue instead of sending immediately
+    if (oscBatchSending) {
+        queueOscParameter(address, value);
+        return;
+    }
+
     ofxOscMessage m;
     m.setAddress(address);
     m.addFloatArg(value);
     oscSender.sendMessage(m, true);
+}
+//--------------------------------------------------------------
+void ofApp::queueOscParameter(string address, float value) {
+    OscQueueItem item;
+    item.address = address;
+    item.value = value;
+    oscSendQueue.push_back(item);
+}
+//--------------------------------------------------------------
+void ofApp::processOscQueue() {
+    if (oscSendQueue.empty()) {
+        if (oscBatchSending) {
+            oscBatchSending = false;
+            ofLogNotice("OSC") << "Finished sending all queued OSC parameters";
+        }
+        return;
+    }
+    
+    if (!oscEnabled || !gui->oscEnabled) {
+        oscSendQueue.clear();
+        oscBatchSending = false;
+        return;
+    }
+    
+    // Send up to oscMessagesPerFrame messages this frame
+    int queueSize = (int)oscSendQueue.size();
+    int maxMessages = gui->oscMessagesPerFrame;
+    int messagesToSend = (queueSize < maxMessages) ? queueSize : maxMessages;
+    
+    for (int i = 0; i < messagesToSend; i++) {
+        OscQueueItem& item = oscSendQueue[i];
+        ofxOscMessage m;
+        m.setAddress(item.address);
+        m.addFloatArg(item.value);
+        oscSender.sendMessage(m, true);
+    }
+    
+    // Remove sent messages from queue
+    oscSendQueue.erase(oscSendQueue.begin(), oscSendQueue.begin() + messagesToSend);
 }
 //--------------------------------------------------------------
 void ofApp::reloadOscSettings() {
@@ -3237,9 +3283,12 @@ void ofApp::sendOscBlock3MatrixAndFinal() {
 void ofApp::sendAllOscParameters() {
     if (!oscEnabled || !gui->oscEnabled) return;
     
-    ofLogNotice("OSC") << "Sending all OSC parameters...";
+    ofLogNotice("OSC") << "Queueing all OSC parameters for throttled sending...";
     
-    // Call each block's helper function
+    // Enable batch mode - sendOscParameter will queue instead of send
+    oscBatchSending = true;
+    
+    // Call each block's helper function (they will queue messages)
     sendOscBlock1Ch1();
     sendOscBlock1Ch2();
     sendOscBlock1Fb1();
@@ -3249,5 +3298,6 @@ void ofApp::sendAllOscParameters() {
     sendOscBlock3B2();
     sendOscBlock3MatrixAndFinal();
     
-    ofLogNotice("OSC") << "Finished sending all OSC parameters";
+    ofLogNotice("OSC") << "Queued " << oscSendQueue.size() << " OSC messages for sending";
+    // Note: oscBatchSending will be set to false by processOscQueue when queue is empty
 }

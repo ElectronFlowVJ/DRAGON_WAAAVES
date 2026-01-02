@@ -4418,7 +4418,11 @@ void GuiApp::draw(){
 				ImGui::Separator();
 				ImGui::Spacing();
 				ImGui::Text("SEND ALL PARAMETERS");
-				ImGui::Text("Send all current values over OSC");
+				ImGui::Text("Send all current values over OSC (throttled)");
+				ImGui::PushItemWidth(150);
+				ImGui::SliderInt("Messages per frame", &oscMessagesPerFrame, 1, 100);
+				ImGui::PopItemWidth();
+				ImGui::Text("Higher = faster but may drop packets");
 				if (ImGui::Button("Send All Values Now", ImVec2(200, 30))) {
 					sendAllOscValues = true;
 				}

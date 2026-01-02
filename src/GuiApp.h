@@ -106,6 +106,7 @@ public:
 	string localIP = "";
 	bool oscConnected = false;
 	bool sendAllOscValues = false;  // Trigger for sending all OSC values
+	int oscMessagesPerFrame = 20;   // Throttle for batch sending
 	void updateLocalIP();
 	
 	// Video Input Settings
