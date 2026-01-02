@@ -44,6 +44,12 @@ void ofApp::setup(){
 void ofApp::update(){
 	processOscMessages();
 
+	// Check if video inputs need to be reinitialized
+	if(gui->reinitializeInputs){
+		reinitializeInputs();
+		gui->reinitializeInputs = false;
+	}
+
 	inputUpdate();
 	lfoUpdate();
 	
@@ -1394,12 +1400,13 @@ void ofApp::inputSetup(){
 	//then do so
 	input1.listDevices();
 	input1.setVerbose(true);
-	input1.setDeviceID(0);
+	input1.setDeviceID(gui->input1DeviceID);
 	input1.setDesiredFrameRate(30);
 	//input1.setPixelFormat(OF_PIXELS_NATIVE);
 	input1.initGrabber(640,480);
 	
-	input2.setDeviceID(1);
+	input2.setVerbose(true);
+	input2.setDeviceID(gui->input2DeviceID);
 	input2.setDesiredFrameRate(30);
 	input2.initGrabber(640,480);
 
@@ -1424,6 +1431,30 @@ void ofApp::inputTest(){
 		input2.draw(0, 0);
 	}
 	
+}
+
+//--------------------------------------------------------------
+void ofApp::reinitializeInputs(){
+	ofLogNotice("Video Input") << "Reinitializing video inputs...";
+	ofLogNotice("Video Input") << "Input 1: Device " << gui->input1DeviceID;
+	ofLogNotice("Video Input") << "Input 2: Device " << gui->input2DeviceID;
+	
+	// Close existing grabbers
+	input1.close();
+	input2.close();
+	
+	// Reinitialize with new device IDs
+	input1.setVerbose(true);
+	input1.setDeviceID(gui->input1DeviceID);
+	input1.setDesiredFrameRate(30);
+	input1.initGrabber(640,480);
+	
+	input2.setVerbose(true);
+	input2.setDeviceID(gui->input2DeviceID);
+	input2.setDesiredFrameRate(30);
+	input2.initGrabber(640,480);
+	
+	ofLogNotice("Video Input") << "Reinitialization complete";
 }
 
 //---------------------------------------------------------

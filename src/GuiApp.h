@@ -108,6 +108,14 @@ public:
 	bool sendAllOscValues = false;  // Trigger for sending all OSC values
 	void updateLocalIP();
 	
+	// Video Input Settings
+	std::vector<ofVideoDevice> videoDevices;
+	std::vector<std::string> videoDeviceNames;
+	int input1DeviceID = 0;
+	int input2DeviceID = 1;
+	bool reinitializeInputs = false;
+	void refreshVideoDevices();
+	
 	//block1
 	const int ch1AdjustLength=15;
 	const int ch2MixAndKeyLength=6;

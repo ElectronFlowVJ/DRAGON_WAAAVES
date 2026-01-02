@@ -62,6 +62,7 @@ class ofApp : public ofBaseApp{
 	void inputSetup();
 	void inputUpdate();
 	void inputTest();
+	void reinitializeInputs();
 	ofVideoGrabber input1;
 	ofVideoGrabber input2;
 

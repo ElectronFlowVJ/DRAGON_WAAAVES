@@ -101,6 +101,9 @@ void GuiApp::setup(){
 	// but update whenever someone saves a new savestate?
 	indexSaveStateNames();
 	initializeNames();
+	
+	// Initialize video device list
+	refreshVideoDevices();
 
 }
 
@@ -137,6 +140,22 @@ void GuiApp::indexSaveStateNames(){
 			cout<<dir.getName(i)<<" was not loaded"<<endl;
 		}
 	}
+}
+
+//-------------------------------------------------------------------------------
+void GuiApp::refreshVideoDevices(){
+	// Use a temporary grabber to list devices
+	ofVideoGrabber tempGrabber;
+	videoDevices = tempGrabber.listDevices();
+	
+	// Build string list for combo box
+	videoDeviceNames.clear();
+	for(int i = 0; i < videoDevices.size(); i++){
+		string name = std::to_string(i) + ": " + videoDevices[i].deviceName;
+		videoDeviceNames.push_back(name);
+	}
+	
+	ofLogNotice("Video Input") << "Found " << videoDevices.size() << " video devices";
 }
 
 //--------------------------------------------------------------
@@ -4250,6 +4269,86 @@ void GuiApp::draw(){
 				ImGui::EndTabItem();		
 			}//end block3
        		ImGui::PopStyleColor(12);	
+
+			// VIDEO INPUT TAB
+			if (ImGui::BeginTabItem("Video Input")) {
+				
+				ImGui::Text("Video Input Device Selection");
+				ImGui::Separator();
+				ImGui::Spacing();
+				
+				// Refresh button
+				if (ImGui::Button("Refresh Device List")) {
+					refreshVideoDevices();
+				}
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+				
+				// Device count
+				ImGui::Text("Found %d video devices", (int)videoDevices.size());
+				ImGui::Spacing();
+				
+				// Input 1 dropdown
+				ImGui::Text("INPUT 1");
+				if (videoDeviceNames.size() > 0) {
+					// Create combo items
+					if (ImGui::BeginCombo("##input1device", 
+						input1DeviceID < videoDeviceNames.size() ? videoDeviceNames[input1DeviceID].c_str() : "Select Device")) {
+						for (int i = 0; i < videoDeviceNames.size(); i++) {
+							bool isSelected = (input1DeviceID == i);
+							if (ImGui::Selectable(videoDeviceNames[i].c_str(), isSelected)) {
+								input1DeviceID = i;
+							}
+							if (isSelected) {
+								ImGui::SetItemDefaultFocus();
+							}
+						}
+						ImGui::EndCombo();
+					}
+				} else {
+					ImGui::Text("No devices found");
+				}
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+				
+				// Input 2 dropdown
+				ImGui::Text("INPUT 2");
+				if (videoDeviceNames.size() > 0) {
+					if (ImGui::BeginCombo("##input2device", 
+						input2DeviceID < videoDeviceNames.size() ? videoDeviceNames[input2DeviceID].c_str() : "Select Device")) {
+						for (int i = 0; i < videoDeviceNames.size(); i++) {
+							bool isSelected = (input2DeviceID == i);
+							if (ImGui::Selectable(videoDeviceNames[i].c_str(), isSelected)) {
+								input2DeviceID = i;
+							}
+							if (isSelected) {
+								ImGui::SetItemDefaultFocus();
+							}
+						}
+						ImGui::EndCombo();
+					}
+				} else {
+					ImGui::Text("No devices found");
+				}
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+				
+				// Reinitialize button
+				ImGui::Text("Apply Changes");
+				if (ImGui::Button("Reinitialize Cameras", ImVec2(200, 30))) {
+					reinitializeInputs = true;
+				}
+				ImGui::Spacing();
+				
+				// Help text
+				ImGui::Separator();
+				ImGui::Text("Select devices and click 'Reinitialize Cameras' to apply.");
+				
+				ImGui::EndTabItem();
+			}
 
 			// OSC SETTINGS TAB
 			if (ImGui::BeginTabItem("OSC Settings")) {
