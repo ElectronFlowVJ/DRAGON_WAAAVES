@@ -1386,24 +1386,23 @@ void ofApp::draw(){
 
 
 //--------------------------------------------------------------
-void ofApp::inputSetup() {
-    // List available devices for debugging
-    vector<ofVideoDevice> devices = input1.listDevices();
-    for(auto& device : devices) {
-        ofLogNotice() << "Device ID: " << device.id 
-                      << " Name: " << device.deviceName;
-    }
-    
-    // Set device by ID (adjust based on your system)
-	input1.listdevices();
-	input1 setVerbose (true);
+void ofApp::inputSetup(){
+	//i guess we might just be 
+	//stuck at sd inputs!
+	//lets just get to work and
+	//if we get the chance to fix this later
+	//then do so
+	input1.listDevices();
+	input1.setVerbose(true);
 	input1.setDeviceID(0);
-	input1.setDesiredFramerate (30);
-    input1.setup(640, 480);
-    
-    input2.setDeviceID(1);  // Second camera if available
-	input2.setDesiredFramerate (30);
-    input2.setup(640, 480);
+	input1.setDesiredFrameRate(30);
+	//input1.setPixelFormat(OF_PIXELS_NATIVE);
+	input1.initGrabber(640,480);
+	
+	input2.setDeviceID(1);
+	input2.setDesiredFrameRate(30);
+	input2.initGrabber(640,480);
+
 }
 
 //--------------------------------------------------------------
@@ -1829,899 +1828,810 @@ void ofApp::processOscMessages() {
         
         ofLogNotice("OSC") << "Received: " << address << " = " << value;
         
-        // ============== BLOCK 1 ==============
-        
-        // BLOCK 1 - Channel 1 Adjust (15 parameters)
-        if (address == "/gravity/block1/ch1/xDisplace") gui->ch1Adjust[0] = value;
-        else if (address == "/gravity/block1/ch1/yDisplace") gui->ch1Adjust[1] = value;
-        else if (address == "/gravity/block1/ch1/zDisplace") gui->ch1Adjust[2] = value;
-        else if (address == "/gravity/block1/ch1/rotate") gui->ch1Adjust[3] = value;
-        else if (address == "/gravity/block1/ch1/hueOffset") gui->ch1Adjust[4] = value;
-        else if (address == "/gravity/block1/ch1/saturationOffset") gui->ch1Adjust[5] = value;
-        else if (address == "/gravity/block1/ch1/brightOffset") gui->ch1Adjust[6] = value;
-        else if (address == "/gravity/block1/ch1/posterize") gui->ch1Adjust[7] = value;
-        else if (address == "/gravity/block1/ch1/kaleidoscopeAmount") gui->ch1Adjust[8] = value;
-        else if (address == "/gravity/block1/ch1/kaleidoscopeSlice") gui->ch1Adjust[9] = value;
-        else if (address == "/gravity/block1/ch1/blurAmount") gui->ch1Adjust[10] = value;
-        else if (address == "/gravity/block1/ch1/blurRadius") gui->ch1Adjust[11] = value;
-        else if (address == "/gravity/block1/ch1/sharpenAmount") gui->ch1Adjust[12] = value;
-        else if (address == "/gravity/block1/ch1/sharpenRadius") gui->ch1Adjust[13] = value;
-        else if (address == "/gravity/block1/ch1/filtersBoost") gui->ch1Adjust[14] = value;
-        
-        // BLOCK 1 - Channel 1 Adjust LFO (16 parameters)
-        else if (address == "/gravity/block1/ch1/lfo/xDisplaceAmp") gui->ch1AdjustLfo[0] = value;
-        else if (address == "/gravity/block1/ch1/lfo/xDisplaceRate") gui->ch1AdjustLfo[1] = value;
-        else if (address == "/gravity/block1/ch1/lfo/yDisplaceAmp") gui->ch1AdjustLfo[2] = value;
-        else if (address == "/gravity/block1/ch1/lfo/yDisplaceRate") gui->ch1AdjustLfo[3] = value;
-        else if (address == "/gravity/block1/ch1/lfo/zDisplaceAmp") gui->ch1AdjustLfo[4] = value;
-        else if (address == "/gravity/block1/ch1/lfo/zDisplaceRate") gui->ch1AdjustLfo[5] = value;
-        else if (address == "/gravity/block1/ch1/lfo/rotateAmp") gui->ch1AdjustLfo[6] = value;
-        else if (address == "/gravity/block1/ch1/lfo/rotateRate") gui->ch1AdjustLfo[7] = value;
-        else if (address == "/gravity/block1/ch1/lfo/kaleidoscopeSliceAmp") gui->ch1AdjustLfo[14] = value;
-        else if (address == "/gravity/block1/ch1/lfo/kaleidoscopeSliceRate") gui->ch1AdjustLfo[15] = value;
-        
-        // BLOCK 1 - Channel 2 Mix and Key (7 parameters)
-        else if (address == "/gravity/block1/ch2/mixAmount") gui->ch2MixAndKey[0] = value;
-        else if (address == "/gravity/block1/ch2/keyThreshold") gui->ch2MixAndKey[4] = value;
-        else if (address == "/gravity/block1/ch2/keySoft") gui->ch2MixAndKey[5] = value;
-        else if (address == "/gravity/block1/ch2/keyBlue") gui->ch2MixAndKey[3] = value;
-        else if (address == "/gravity/block1/ch2/keyRed") gui->ch2MixAndKey[1] = value;
-        else if (address == "/gravity/block1/ch2/keyGreen") gui->ch2MixAndKey[2] = value;
-        
-        // BLOCK 1 - Channel 2 Mix and Key LFO (6 parameters)
-        else if (address == "/gravity/block1/ch2/lfo/mixAmountAmp") gui->ch2MixAndKeyLfo[0] = value;
-        else if (address == "/gravity/block1/ch2/lfo/mixAmountRate") gui->ch2MixAndKeyLfo[1] = value;
-        else if (address == "/gravity/block1/ch2/lfo/keyThresholdAmp") gui->ch2MixAndKeyLfo[2] = value;
-        else if (address == "/gravity/block1/ch2/lfo/keyThresholdRate") gui->ch2MixAndKeyLfo[3] = value;
-        else if (address == "/gravity/block1/ch2/lfo/keySoftAmp") gui->ch2MixAndKeyLfo[4] = value;
-        else if (address == "/gravity/block1/ch2/lfo/keySoftRate") gui->ch2MixAndKeyLfo[5] = value;
-        
-        // BLOCK 1 - Channel 2 Adjust (15 parameters)
-        else if (address == "/gravity/block1/ch2/xDisplace") gui->ch2Adjust[0] = value;
-        else if (address == "/gravity/block1/ch2/yDisplace") gui->ch2Adjust[1] = value;
-        else if (address == "/gravity/block1/ch2/zDisplace") gui->ch2Adjust[2] = value;
-        else if (address == "/gravity/block1/ch2/rotate") gui->ch2Adjust[3] = value;
-        else if (address == "/gravity/block1/ch2/hueOffset") gui->ch2Adjust[4] = value;
-        else if (address == "/gravity/block1/ch2/saturationOffset") gui->ch2Adjust[5] = value;
-        else if (address == "/gravity/block1/ch2/brightOffset") gui->ch2Adjust[6] = value;
-        else if (address == "/gravity/block1/ch2/posterize") gui->ch2Adjust[7] = value;
-        else if (address == "/gravity/block1/ch2/kaleidoscopeAmount") gui->ch2Adjust[8] = value;
-        else if (address == "/gravity/block1/ch2/kaleidoscopeSlice") gui->ch2Adjust[9] = value;
-        else if (address == "/gravity/block1/ch2/blurAmount") gui->ch2Adjust[10] = value;
-        else if (address == "/gravity/block1/ch2/blurRadius") gui->ch2Adjust[11] = value;
-        else if (address == "/gravity/block1/ch2/sharpenAmount") gui->ch2Adjust[12] = value;
-        else if (address == "/gravity/block1/ch2/sharpenRadius") gui->ch2Adjust[13] = value;
-        else if (address == "/gravity/block1/ch2/filtersBoost") gui->ch2Adjust[14] = value;
-        
-        // BLOCK 1 - Channel 2 Adjust LFO (16 parameters)
-        else if (address == "/gravity/block1/ch2/lfo/xDisplaceAmp") gui->ch2AdjustLfo[0] = value;
-        else if (address == "/gravity/block1/ch2/lfo/xDisplaceRate") gui->ch2AdjustLfo[1] = value;
-        else if (address == "/gravity/block1/ch2/lfo/yDisplaceAmp") gui->ch2AdjustLfo[2] = value;
-        else if (address == "/gravity/block1/ch2/lfo/yDisplaceRate") gui->ch2AdjustLfo[3] = value;
-        else if (address == "/gravity/block1/ch2/lfo/zDisplaceAmp") gui->ch2AdjustLfo[4] = value;
-        else if (address == "/gravity/block1/ch2/lfo/zDisplaceRate") gui->ch2AdjustLfo[5] = value;
-        else if (address == "/gravity/block1/ch2/lfo/rotateAmp") gui->ch2AdjustLfo[6] = value;
-        else if (address == "/gravity/block1/ch2/lfo/rotateRate") gui->ch2AdjustLfo[7] = value;
-        else if (address == "/gravity/block1/ch2/lfo/kaleidoscopeSliceAmp") gui->ch2AdjustLfo[14] = value;
-        else if (address == "/gravity/block1/ch2/lfo/kaleidoscopeSliceRate") gui->ch2AdjustLfo[15] = value;
-        
-        // BLOCK 1 - FB1 Mix and Key (6 parameters)
-        else if (address == "/gravity/block1/fb1/mixAmount") gui->fb1MixAndKey[0] = value;
-        else if (address == "/gravity/block1/fb1/keyThreshold") gui->fb1MixAndKey[4] = value;
-        else if (address == "/gravity/block1/fb1/keySoft") gui->fb1MixAndKey[5] = value;
-        else if (address == "/gravity/block1/fb1/keyBlue") gui->fb1MixAndKey[3] = value;
-        else if (address == "/gravity/block1/fb1/keyRed") gui->fb1MixAndKey[1] = value;
-        else if (address == "/gravity/block1/fb1/keyGreen") gui->fb1MixAndKey[2] = value;
-        
-        // BLOCK 1 - FB1 Geometry (10 parameters)
-        else if (address == "/gravity/block1/fb1/xDisplace") gui->fb1Geo1[0] = value;
-        else if (address == "/gravity/block1/fb1/yDisplace") gui->fb1Geo1[1] = value;
-        else if (address == "/gravity/block1/fb1/zDisplace") gui->fb1Geo1[2] = value;
-        else if (address == "/gravity/block1/fb1/rotate") gui->fb1Geo1[3] = value;
-        else if (address == "/gravity/block1/fb1/xStretch") gui->fb1Geo1[4] = value;
-        else if (address == "/gravity/block1/fb1/yStretch") gui->fb1Geo1[5] = value;
-        else if (address == "/gravity/block1/fb1/xShear") gui->fb1Geo1[6] = value;
-        else if (address == "/gravity/block1/fb1/yShear") gui->fb1Geo1[7] = value;
-        else if (address == "/gravity/block1/fb1/kaleidoscopeAmount") gui->fb1Geo1[8] = value;
-        else if (address == "/gravity/block1/fb1/kaleidoscopeSlice") gui->fb1Geo1[9] = value;
-        
-        // BLOCK 1 - FB1 Color (11 parameters)
-        else if (address == "/gravity/block1/fb1/hueOffset") gui->fb1Color1[0] = value;
-        else if (address == "/gravity/block1/fb1/saturationOffset") gui->fb1Color1[1] = value;
-        else if (address == "/gravity/block1/fb1/brightOffset") gui->fb1Color1[2] = value;
-        else if (address == "/gravity/block1/fb1/hueMultiply") gui->fb1Color1[3] = value;
-        else if (address == "/gravity/block1/fb1/saturationMultiply") gui->fb1Color1[4] = value;
-        else if (address == "/gravity/block1/fb1/brightMultiply") gui->fb1Color1[5] = value;
-        else if (address == "/gravity/block1/fb1/huePowmap") gui->fb1Color1[6] = value;
-        else if (address == "/gravity/block1/fb1/saturationPowmap") gui->fb1Color1[7] = value;
-        else if (address == "/gravity/block1/fb1/brightPowmap") gui->fb1Color1[8] = value;
-        else if (address == "/gravity/block1/fb1/hueShaper") gui->fb1Color1[9] = value;
-        else if (address == "/gravity/block1/fb1/posterize") gui->fb1Color1[10] = value;
-        
-        // BLOCK 1 - FB1 Filters (9 parameters)
-        // BLOCK 1 - FB1 Filters (9 parameters)
-        else if (address == "/gravity/block1/fb1/blurAmount") gui->fb1Filters[0] = value;
-        else if (address == "/gravity/block1/fb1/blurRadius") gui->fb1Filters[1] = value;
-        else if (address == "/gravity/block1/fb1/sharpenAmount") gui->fb1Filters[2] = value;
-        else if (address == "/gravity/block1/fb1/sharpenRadius") gui->fb1Filters[3] = value;
-        else if (address == "/gravity/block1/fb1/temp1Amount") gui->fb1Filters[4] = value;
-        else if (address == "/gravity/block1/fb1/temp1q") gui->fb1Filters[5] = value;
-        else if (address == "/gravity/block1/fb1/temp2Amount") gui->fb1Filters[6] = value;
-        else if (address == "/gravity/block1/fb1/temp2q") gui->fb1Filters[7] = value;
-        else if (address == "/gravity/block1/fb1/filtersBoost") gui->fb1Filters[8] = value;
-        
-        // ============== BLOCK 2 ==============
-        
-        // BLOCK 2 - Input Adjust (15 parameters)
-        else if (address == "/gravity/block2/input/xDisplace") gui->block2InputAdjust[0] = value;
-        else if (address == "/gravity/block2/input/yDisplace") gui->block2InputAdjust[1] = value;
-        else if (address == "/gravity/block2/input/zDisplace") gui->block2InputAdjust[2] = value;
-        else if (address == "/gravity/block2/input/rotate") gui->block2InputAdjust[3] = value;
-        else if (address == "/gravity/block2/input/hueOffset") gui->block2InputAdjust[4] = value;
-        else if (address == "/gravity/block2/input/saturationOffset") gui->block2InputAdjust[5] = value;
-        else if (address == "/gravity/block2/input/brightOffset") gui->block2InputAdjust[6] = value;
-        else if (address == "/gravity/block2/input/posterize") gui->block2InputAdjust[7] = value;
-        else if (address == "/gravity/block2/input/kaleidoscopeAmount") gui->block2InputAdjust[8] = value;
-        else if (address == "/gravity/block2/input/kaleidoscopeSlice") gui->block2InputAdjust[9] = value;
-        else if (address == "/gravity/block2/input/blurAmount") gui->block2InputAdjust[10] = value;
-        else if (address == "/gravity/block2/input/blurRadius") gui->block2InputAdjust[11] = value;
-        else if (address == "/gravity/block2/input/sharpenAmount") gui->block2InputAdjust[12] = value;
-        else if (address == "/gravity/block2/input/sharpenRadius") gui->block2InputAdjust[13] = value;
-        else if (address == "/gravity/block2/input/filtersBoost") gui->block2InputAdjust[14] = value;
-        
-        // BLOCK 2 - FB2 Mix and Key (6 parameters)
-        else if (address == "/gravity/block2/fb2/mixAmount") gui->fb2MixAndKey[0] = value;
-        else if (address == "/gravity/block2/fb2/keyThreshold") gui->fb2MixAndKey[4] = value;
-        else if (address == "/gravity/block2/fb2/keySoft") gui->fb2MixAndKey[5] = value;
-        else if (address == "/gravity/block2/fb2/keyBlue") gui->fb2MixAndKey[3] = value;
-        else if (address == "/gravity/block2/fb2/keyRed") gui->fb2MixAndKey[1] = value;
-        else if (address == "/gravity/block2/fb2/keyGreen") gui->fb2MixAndKey[2] = value;
-        
-        // BLOCK 2 - FB2 Geometry (10 parameters)
-        else if (address == "/gravity/block2/fb2/xDisplace") gui->fb2Geo1[0] = value;
-        else if (address == "/gravity/block2/fb2/yDisplace") gui->fb2Geo1[1] = value;
-        else if (address == "/gravity/block2/fb2/zDisplace") gui->fb2Geo1[2] = value;
-        else if (address == "/gravity/block2/fb2/rotate") gui->fb2Geo1[3] = value;
-        else if (address == "/gravity/block2/fb2/xStretch") gui->fb2Geo1[4] = value;
-        else if (address == "/gravity/block2/fb2/yStretch") gui->fb2Geo1[5] = value;
-        else if (address == "/gravity/block2/fb2/xShear") gui->fb2Geo1[6] = value;
-        else if (address == "/gravity/block2/fb2/yShear") gui->fb2Geo1[7] = value;
-        else if (address == "/gravity/block2/fb2/kaleidoscopeAmount") gui->fb2Geo1[8] = value;
-        else if (address == "/gravity/block2/fb2/kaleidoscopeSlice") gui->fb2Geo1[9] = value;
-        
-        // BLOCK 2 - FB2 Color (11 parameters)
-        else if (address == "/gravity/block2/fb2/hueOffset") gui->fb2Color1[0] = value;
-        else if (address == "/gravity/block2/fb2/saturationOffset") gui->fb2Color1[1] = value;
-        else if (address == "/gravity/block2/fb2/brightOffset") gui->fb2Color1[2] = value;
-        else if (address == "/gravity/block2/fb2/hueMultiply") gui->fb2Color1[3] = value;
-        else if (address == "/gravity/block2/fb2/saturationMultiply") gui->fb2Color1[4] = value;
-                else if (address == "/gravity/block2/fb2/huePowmap") gui->fb2Color1[6] = value;
-        else if (address == "/gravity/block2/fb2/saturationPowmap") gui->fb2Color1[7] = value;
-        else if (address == "/gravity/block2/fb2/brightPowmap") gui->fb2Color1[8] = value;
-        else if (address == "/gravity/block2/fb2/hueShaper") gui->fb2Color1[9] = value;
-        else if (address == "/gravity/block2/fb2/posterize") gui->fb2Color1[10] = value;
-        
-        // BLOCK 2 - FB2 Filters (9 parameters)
-        else if (address == "/gravity/block2/fb2/blurAmount") gui->fb2Filters[0] = value;
-        else if (address == "/gravity/block2/fb2/blurRadius") gui->fb2Filters[1] = value;
-        else if (address == "/gravity/block2/fb2/sharpenAmount") gui->fb2Filters[2] = value;
-        else if (address == "/gravity/block2/fb2/sharpenRadius") gui->fb2Filters[3] = value;
-        else if (address == "/gravity/block2/fb2/temp1Amount") gui->fb2Filters[4] = value;
-        else if (address == "/gravity/block2/fb2/temp1q") gui->fb2Filters[5] = value;
-        else if (address == "/gravity/block2/fb2/temp2Amount") gui->fb2Filters[6] = value;
-        else if (address == "/gravity/block2/fb2/temp2q") gui->fb2Filters[7] = value;
-        else if (address == "/gravity/block2/fb2/filtersBoost") gui->fb2Filters[8] = value;
-        
-        // ============== BLOCK 3 ==============
-        
-        // BLOCK 3 - Block 1 Geometry (10 parameters)
-        else if (address == "/gravity/block3/b1/xDisplace") gui->block1Geo[0] = value;
-        else if (address == "/gravity/block3/b1/yDisplace") gui->block1Geo[1] = value;
-        else if (address == "/gravity/block3/b1/zDisplace") gui->block1Geo[2] = value;
-        else if (address == "/gravity/block3/b1/rotate") gui->block1Geo[3] = value;
-        else if (address == "/gravity/block3/b1/xStretch") gui->block1Geo[4] = value;
-        else if (address == "/gravity/block3/b1/yStretch") gui->block1Geo[5] = value;
-        else if (address == "/gravity/block3/b1/xShear") gui->block1Geo[6] = value;
-        else if (address == "/gravity/block3/b1/yShear") gui->block1Geo[7] = value;
-        else if (address == "/gravity/block3/b1/kaleidoscopeAmount") gui->block1Geo[8] = value;
-        else if (address == "/gravity/block3/b1/kaleidoscopeSlice") gui->block1Geo[9] = value;
-        
-        // BLOCK 3 - Block 1 Colorize (15 parameters - 5 bands x 3 HSB)
-        else if (address == "/gravity/block3/b1/colorize/hueBand1") gui->block1Colorize[0] = value;
-        else if (address == "/gravity/block3/b1/colorize/saturationBand1") gui->block1Colorize[1] = value;
-        else if (address == "/gravity/block3/b1/colorize/brightBand1") gui->block1Colorize[2] = value;
-        else if (address == "/gravity/block3/b1/colorize/hueBand2") gui->block1Colorize[3] = value;
-        else if (address == "/gravity/block3/b1/colorize/saturationBand2") gui->block1Colorize[4] = value;
-        else if (address == "/gravity/block3/b1/colorize/brightBand2") gui->block1Colorize[5] = value;
-        else if (address == "/gravity/block3/b1/colorize/hueBand3") gui->block1Colorize[6] = value;
-        else if (address == "/gravity/block3/b1/colorize/saturationBand3") gui->block1Colorize[7] = value;
-        else if (address == "/gravity/block3/b1/colorize/brightBand3") gui->block1Colorize[8] = value;
-        else if (address == "/gravity/block3/b1/colorize/hueBand4") gui->block1Colorize[9] = value;
-        else if (address == "/gravity/block3/b1/colorize/saturationBand4") gui->block1Colorize[10] = value;
-        else if (address == "/gravity/block3/b1/colorize/brightBand4") gui->block1Colorize[11] = value;
-        else if (address == "/gravity/block3/b1/colorize/hueBand5") gui->block1Colorize[12] = value;
-        else if (address == "/gravity/block3/b1/colorize/saturationBand5") gui->block1Colorize[13] = value;
-        else if (address == "/gravity/block3/b1/colorize/brightBand5") gui->block1Colorize[14] = value;
-        else if (address == "/gravity/block3/b1/colorize/active") gui->block1ColorizeSwitch = (value > 0.5f);
-        else if (address == "/gravity/block3/b1/colorize/colorspace") gui->block1ColorizeHSB_RGB = (value > 0.5f);
-        
-        // BLOCK 3 - Block 1 Filters (5 parameters)
-        else if (address == "/gravity/block3/b1/blurAmount") gui->block1Filters[0] = value;
-        else if (address == "/gravity/block3/b1/blurRadius") gui->block1Filters[1] = value;
-        else if (address == "/gravity/block3/b1/sharpenAmount") gui->block1Filters[2] = value;
-        else if (address == "/gravity/block3/b1/sharpenRadius") gui->block1Filters[3] = value;
-        else if (address == "/gravity/block3/b1/filtersBoost") gui->block1Filters[4] = value;
-        
-        // BLOCK 3 - Block 2 Geometry (10 parameters)
-        else if (address == "/gravity/block3/b2/xDisplace") gui->block2Geo[0] = value;
-        else if (address == "/gravity/block3/b2/yDisplace") gui->block2Geo[1] = value;
-        else if (address == "/gravity/block3/b2/zDisplace") gui->block2Geo[2] = value;
-        else if (address == "/gravity/block3/b2/rotate") gui->block2Geo[3] = value;
-        else if (address == "/gravity/block3/b2/xStretch") gui->block2Geo[4] = value;
-        else if (address == "/gravity/block3/b2/yStretch") gui->block2Geo[5] = value;
-        else if (address == "/gravity/block3/b2/xShear") gui->block2Geo[6] = value;
-        else if (address == "/gravity/block3/b2/yShear") gui->block2Geo[7] = value;
-        else if (address == "/gravity/block3/b2/kaleidoscopeAmount") gui->block2Geo[8] = value;
-        else if (address == "/gravity/block3/b2/kaleidoscopeSlice") gui->block2Geo[9] = value;
-        
-        // BLOCK 3 - Block 2 Colorize (15 parameters)
-        else if (address == "/gravity/block3/b2/colorize/hueBand1") gui->block2Colorize[0] = value;
-        else if (address == "/gravity/block3/b2/colorize/saturationBand1") gui->block2Colorize[1] = value;
-        else if (address == "/gravity/block3/b2/colorize/brightBand1") gui->block2Colorize[2] = value;
-        else if (address == "/gravity/block3/b2/colorize/hueBand2") gui->block2Colorize[3] = value;
-        else if (address == "/gravity/block3/b2/colorize/saturationBand2") gui->block2Colorize[4] = value;
-        else if (address == "/gravity/block3/b2/colorize/brightBand2") gui->block2Colorize[5] = value;
-        else if (address == "/gravity/block3/b2/colorize/hueBand3") gui->block2Colorize[6] = value;
-        else if (address == "/gravity/block3/b2/colorize/saturationBand3") gui->block2Colorize[7] = value;
-        else if (address == "/gravity/block3/b2/colorize/brightBand3") gui->block2Colorize[8] = value;
-        else if (address == "/gravity/block3/b2/colorize/hueBand4") gui->block2Colorize[9] = value;
-        else if (address == "/gravity/block3/b2/colorize/saturationBand4") gui->block2Colorize[10] = value;
-        else if (address == "/gravity/block3/b2/colorize/brightBand4") gui->block2Colorize[11] = value;
-        else if (address == "/gravity/block3/b2/colorize/hueBand5") gui->block2Colorize[12] = value;
-        else if (address == "/gravity/block3/b2/colorize/saturationBand5") gui->block2Colorize[13] = value;
-        else if (address == "/gravity/block3/b2/colorize/brightBand5") gui->block2Colorize[14] = value;
-        else if (address == "/gravity/block3/b2/colorize/active") gui->block2ColorizeSwitch = (value > 0.5f);
-        else if (address == "/gravity/block3/b2/colorize/colorspace") gui->block2ColorizeHSB_RGB = (value > 0.5f);
-        
-        // BLOCK 3 - Block 2 Filters (5 parameters)
-        else if (address == "/gravity/block3/b2/blurAmount") gui->block2Filters[0] = value;
-        else if (address == "/gravity/block3/b2/blurRadius") gui->block2Filters[1] = value;
-        else if (address == "/gravity/block3/b2/sharpenAmount") gui->block2Filters[2] = value;
-        else if (address == "/gravity/block3/b2/sharpenRadius") gui->block2Filters[3] = value;
-        else if (address == "/gravity/block3/b2/filtersBoost") gui->block2Filters[4] = value;
-        
-        // BLOCK 3 - Matrix Mix (16 parameters)
-        else if (address == "/gravity/block3/matrixMix/b1RedToB2Red") gui->matrixMix[0] = value;
-        else if (address == "/gravity/block3/matrixMix/b1GreenToB2Red") gui->matrixMix[1] = value;
-        else if (address == "/gravity/block3/matrixMix/b1BlueToB2Red") gui->matrixMix[2] = value;
-        else if (address == "/gravity/block3/matrixMix/b1RedToB2Green") gui->matrixMix[3] = value;
-        else if (address == "/gravity/block3/matrixMix/b1GreenToB2Green") gui->matrixMix[4] = value;
-        else if (address == "/gravity/block3/matrixMix/b1BlueToB2Green") gui->matrixMix[5] = value;
-        else if (address == "/gravity/block3/matrixMix/b1RedToB2Blue") gui->matrixMix[6] = value;
-        else if (address == "/gravity/block3/matrixMix/b1GreenToB2Blue") gui->matrixMix[7] = value;
-        else if (address == "/gravity/block3/matrixMix/b1BlueToB2Blue") gui->matrixMix[8] = value;
-        
-        // BLOCK 3 - Final Mix and Key (6 parameters)
-        else if (address == "/gravity/block3/final/mixAmount") gui->finalMixAndKey[0] = value;
-        else if (address == "/gravity/block3/final/keyThreshold") gui->finalMixAndKey[4] = value;
-        else if (address == "/gravity/block3/final/keySoft") gui->finalMixAndKey[5] = value;
-        else if (address == "/gravity/block3/final/keyInvert") gui->finalMixAndKey[3] = value;
-        else if (address == "/gravity/block3/final/keyRed") gui->finalMixAndKey[1] = value;
-        else if (address == "/gravity/block3/final/keyGreen") gui->finalMixAndKey[2] = value;
-        
-        // ============== DROPDOWN/DISCRETE PARAMETERS ==============
-        
-        // BLOCK 1 - Ch1 Discrete Parameters
-        else if (address == "/gravity/block1/ch1/inputSelect") gui->ch1InputSelect = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch1/geoOverflow") gui->ch1GeoOverflow = m.getArgAsInt(0);
-        
-        // BLOCK 1 - Ch2 Mix and Key Discrete Parameters
-        else if (address == "/gravity/block1/ch2/inputSelect") gui->ch2InputSelect = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch2/keyOrder") gui->ch2KeyOrder = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch2/mixType") gui->ch2MixType = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch2/mixOverflow") gui->ch2MixOverflow = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch2/keyMode") gui->ch2KeyMode = m.getArgAsInt(0);
-        
-        // BLOCK 1 - Ch2 Adjust Discrete Parameters
-        else if (address == "/gravity/block1/ch2/geoOverflow") gui->ch2GeoOverflow = m.getArgAsInt(0);
-        
-        // BLOCK 1 - FB1 Mix and Key Discrete Parameters
-        else if (address == "/gravity/block1/fb1/keyOrder") gui->fb1KeyOrder = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/fb1/mixType") gui->fb1MixType = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/fb1/mixOverflow") gui->fb1MixOverflow = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/fb1/keyMode") gui->fb1KeyMode = m.getArgAsInt(0);
-        
-        // BLOCK 1 - FB1 Geometry Discrete Parameters
-        else if (address == "/gravity/block1/fb1/geoOverflow") gui->fb1GeoOverflow = m.getArgAsInt(0);
-        
-        // BLOCK 2 - Input Adjust Discrete Parameters
-        else if (address == "/gravity/block2/input/inputSelect") gui->block2InputSelect = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/input/geoOverflow") gui->block2InputGeoOverflow = m.getArgAsInt(0);
-        
-        // BLOCK 2 - FB2 Mix and Key Discrete Parameters
-        else if (address == "/gravity/block2/fb2/keyOrder") gui->fb2KeyOrder = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/fb2/mixType") gui->fb2MixType = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/fb2/mixOverflow") gui->fb2MixOverflow = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/fb2/keyMode") gui->fb2KeyMode = m.getArgAsInt(0);
-        
-        // BLOCK 2 - FB2 Geometry Discrete Parameters
-        else if (address == "/gravity/block2/fb2/geoOverflow") gui->fb2GeoOverflow = m.getArgAsInt(0);
-        
-        // BLOCK 3 - Block 1 Geometry Discrete Parameters
-        else if (address == "/gravity/block3/b1/geoOverflow") gui->block1GeoOverflow = m.getArgAsInt(0);
-        
-        // BLOCK 3 - Block 2 Geometry Discrete Parameters
-        else if (address == "/gravity/block3/b2/geoOverflow") gui->block2GeoOverflow = m.getArgAsInt(0);
-        
-        // BLOCK 3 - Matrix Mix Discrete Parameters
-        else if (address == "/gravity/block3/matrixMix/mixType") gui->matrixMixType = m.getArgAsInt(0);
-        else if (address == "/gravity/block3/matrixMix/overflow") gui->matrixMixOverflow = m.getArgAsInt(0);
-        
-        // BLOCK 3 - Final Mix and Key Discrete Parameters
-        else if (address == "/gravity/block3/final/keyOrder") gui->finalKeyOrder = m.getArgAsInt(0);
-        else if (address == "/gravity/block3/final/mixType") gui->finalMixType = m.getArgAsInt(0);
-        else if (address == "/gravity/block3/final/overflow") gui->finalMixOverflow = m.getArgAsInt(0);
-        else if (address == "/gravity/block3/final/keyMode") gui->finalKeyMode = m.getArgAsInt(0);
-        
-        // ============== CHECKBOX/BOOLEAN PARAMETERS ==============
-        
-        // BLOCK 1 - Ch1 Adjust Boolean Parameters
-        else if (address == "/gravity/block1/ch1/hMirror") gui->ch1HMirror = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch1/vMirror") gui->ch1VMirror = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch1/hFlip") gui->ch1HFlip = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch1/vFlip") gui->ch1VFlip = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch1/hueInvert") gui->ch1HueInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch1/saturationInvert") gui->ch1SaturationInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch1/brightInvert") gui->ch1BrightInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch1/rgbInvert") gui->ch1RGBInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch1/solarize") gui->ch1Solarize = m.getArgAsInt(0);
-        
-        // BLOCK 1 - Ch2 Adjust Boolean Parameters
-        else if (address == "/gravity/block1/ch2/hMirror") gui->ch2HMirror = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch2/vMirror") gui->ch2VMirror = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch2/hFlip") gui->ch2HFlip = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch2/vFlip") gui->ch2VFlip = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch2/hueInvert") gui->ch2HueInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch2/saturationInvert") gui->ch2SaturationInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch2/brightInvert") gui->ch2BrightInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch2/rgbInvert") gui->ch2RGBInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/ch2/solarize") gui->ch2Solarize = m.getArgAsInt(0);
-        
-        // BLOCK 1 - FB1 Geometry Boolean Parameters
-        else if (address == "/gravity/block1/fb1/hMirror") gui->fb1HMirror = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/fb1/vMirror") gui->fb1VMirror = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/fb1/hFlip") gui->fb1HFlip = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/fb1/vFlip") gui->fb1VFlip = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/fb1/rotateMode") gui->fb1RotateMode = m.getArgAsInt(0);
-        
-        // BLOCK 1 - FB1 Color Boolean Parameters
-        else if (address == "/gravity/block1/fb1/hueInvert") gui->fb1HueInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/fb1/saturationInvert") gui->fb1SaturationInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/fb1/brightInvert") gui->fb1BrightInvert = m.getArgAsInt(0);
-        
-        // BLOCK 1 - FB1 Geometric Animations
-        else if (address == "/gravity/block1/fb1/hypercube") gui->block1HypercubeSwitch = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/fb1/dancingLine") gui->block1LineSwitch = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/fb1/septagram") gui->block1SevenStarSwitch = m.getArgAsInt(0);
-        else if (address == "/gravity/block1/fb1/lissajousBall") gui->block1LissaBallSwitch = m.getArgAsInt(0);
-        
-        // BLOCK 2 - Input Adjust Boolean Parameters
-        else if (address == "/gravity/block2/input/hMirror") gui->block2InputHMirror = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/input/vMirror") gui->block2InputVMirror = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/input/hFlip") gui->block2InputHFlip = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/input/vFlip") gui->block2InputVFlip = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/input/hueInvert") gui->block2InputHueInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/input/saturationInvert") gui->block2InputSaturationInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/input/brightInvert") gui->block2InputBrightInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/input/rgbInvert") gui->block2InputRGBInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/input/solarize") gui->block2InputSolarize = m.getArgAsInt(0);
-        
-        // BLOCK 2 - FB2 Geometry Boolean Parameters
-        else if (address == "/gravity/block2/fb2/hMirror") gui->fb2HMirror = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/fb2/vMirror") gui->fb2VMirror = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/fb2/hFlip") gui->fb2HFlip = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/fb2/vFlip") gui->fb2VFlip = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/fb2/rotateMode") gui->fb2RotateMode = m.getArgAsInt(0);
-        
-        // BLOCK 2 - FB2 Color Boolean Parameters
-        else if (address == "/gravity/block2/fb2/hueInvert") gui->fb2HueInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/fb2/saturationInvert") gui->fb2SaturationInvert = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/fb2/brightInvert") gui->fb2BrightInvert = m.getArgAsInt(0);
-        
-        // BLOCK 2 - FB2 Geometric Animations
-        else if (address == "/gravity/block2/fb2/hypercube") gui->block2HypercubeSwitch = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/fb2/dancingLine") gui->block2LineSwitch = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/fb2/septagram") gui->block2SevenStarSwitch = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/fb2/lissajousBall") gui->block2LissaBallSwitch = m.getArgAsInt(0);
-        
-        // BLOCK 3 - Block Rotate Modes
-        else if (address == "/gravity/block3/b1/rotateMode") gui->block1RotateMode = m.getArgAsInt(0);
-        else if (address == "/gravity/block3/b2/rotateMode") gui->block2RotateMode = m.getArgAsInt(0);
-        
-        // Framebuffer Delay Time Integer Sliders
-        else if (address == "/gravity/block1/fb1/delayTime") gui->fb1DelayTime = m.getArgAsInt(0);
-        else if (address == "/gravity/block2/fb2/delayTime") gui->fb2DelayTime = m.getArgAsInt(0);
-        
-        // BLOCK 3 - Block 1 Geometry Boolean Parameters
-        else if (address == "/gravity/block3/b1/hMirror") gui->block1HMirror = m.getArgAsInt(0);
-        else if (address == "/gravity/block3/b1/vMirror") gui->block1VMirror = m.getArgAsInt(0);
-        else if (address == "/gravity/block3/b1/hFlip") gui->block1HFlip = m.getArgAsInt(0);
-        else if (address == "/gravity/block3/b1/vFlip") gui->block1VFlip = m.getArgAsInt(0);
-        
-        // BLOCK 3 - Block 2 Geometry Boolean Parameters
-        else if (address == "/gravity/block3/b2/hMirror") gui->block2HMirror = m.getArgAsInt(0);
-        else if (address == "/gravity/block3/b2/vMirror") gui->block2VMirror = m.getArgAsInt(0);
-        else if (address == "/gravity/block3/b2/hFlip") gui->block2HFlip = m.getArgAsInt(0);
-        else if (address == "/gravity/block3/b2/vFlip") gui->block2VFlip = m.getArgAsInt(0);
-        
-        // ============== MISSING LFO HANDLERS ==============
-
-        // /gravity/block1/ch1/lfo (6 parameters) - hueOffset/satOffset/brightOffset
-        else if (address == "/gravity/block1/ch1/lfo/hueOffsetAmp") gui->ch1AdjustLfo[8] = value;
-        else if (address == "/gravity/block1/ch1/lfo/hueOffsetRate") gui->ch1AdjustLfo[9] = value;
-        else if (address == "/gravity/block1/ch1/lfo/saturationOffsetAmp") gui->ch1AdjustLfo[10] = value;
-        else if (address == "/gravity/block1/ch1/lfo/saturationOffsetRate") gui->ch1AdjustLfo[11] = value;
-        else if (address == "/gravity/block1/ch1/lfo/brightOffsetAmp") gui->ch1AdjustLfo[12] = value;
-        else if (address == "/gravity/block1/ch1/lfo/brightOffsetRate") gui->ch1AdjustLfo[13] = value;
-
-        // /gravity/block1/ch2/lfo (6 parameters) - hueOffset/satOffset/brightOffset  
-        else if (address == "/gravity/block1/ch2/lfo/hueOffsetAmp") gui->ch2AdjustLfo[8] = value;
-        else if (address == "/gravity/block1/ch2/lfo/hueOffsetRate") gui->ch2AdjustLfo[9] = value;
-        else if (address == "/gravity/block1/ch2/lfo/saturationOffsetAmp") gui->ch2AdjustLfo[10] = value;
-        else if (address == "/gravity/block1/ch2/lfo/saturationOffsetRate") gui->ch2AdjustLfo[11] = value;
-        else if (address == "/gravity/block1/ch2/lfo/brightOffsetAmp") gui->ch2AdjustLfo[12] = value;
-        else if (address == "/gravity/block1/ch2/lfo/brightOffsetRate") gui->ch2AdjustLfo[13] = value;
-
-        // /gravity/block1/fb1/lfo (30 parameters)
-        else if (address == "/gravity/block1/fb1/lfo/mixAmountAmp") gui->fb1MixAndKeyLfo[0] = value;
-        else if (address == "/gravity/block1/fb1/lfo/mixAmountRate") gui->fb1MixAndKeyLfo[1] = value;
-        else if (address == "/gravity/block1/fb1/lfo/keyThresholdAmp") gui->fb1MixAndKeyLfo[2] = value;
-        else if (address == "/gravity/block1/fb1/lfo/keyThresholdRate") gui->fb1MixAndKeyLfo[3] = value;
-        else if (address == "/gravity/block1/fb1/lfo/keySoftAmp") gui->fb1MixAndKeyLfo[4] = value;
-        else if (address == "/gravity/block1/fb1/lfo/keySoftRate") gui->fb1MixAndKeyLfo[5] = value;
-        else if (address == "/gravity/block1/fb1/lfo/xDisplaceAmp") gui->fb1Geo1Lfo1[0] = value;
-        else if (address == "/gravity/block1/fb1/lfo/xDisplaceRate") gui->fb1Geo1Lfo1[1] = value;
-        else if (address == "/gravity/block1/fb1/lfo/yDisplaceAmp") gui->fb1Geo1Lfo1[2] = value;
-        else if (address == "/gravity/block1/fb1/lfo/yDisplaceRate") gui->fb1Geo1Lfo1[3] = value;
-        else if (address == "/gravity/block1/fb1/lfo/zDisplaceAmp") gui->fb1Geo1Lfo1[4] = value;
-        else if (address == "/gravity/block1/fb1/lfo/zDisplaceRate") gui->fb1Geo1Lfo1[5] = value;
-        else if (address == "/gravity/block1/fb1/lfo/rotateAmp") gui->fb1Geo1Lfo1[6] = value;
-        else if (address == "/gravity/block1/fb1/lfo/rotateRate") gui->fb1Geo1Lfo1[7] = value;
-        else if (address == "/gravity/block1/fb1/lfo/xStretchAmp") gui->fb1Geo1Lfo2[0] = value;
-        else if (address == "/gravity/block1/fb1/lfo/xStretchRate") gui->fb1Geo1Lfo2[1] = value;
-        else if (address == "/gravity/block1/fb1/lfo/yStretchAmp") gui->fb1Geo1Lfo2[2] = value;
-        else if (address == "/gravity/block1/fb1/lfo/yStretchRate") gui->fb1Geo1Lfo2[3] = value;
-        else if (address == "/gravity/block1/fb1/lfo/xShearAmp") gui->fb1Geo1Lfo2[4] = value;
-        else if (address == "/gravity/block1/fb1/lfo/xShearRate") gui->fb1Geo1Lfo2[5] = value;
-        else if (address == "/gravity/block1/fb1/lfo/yShearAmp") gui->fb1Geo1Lfo2[6] = value;
-        else if (address == "/gravity/block1/fb1/lfo/yShearRate") gui->fb1Geo1Lfo2[7] = value;
-        else if (address == "/gravity/block1/fb1/lfo/kaleidoscopeSliceAmp") gui->fb1Geo1Lfo2[8] = value;
-        else if (address == "/gravity/block1/fb1/lfo/kaleidoscopeSliceRate") gui->fb1Geo1Lfo2[9] = value;
-        else if (address == "/gravity/block1/fb1/lfo/huePowmapAmp") gui->fb1Color1Lfo1[0] = value;
-        else if (address == "/gravity/block1/fb1/lfo/huePowmapRate") gui->fb1Color1Lfo1[1] = value;
-        else if (address == "/gravity/block1/fb1/lfo/saturationPowmapAmp") gui->fb1Color1Lfo1[2] = value;
-        else if (address == "/gravity/block1/fb1/lfo/saturationPowmapRate") gui->fb1Color1Lfo1[3] = value;
-        else if (address == "/gravity/block1/fb1/lfo/brightPowmapAmp") gui->fb1Color1Lfo1[4] = value;
-        else if (address == "/gravity/block1/fb1/lfo/brightPowmapRate") gui->fb1Color1Lfo1[5] = value;
-
-        // /gravity/block2/input/lfo (16 parameters)
-        else if (address == "/gravity/block2/input/lfo/xDisplaceAmp") gui->block2InputAdjustLfo[0] = value;
-        else if (address == "/gravity/block2/input/lfo/xDisplaceRate") gui->block2InputAdjustLfo[1] = value;
-        else if (address == "/gravity/block2/input/lfo/yDisplaceAmp") gui->block2InputAdjustLfo[2] = value;
-        else if (address == "/gravity/block2/input/lfo/yDisplaceRate") gui->block2InputAdjustLfo[3] = value;
-        else if (address == "/gravity/block2/input/lfo/zDisplaceAmp") gui->block2InputAdjustLfo[4] = value;
-        else if (address == "/gravity/block2/input/lfo/zDisplaceRate") gui->block2InputAdjustLfo[5] = value;
-        else if (address == "/gravity/block2/input/lfo/rotateAmp") gui->block2InputAdjustLfo[6] = value;
-        else if (address == "/gravity/block2/input/lfo/rotateRate") gui->block2InputAdjustLfo[7] = value;
-        else if (address == "/gravity/block2/input/lfo/hueOffsetAmp") gui->block2InputAdjustLfo[8] = value;
-        else if (address == "/gravity/block2/input/lfo/hueOffsetRate") gui->block2InputAdjustLfo[9] = value;
-        else if (address == "/gravity/block2/input/lfo/saturationOffsetAmp") gui->block2InputAdjustLfo[10] = value;
-        else if (address == "/gravity/block2/input/lfo/saturationOffsetRate") gui->block2InputAdjustLfo[11] = value;
-        else if (address == "/gravity/block2/input/lfo/brightOffsetAmp") gui->block2InputAdjustLfo[12] = value;
-        else if (address == "/gravity/block2/input/lfo/brightOffsetRate") gui->block2InputAdjustLfo[13] = value;
-        else if (address == "/gravity/block2/input/lfo/kaleidoscopeSliceAmp") gui->block2InputAdjustLfo[14] = value;
-        else if (address == "/gravity/block2/input/lfo/kaleidoscopeSliceRate") gui->block2InputAdjustLfo[15] = value;
-
-        // /gravity/block2/fb2/lfo (30 parameters)
-        else if (address == "/gravity/block2/fb2/lfo/mixAmountAmp") gui->fb2MixAndKeyLfo[0] = value;
-        else if (address == "/gravity/block2/fb2/lfo/mixAmountRate") gui->fb2MixAndKeyLfo[1] = value;
-        else if (address == "/gravity/block2/fb2/lfo/keyThresholdAmp") gui->fb2MixAndKeyLfo[2] = value;
-        else if (address == "/gravity/block2/fb2/lfo/keyThresholdRate") gui->fb2MixAndKeyLfo[3] = value;
-        else if (address == "/gravity/block2/fb2/lfo/keySoftAmp") gui->fb2MixAndKeyLfo[4] = value;
-        else if (address == "/gravity/block2/fb2/lfo/keySoftRate") gui->fb2MixAndKeyLfo[5] = value;
-        else if (address == "/gravity/block2/fb2/lfo/xDisplaceAmp") gui->fb2Geo1Lfo1[0] = value;
-        else if (address == "/gravity/block2/fb2/lfo/xDisplaceRate") gui->fb2Geo1Lfo1[1] = value;
-        else if (address == "/gravity/block2/fb2/lfo/yDisplaceAmp") gui->fb2Geo1Lfo1[2] = value;
-        else if (address == "/gravity/block2/fb2/lfo/yDisplaceRate") gui->fb2Geo1Lfo1[3] = value;
-        else if (address == "/gravity/block2/fb2/lfo/zDisplaceAmp") gui->fb2Geo1Lfo1[4] = value;
-        else if (address == "/gravity/block2/fb2/lfo/zDisplaceRate") gui->fb2Geo1Lfo1[5] = value;
-        else if (address == "/gravity/block2/fb2/lfo/rotateAmp") gui->fb2Geo1Lfo1[6] = value;
-        else if (address == "/gravity/block2/fb2/lfo/rotateRate") gui->fb2Geo1Lfo1[7] = value;
-        else if (address == "/gravity/block2/fb2/lfo/xStretchAmp") gui->fb2Geo1Lfo2[0] = value;
-        else if (address == "/gravity/block2/fb2/lfo/xStretchRate") gui->fb2Geo1Lfo2[1] = value;
-        else if (address == "/gravity/block2/fb2/lfo/yStretchAmp") gui->fb2Geo1Lfo2[2] = value;
-        else if (address == "/gravity/block2/fb2/lfo/yStretchRate") gui->fb2Geo1Lfo2[3] = value;
-        else if (address == "/gravity/block2/fb2/lfo/xShearAmp") gui->fb2Geo1Lfo2[4] = value;
-        else if (address == "/gravity/block2/fb2/lfo/xShearRate") gui->fb2Geo1Lfo2[5] = value;
-        else if (address == "/gravity/block2/fb2/lfo/yShearAmp") gui->fb2Geo1Lfo2[6] = value;
-        else if (address == "/gravity/block2/fb2/lfo/yShearRate") gui->fb2Geo1Lfo2[7] = value;
-        else if (address == "/gravity/block2/fb2/lfo/kaleidoscopeSliceAmp") gui->fb2Geo1Lfo2[8] = value;
-        else if (address == "/gravity/block2/fb2/lfo/kaleidoscopeSliceRate") gui->fb2Geo1Lfo2[9] = value;
-        else if (address == "/gravity/block2/fb2/lfo/huePowmapAmp") gui->fb2Color1Lfo1[0] = value;
-        else if (address == "/gravity/block2/fb2/lfo/huePowmapRate") gui->fb2Color1Lfo1[1] = value;
-        else if (address == "/gravity/block2/fb2/lfo/saturationPowmapAmp") gui->fb2Color1Lfo1[2] = value;
-        else if (address == "/gravity/block2/fb2/lfo/saturationPowmapRate") gui->fb2Color1Lfo1[3] = value;
-        else if (address == "/gravity/block2/fb2/lfo/brightPowmapAmp") gui->fb2Color1Lfo1[4] = value;
-        else if (address == "/gravity/block2/fb2/lfo/brightPowmapRate") gui->fb2Color1Lfo1[5] = value;
-
-        // /gravity/block3/lfo/b1 colorize bands 1-2 (12 parameters)
-        else if (address == "/gravity/block3/lfo/b1/hueBand1Amp") gui->block1ColorizeLfo1[0] = value;
-        else if (address == "/gravity/block3/lfo/b1/saturationBand1Amp") gui->block1ColorizeLfo1[1] = value;
-        else if (address == "/gravity/block3/lfo/b1/brightBand1Amp") gui->block1ColorizeLfo1[2] = value;
-        else if (address == "/gravity/block3/lfo/b1/hueBand1Rate") gui->block1ColorizeLfo1[3] = value;
-        else if (address == "/gravity/block3/lfo/b1/saturationBand1Rate") gui->block1ColorizeLfo1[4] = value;
-        else if (address == "/gravity/block3/lfo/b1/brightBand1Rate") gui->block1ColorizeLfo1[5] = value;
-        else if (address == "/gravity/block3/lfo/b1/hueBand2Amp") gui->block1ColorizeLfo1[6] = value;
-        else if (address == "/gravity/block3/lfo/b1/saturationBand2Amp") gui->block1ColorizeLfo1[7] = value;
-        else if (address == "/gravity/block3/lfo/b1/brightBand2Amp") gui->block1ColorizeLfo1[8] = value;
-        else if (address == "/gravity/block3/lfo/b1/hueBand2Rate") gui->block1ColorizeLfo1[9] = value;
-        else if (address == "/gravity/block3/lfo/b1/saturationBand2Rate") gui->block1ColorizeLfo1[10] = value;
-        else if (address == "/gravity/block3/lfo/b1/brightBand2Rate") gui->block1ColorizeLfo1[11] = value;
-
-        // /gravity/block3/lfo/b1 colorize bands 3-4 (12 parameters)
-        else if (address == "/gravity/block3/lfo/b1/hueBand3Amp") gui->block1ColorizeLfo2[0] = value;
-        else if (address == "/gravity/block3/lfo/b1/saturationBand3Amp") gui->block1ColorizeLfo2[1] = value;
-        else if (address == "/gravity/block3/lfo/b1/brightBand3Amp") gui->block1ColorizeLfo2[2] = value;
-        else if (address == "/gravity/block3/lfo/b1/hueBand3Rate") gui->block1ColorizeLfo2[3] = value;
-        else if (address == "/gravity/block3/lfo/b1/saturationBand3Rate") gui->block1ColorizeLfo2[4] = value;
-        else if (address == "/gravity/block3/lfo/b1/brightBand3Rate") gui->block1ColorizeLfo2[5] = value;
-        else if (address == "/gravity/block3/lfo/b1/hueBand4Amp") gui->block1ColorizeLfo2[6] = value;
-        else if (address == "/gravity/block3/lfo/b1/saturationBand4Amp") gui->block1ColorizeLfo2[7] = value;
-        else if (address == "/gravity/block3/lfo/b1/brightBand4Amp") gui->block1ColorizeLfo2[8] = value;
-        else if (address == "/gravity/block3/lfo/b1/hueBand4Rate") gui->block1ColorizeLfo2[9] = value;
-        else if (address == "/gravity/block3/lfo/b1/saturationBand4Rate") gui->block1ColorizeLfo2[10] = value;
-        else if (address == "/gravity/block3/lfo/b1/brightBand4Rate") gui->block1ColorizeLfo2[11] = value;
-
-        // /gravity/block3/lfo/b1 colorize band 5 (6 parameters)
-        else if (address == "/gravity/block3/lfo/b1/hueBand5Amp") gui->block1ColorizeLfo3[0] = value;
-        else if (address == "/gravity/block3/lfo/b1/saturationBand5Amp") gui->block1ColorizeLfo3[1] = value;
-        else if (address == "/gravity/block3/lfo/b1/brightBand5Amp") gui->block1ColorizeLfo3[2] = value;
-        else if (address == "/gravity/block3/lfo/b1/hueBand5Rate") gui->block1ColorizeLfo3[3] = value;
-        else if (address == "/gravity/block3/lfo/b1/saturationBand5Rate") gui->block1ColorizeLfo3[4] = value;
-        else if (address == "/gravity/block3/lfo/b1/brightBand5Rate") gui->block1ColorizeLfo3[5] = value;
-
-        // /gravity/block3/lfo/b1 geo displace/rotate (8 parameters)
-        else if (address == "/gravity/block3/lfo/b1/xDisplaceAmp") gui->block1Geo1Lfo1[0] = value;
-        else if (address == "/gravity/block3/lfo/b1/xDisplaceRate") gui->block1Geo1Lfo1[1] = value;
-        else if (address == "/gravity/block3/lfo/b1/yDisplaceAmp") gui->block1Geo1Lfo1[2] = value;
-        else if (address == "/gravity/block3/lfo/b1/yDisplaceRate") gui->block1Geo1Lfo1[3] = value;
-        else if (address == "/gravity/block3/lfo/b1/zDisplaceAmp") gui->block1Geo1Lfo1[4] = value;
-        else if (address == "/gravity/block3/lfo/b1/zDisplaceRate") gui->block1Geo1Lfo1[5] = value;
-        else if (address == "/gravity/block3/lfo/b1/rotateAmp") gui->block1Geo1Lfo1[6] = value;
-        else if (address == "/gravity/block3/lfo/b1/rotateRate") gui->block1Geo1Lfo1[7] = value;
-
-        // /gravity/block3/lfo/b1 geo stretch/shear/kaleid (10 parameters)
-        else if (address == "/gravity/block3/lfo/b1/xStretchAmp") gui->block1Geo1Lfo2[0] = value;
-        else if (address == "/gravity/block3/lfo/b1/xStretchRate") gui->block1Geo1Lfo2[1] = value;
-        else if (address == "/gravity/block3/lfo/b1/yStretchAmp") gui->block1Geo1Lfo2[2] = value;
-        else if (address == "/gravity/block3/lfo/b1/yStretchRate") gui->block1Geo1Lfo2[3] = value;
-        else if (address == "/gravity/block3/lfo/b1/xShearAmp") gui->block1Geo1Lfo2[4] = value;
-        else if (address == "/gravity/block3/lfo/b1/xShearRate") gui->block1Geo1Lfo2[5] = value;
-        else if (address == "/gravity/block3/lfo/b1/yShearAmp") gui->block1Geo1Lfo2[6] = value;
-        else if (address == "/gravity/block3/lfo/b1/yShearRate") gui->block1Geo1Lfo2[7] = value;
-        else if (address == "/gravity/block3/lfo/b1/kaleidoscopeSliceAmp") gui->block1Geo1Lfo2[8] = value;
-        else if (address == "/gravity/block3/lfo/b1/kaleidoscopeSliceRate") gui->block1Geo1Lfo2[9] = value;
-
-        // /gravity/block3/lfo/b2 colorize bands 1-2 (12 parameters)
-        else if (address == "/gravity/block3/lfo/b2/hueBand1Amp") gui->block2ColorizeLfo1[0] = value;
-        else if (address == "/gravity/block3/lfo/b2/saturationBand1Amp") gui->block2ColorizeLfo1[1] = value;
-        else if (address == "/gravity/block3/lfo/b2/brightBand1Amp") gui->block2ColorizeLfo1[2] = value;
-        else if (address == "/gravity/block3/lfo/b2/hueBand1Rate") gui->block2ColorizeLfo1[3] = value;
-        else if (address == "/gravity/block3/lfo/b2/saturationBand1Rate") gui->block2ColorizeLfo1[4] = value;
-        else if (address == "/gravity/block3/lfo/b2/brightBand1Rate") gui->block2ColorizeLfo1[5] = value;
-        else if (address == "/gravity/block3/lfo/b2/hueBand2Amp") gui->block2ColorizeLfo1[6] = value;
-        else if (address == "/gravity/block3/lfo/b2/saturationBand2Amp") gui->block2ColorizeLfo1[7] = value;
-        else if (address == "/gravity/block3/lfo/b2/brightBand2Amp") gui->block2ColorizeLfo1[8] = value;
-        else if (address == "/gravity/block3/lfo/b2/hueBand2Rate") gui->block2ColorizeLfo1[9] = value;
-        else if (address == "/gravity/block3/lfo/b2/saturationBand2Rate") gui->block2ColorizeLfo1[10] = value;
-        else if (address == "/gravity/block3/lfo/b2/brightBand2Rate") gui->block2ColorizeLfo1[11] = value;
-
-        // /gravity/block3/lfo/b2 colorize bands 3-4 (12 parameters)
-        else if (address == "/gravity/block3/lfo/b2/hueBand3Amp") gui->block2ColorizeLfo2[0] = value;
-        else if (address == "/gravity/block3/lfo/b2/saturationBand3Amp") gui->block2ColorizeLfo2[1] = value;
-        else if (address == "/gravity/block3/lfo/b2/brightBand3Amp") gui->block2ColorizeLfo2[2] = value;
-        else if (address == "/gravity/block3/lfo/b2/hueBand3Rate") gui->block2ColorizeLfo2[3] = value;
-        else if (address == "/gravity/block3/lfo/b2/saturationBand3Rate") gui->block2ColorizeLfo2[4] = value;
-        else if (address == "/gravity/block3/lfo/b2/brightBand3Rate") gui->block2ColorizeLfo2[5] = value;
-        else if (address == "/gravity/block3/lfo/b2/hueBand4Amp") gui->block2ColorizeLfo2[6] = value;
-        else if (address == "/gravity/block3/lfo/b2/saturationBand4Amp") gui->block2ColorizeLfo2[7] = value;
-        else if (address == "/gravity/block3/lfo/b2/brightBand4Amp") gui->block2ColorizeLfo2[8] = value;
-        else if (address == "/gravity/block3/lfo/b2/hueBand4Rate") gui->block2ColorizeLfo2[9] = value;
-        else if (address == "/gravity/block3/lfo/b2/saturationBand4Rate") gui->block2ColorizeLfo2[10] = value;
-        else if (address == "/gravity/block3/lfo/b2/brightBand4Rate") gui->block2ColorizeLfo2[11] = value;
-
-        // /gravity/block3/lfo/b2 colorize band 5 (6 parameters)
-        else if (address == "/gravity/block3/lfo/b2/hueBand5Amp") gui->block2ColorizeLfo3[0] = value;
-        else if (address == "/gravity/block3/lfo/b2/saturationBand5Amp") gui->block2ColorizeLfo3[1] = value;
-        else if (address == "/gravity/block3/lfo/b2/brightBand5Amp") gui->block2ColorizeLfo3[2] = value;
-        else if (address == "/gravity/block3/lfo/b2/hueBand5Rate") gui->block2ColorizeLfo3[3] = value;
-        else if (address == "/gravity/block3/lfo/b2/saturationBand5Rate") gui->block2ColorizeLfo3[4] = value;
-        else if (address == "/gravity/block3/lfo/b2/brightBand5Rate") gui->block2ColorizeLfo3[5] = value;
-
-        // /gravity/block3/lfo/b2 geo displace/rotate (8 parameters)
-        else if (address == "/gravity/block3/lfo/b2/xDisplaceAmp") gui->block2Geo1Lfo1[0] = value;
-        else if (address == "/gravity/block3/lfo/b2/xDisplaceRate") gui->block2Geo1Lfo1[1] = value;
-        else if (address == "/gravity/block3/lfo/b2/yDisplaceAmp") gui->block2Geo1Lfo1[2] = value;
-        else if (address == "/gravity/block3/lfo/b2/yDisplaceRate") gui->block2Geo1Lfo1[3] = value;
-        else if (address == "/gravity/block3/lfo/b2/zDisplaceAmp") gui->block2Geo1Lfo1[4] = value;
-        else if (address == "/gravity/block3/lfo/b2/zDisplaceRate") gui->block2Geo1Lfo1[5] = value;
-        else if (address == "/gravity/block3/lfo/b2/rotateAmp") gui->block2Geo1Lfo1[6] = value;
-        else if (address == "/gravity/block3/lfo/b2/rotateRate") gui->block2Geo1Lfo1[7] = value;
-
-        // /gravity/block3/lfo/b2 geo stretch/shear/kaleid (10 parameters)
-        else if (address == "/gravity/block3/lfo/b2/xStretchAmp") gui->block2Geo1Lfo2[0] = value;
-        else if (address == "/gravity/block3/lfo/b2/xStretchRate") gui->block2Geo1Lfo2[1] = value;
-        else if (address == "/gravity/block3/lfo/b2/yStretchAmp") gui->block2Geo1Lfo2[2] = value;
-        else if (address == "/gravity/block3/lfo/b2/yStretchRate") gui->block2Geo1Lfo2[3] = value;
-        else if (address == "/gravity/block3/lfo/b2/xShearAmp") gui->block2Geo1Lfo2[4] = value;
-        else if (address == "/gravity/block3/lfo/b2/xShearRate") gui->block2Geo1Lfo2[5] = value;
-        else if (address == "/gravity/block3/lfo/b2/yShearAmp") gui->block2Geo1Lfo2[6] = value;
-        else if (address == "/gravity/block3/lfo/b2/yShearRate") gui->block2Geo1Lfo2[7] = value;
-        else if (address == "/gravity/block3/lfo/b2/kaleidoscopeSliceAmp") gui->block2Geo1Lfo2[8] = value;
-        else if (address == "/gravity/block3/lfo/b2/kaleidoscopeSliceRate") gui->block2Geo1Lfo2[9] = value;
-
-        // /gravity/block3/lfo/final (6 parameters)
-        else if (address == "/gravity/block3/lfo/final/mixAmountAmp") gui->finalMixAndKeyLfo[0] = value;
-        else if (address == "/gravity/block3/lfo/final/mixAmountRate") gui->finalMixAndKeyLfo[1] = value;
-        else if (address == "/gravity/block3/lfo/final/keyThresholdAmp") gui->finalMixAndKeyLfo[2] = value;
-        else if (address == "/gravity/block3/lfo/final/keyThresholdRate") gui->finalMixAndKeyLfo[3] = value;
-        else if (address == "/gravity/block3/lfo/final/keySoftAmp") gui->finalMixAndKeyLfo[4] = value;
-        else if (address == "/gravity/block3/lfo/final/keySoftRate") gui->finalMixAndKeyLfo[5] = value;
-
-        // /gravity/block3/lfo/matrixMix1 (12 parameters)
-        else if (address == "/gravity/block3/lfo/matrixMix/b1RedToB2RedAmp") gui->matrixMixLfo1[0] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1RedToB2GreenAmp") gui->matrixMixLfo1[1] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1RedToB2BlueAmp") gui->matrixMixLfo1[2] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1RedToB2RedRate") gui->matrixMixLfo1[3] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1RedToB2GreenRate") gui->matrixMixLfo1[4] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1RedToB2BlueRate") gui->matrixMixLfo1[5] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1GreenToB2RedAmp") gui->matrixMixLfo1[6] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1GreenToB2GreenAmp") gui->matrixMixLfo1[7] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1GreenToB2BlueAmp") gui->matrixMixLfo1[8] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1GreenToB2RedRate") gui->matrixMixLfo1[9] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1GreenToB2GreenRate") gui->matrixMixLfo1[10] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1GreenToB2BlueRate") gui->matrixMixLfo1[11] = value;
-
-        // /gravity/block3/lfo/matrixMix2 (6 parameters)
-        else if (address == "/gravity/block3/lfo/matrixMix/b1BlueToB2RedAmp") gui->matrixMixLfo2[0] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1BlueToB2GreenAmp") gui->matrixMixLfo2[1] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1BlueToB2BlueAmp") gui->matrixMixLfo2[2] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1BlueToB2RedRate") gui->matrixMixLfo2[3] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1BlueToB2GreenRate") gui->matrixMixLfo2[4] = value;
-        else if (address == "/gravity/block3/lfo/matrixMix/b1BlueToB2BlueRate") gui->matrixMixLfo2[5] = value;
-        
-        // Framebuffer Clear Buttons (Triggers)
-        else if (address == "/gravity/block1/fb1/clear") {
-            gui->fb1FramebufferClearSwitch = 1;
-        }
-        else if (address == "/gravity/block2/fb2/clear") {
-            gui->fb2FramebufferClearSwitch = 1;
-        }
-        
-        // ============== PRESET CONTROL ==============
-        else if (address == "/gravity/preset/load") {
-            int presetNum = m.getArgAsInt(0);
-            if (presetNum >= 0 && presetNum < 64) {
-                gui->loadStateSelectSwitch = presetNum;
-                gui->loadALL = true;
-                ofLogNotice("OSC") << "Loading preset: " << presetNum;
-            }
-        }
-        else if (address == "/gravity/preset/save") {
-            int presetNum = m.getArgAsInt(0);
-            if (presetNum >= 0 && presetNum < 64) {
-                gui->saveStateSelectSwitch = presetNum;
-                gui->saveALL = true;
-                ofLogNotice("OSC") << "Saving preset: " << presetNum;
-            }
-        }
-        
-        // ============== SEND ALL VALUES ==============
-        else if (address == "/gravity/sendAll") {
-            ofLogNotice("OSC") << "Received sendAll trigger";
-            sendAllOscParameters();
-        }
-        
-        // ============== RESET TRIGGERS ==============
-        // These trigger reset functions - NOT included in sendAllOscParameters
-        
-        // Global resets
-        else if (address == "/gravity/resetAll") {
-            gui->resetAll();
-            ofLogNotice("OSC") << "Reset all parameters";
-        }
-        
-        // Block-level resets
-        else if (address == "/gravity/block1/resetAll") {
-            gui->block1ResetAll();
-            ofLogNotice("OSC") << "Reset Block 1";
-        }
-        else if (address == "/gravity/block1/resetInputs") {
-            gui->block1InputResetAll();
-            ofLogNotice("OSC") << "Reset Block 1 inputs";
-        }
-        else if (address == "/gravity/block1/fb1/resetAll") {
-            gui->fb1ResetAll();
-            ofLogNotice("OSC") << "Reset FB1";
-        }
-        else if (address == "/gravity/block2/resetAll") {
-            gui->block2ResetAll();
-            ofLogNotice("OSC") << "Reset Block 2";
-        }
-        else if (address == "/gravity/block2/resetInputs") {
-            gui->block2InputResetAll();
-            ofLogNotice("OSC") << "Reset Block 2 inputs";
-        }
-        else if (address == "/gravity/block2/fb2/resetAll") {
-            gui->fb2ResetAll();
-            ofLogNotice("OSC") << "Reset FB2";
-        }
-        else if (address == "/gravity/block3/resetAll") {
-            gui->block3ResetAll();
-            ofLogNotice("OSC") << "Reset Block 3";
-        }
-        
-        // Individual section resets - Block 1
-        else if (address == "/gravity/block1/ch1/reset") {
-            gui->ch1AdjustReset = 1;
-        }
-        else if (address == "/gravity/block1/ch1/lfo/reset") {
-            gui->ch1AdjustLfoReset = 1;
-        }
-        else if (address == "/gravity/block1/ch2/resetMixAndKey") {
-            gui->ch2MixAndKeyReset = 1;
-        }
-        else if (address == "/gravity/block1/ch2/reset") {
-            gui->ch2AdjustReset = 1;
-        }
-        else if (address == "/gravity/block1/ch2/lfo/resetMixAndKey") {
-            gui->ch2MixAndKeyLfoReset = 1;
-        }
-        else if (address == "/gravity/block1/ch2/lfo/reset") {
-            gui->ch2AdjustLfoReset = 1;
-        }
-        else if (address == "/gravity/block1/fb1/resetMixAndKey") {
-            gui->fb1MixAndKeyReset = 1;
-        }
-        else if (address == "/gravity/block1/fb1/resetGeo") {
-            gui->fb1Geo1Reset = 1;
-        }
-        else if (address == "/gravity/block1/fb1/resetColor") {
-            gui->fb1Color1Reset = 1;
-        }
-        else if (address == "/gravity/block1/fb1/resetFilters") {
-            gui->fb1FiltersReset = 1;
-        }
-        else if (address == "/gravity/block1/fb1/lfo/resetMixAndKey") {
-            gui->fb1MixAndKeyLfoReset = 1;
-        }
-        else if (address == "/gravity/block1/fb1/lfo/resetGeo1") {
-            gui->fb1Geo1Lfo1Reset = 1;
-        }
-        else if (address == "/gravity/block1/fb1/lfo/resetGeo2") {
-            gui->fb1Geo1Lfo2Reset = 1;
-        }
-        else if (address == "/gravity/block1/fb1/lfo/resetColor") {
-            gui->fb1Color1Lfo1Reset = 1;
-        }
-        
-        // Individual section resets - Block 2
-        else if (address == "/gravity/block2/input/reset") {
-            gui->block2InputAdjustReset = 1;
-        }
-        else if (address == "/gravity/block2/input/lfo/reset") {
-            gui->block2InputAdjustLfoReset = 1;
-        }
-        else if (address == "/gravity/block2/fb2/resetMixAndKey") {
-            gui->fb2MixAndKeyReset = 1;
-        }
-        else if (address == "/gravity/block2/fb2/resetGeo") {
-            gui->fb2Geo1Reset = 1;
-        }
-        else if (address == "/gravity/block2/fb2/resetColor") {
-            gui->fb2Color1Reset = 1;
-        }
-        else if (address == "/gravity/block2/fb2/resetFilters") {
-            gui->fb2FiltersReset = 1;
-        }
-        else if (address == "/gravity/block2/fb2/lfo/resetMixAndKey") {
-            gui->fb2MixAndKeyLfoReset = 1;
-        }
-        else if (address == "/gravity/block2/fb2/lfo/resetGeo1") {
-            gui->fb2Geo1Lfo1Reset = 1;
-        }
-        else if (address == "/gravity/block2/fb2/lfo/resetGeo2") {
-            gui->fb2Geo1Lfo2Reset = 1;
-        }
-        else if (address == "/gravity/block2/fb2/lfo/resetColor") {
-            gui->fb2Color1Lfo1Reset = 1;
-        }
-        
-        // Individual section resets - Block 3
-        else if (address == "/gravity/block3/b1/resetGeo") {
-            gui->block1GeoReset = 1;
-        }
-        else if (address == "/gravity/block3/b1/resetColorize") {
-            gui->block1ColorizeReset = 1;
-        }
-        else if (address == "/gravity/block3/b1/resetFilters") {
-            gui->block1FiltersReset = 1;
-        }
-        else if (address == "/gravity/block3/b1/lfo/resetGeo1") {
-            gui->block1Geo1Lfo1Reset = 1;
-        }
-        else if (address == "/gravity/block3/b1/lfo/resetGeo2") {
-            gui->block1Geo1Lfo2Reset = 1;
-        }
-        else if (address == "/gravity/block3/b1/lfo/resetColorize1") {
-            gui->block1ColorizeLfo1Reset = 1;
-        }
-        else if (address == "/gravity/block3/b1/lfo/resetColorize2") {
-            gui->block1ColorizeLfo2Reset = 1;
-        }
-        else if (address == "/gravity/block3/b1/lfo/resetColorize3") {
-            gui->block1ColorizeLfo3Reset = 1;
-        }
-        else if (address == "/gravity/block3/b2/resetGeo") {
-            gui->block2GeoReset = 1;
-        }
-        else if (address == "/gravity/block3/b2/resetColorize") {
-            gui->block2ColorizeReset = 1;
-        }
-        else if (address == "/gravity/block3/b2/resetFilters") {
-            gui->block2FiltersReset = 1;
-        }
-        else if (address == "/gravity/block3/b2/lfo/resetGeo1") {
-            gui->block2Geo1Lfo1Reset = 1;
-        }
-        else if (address == "/gravity/block3/b2/lfo/resetGeo2") {
-            gui->block2Geo1Lfo2Reset = 1;
-        }
-        else if (address == "/gravity/block3/b2/lfo/resetColorize1") {
-            gui->block2ColorizeLfo1Reset = 1;
-        }
-        else if (address == "/gravity/block3/b2/lfo/resetColorize2") {
-            gui->block2ColorizeLfo2Reset = 1;
-        }
-        else if (address == "/gravity/block3/b2/lfo/resetColorize3") {
-            gui->block2ColorizeLfo3Reset = 1;
-        }
-        else if (address == "/gravity/block3/matrixMix/reset") {
-            gui->matrixMixReset = 1;
-        }
-        else if (address == "/gravity/block3/matrixMix/lfo/reset1") {
-            gui->matrixMixLfo1Reset = 1;
-        }
-        else if (address == "/gravity/block3/matrixMix/lfo/reset2") {
-            gui->matrixMixLfo2Reset = 1;
-        }
-        else if (address == "/gravity/block3/final/resetMixAndKey") {
-            gui->finalMixAndKeyReset = 1;
-        }
-        else if (address == "/gravity/block3/final/lfo/reset") {
-            gui->finalMixAndKeyLfoReset = 1;
-        }
-        
-        // Macro data resets
-        else if (address == "/gravity/macro/reset") {
-            gui->macroDataReset = 1;
-        }
-        else if (address == "/gravity/macro/resetAssignments") {
-            gui->macroDataResetAssignments = 1;
-        }
-        
-        // Send feedback
+        // Try each handler in sequence - stop when one handles the message
+        if (processOscBlock1(address, value, m)) continue;
+        if (processOscBlock2(address, value, m)) continue;
+        if (processOscBlock3(address, value, m)) continue;
+        if (processOscDiscreteParams(address, m)) continue;
+        if (processOscBooleanParams(address, m)) continue;
+        if (processOscLfoParamsFb(address, value)) continue;
+        if (processOscLfoParamsBlock3B1(address, value)) continue;
+        if (processOscLfoParamsBlock3B2AndMatrix(address, value)) continue;
+        if (processOscResetCommands(address)) continue;
     }
+}
+
+//--------------------------------------------------------------
+// OSC PROCESS HELPER FUNCTIONS - Split to avoid MSVC compiler limits
+//--------------------------------------------------------------
+bool ofApp::processOscBlock1(const string& address, float value, const ofxOscMessage& m) {
+    // BLOCK 1 - Channel 1 Adjust (15 parameters)
+    if (address == "/gravity/block1/ch1/xDisplace") gui->ch1Adjust[0] = value;
+    else if (address == "/gravity/block1/ch1/yDisplace") gui->ch1Adjust[1] = value;
+    else if (address == "/gravity/block1/ch1/zDisplace") gui->ch1Adjust[2] = value;
+    else if (address == "/gravity/block1/ch1/rotate") gui->ch1Adjust[3] = value;
+    else if (address == "/gravity/block1/ch1/hueOffset") gui->ch1Adjust[4] = value;
+    else if (address == "/gravity/block1/ch1/saturationOffset") gui->ch1Adjust[5] = value;
+    else if (address == "/gravity/block1/ch1/brightOffset") gui->ch1Adjust[6] = value;
+    else if (address == "/gravity/block1/ch1/posterize") gui->ch1Adjust[7] = value;
+    else if (address == "/gravity/block1/ch1/kaleidoscopeAmount") gui->ch1Adjust[8] = value;
+    else if (address == "/gravity/block1/ch1/kaleidoscopeSlice") gui->ch1Adjust[9] = value;
+    else if (address == "/gravity/block1/ch1/blurAmount") gui->ch1Adjust[10] = value;
+    else if (address == "/gravity/block1/ch1/blurRadius") gui->ch1Adjust[11] = value;
+    else if (address == "/gravity/block1/ch1/sharpenAmount") gui->ch1Adjust[12] = value;
+    else if (address == "/gravity/block1/ch1/sharpenRadius") gui->ch1Adjust[13] = value;
+    else if (address == "/gravity/block1/ch1/filtersBoost") gui->ch1Adjust[14] = value;
+    
+    // BLOCK 1 - Channel 1 Adjust LFO (16 parameters)
+    else if (address == "/gravity/block1/ch1/lfo/xDisplaceAmp") gui->ch1AdjustLfo[0] = value;
+    else if (address == "/gravity/block1/ch1/lfo/xDisplaceRate") gui->ch1AdjustLfo[1] = value;
+    else if (address == "/gravity/block1/ch1/lfo/yDisplaceAmp") gui->ch1AdjustLfo[2] = value;
+    else if (address == "/gravity/block1/ch1/lfo/yDisplaceRate") gui->ch1AdjustLfo[3] = value;
+    else if (address == "/gravity/block1/ch1/lfo/zDisplaceAmp") gui->ch1AdjustLfo[4] = value;
+    else if (address == "/gravity/block1/ch1/lfo/zDisplaceRate") gui->ch1AdjustLfo[5] = value;
+    else if (address == "/gravity/block1/ch1/lfo/rotateAmp") gui->ch1AdjustLfo[6] = value;
+    else if (address == "/gravity/block1/ch1/lfo/rotateRate") gui->ch1AdjustLfo[7] = value;
+    else if (address == "/gravity/block1/ch1/lfo/kaleidoscopeSliceAmp") gui->ch1AdjustLfo[14] = value;
+    else if (address == "/gravity/block1/ch1/lfo/kaleidoscopeSliceRate") gui->ch1AdjustLfo[15] = value;
+    else if (address == "/gravity/block1/ch1/lfo/hueOffsetAmp") gui->ch1AdjustLfo[8] = value;
+    else if (address == "/gravity/block1/ch1/lfo/hueOffsetRate") gui->ch1AdjustLfo[9] = value;
+    else if (address == "/gravity/block1/ch1/lfo/saturationOffsetAmp") gui->ch1AdjustLfo[10] = value;
+    else if (address == "/gravity/block1/ch1/lfo/saturationOffsetRate") gui->ch1AdjustLfo[11] = value;
+    else if (address == "/gravity/block1/ch1/lfo/brightOffsetAmp") gui->ch1AdjustLfo[12] = value;
+    else if (address == "/gravity/block1/ch1/lfo/brightOffsetRate") gui->ch1AdjustLfo[13] = value;
+    
+    // BLOCK 1 - Channel 2 Mix and Key (7 parameters)
+    else if (address == "/gravity/block1/ch2/mixAmount") gui->ch2MixAndKey[0] = value;
+    else if (address == "/gravity/block1/ch2/keyThreshold") gui->ch2MixAndKey[4] = value;
+    else if (address == "/gravity/block1/ch2/keySoft") gui->ch2MixAndKey[5] = value;
+    else if (address == "/gravity/block1/ch2/keyBlue") gui->ch2MixAndKey[3] = value;
+    else if (address == "/gravity/block1/ch2/keyRed") gui->ch2MixAndKey[1] = value;
+    else if (address == "/gravity/block1/ch2/keyGreen") gui->ch2MixAndKey[2] = value;
+    
+    // BLOCK 1 - Channel 2 Mix and Key LFO (6 parameters)
+    else if (address == "/gravity/block1/ch2/lfo/mixAmountAmp") gui->ch2MixAndKeyLfo[0] = value;
+    else if (address == "/gravity/block1/ch2/lfo/mixAmountRate") gui->ch2MixAndKeyLfo[1] = value;
+    else if (address == "/gravity/block1/ch2/lfo/keyThresholdAmp") gui->ch2MixAndKeyLfo[2] = value;
+    else if (address == "/gravity/block1/ch2/lfo/keyThresholdRate") gui->ch2MixAndKeyLfo[3] = value;
+    else if (address == "/gravity/block1/ch2/lfo/keySoftAmp") gui->ch2MixAndKeyLfo[4] = value;
+    else if (address == "/gravity/block1/ch2/lfo/keySoftRate") gui->ch2MixAndKeyLfo[5] = value;
+    
+    // BLOCK 1 - Channel 2 Adjust (15 parameters)
+    else if (address == "/gravity/block1/ch2/xDisplace") gui->ch2Adjust[0] = value;
+    else if (address == "/gravity/block1/ch2/yDisplace") gui->ch2Adjust[1] = value;
+    else if (address == "/gravity/block1/ch2/zDisplace") gui->ch2Adjust[2] = value;
+    else if (address == "/gravity/block1/ch2/rotate") gui->ch2Adjust[3] = value;
+    else if (address == "/gravity/block1/ch2/hueOffset") gui->ch2Adjust[4] = value;
+    else if (address == "/gravity/block1/ch2/saturationOffset") gui->ch2Adjust[5] = value;
+    else if (address == "/gravity/block1/ch2/brightOffset") gui->ch2Adjust[6] = value;
+    else if (address == "/gravity/block1/ch2/posterize") gui->ch2Adjust[7] = value;
+    else if (address == "/gravity/block1/ch2/kaleidoscopeAmount") gui->ch2Adjust[8] = value;
+    else if (address == "/gravity/block1/ch2/kaleidoscopeSlice") gui->ch2Adjust[9] = value;
+    else if (address == "/gravity/block1/ch2/blurAmount") gui->ch2Adjust[10] = value;
+    else if (address == "/gravity/block1/ch2/blurRadius") gui->ch2Adjust[11] = value;
+    else if (address == "/gravity/block1/ch2/sharpenAmount") gui->ch2Adjust[12] = value;
+    else if (address == "/gravity/block1/ch2/sharpenRadius") gui->ch2Adjust[13] = value;
+    else if (address == "/gravity/block1/ch2/filtersBoost") gui->ch2Adjust[14] = value;
+    
+    // BLOCK 1 - Channel 2 Adjust LFO (16 parameters)
+    else if (address == "/gravity/block1/ch2/lfo/xDisplaceAmp") gui->ch2AdjustLfo[0] = value;
+    else if (address == "/gravity/block1/ch2/lfo/xDisplaceRate") gui->ch2AdjustLfo[1] = value;
+    else if (address == "/gravity/block1/ch2/lfo/yDisplaceAmp") gui->ch2AdjustLfo[2] = value;
+    else if (address == "/gravity/block1/ch2/lfo/yDisplaceRate") gui->ch2AdjustLfo[3] = value;
+    else if (address == "/gravity/block1/ch2/lfo/zDisplaceAmp") gui->ch2AdjustLfo[4] = value;
+    else if (address == "/gravity/block1/ch2/lfo/zDisplaceRate") gui->ch2AdjustLfo[5] = value;
+    else if (address == "/gravity/block1/ch2/lfo/rotateAmp") gui->ch2AdjustLfo[6] = value;
+    else if (address == "/gravity/block1/ch2/lfo/rotateRate") gui->ch2AdjustLfo[7] = value;
+    else if (address == "/gravity/block1/ch2/lfo/kaleidoscopeSliceAmp") gui->ch2AdjustLfo[14] = value;
+    else if (address == "/gravity/block1/ch2/lfo/kaleidoscopeSliceRate") gui->ch2AdjustLfo[15] = value;
+    else if (address == "/gravity/block1/ch2/lfo/hueOffsetAmp") gui->ch2AdjustLfo[8] = value;
+    else if (address == "/gravity/block1/ch2/lfo/hueOffsetRate") gui->ch2AdjustLfo[9] = value;
+    else if (address == "/gravity/block1/ch2/lfo/saturationOffsetAmp") gui->ch2AdjustLfo[10] = value;
+    else if (address == "/gravity/block1/ch2/lfo/saturationOffsetRate") gui->ch2AdjustLfo[11] = value;
+    else if (address == "/gravity/block1/ch2/lfo/brightOffsetAmp") gui->ch2AdjustLfo[12] = value;
+    else if (address == "/gravity/block1/ch2/lfo/brightOffsetRate") gui->ch2AdjustLfo[13] = value;
+    
+    // BLOCK 1 - FB1 Mix and Key (6 parameters)
+    else if (address == "/gravity/block1/fb1/mixAmount") gui->fb1MixAndKey[0] = value;
+    else if (address == "/gravity/block1/fb1/keyThreshold") gui->fb1MixAndKey[4] = value;
+    else if (address == "/gravity/block1/fb1/keySoft") gui->fb1MixAndKey[5] = value;
+    else if (address == "/gravity/block1/fb1/keyBlue") gui->fb1MixAndKey[3] = value;
+    else if (address == "/gravity/block1/fb1/keyRed") gui->fb1MixAndKey[1] = value;
+    else if (address == "/gravity/block1/fb1/keyGreen") gui->fb1MixAndKey[2] = value;
+    
+    // BLOCK 1 - FB1 Geometry (10 parameters)
+    else if (address == "/gravity/block1/fb1/xDisplace") gui->fb1Geo1[0] = value;
+    else if (address == "/gravity/block1/fb1/yDisplace") gui->fb1Geo1[1] = value;
+    else if (address == "/gravity/block1/fb1/zDisplace") gui->fb1Geo1[2] = value;
+    else if (address == "/gravity/block1/fb1/rotate") gui->fb1Geo1[3] = value;
+    else if (address == "/gravity/block1/fb1/xStretch") gui->fb1Geo1[4] = value;
+    else if (address == "/gravity/block1/fb1/yStretch") gui->fb1Geo1[5] = value;
+    else if (address == "/gravity/block1/fb1/xShear") gui->fb1Geo1[6] = value;
+    else if (address == "/gravity/block1/fb1/yShear") gui->fb1Geo1[7] = value;
+    else if (address == "/gravity/block1/fb1/kaleidoscopeAmount") gui->fb1Geo1[8] = value;
+    else if (address == "/gravity/block1/fb1/kaleidoscopeSlice") gui->fb1Geo1[9] = value;
+    
+    // BLOCK 1 - FB1 Color (11 parameters)
+    else if (address == "/gravity/block1/fb1/hueOffset") gui->fb1Color1[0] = value;
+    else if (address == "/gravity/block1/fb1/saturationOffset") gui->fb1Color1[1] = value;
+    else if (address == "/gravity/block1/fb1/brightOffset") gui->fb1Color1[2] = value;
+    else if (address == "/gravity/block1/fb1/hueMultiply") gui->fb1Color1[3] = value;
+    else if (address == "/gravity/block1/fb1/saturationMultiply") gui->fb1Color1[4] = value;
+    else if (address == "/gravity/block1/fb1/brightMultiply") gui->fb1Color1[5] = value;
+    else if (address == "/gravity/block1/fb1/huePowmap") gui->fb1Color1[6] = value;
+    else if (address == "/gravity/block1/fb1/saturationPowmap") gui->fb1Color1[7] = value;
+    else if (address == "/gravity/block1/fb1/brightPowmap") gui->fb1Color1[8] = value;
+    else if (address == "/gravity/block1/fb1/hueShaper") gui->fb1Color1[9] = value;
+    else if (address == "/gravity/block1/fb1/posterize") gui->fb1Color1[10] = value;
+    
+    // BLOCK 1 - FB1 Filters (9 parameters)
+    else if (address == "/gravity/block1/fb1/blurAmount") gui->fb1Filters[0] = value;
+    else if (address == "/gravity/block1/fb1/blurRadius") gui->fb1Filters[1] = value;
+    else if (address == "/gravity/block1/fb1/sharpenAmount") gui->fb1Filters[2] = value;
+    else if (address == "/gravity/block1/fb1/sharpenRadius") gui->fb1Filters[3] = value;
+    else if (address == "/gravity/block1/fb1/temp1Amount") gui->fb1Filters[4] = value;
+    else if (address == "/gravity/block1/fb1/temp1q") gui->fb1Filters[5] = value;
+    else if (address == "/gravity/block1/fb1/temp2Amount") gui->fb1Filters[6] = value;
+    else if (address == "/gravity/block1/fb1/temp2q") gui->fb1Filters[7] = value;
+    else if (address == "/gravity/block1/fb1/filtersBoost") gui->fb1Filters[8] = value;
+    
+    else return false;
+    return true;
+}
+
+//--------------------------------------------------------------
+bool ofApp::processOscBlock2(const string& address, float value, const ofxOscMessage& m) {
+    // BLOCK 2 - Input Adjust (15 parameters)
+    if (address == "/gravity/block2/input/xDisplace") gui->block2InputAdjust[0] = value;
+    else if (address == "/gravity/block2/input/yDisplace") gui->block2InputAdjust[1] = value;
+    else if (address == "/gravity/block2/input/zDisplace") gui->block2InputAdjust[2] = value;
+    else if (address == "/gravity/block2/input/rotate") gui->block2InputAdjust[3] = value;
+    else if (address == "/gravity/block2/input/hueOffset") gui->block2InputAdjust[4] = value;
+    else if (address == "/gravity/block2/input/saturationOffset") gui->block2InputAdjust[5] = value;
+    else if (address == "/gravity/block2/input/brightOffset") gui->block2InputAdjust[6] = value;
+    else if (address == "/gravity/block2/input/posterize") gui->block2InputAdjust[7] = value;
+    else if (address == "/gravity/block2/input/kaleidoscopeAmount") gui->block2InputAdjust[8] = value;
+    else if (address == "/gravity/block2/input/kaleidoscopeSlice") gui->block2InputAdjust[9] = value;
+    else if (address == "/gravity/block2/input/blurAmount") gui->block2InputAdjust[10] = value;
+    else if (address == "/gravity/block2/input/blurRadius") gui->block2InputAdjust[11] = value;
+    else if (address == "/gravity/block2/input/sharpenAmount") gui->block2InputAdjust[12] = value;
+    else if (address == "/gravity/block2/input/sharpenRadius") gui->block2InputAdjust[13] = value;
+    else if (address == "/gravity/block2/input/filtersBoost") gui->block2InputAdjust[14] = value;
+    
+    // BLOCK 2 - FB2 Mix and Key (6 parameters)
+    else if (address == "/gravity/block2/fb2/mixAmount") gui->fb2MixAndKey[0] = value;
+    else if (address == "/gravity/block2/fb2/keyThreshold") gui->fb2MixAndKey[4] = value;
+    else if (address == "/gravity/block2/fb2/keySoft") gui->fb2MixAndKey[5] = value;
+    else if (address == "/gravity/block2/fb2/keyBlue") gui->fb2MixAndKey[3] = value;
+    else if (address == "/gravity/block2/fb2/keyRed") gui->fb2MixAndKey[1] = value;
+    else if (address == "/gravity/block2/fb2/keyGreen") gui->fb2MixAndKey[2] = value;
+    
+    // BLOCK 2 - FB2 Geometry (10 parameters)
+    else if (address == "/gravity/block2/fb2/xDisplace") gui->fb2Geo1[0] = value;
+    else if (address == "/gravity/block2/fb2/yDisplace") gui->fb2Geo1[1] = value;
+    else if (address == "/gravity/block2/fb2/zDisplace") gui->fb2Geo1[2] = value;
+    else if (address == "/gravity/block2/fb2/rotate") gui->fb2Geo1[3] = value;
+    else if (address == "/gravity/block2/fb2/xStretch") gui->fb2Geo1[4] = value;
+    else if (address == "/gravity/block2/fb2/yStretch") gui->fb2Geo1[5] = value;
+    else if (address == "/gravity/block2/fb2/xShear") gui->fb2Geo1[6] = value;
+    else if (address == "/gravity/block2/fb2/yShear") gui->fb2Geo1[7] = value;
+    else if (address == "/gravity/block2/fb2/kaleidoscopeAmount") gui->fb2Geo1[8] = value;
+    else if (address == "/gravity/block2/fb2/kaleidoscopeSlice") gui->fb2Geo1[9] = value;
+    
+    // BLOCK 2 - FB2 Color (11 parameters)
+    else if (address == "/gravity/block2/fb2/hueOffset") gui->fb2Color1[0] = value;
+    else if (address == "/gravity/block2/fb2/saturationOffset") gui->fb2Color1[1] = value;
+    else if (address == "/gravity/block2/fb2/brightOffset") gui->fb2Color1[2] = value;
+    else if (address == "/gravity/block2/fb2/hueMultiply") gui->fb2Color1[3] = value;
+    else if (address == "/gravity/block2/fb2/saturationMultiply") gui->fb2Color1[4] = value;
+    else if (address == "/gravity/block2/fb2/brightMultiply") gui->fb2Color1[5] = value;
+    else if (address == "/gravity/block2/fb2/huePowmap") gui->fb2Color1[6] = value;
+    else if (address == "/gravity/block2/fb2/saturationPowmap") gui->fb2Color1[7] = value;
+    else if (address == "/gravity/block2/fb2/brightPowmap") gui->fb2Color1[8] = value;
+    else if (address == "/gravity/block2/fb2/hueShaper") gui->fb2Color1[9] = value;
+    else if (address == "/gravity/block2/fb2/posterize") gui->fb2Color1[10] = value;
+    
+    // BLOCK 2 - FB2 Filters (9 parameters)
+    else if (address == "/gravity/block2/fb2/blurAmount") gui->fb2Filters[0] = value;
+    else if (address == "/gravity/block2/fb2/blurRadius") gui->fb2Filters[1] = value;
+    else if (address == "/gravity/block2/fb2/sharpenAmount") gui->fb2Filters[2] = value;
+    else if (address == "/gravity/block2/fb2/sharpenRadius") gui->fb2Filters[3] = value;
+    else if (address == "/gravity/block2/fb2/temp1Amount") gui->fb2Filters[4] = value;
+    else if (address == "/gravity/block2/fb2/temp1q") gui->fb2Filters[5] = value;
+    else if (address == "/gravity/block2/fb2/temp2Amount") gui->fb2Filters[6] = value;
+    else if (address == "/gravity/block2/fb2/temp2q") gui->fb2Filters[7] = value;
+    else if (address == "/gravity/block2/fb2/filtersBoost") gui->fb2Filters[8] = value;
+    
+    else return false;
+    return true;
+}
+
+//--------------------------------------------------------------
+bool ofApp::processOscBlock3(const string& address, float value, const ofxOscMessage& m) {
+    // BLOCK 3 - Block 1 Geometry (10 parameters)
+    if (address == "/gravity/block3/b1/xDisplace") gui->block1Geo[0] = value;
+    else if (address == "/gravity/block3/b1/yDisplace") gui->block1Geo[1] = value;
+    else if (address == "/gravity/block3/b1/zDisplace") gui->block1Geo[2] = value;
+    else if (address == "/gravity/block3/b1/rotate") gui->block1Geo[3] = value;
+    else if (address == "/gravity/block3/b1/xStretch") gui->block1Geo[4] = value;
+    else if (address == "/gravity/block3/b1/yStretch") gui->block1Geo[5] = value;
+    else if (address == "/gravity/block3/b1/xShear") gui->block1Geo[6] = value;
+    else if (address == "/gravity/block3/b1/yShear") gui->block1Geo[7] = value;
+    else if (address == "/gravity/block3/b1/kaleidoscopeAmount") gui->block1Geo[8] = value;
+    else if (address == "/gravity/block3/b1/kaleidoscopeSlice") gui->block1Geo[9] = value;
+    
+    // BLOCK 3 - Block 1 Colorize (15 parameters)
+    else if (address == "/gravity/block3/b1/colorize/hueBand1") gui->block1Colorize[0] = value;
+    else if (address == "/gravity/block3/b1/colorize/saturationBand1") gui->block1Colorize[1] = value;
+    else if (address == "/gravity/block3/b1/colorize/brightBand1") gui->block1Colorize[2] = value;
+    else if (address == "/gravity/block3/b1/colorize/hueBand2") gui->block1Colorize[3] = value;
+    else if (address == "/gravity/block3/b1/colorize/saturationBand2") gui->block1Colorize[4] = value;
+    else if (address == "/gravity/block3/b1/colorize/brightBand2") gui->block1Colorize[5] = value;
+    else if (address == "/gravity/block3/b1/colorize/hueBand3") gui->block1Colorize[6] = value;
+    else if (address == "/gravity/block3/b1/colorize/saturationBand3") gui->block1Colorize[7] = value;
+    else if (address == "/gravity/block3/b1/colorize/brightBand3") gui->block1Colorize[8] = value;
+    else if (address == "/gravity/block3/b1/colorize/hueBand4") gui->block1Colorize[9] = value;
+    else if (address == "/gravity/block3/b1/colorize/saturationBand4") gui->block1Colorize[10] = value;
+    else if (address == "/gravity/block3/b1/colorize/brightBand4") gui->block1Colorize[11] = value;
+    else if (address == "/gravity/block3/b1/colorize/hueBand5") gui->block1Colorize[12] = value;
+    else if (address == "/gravity/block3/b1/colorize/saturationBand5") gui->block1Colorize[13] = value;
+    else if (address == "/gravity/block3/b1/colorize/brightBand5") gui->block1Colorize[14] = value;
+    
+    // BLOCK 3 - Block 1 Filters (5 parameters)
+    else if (address == "/gravity/block3/b1/blurAmount") gui->block1Filters[0] = value;
+    else if (address == "/gravity/block3/b1/blurRadius") gui->block1Filters[1] = value;
+    else if (address == "/gravity/block3/b1/sharpenAmount") gui->block1Filters[2] = value;
+    else if (address == "/gravity/block3/b1/sharpenRadius") gui->block1Filters[3] = value;
+    else if (address == "/gravity/block3/b1/filtersBoost") gui->block1Filters[4] = value;
+    
+    // BLOCK 3 - Block 2 Geometry (10 parameters)
+    else if (address == "/gravity/block3/b2/xDisplace") gui->block2Geo[0] = value;
+    else if (address == "/gravity/block3/b2/yDisplace") gui->block2Geo[1] = value;
+    else if (address == "/gravity/block3/b2/zDisplace") gui->block2Geo[2] = value;
+    else if (address == "/gravity/block3/b2/rotate") gui->block2Geo[3] = value;
+    else if (address == "/gravity/block3/b2/xStretch") gui->block2Geo[4] = value;
+    else if (address == "/gravity/block3/b2/yStretch") gui->block2Geo[5] = value;
+    else if (address == "/gravity/block3/b2/xShear") gui->block2Geo[6] = value;
+    else if (address == "/gravity/block3/b2/yShear") gui->block2Geo[7] = value;
+    else if (address == "/gravity/block3/b2/kaleidoscopeAmount") gui->block2Geo[8] = value;
+    else if (address == "/gravity/block3/b2/kaleidoscopeSlice") gui->block2Geo[9] = value;
+    
+    // BLOCK 3 - Block 2 Colorize (15 parameters)
+    else if (address == "/gravity/block3/b2/colorize/hueBand1") gui->block2Colorize[0] = value;
+    else if (address == "/gravity/block3/b2/colorize/saturationBand1") gui->block2Colorize[1] = value;
+    else if (address == "/gravity/block3/b2/colorize/brightBand1") gui->block2Colorize[2] = value;
+    else if (address == "/gravity/block3/b2/colorize/hueBand2") gui->block2Colorize[3] = value;
+    else if (address == "/gravity/block3/b2/colorize/saturationBand2") gui->block2Colorize[4] = value;
+    else if (address == "/gravity/block3/b2/colorize/brightBand2") gui->block2Colorize[5] = value;
+    else if (address == "/gravity/block3/b2/colorize/hueBand3") gui->block2Colorize[6] = value;
+    else if (address == "/gravity/block3/b2/colorize/saturationBand3") gui->block2Colorize[7] = value;
+    else if (address == "/gravity/block3/b2/colorize/brightBand3") gui->block2Colorize[8] = value;
+    else if (address == "/gravity/block3/b2/colorize/hueBand4") gui->block2Colorize[9] = value;
+    else if (address == "/gravity/block3/b2/colorize/saturationBand4") gui->block2Colorize[10] = value;
+    else if (address == "/gravity/block3/b2/colorize/brightBand4") gui->block2Colorize[11] = value;
+    else if (address == "/gravity/block3/b2/colorize/hueBand5") gui->block2Colorize[12] = value;
+    else if (address == "/gravity/block3/b2/colorize/saturationBand5") gui->block2Colorize[13] = value;
+    else if (address == "/gravity/block3/b2/colorize/brightBand5") gui->block2Colorize[14] = value;
+    
+    // BLOCK 3 - Block 2 Filters (5 parameters)
+    else if (address == "/gravity/block3/b2/blurAmount") gui->block2Filters[0] = value;
+    else if (address == "/gravity/block3/b2/blurRadius") gui->block2Filters[1] = value;
+    else if (address == "/gravity/block3/b2/sharpenAmount") gui->block2Filters[2] = value;
+    else if (address == "/gravity/block3/b2/sharpenRadius") gui->block2Filters[3] = value;
+    else if (address == "/gravity/block3/b2/filtersBoost") gui->block2Filters[4] = value;
+    
+    // BLOCK 3 - Matrix Mix (9 parameters)
+    else if (address == "/gravity/block3/matrixMix/b1RedToB2Red") gui->matrixMix[0] = value;
+    else if (address == "/gravity/block3/matrixMix/b1RedToB2Green") gui->matrixMix[1] = value;
+    else if (address == "/gravity/block3/matrixMix/b1RedToB2Blue") gui->matrixMix[2] = value;
+    else if (address == "/gravity/block3/matrixMix/b1GreenToB2Red") gui->matrixMix[3] = value;
+    else if (address == "/gravity/block3/matrixMix/b1GreenToB2Green") gui->matrixMix[4] = value;
+    else if (address == "/gravity/block3/matrixMix/b1GreenToB2Blue") gui->matrixMix[5] = value;
+    else if (address == "/gravity/block3/matrixMix/b1BlueToB2Red") gui->matrixMix[6] = value;
+    else if (address == "/gravity/block3/matrixMix/b1GreenToB2Blue") gui->matrixMix[7] = value;
+    else if (address == "/gravity/block3/matrixMix/b1BlueToB2Blue") gui->matrixMix[8] = value;
+    
+    // BLOCK 3 - Final Mix and Key (6 parameters)
+    else if (address == "/gravity/block3/final/mixAmount") gui->finalMixAndKey[0] = value;
+    else if (address == "/gravity/block3/final/keyThreshold") gui->finalMixAndKey[4] = value;
+    else if (address == "/gravity/block3/final/keySoft") gui->finalMixAndKey[5] = value;
+    else if (address == "/gravity/block3/final/keyInvert") gui->finalMixAndKey[3] = value;
+    else if (address == "/gravity/block3/final/keyRed") gui->finalMixAndKey[1] = value;
+    else if (address == "/gravity/block3/final/keyGreen") gui->finalMixAndKey[2] = value;
+    
+    else return false;
+    return true;
+}
+
+//--------------------------------------------------------------
+bool ofApp::processOscDiscreteParams(const string& address, const ofxOscMessage& m) {
+    // BLOCK 1 - Ch1 Discrete Parameters
+    if (address == "/gravity/block1/ch1/inputSelect") gui->ch1InputSelect = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch1/geoOverflow") gui->ch1GeoOverflow = m.getArgAsInt(0);
+    
+    // BLOCK 1 - Ch2 Mix and Key Discrete Parameters
+    else if (address == "/gravity/block1/ch2/inputSelect") gui->ch2InputSelect = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch2/keyOrder") gui->ch2KeyOrder = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch2/mixType") gui->ch2MixType = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch2/mixOverflow") gui->ch2MixOverflow = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch2/keyMode") gui->ch2KeyMode = m.getArgAsInt(0);
+    
+    // BLOCK 1 - Ch2 Adjust Discrete Parameters
+    else if (address == "/gravity/block1/ch2/geoOverflow") gui->ch2GeoOverflow = m.getArgAsInt(0);
+    
+    // BLOCK 1 - FB1 Mix and Key Discrete Parameters
+    else if (address == "/gravity/block1/fb1/keyOrder") gui->fb1KeyOrder = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/fb1/mixType") gui->fb1MixType = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/fb1/mixOverflow") gui->fb1MixOverflow = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/fb1/keyMode") gui->fb1KeyMode = m.getArgAsInt(0);
+    
+    // BLOCK 1 - FB1 Geometry Discrete Parameters
+    else if (address == "/gravity/block1/fb1/geoOverflow") gui->fb1GeoOverflow = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/fb1/delayTime") gui->fb1DelayTime = m.getArgAsInt(0);
+    
+    // BLOCK 2 - Input Adjust Discrete Parameters
+    else if (address == "/gravity/block2/input/inputSelect") gui->block2InputSelect = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/input/geoOverflow") gui->block2InputGeoOverflow = m.getArgAsInt(0);
+    
+    // BLOCK 2 - FB2 Mix and Key Discrete Parameters
+    else if (address == "/gravity/block2/fb2/keyOrder") gui->fb2KeyOrder = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/fb2/mixType") gui->fb2MixType = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/fb2/mixOverflow") gui->fb2MixOverflow = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/fb2/keyMode") gui->fb2KeyMode = m.getArgAsInt(0);
+    
+    // BLOCK 2 - FB2 Geometry Discrete Parameters
+    else if (address == "/gravity/block2/fb2/geoOverflow") gui->fb2GeoOverflow = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/fb2/delayTime") gui->fb2DelayTime = m.getArgAsInt(0);
+    
+    // BLOCK 3 - Block 1 Geometry Discrete Parameters
+    else if (address == "/gravity/block3/b1/geoOverflow") gui->block1GeoOverflow = m.getArgAsInt(0);
+    else if (address == "/gravity/block3/b1/rotateMode") gui->block1RotateMode = m.getArgAsInt(0);
+    else if (address == "/gravity/block3/b1/colorize/colorspace") gui->block1ColorizeHSB_RGB = m.getArgAsInt(0);
+    
+    // BLOCK 3 - Block 2 Geometry Discrete Parameters
+    else if (address == "/gravity/block3/b2/geoOverflow") gui->block2GeoOverflow = m.getArgAsInt(0);
+    else if (address == "/gravity/block3/b2/rotateMode") gui->block2RotateMode = m.getArgAsInt(0);
+    else if (address == "/gravity/block3/b2/colorize/colorspace") gui->block2ColorizeHSB_RGB = m.getArgAsInt(0);
+    
+    // BLOCK 3 - Matrix Mix Discrete Parameters
+    else if (address == "/gravity/block3/matrixMix/mixType") gui->matrixMixType = m.getArgAsInt(0);
+    else if (address == "/gravity/block3/matrixMix/overflow") gui->matrixMixOverflow = m.getArgAsInt(0);
+    
+    // BLOCK 3 - Final Mix and Key Discrete Parameters
+    else if (address == "/gravity/block3/final/keyOrder") gui->finalKeyOrder = m.getArgAsInt(0);
+    else if (address == "/gravity/block3/final/mixType") gui->finalMixType = m.getArgAsInt(0);
+    else if (address == "/gravity/block3/final/overflow") gui->finalMixOverflow = m.getArgAsInt(0);
+    else if (address == "/gravity/block3/final/keyMode") gui->finalKeyMode = m.getArgAsInt(0);
+    
+    else return false;
+    return true;
+}
+
+//--------------------------------------------------------------
+bool ofApp::processOscBooleanParams(const string& address, const ofxOscMessage& m) {
+    // BLOCK 1 - Ch1 Adjust Boolean Parameters
+    if (address == "/gravity/block1/ch1/hMirror") gui->ch1HMirror = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch1/vMirror") gui->ch1VMirror = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch1/hFlip") gui->ch1HFlip = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch1/vFlip") gui->ch1VFlip = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch1/hueInvert") gui->ch1HueInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch1/saturationInvert") gui->ch1SaturationInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch1/brightInvert") gui->ch1BrightInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch1/rgbInvert") gui->ch1RGBInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch1/solarize") gui->ch1Solarize = m.getArgAsInt(0);
+    
+    // BLOCK 1 - Ch2 Adjust Boolean Parameters
+    else if (address == "/gravity/block1/ch2/hMirror") gui->ch2HMirror = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch2/vMirror") gui->ch2VMirror = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch2/hFlip") gui->ch2HFlip = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch2/vFlip") gui->ch2VFlip = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch2/hueInvert") gui->ch2HueInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch2/saturationInvert") gui->ch2SaturationInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch2/brightInvert") gui->ch2BrightInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch2/rgbInvert") gui->ch2RGBInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/ch2/solarize") gui->ch2Solarize = m.getArgAsInt(0);
+    
+    // BLOCK 1 - FB1 Geometry Boolean Parameters
+    else if (address == "/gravity/block1/fb1/hMirror") gui->fb1HMirror = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/fb1/vMirror") gui->fb1VMirror = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/fb1/hFlip") gui->fb1HFlip = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/fb1/vFlip") gui->fb1VFlip = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/fb1/rotateMode") gui->fb1RotateMode = m.getArgAsInt(0);
+    
+    // BLOCK 1 - FB1 Geometrical Animations
+    else if (address == "/gravity/block1/fb1/hypercube") gui->block1HypercubeSwitch = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/fb1/dancingLine") gui->block1LineSwitch = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/fb1/septagram") gui->block1SevenStarSwitch = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/fb1/lissajousBall") gui->block1LissaBallSwitch = m.getArgAsInt(0);
+    
+    // BLOCK 1 - FB1 Color Boolean Parameters
+    else if (address == "/gravity/block1/fb1/hueInvert") gui->fb1HueInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/fb1/saturationInvert") gui->fb1SaturationInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/fb1/brightInvert") gui->fb1BrightInvert = m.getArgAsInt(0);
+    
+    // BLOCK 2 - Input Adjust Boolean Parameters
+    else if (address == "/gravity/block2/input/hMirror") gui->block2InputHMirror = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/input/vMirror") gui->block2InputVMirror = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/input/hFlip") gui->block2InputHFlip = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/input/vFlip") gui->block2InputVFlip = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/input/hueInvert") gui->block2InputHueInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/input/saturationInvert") gui->block2InputSaturationInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/input/brightInvert") gui->block2InputBrightInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/input/rgbInvert") gui->block2InputRGBInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/input/solarize") gui->block2InputSolarize = m.getArgAsInt(0);
+    
+    // BLOCK 2 - FB2 Geometry Boolean Parameters
+    else if (address == "/gravity/block2/fb2/hMirror") gui->fb2HMirror = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/fb2/vMirror") gui->fb2VMirror = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/fb2/hFlip") gui->fb2HFlip = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/fb2/vFlip") gui->fb2VFlip = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/fb2/rotateMode") gui->fb2RotateMode = m.getArgAsInt(0);
+    
+    // BLOCK 2 - FB2 Geometrical Animations
+    else if (address == "/gravity/block2/fb2/hypercube") gui->block2HypercubeSwitch = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/fb2/dancingLine") gui->block2LineSwitch = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/fb2/septagram") gui->block2SevenStarSwitch = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/fb2/lissajousBall") gui->block2LissaBallSwitch = m.getArgAsInt(0);
+    
+    // BLOCK 2 - FB2 Color Boolean Parameters
+    else if (address == "/gravity/block2/fb2/hueInvert") gui->fb2HueInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/fb2/saturationInvert") gui->fb2SaturationInvert = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/fb2/brightInvert") gui->fb2BrightInvert = m.getArgAsInt(0);
+    
+    // BLOCK 3 - Block 1 Geometry Boolean Parameters
+    else if (address == "/gravity/block3/b1/hMirror") gui->block1HMirror = m.getArgAsInt(0);
+    else if (address == "/gravity/block3/b1/vMirror") gui->block1VMirror = m.getArgAsInt(0);
+    else if (address == "/gravity/block3/b1/hFlip") gui->block1HFlip = m.getArgAsInt(0);
+    else if (address == "/gravity/block3/b1/vFlip") gui->block1VFlip = m.getArgAsInt(0);
+    
+    // BLOCK 3 - Block 2 Geometry Boolean Parameters
+    else if (address == "/gravity/block3/b2/hMirror") gui->block2HMirror = m.getArgAsInt(0);
+    else if (address == "/gravity/block3/b2/vMirror") gui->block2VMirror = m.getArgAsInt(0);
+    else if (address == "/gravity/block3/b2/hFlip") gui->block2HFlip = m.getArgAsInt(0);
+    else if (address == "/gravity/block3/b2/vFlip") gui->block2VFlip = m.getArgAsInt(0);
+    
+    // BLOCK 3 - Color EQ Boolean Parameters
+    else if (address == "/gravity/block3/b1/colorize/active") gui->block1ColorizeSwitch = m.getArgAsInt(0);
+    else if (address == "/gravity/block3/b2/colorize/active") gui->block2ColorizeSwitch = m.getArgAsInt(0);
+    
+    else return false;
+    return true;
+}
+
+//--------------------------------------------------------------
+bool ofApp::processOscLfoParamsFb(const string& address, float value) {
+    // FB1 Mix and Key LFO (6 parameters)
+    if (address == "/gravity/block1/fb1/lfo/mixAmountAmp") gui->fb1MixAndKeyLfo[0] = value;
+    else if (address == "/gravity/block1/fb1/lfo/mixAmountRate") gui->fb1MixAndKeyLfo[1] = value;
+    else if (address == "/gravity/block1/fb1/lfo/keyThresholdAmp") gui->fb1MixAndKeyLfo[2] = value;
+    else if (address == "/gravity/block1/fb1/lfo/keyThresholdRate") gui->fb1MixAndKeyLfo[3] = value;
+    else if (address == "/gravity/block1/fb1/lfo/keySoftAmp") gui->fb1MixAndKeyLfo[4] = value;
+    else if (address == "/gravity/block1/fb1/lfo/keySoftRate") gui->fb1MixAndKeyLfo[5] = value;
+    
+    // FB1 Geometry LFO 1 (8 parameters)
+    else if (address == "/gravity/block1/fb1/lfo/xDisplaceAmp") gui->fb1Geo1Lfo1[0] = value;
+    else if (address == "/gravity/block1/fb1/lfo/xDisplaceRate") gui->fb1Geo1Lfo1[1] = value;
+    else if (address == "/gravity/block1/fb1/lfo/yDisplaceAmp") gui->fb1Geo1Lfo1[2] = value;
+    else if (address == "/gravity/block1/fb1/lfo/yDisplaceRate") gui->fb1Geo1Lfo1[3] = value;
+    else if (address == "/gravity/block1/fb1/lfo/zDisplaceAmp") gui->fb1Geo1Lfo1[4] = value;
+    else if (address == "/gravity/block1/fb1/lfo/zDisplaceRate") gui->fb1Geo1Lfo1[5] = value;
+    else if (address == "/gravity/block1/fb1/lfo/rotateAmp") gui->fb1Geo1Lfo1[6] = value;
+    else if (address == "/gravity/block1/fb1/lfo/rotateRate") gui->fb1Geo1Lfo1[7] = value;
+    
+    // FB1 Geometry LFO 2 (10 parameters)
+    else if (address == "/gravity/block1/fb1/lfo/xStretchAmp") gui->fb1Geo1Lfo2[0] = value;
+    else if (address == "/gravity/block1/fb1/lfo/xStretchRate") gui->fb1Geo1Lfo2[1] = value;
+    else if (address == "/gravity/block1/fb1/lfo/yStretchAmp") gui->fb1Geo1Lfo2[2] = value;
+    else if (address == "/gravity/block1/fb1/lfo/yStretchRate") gui->fb1Geo1Lfo2[3] = value;
+    else if (address == "/gravity/block1/fb1/lfo/xShearAmp") gui->fb1Geo1Lfo2[4] = value;
+    else if (address == "/gravity/block1/fb1/lfo/xShearRate") gui->fb1Geo1Lfo2[5] = value;
+    else if (address == "/gravity/block1/fb1/lfo/yShearAmp") gui->fb1Geo1Lfo2[6] = value;
+    else if (address == "/gravity/block1/fb1/lfo/yShearRate") gui->fb1Geo1Lfo2[7] = value;
+    else if (address == "/gravity/block1/fb1/lfo/kaleidoscopeSliceAmp") gui->fb1Geo1Lfo2[8] = value;
+    else if (address == "/gravity/block1/fb1/lfo/kaleidoscopeSliceRate") gui->fb1Geo1Lfo2[9] = value;
+    
+    // FB1 Color LFO (6 parameters)
+    else if (address == "/gravity/block1/fb1/lfo/huePowmapAmp") gui->fb1Color1Lfo1[0] = value;
+    else if (address == "/gravity/block1/fb1/lfo/huePowmapRate") gui->fb1Color1Lfo1[1] = value;
+    else if (address == "/gravity/block1/fb1/lfo/saturationPowmapAmp") gui->fb1Color1Lfo1[2] = value;
+    else if (address == "/gravity/block1/fb1/lfo/saturationPowmapRate") gui->fb1Color1Lfo1[3] = value;
+    else if (address == "/gravity/block1/fb1/lfo/brightPowmapAmp") gui->fb1Color1Lfo1[4] = value;
+    else if (address == "/gravity/block1/fb1/lfo/brightPowmapRate") gui->fb1Color1Lfo1[5] = value;
+    
+    // FB2 Mix and Key LFO (6 parameters)
+    else if (address == "/gravity/block2/fb2/lfo/mixAmountAmp") gui->fb2MixAndKeyLfo[0] = value;
+    else if (address == "/gravity/block2/fb2/lfo/mixAmountRate") gui->fb2MixAndKeyLfo[1] = value;
+    else if (address == "/gravity/block2/fb2/lfo/keyThresholdAmp") gui->fb2MixAndKeyLfo[2] = value;
+    else if (address == "/gravity/block2/fb2/lfo/keyThresholdRate") gui->fb2MixAndKeyLfo[3] = value;
+    else if (address == "/gravity/block2/fb2/lfo/keySoftAmp") gui->fb2MixAndKeyLfo[4] = value;
+    else if (address == "/gravity/block2/fb2/lfo/keySoftRate") gui->fb2MixAndKeyLfo[5] = value;
+    
+    // FB2 Geometry LFO 1 (8 parameters)
+    else if (address == "/gravity/block2/fb2/lfo/xDisplaceAmp") gui->fb2Geo1Lfo1[0] = value;
+    else if (address == "/gravity/block2/fb2/lfo/xDisplaceRate") gui->fb2Geo1Lfo1[1] = value;
+    else if (address == "/gravity/block2/fb2/lfo/yDisplaceAmp") gui->fb2Geo1Lfo1[2] = value;
+    else if (address == "/gravity/block2/fb2/lfo/yDisplaceRate") gui->fb2Geo1Lfo1[3] = value;
+    else if (address == "/gravity/block2/fb2/lfo/zDisplaceAmp") gui->fb2Geo1Lfo1[4] = value;
+    else if (address == "/gravity/block2/fb2/lfo/zDisplaceRate") gui->fb2Geo1Lfo1[5] = value;
+    else if (address == "/gravity/block2/fb2/lfo/rotateAmp") gui->fb2Geo1Lfo1[6] = value;
+    else if (address == "/gravity/block2/fb2/lfo/rotateRate") gui->fb2Geo1Lfo1[7] = value;
+    
+    // FB2 Geometry LFO 2 (10 parameters)
+    else if (address == "/gravity/block2/fb2/lfo/xStretchAmp") gui->fb2Geo1Lfo2[0] = value;
+    else if (address == "/gravity/block2/fb2/lfo/xStretchRate") gui->fb2Geo1Lfo2[1] = value;
+    else if (address == "/gravity/block2/fb2/lfo/yStretchAmp") gui->fb2Geo1Lfo2[2] = value;
+    else if (address == "/gravity/block2/fb2/lfo/yStretchRate") gui->fb2Geo1Lfo2[3] = value;
+    else if (address == "/gravity/block2/fb2/lfo/xShearAmp") gui->fb2Geo1Lfo2[4] = value;
+    else if (address == "/gravity/block2/fb2/lfo/xShearRate") gui->fb2Geo1Lfo2[5] = value;
+    else if (address == "/gravity/block2/fb2/lfo/yShearAmp") gui->fb2Geo1Lfo2[6] = value;
+    else if (address == "/gravity/block2/fb2/lfo/yShearRate") gui->fb2Geo1Lfo2[7] = value;
+    else if (address == "/gravity/block2/fb2/lfo/kaleidoscopeSliceAmp") gui->fb2Geo1Lfo2[8] = value;
+    else if (address == "/gravity/block2/fb2/lfo/kaleidoscopeSliceRate") gui->fb2Geo1Lfo2[9] = value;
+    
+    // FB2 Color LFO (6 parameters)
+    else if (address == "/gravity/block2/fb2/lfo/huePowmapAmp") gui->fb2Color1Lfo1[0] = value;
+    else if (address == "/gravity/block2/fb2/lfo/huePowmapRate") gui->fb2Color1Lfo1[1] = value;
+    else if (address == "/gravity/block2/fb2/lfo/saturationPowmapAmp") gui->fb2Color1Lfo1[2] = value;
+    else if (address == "/gravity/block2/fb2/lfo/saturationPowmapRate") gui->fb2Color1Lfo1[3] = value;
+    else if (address == "/gravity/block2/fb2/lfo/brightPowmapAmp") gui->fb2Color1Lfo1[4] = value;
+    else if (address == "/gravity/block2/fb2/lfo/brightPowmapRate") gui->fb2Color1Lfo1[5] = value;
+
+    // Block 2 Input Adjust LFO (16 parameters)
+    else if (address == "/gravity/block2/input/lfo/xDisplaceAmp") gui->block2InputAdjustLfo[0] = value;
+    else if (address == "/gravity/block2/input/lfo/xDisplaceRate") gui->block2InputAdjustLfo[1] = value;
+    else if (address == "/gravity/block2/input/lfo/yDisplaceAmp") gui->block2InputAdjustLfo[2] = value;
+    else if (address == "/gravity/block2/input/lfo/yDisplaceRate") gui->block2InputAdjustLfo[3] = value;
+    else if (address == "/gravity/block2/input/lfo/zDisplaceAmp") gui->block2InputAdjustLfo[4] = value;
+    else if (address == "/gravity/block2/input/lfo/zDisplaceRate") gui->block2InputAdjustLfo[5] = value;
+    else if (address == "/gravity/block2/input/lfo/rotateAmp") gui->block2InputAdjustLfo[6] = value;
+    else if (address == "/gravity/block2/input/lfo/rotateRate") gui->block2InputAdjustLfo[7] = value;
+    else if (address == "/gravity/block2/input/lfo/hueOffsetAmp") gui->block2InputAdjustLfo[8] = value;
+    else if (address == "/gravity/block2/input/lfo/hueOffsetRate") gui->block2InputAdjustLfo[9] = value;
+    else if (address == "/gravity/block2/input/lfo/saturationOffsetAmp") gui->block2InputAdjustLfo[10] = value;
+    else if (address == "/gravity/block2/input/lfo/saturationOffsetRate") gui->block2InputAdjustLfo[11] = value;
+    else if (address == "/gravity/block2/input/lfo/brightOffsetAmp") gui->block2InputAdjustLfo[12] = value;
+    else if (address == "/gravity/block2/input/lfo/brightOffsetRate") gui->block2InputAdjustLfo[13] = value;
+    else if (address == "/gravity/block2/input/lfo/kaleidoscopeSliceAmp") gui->block2InputAdjustLfo[14] = value;
+    else if (address == "/gravity/block2/input/lfo/kaleidoscopeSliceRate") gui->block2InputAdjustLfo[15] = value;
+
+    else return false;
+    return true;
+}
+
+//--------------------------------------------------------------
+bool ofApp::processOscLfoParamsBlock3B1(const string& address, float value) {
+    // Block3 B1 Colorize LFO 1 (12 parameters)
+    if (address == "/gravity/block3/lfo/b1/hueBand1Amp") gui->block1ColorizeLfo1[0] = value;
+    else if (address == "/gravity/block3/lfo/b1/saturationBand1Amp") gui->block1ColorizeLfo1[1] = value;
+    else if (address == "/gravity/block3/lfo/b1/brightBand1Amp") gui->block1ColorizeLfo1[2] = value;
+    else if (address == "/gravity/block3/lfo/b1/hueBand1Rate") gui->block1ColorizeLfo1[3] = value;
+    else if (address == "/gravity/block3/lfo/b1/saturationBand1Rate") gui->block1ColorizeLfo1[4] = value;
+    else if (address == "/gravity/block3/lfo/b1/brightBand1Rate") gui->block1ColorizeLfo1[5] = value;
+    else if (address == "/gravity/block3/lfo/b1/hueBand2Amp") gui->block1ColorizeLfo1[6] = value;
+    else if (address == "/gravity/block3/lfo/b1/saturationBand2Amp") gui->block1ColorizeLfo1[7] = value;
+    else if (address == "/gravity/block3/lfo/b1/brightBand2Amp") gui->block1ColorizeLfo1[8] = value;
+    else if (address == "/gravity/block3/lfo/b1/hueBand2Rate") gui->block1ColorizeLfo1[9] = value;
+    else if (address == "/gravity/block3/lfo/b1/saturationBand2Rate") gui->block1ColorizeLfo1[10] = value;
+    else if (address == "/gravity/block3/lfo/b1/brightBand2Rate") gui->block1ColorizeLfo1[11] = value;
+
+    // Block3 B1 Colorize LFO 2 (12 parameters)
+    else if (address == "/gravity/block3/lfo/b1/hueBand3Amp") gui->block1ColorizeLfo2[0] = value;
+    else if (address == "/gravity/block3/lfo/b1/saturationBand3Amp") gui->block1ColorizeLfo2[1] = value;
+    else if (address == "/gravity/block3/lfo/b1/brightBand3Amp") gui->block1ColorizeLfo2[2] = value;
+    else if (address == "/gravity/block3/lfo/b1/hueBand3Rate") gui->block1ColorizeLfo2[3] = value;
+    else if (address == "/gravity/block3/lfo/b1/saturationBand3Rate") gui->block1ColorizeLfo2[4] = value;
+    else if (address == "/gravity/block3/lfo/b1/brightBand3Rate") gui->block1ColorizeLfo2[5] = value;
+    else if (address == "/gravity/block3/lfo/b1/hueBand4Amp") gui->block1ColorizeLfo2[6] = value;
+    else if (address == "/gravity/block3/lfo/b1/saturationBand4Amp") gui->block1ColorizeLfo2[7] = value;
+    else if (address == "/gravity/block3/lfo/b1/brightBand4Amp") gui->block1ColorizeLfo2[8] = value;
+    else if (address == "/gravity/block3/lfo/b1/hueBand4Rate") gui->block1ColorizeLfo2[9] = value;
+    else if (address == "/gravity/block3/lfo/b1/saturationBand4Rate") gui->block1ColorizeLfo2[10] = value;
+    else if (address == "/gravity/block3/lfo/b1/brightBand4Rate") gui->block1ColorizeLfo2[11] = value;
+
+    // Block3 B1 Colorize LFO 3 (6 parameters)
+    else if (address == "/gravity/block3/lfo/b1/hueBand5Amp") gui->block1ColorizeLfo3[0] = value;
+    else if (address == "/gravity/block3/lfo/b1/saturationBand5Amp") gui->block1ColorizeLfo3[1] = value;
+    else if (address == "/gravity/block3/lfo/b1/brightBand5Amp") gui->block1ColorizeLfo3[2] = value;
+    else if (address == "/gravity/block3/lfo/b1/hueBand5Rate") gui->block1ColorizeLfo3[3] = value;
+    else if (address == "/gravity/block3/lfo/b1/saturationBand5Rate") gui->block1ColorizeLfo3[4] = value;
+    else if (address == "/gravity/block3/lfo/b1/brightBand5Rate") gui->block1ColorizeLfo3[5] = value;
+
+    // Block3 B1 Geo LFO 1 (8 parameters)
+    else if (address == "/gravity/block3/lfo/b1/xDisplaceAmp") gui->block1Geo1Lfo1[0] = value;
+    else if (address == "/gravity/block3/lfo/b1/xDisplaceRate") gui->block1Geo1Lfo1[1] = value;
+    else if (address == "/gravity/block3/lfo/b1/yDisplaceAmp") gui->block1Geo1Lfo1[2] = value;
+    else if (address == "/gravity/block3/lfo/b1/yDisplaceRate") gui->block1Geo1Lfo1[3] = value;
+    else if (address == "/gravity/block3/lfo/b1/zDisplaceAmp") gui->block1Geo1Lfo1[4] = value;
+    else if (address == "/gravity/block3/lfo/b1/zDisplaceRate") gui->block1Geo1Lfo1[5] = value;
+    else if (address == "/gravity/block3/lfo/b1/rotateAmp") gui->block1Geo1Lfo1[6] = value;
+    else if (address == "/gravity/block3/lfo/b1/rotateRate") gui->block1Geo1Lfo1[7] = value;
+
+    // Block3 B1 Geo LFO 2 (10 parameters)
+    else if (address == "/gravity/block3/lfo/b1/xStretchAmp") gui->block1Geo1Lfo2[0] = value;
+    else if (address == "/gravity/block3/lfo/b1/xStretchRate") gui->block1Geo1Lfo2[1] = value;
+    else if (address == "/gravity/block3/lfo/b1/yStretchAmp") gui->block1Geo1Lfo2[2] = value;
+    else if (address == "/gravity/block3/lfo/b1/yStretchRate") gui->block1Geo1Lfo2[3] = value;
+    else if (address == "/gravity/block3/lfo/b1/xShearAmp") gui->block1Geo1Lfo2[4] = value;
+    else if (address == "/gravity/block3/lfo/b1/xShearRate") gui->block1Geo1Lfo2[5] = value;
+    else if (address == "/gravity/block3/lfo/b1/yShearAmp") gui->block1Geo1Lfo2[6] = value;
+    else if (address == "/gravity/block3/lfo/b1/yShearRate") gui->block1Geo1Lfo2[7] = value;
+    else if (address == "/gravity/block3/lfo/b1/kaleidoscopeSliceAmp") gui->block1Geo1Lfo2[8] = value;
+    else if (address == "/gravity/block3/lfo/b1/kaleidoscopeSliceRate") gui->block1Geo1Lfo2[9] = value;
+
+    else return false;
+    return true;
+}
+
+//--------------------------------------------------------------
+bool ofApp::processOscLfoParamsBlock3B2AndMatrix(const string& address, float value) {
+    // Block3 B2 Colorize LFO 1 (12 parameters)
+    if (address == "/gravity/block3/lfo/b2/hueBand1Amp") gui->block2ColorizeLfo1[0] = value;
+    else if (address == "/gravity/block3/lfo/b2/saturationBand1Amp") gui->block2ColorizeLfo1[1] = value;
+    else if (address == "/gravity/block3/lfo/b2/brightBand1Amp") gui->block2ColorizeLfo1[2] = value;
+    else if (address == "/gravity/block3/lfo/b2/hueBand1Rate") gui->block2ColorizeLfo1[3] = value;
+    else if (address == "/gravity/block3/lfo/b2/saturationBand1Rate") gui->block2ColorizeLfo1[4] = value;
+    else if (address == "/gravity/block3/lfo/b2/brightBand1Rate") gui->block2ColorizeLfo1[5] = value;
+    else if (address == "/gravity/block3/lfo/b2/hueBand2Amp") gui->block2ColorizeLfo1[6] = value;
+    else if (address == "/gravity/block3/lfo/b2/saturationBand2Amp") gui->block2ColorizeLfo1[7] = value;
+    else if (address == "/gravity/block3/lfo/b2/brightBand2Amp") gui->block2ColorizeLfo1[8] = value;
+    else if (address == "/gravity/block3/lfo/b2/hueBand2Rate") gui->block2ColorizeLfo1[9] = value;
+    else if (address == "/gravity/block3/lfo/b2/saturationBand2Rate") gui->block2ColorizeLfo1[10] = value;
+    else if (address == "/gravity/block3/lfo/b2/brightBand2Rate") gui->block2ColorizeLfo1[11] = value;
+
+    // Block3 B2 Colorize LFO 2 (12 parameters)
+    else if (address == "/gravity/block3/lfo/b2/hueBand3Amp") gui->block2ColorizeLfo2[0] = value;
+    else if (address == "/gravity/block3/lfo/b2/saturationBand3Amp") gui->block2ColorizeLfo2[1] = value;
+    else if (address == "/gravity/block3/lfo/b2/brightBand3Amp") gui->block2ColorizeLfo2[2] = value;
+    else if (address == "/gravity/block3/lfo/b2/hueBand3Rate") gui->block2ColorizeLfo2[3] = value;
+    else if (address == "/gravity/block3/lfo/b2/saturationBand3Rate") gui->block2ColorizeLfo2[4] = value;
+    else if (address == "/gravity/block3/lfo/b2/brightBand3Rate") gui->block2ColorizeLfo2[5] = value;
+    else if (address == "/gravity/block3/lfo/b2/hueBand4Amp") gui->block2ColorizeLfo2[6] = value;
+    else if (address == "/gravity/block3/lfo/b2/saturationBand4Amp") gui->block2ColorizeLfo2[7] = value;
+    else if (address == "/gravity/block3/lfo/b2/brightBand4Amp") gui->block2ColorizeLfo2[8] = value;
+    else if (address == "/gravity/block3/lfo/b2/hueBand4Rate") gui->block2ColorizeLfo2[9] = value;
+    else if (address == "/gravity/block3/lfo/b2/saturationBand4Rate") gui->block2ColorizeLfo2[10] = value;
+    else if (address == "/gravity/block3/lfo/b2/brightBand4Rate") gui->block2ColorizeLfo2[11] = value;
+
+    // Block3 B2 Colorize LFO 3 (6 parameters)
+    else if (address == "/gravity/block3/lfo/b2/hueBand5Amp") gui->block2ColorizeLfo3[0] = value;
+    else if (address == "/gravity/block3/lfo/b2/saturationBand5Amp") gui->block2ColorizeLfo3[1] = value;
+    else if (address == "/gravity/block3/lfo/b2/brightBand5Amp") gui->block2ColorizeLfo3[2] = value;
+    else if (address == "/gravity/block3/lfo/b2/hueBand5Rate") gui->block2ColorizeLfo3[3] = value;
+    else if (address == "/gravity/block3/lfo/b2/saturationBand5Rate") gui->block2ColorizeLfo3[4] = value;
+    else if (address == "/gravity/block3/lfo/b2/brightBand5Rate") gui->block2ColorizeLfo3[5] = value;
+
+    // Block3 B2 Geo LFO 1 (8 parameters)
+    else if (address == "/gravity/block3/lfo/b2/xDisplaceAmp") gui->block2Geo1Lfo1[0] = value;
+    else if (address == "/gravity/block3/lfo/b2/xDisplaceRate") gui->block2Geo1Lfo1[1] = value;
+    else if (address == "/gravity/block3/lfo/b2/yDisplaceAmp") gui->block2Geo1Lfo1[2] = value;
+    else if (address == "/gravity/block3/lfo/b2/yDisplaceRate") gui->block2Geo1Lfo1[3] = value;
+    else if (address == "/gravity/block3/lfo/b2/zDisplaceAmp") gui->block2Geo1Lfo1[4] = value;
+    else if (address == "/gravity/block3/lfo/b2/zDisplaceRate") gui->block2Geo1Lfo1[5] = value;
+    else if (address == "/gravity/block3/lfo/b2/rotateAmp") gui->block2Geo1Lfo1[6] = value;
+    else if (address == "/gravity/block3/lfo/b2/rotateRate") gui->block2Geo1Lfo1[7] = value;
+
+    // Block3 B2 Geo LFO 2 (10 parameters)
+    else if (address == "/gravity/block3/lfo/b2/xStretchAmp") gui->block2Geo1Lfo2[0] = value;
+    else if (address == "/gravity/block3/lfo/b2/xStretchRate") gui->block2Geo1Lfo2[1] = value;
+    else if (address == "/gravity/block3/lfo/b2/yStretchAmp") gui->block2Geo1Lfo2[2] = value;
+    else if (address == "/gravity/block3/lfo/b2/yStretchRate") gui->block2Geo1Lfo2[3] = value;
+    else if (address == "/gravity/block3/lfo/b2/xShearAmp") gui->block2Geo1Lfo2[4] = value;
+    else if (address == "/gravity/block3/lfo/b2/xShearRate") gui->block2Geo1Lfo2[5] = value;
+    else if (address == "/gravity/block3/lfo/b2/yShearAmp") gui->block2Geo1Lfo2[6] = value;
+    else if (address == "/gravity/block3/lfo/b2/yShearRate") gui->block2Geo1Lfo2[7] = value;
+    else if (address == "/gravity/block3/lfo/b2/kaleidoscopeSliceAmp") gui->block2Geo1Lfo2[8] = value;
+    else if (address == "/gravity/block3/lfo/b2/kaleidoscopeSliceRate") gui->block2Geo1Lfo2[9] = value;
+
+    // Final Mix and Key LFO (6 parameters)
+    else if (address == "/gravity/block3/lfo/final/mixAmountAmp") gui->finalMixAndKeyLfo[0] = value;
+    else if (address == "/gravity/block3/lfo/final/mixAmountRate") gui->finalMixAndKeyLfo[1] = value;
+    else if (address == "/gravity/block3/lfo/final/keyThresholdAmp") gui->finalMixAndKeyLfo[2] = value;
+    else if (address == "/gravity/block3/lfo/final/keyThresholdRate") gui->finalMixAndKeyLfo[3] = value;
+    else if (address == "/gravity/block3/lfo/final/keySoftAmp") gui->finalMixAndKeyLfo[4] = value;
+    else if (address == "/gravity/block3/lfo/final/keySoftRate") gui->finalMixAndKeyLfo[5] = value;
+
+    // Matrix Mix LFO 1 (12 parameters)
+    else if (address == "/gravity/block3/lfo/matrixMix/b1RedToB2RedAmp") gui->matrixMixLfo1[0] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1RedToB2GreenAmp") gui->matrixMixLfo1[1] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1RedToB2BlueAmp") gui->matrixMixLfo1[2] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1RedToB2RedRate") gui->matrixMixLfo1[3] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1RedToB2GreenRate") gui->matrixMixLfo1[4] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1RedToB2BlueRate") gui->matrixMixLfo1[5] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1GreenToB2RedAmp") gui->matrixMixLfo1[6] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1GreenToB2GreenAmp") gui->matrixMixLfo1[7] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1GreenToB2BlueAmp") gui->matrixMixLfo1[8] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1GreenToB2RedRate") gui->matrixMixLfo1[9] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1GreenToB2GreenRate") gui->matrixMixLfo1[10] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1GreenToB2BlueRate") gui->matrixMixLfo1[11] = value;
+
+    // Matrix Mix LFO 2 (6 parameters)
+    else if (address == "/gravity/block3/lfo/matrixMix/b1BlueToB2RedAmp") gui->matrixMixLfo2[0] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1BlueToB2GreenAmp") gui->matrixMixLfo2[1] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1BlueToB2BlueAmp") gui->matrixMixLfo2[2] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1BlueToB2RedRate") gui->matrixMixLfo2[3] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1BlueToB2GreenRate") gui->matrixMixLfo2[4] = value;
+    else if (address == "/gravity/block3/lfo/matrixMix/b1BlueToB2BlueRate") gui->matrixMixLfo2[5] = value;
+
+    else return false;
+    return true;
+}
+
+//--------------------------------------------------------------
+bool ofApp::processOscResetCommands(const string& address) {
+    // BLOCK 1 Resets
+    if (address == "/gravity/block1/ch1/resetAdjust") gui->ch1AdjustReset = 1;
+    else if (address == "/gravity/block1/ch1/lfo/resetAdjust") gui->ch1AdjustLfoReset = 1;
+    else if (address == "/gravity/block1/ch2/resetAdjust") gui->ch2AdjustReset = 1;
+    else if (address == "/gravity/block1/ch2/lfo/resetAdjust") gui->ch2AdjustLfoReset = 1;
+    else if (address == "/gravity/block1/ch2/resetMixAndKey") gui->ch2MixAndKeyReset = 1;
+    else if (address == "/gravity/block1/ch2/lfo/resetMixAndKey") gui->ch2MixAndKeyLfoReset = 1;
+    else if (address == "/gravity/block1/fb1/resetMixAndKey") gui->fb1MixAndKeyReset = 1;
+    else if (address == "/gravity/block1/fb1/lfo/resetMixAndKey") gui->fb1MixAndKeyLfoReset = 1;
+    else if (address == "/gravity/block1/fb1/resetGeo") gui->fb1Geo1Reset = 1;
+    else if (address == "/gravity/block1/fb1/lfo/resetGeo1") gui->fb1Geo1Lfo1Reset = 1;
+    else if (address == "/gravity/block1/fb1/lfo/resetGeo2") gui->fb1Geo1Lfo2Reset = 1;
+    else if (address == "/gravity/block1/fb1/resetColor") gui->fb1Color1Reset = 1;
+    else if (address == "/gravity/block1/fb1/lfo/resetColor") gui->fb1Color1Lfo1Reset = 1;
+    else if (address == "/gravity/block1/fb1/resetFilters") gui->fb1FiltersReset = 1;
+    
+    // BLOCK 2 Resets
+    else if (address == "/gravity/block2/input/resetAdjust") gui->block2InputAdjustReset = 1;
+    else if (address == "/gravity/block2/input/lfo/resetAdjust") gui->block2InputAdjustLfoReset = 1;
+    else if (address == "/gravity/block2/fb2/resetMixAndKey") gui->fb2MixAndKeyReset = 1;
+    else if (address == "/gravity/block2/fb2/lfo/resetMixAndKey") gui->fb2MixAndKeyLfoReset = 1;
+    else if (address == "/gravity/block2/fb2/resetGeo") gui->fb2Geo1Reset = 1;
+    else if (address == "/gravity/block2/fb2/lfo/resetGeo1") gui->fb2Geo1Lfo1Reset = 1;
+    else if (address == "/gravity/block2/fb2/lfo/resetGeo2") gui->fb2Geo1Lfo2Reset = 1;
+    else if (address == "/gravity/block2/fb2/resetColor") gui->fb2Color1Reset = 1;
+    else if (address == "/gravity/block2/fb2/lfo/resetColor") gui->fb2Color1Lfo1Reset = 1;
+    else if (address == "/gravity/block2/fb2/resetFilters") gui->fb2FiltersReset = 1;
+    
+    // BLOCK 3 Resets
+    else if (address == "/gravity/block3/b1/resetGeo") gui->block1GeoReset = 1;
+    else if (address == "/gravity/block3/b1/resetColorize") gui->block1ColorizeReset = 1;
+    else if (address == "/gravity/block3/b1/resetFilters") gui->block1FiltersReset = 1;
+    else if (address == "/gravity/block3/b1/lfo/resetGeo1") gui->block1Geo1Lfo1Reset = 1;
+    else if (address == "/gravity/block3/b1/lfo/resetGeo2") gui->block1Geo1Lfo2Reset = 1;
+    else if (address == "/gravity/block3/b1/lfo/resetColorize1") gui->block1ColorizeLfo1Reset = 1;
+    else if (address == "/gravity/block3/b1/lfo/resetColorize2") gui->block1ColorizeLfo2Reset = 1;
+    else if (address == "/gravity/block3/b1/lfo/resetColorize3") gui->block1ColorizeLfo3Reset = 1;
+    else if (address == "/gravity/block3/b2/resetGeo") gui->block2GeoReset = 1;
+    else if (address == "/gravity/block3/b2/resetColorize") gui->block2ColorizeReset = 1;
+    else if (address == "/gravity/block3/b2/resetFilters") gui->block2FiltersReset = 1;
+    else if (address == "/gravity/block3/b2/lfo/resetGeo1") gui->block2Geo1Lfo1Reset = 1;
+    else if (address == "/gravity/block3/b2/lfo/resetGeo2") gui->block2Geo1Lfo2Reset = 1;
+    else if (address == "/gravity/block3/b2/lfo/resetColorize1") gui->block2ColorizeLfo1Reset = 1;
+    else if (address == "/gravity/block3/b2/lfo/resetColorize2") gui->block2ColorizeLfo2Reset = 1;
+    else if (address == "/gravity/block3/b2/lfo/resetColorize3") gui->block2ColorizeLfo3Reset = 1;
+    else if (address == "/gravity/block3/matrixMix/reset") gui->matrixMixReset = 1;
+    else if (address == "/gravity/block3/matrixMix/lfo/reset1") gui->matrixMixLfo1Reset = 1;
+    else if (address == "/gravity/block3/matrixMix/lfo/reset2") gui->matrixMixLfo2Reset = 1;
+    else if (address == "/gravity/block3/final/resetMixAndKey") gui->finalMixAndKeyReset = 1;
+    else if (address == "/gravity/block3/final/lfo/reset") gui->finalMixAndKeyLfoReset = 1;
+    
+    // Macro data resets
+    else if (address == "/gravity/macro/reset") gui->macroDataReset = 1;
+    else if (address == "/gravity/macro/resetAssignments") gui->macroDataResetAssignments = 1;
+    
+    // Framebuffer clears
+    else if (address == "/gravity/block1/fb1/clear") gui->fb1FramebufferClearSwitch = 1;
+    else if (address == "/gravity/block2/fb2/clear") gui->fb2FramebufferClearSwitch = 1;
+    
+    // Send all OSC values
+    else if (address == "/gravity/sendAll") gui->sendAllOscValues = 1;
+    
+    // Block-level resets
+    else if (address == "/gravity/resetAll") gui->resetAllSwitch = 1;
+    else if (address == "/gravity/block1/resetAll") gui->block1ResetAllSwitch = 1;
+    else if (address == "/gravity/block1/resetInputs") gui->block1InputResetAllSwitch = 1;
+    else if (address == "/gravity/block1/fb1/resetAll") gui->fb1ResetAllSwitch = 1;
+    else if (address == "/gravity/block2/resetAll") gui->block2ResetAllSwitch = 1;
+    else if (address == "/gravity/block2/resetInput") gui->block2InputResetAllSwitch = 1;
+    else if (address == "/gravity/block2/fb2/resetAll") gui->fb2ResetAllSwitch = 1;
+    else if (address == "/gravity/block3/resetAll") gui->block3ResetAllSwitch = 1;
+    
+    else return false;
+    return true;
 }
 
 //--------------------------------------------------------------
@@ -2742,11 +2652,9 @@ void ofApp::reloadOscSettings() {
 }
 //--------------------------------------------------------------
 //--------------------------------------------------------------
-void ofApp::sendAllOscParameters() {
-    if (!oscEnabled || !gui->oscEnabled) return;
-    
-    ofLogNotice("OSC") << "Sending all OSC parameters (" << 525 << " total)...";
-    
+// OSC SEND HELPER FUNCTIONS - Split to avoid MSVC compiler limits
+//--------------------------------------------------------------
+void ofApp::sendOscBlock1Ch1() {
     sendOscParameter("/gravity/block1/ch1/blurAmount", gui->ch1Adjust[10]);
     sendOscParameter("/gravity/block1/ch1/blurRadius", gui->ch1Adjust[11]);
     sendOscParameter("/gravity/block1/ch1/brightInvert", gui->ch1BrightInvert);
@@ -2789,6 +2697,10 @@ void ofApp::sendAllOscParameters() {
     sendOscParameter("/gravity/block1/ch1/xDisplace", gui->ch1Adjust[0]);
     sendOscParameter("/gravity/block1/ch1/yDisplace", gui->ch1Adjust[1]);
     sendOscParameter("/gravity/block1/ch1/zDisplace", gui->ch1Adjust[2]);
+}
+
+//--------------------------------------------------------------
+void ofApp::sendOscBlock1Ch2() {
     sendOscParameter("/gravity/block1/ch2/blurAmount", gui->ch2Adjust[10]);
     sendOscParameter("/gravity/block1/ch2/blurRadius", gui->ch2Adjust[11]);
     sendOscParameter("/gravity/block1/ch2/brightInvert", gui->ch2BrightInvert);
@@ -2847,6 +2759,10 @@ void ofApp::sendAllOscParameters() {
     sendOscParameter("/gravity/block1/ch2/xDisplace", gui->ch2Adjust[0]);
     sendOscParameter("/gravity/block1/ch2/yDisplace", gui->ch2Adjust[1]);
     sendOscParameter("/gravity/block1/ch2/zDisplace", gui->ch2Adjust[2]);
+}
+
+//--------------------------------------------------------------
+void ofApp::sendOscBlock1Fb1() {
     sendOscParameter("/gravity/block1/fb1/brightOffset", gui->fb1Color1[2]);
     sendOscParameter("/gravity/block1/fb1/blurAmount", gui->fb1Filters[0]);
     sendOscParameter("/gravity/block1/fb1/blurRadius", gui->fb1Filters[1]);
@@ -2927,6 +2843,10 @@ void ofApp::sendAllOscParameters() {
     sendOscParameter("/gravity/block1/fb1/yShear", gui->fb1Geo1[7]);
     sendOscParameter("/gravity/block1/fb1/yStretch", gui->fb1Geo1[5]);
     sendOscParameter("/gravity/block1/fb1/zDisplace", gui->fb1Geo1[2]);
+}
+
+//--------------------------------------------------------------
+void ofApp::sendOscBlock2Fb2() {
     sendOscParameter("/gravity/block2/fb2/blurAmount", gui->fb2Filters[0]);
     sendOscParameter("/gravity/block2/fb2/blurRadius", gui->fb2Filters[1]);
     sendOscParameter("/gravity/block2/fb2/brightOffset", gui->fb2Color1[2]);
@@ -3007,6 +2927,10 @@ void ofApp::sendAllOscParameters() {
     sendOscParameter("/gravity/block2/fb2/yShear", gui->fb2Geo1[7]);
     sendOscParameter("/gravity/block2/fb2/yStretch", gui->fb2Geo1[5]);
     sendOscParameter("/gravity/block2/fb2/zDisplace", gui->fb2Geo1[2]);
+}
+
+//--------------------------------------------------------------
+void ofApp::sendOscBlock2Input() {
     sendOscParameter("/gravity/block2/input/blurRadius", gui->block2InputAdjust[11]);
     sendOscParameter("/gravity/block2/input/brightInvert", gui->block2InputBrightInvert);
     sendOscParameter("/gravity/block2/input/brightOffset", gui->block2InputAdjust[6]);
@@ -3049,6 +2973,10 @@ void ofApp::sendAllOscParameters() {
     sendOscParameter("/gravity/block2/input/xDisplace", gui->block2InputAdjust[0]);
     sendOscParameter("/gravity/block2/input/yDisplace", gui->block2InputAdjust[1]);
     sendOscParameter("/gravity/block2/input/zDisplace", gui->block2InputAdjust[2]);
+}
+
+//--------------------------------------------------------------
+void ofApp::sendOscBlock3B1() {
     sendOscParameter("/gravity/block3/b1/blurAmount", gui->block1Filters[0]);
     sendOscParameter("/gravity/block3/b1/blurRadius", gui->block1Filters[1]);
     sendOscParameter("/gravity/block3/b1/colorize/brightBand1", gui->block1Colorize[2]);
@@ -3134,6 +3062,10 @@ void ofApp::sendAllOscParameters() {
     sendOscParameter("/gravity/block3/b1/yShear", gui->block1Geo[7]);
     sendOscParameter("/gravity/block3/b1/yStretch", gui->block1Geo[5]);
     sendOscParameter("/gravity/block3/b1/zDisplace", gui->block1Geo[2]);
+}
+
+//--------------------------------------------------------------
+void ofApp::sendOscBlock3B2() {
     sendOscParameter("/gravity/block3/b2/blurAmount", gui->block2Filters[0]);
     sendOscParameter("/gravity/block3/b2/blurRadius", gui->block2Filters[1]);
     sendOscParameter("/gravity/block3/b2/colorize/brightBand1", gui->block2Colorize[2]);
@@ -3219,6 +3151,10 @@ void ofApp::sendAllOscParameters() {
     sendOscParameter("/gravity/block3/b2/yShear", gui->block2Geo[7]);
     sendOscParameter("/gravity/block3/b2/yStretch", gui->block2Geo[5]);
     sendOscParameter("/gravity/block3/b2/zDisplace", gui->block2Geo[2]);
+}
+
+//--------------------------------------------------------------
+void ofApp::sendOscBlock3MatrixAndFinal() {
     sendOscParameter("/gravity/block3/final/keyBlue", gui->finalMixAndKey[3]);
     sendOscParameter("/gravity/block3/final/keyGreen", gui->finalMixAndKey[2]);
     sendOscParameter("/gravity/block3/final/keyMode", gui->finalKeyMode);
@@ -3263,6 +3199,24 @@ void ofApp::sendAllOscParameters() {
     sendOscParameter("/gravity/block3/lfo/matrixMix/b1BlueToB2RedAmp", gui->matrixMixLfo2[0]);
     sendOscParameter("/gravity/block3/lfo/matrixMix/b1BlueToB2RedRate", gui->matrixMixLfo2[3]);
     sendOscParameter("/gravity/block3/matrixMix/mixType", gui->matrixMixType);
-    sendOscParameter("/gravity/block3/matrixMix/overflow", gui->matrixMixOverflow);    
+    sendOscParameter("/gravity/block3/matrixMix/overflow", gui->matrixMixOverflow);
+}
+
+//--------------------------------------------------------------
+void ofApp::sendAllOscParameters() {
+    if (!oscEnabled || !gui->oscEnabled) return;
+    
+    ofLogNotice("OSC") << "Sending all OSC parameters...";
+    
+    // Call each block's helper function
+    sendOscBlock1Ch1();
+    sendOscBlock1Ch2();
+    sendOscBlock1Fb1();
+    sendOscBlock2Fb2();
+    sendOscBlock2Input();
+    sendOscBlock3B1();
+    sendOscBlock3B2();
+    sendOscBlock3MatrixAndFinal();
+    
     ofLogNotice("OSC") << "Finished sending all OSC parameters";
 }

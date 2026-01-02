@@ -171,6 +171,62 @@ void GuiApp::update(){
 		sendAllOscValues = 0;
 	}
 	
+	// OSC-triggered reset handlers
+	if (resetAllSwitch == 1) {
+		resetAll();
+		if (mainApp) mainApp->sendAllOscParameters();
+		resetAllSwitch = 0;
+	}
+	if (block1ResetAllSwitch == 1) {
+		block1ResetAll();
+		if (mainApp) {
+			mainApp->sendOscBlock1Ch1();
+			mainApp->sendOscBlock1Ch2();
+			mainApp->sendOscBlock1Fb1();
+		}
+		block1ResetAllSwitch = 0;
+	}
+	if (block1InputResetAllSwitch == 1) {
+		block1InputResetAll();
+		if (mainApp) {
+			mainApp->sendOscBlock1Ch1();
+			mainApp->sendOscBlock1Ch2();
+		}
+		block1InputResetAllSwitch = 0;
+	}
+	if (fb1ResetAllSwitch == 1) {
+		fb1ResetAll();
+		if (mainApp) mainApp->sendOscBlock1Fb1();
+		fb1ResetAllSwitch = 0;
+	}
+	if (block2ResetAllSwitch == 1) {
+		block2ResetAll();
+		if (mainApp) {
+			mainApp->sendOscBlock2Input();
+			mainApp->sendOscBlock2Fb2();
+		}
+		block2ResetAllSwitch = 0;
+	}
+	if (block2InputResetAllSwitch == 1) {
+		block2InputResetAll();
+		if (mainApp) mainApp->sendOscBlock2Input();
+		block2InputResetAllSwitch = 0;
+	}
+	if (fb2ResetAllSwitch == 1) {
+		fb2ResetAll();
+		if (mainApp) mainApp->sendOscBlock2Fb2();
+		fb2ResetAllSwitch = 0;
+	}
+	if (block3ResetAllSwitch == 1) {
+		block3ResetAll();
+		if (mainApp) {
+			mainApp->sendOscBlock3B1();
+			mainApp->sendOscBlock3B2();
+			mainApp->sendOscBlock3MatrixAndFinal();
+		}
+		block3ResetAllSwitch = 0;
+	}
+	
 }
 
 //--------------------------------------------------------------
@@ -713,6 +769,7 @@ void GuiApp::draw(){
 							}
 							ch1AdjustReset = 0;
 							ch1VMirror=ch1HMirror=ch1VFlip=ch1HFlip=ch1HueInvert=ch1SaturationInvert=ch1BrightInvert=ch1RGBInvert=ch1Solarize=0;
+							if (mainApp) mainApp->sendOscBlock1Ch1();
 						}
 						midi2Gui(ch1AdjustMidiActive, ch1Adjust, ch1AdjustMidiGui);
 						ImGui::Separator();
@@ -821,6 +878,7 @@ void GuiApp::draw(){
 								ch2MixAndKeyMidiActive[i] = 0;
 							}
 							ch2MixAndKeyReset = 0;
+							if (mainApp) mainApp->sendOscBlock1Ch2();
 						}
 						
 						midi2Gui(ch2MixAndKeyMidiActive, ch2MixAndKey, ch2MixAndKeyMidiGui);
@@ -894,6 +952,7 @@ void GuiApp::draw(){
 								ch2AdjustMidiActive[i] = 0;
 							}
 							ch2AdjustReset = 0;
+							if (mainApp) mainApp->sendOscBlock1Ch2();
 							ch2VMirror=ch2HMirror=ch2VFlip=ch2HFlip=ch2HueInvert=ch2SaturationInvert=ch2BrightInvert=ch2RGBInvert=ch2Solarize=0;
 						}
 						
@@ -999,6 +1058,7 @@ void GuiApp::draw(){
 										ch1AdjustLfoMidiActive[i] = 0;
 									}
 									ch1AdjustLfoReset = 0;
+									if (mainApp) mainApp->sendOscBlock1Ch1();
 								}
 								
 								midi2Gui(ch1AdjustLfoMidiActive, ch1AdjustLfo, ch1AdjustLfoMidiGui);
@@ -1072,6 +1132,7 @@ void GuiApp::draw(){
 										ch2MixAndKeyLfoMidiActive[i] = 0;
 									}
 									ch2MixAndKeyLfoReset = 0;
+									if (mainApp) mainApp->sendOscBlock1Ch2();
 								}
 								
 								midi2Gui(ch2MixAndKeyLfoMidiActive, ch2MixAndKeyLfo, ch2MixAndKeyLfoMidiGui);
@@ -1120,6 +1181,7 @@ void GuiApp::draw(){
 										ch2AdjustLfoMidiActive[i] = 0;
 									}
 									ch2AdjustLfoReset = 0;
+									if (mainApp) mainApp->sendOscBlock1Ch2();
 								}
 								
 								midi2Gui(ch2AdjustLfoMidiActive, ch2AdjustLfo, ch2AdjustLfoMidiGui);
@@ -1209,6 +1271,7 @@ void GuiApp::draw(){
 										fb1MixAndKeyMidiActive[i] = 0;
 									}
 									fb1MixAndKeyReset = 0;
+									if (mainApp) mainApp->sendOscBlock1Fb1();
 									fb1KeyOrder=fb1MixType=fb1MixOverflow=fb1KeyMode=0;
 								}
 								
@@ -1298,6 +1361,7 @@ void GuiApp::draw(){
 									fb1HMirror=fb1VMirror=fb1RotateMode=fb1HFlip=fb1VFlip=0;
 									//ADD ALL CHECKBOXES ETC HERE
 									fb1Geo1Reset = 0;
+									if (mainApp) mainApp->sendOscBlock1Fb1();
 								}
 								
 								midi2Gui(fb1Geo1MidiActive, fb1Geo1, fb1Geo1MidiGui);
@@ -1379,6 +1443,7 @@ void GuiApp::draw(){
 									//ADD ALL CHECKBOXES ETC HERE
 									fb1HueInvert=fb1SaturationInvert=fb1BrightInvert=0;
 									fb1Color1Reset = 0;
+									if (mainApp) mainApp->sendOscBlock1Fb1();
 								}
 								
 								midi2Gui(fb1Color1MidiActive, fb1Color1, fb1Color1MidiGui);
@@ -1446,6 +1511,7 @@ void GuiApp::draw(){
 									}
 									//ADD ALL CHECKBOXES ETC HERE
 									fb1FiltersReset = 0;
+									if (mainApp) mainApp->sendOscBlock1Fb1();
 								}
 								
 								midi2Gui(fb1FiltersMidiActive, fb1Filters, fb1FiltersMidiGui);
@@ -1542,6 +1608,7 @@ void GuiApp::draw(){
 										fb1MixAndKeyLfoMidiActive[i] = 0;
 									}
 									fb1MixAndKeyLfoReset = 0;
+									if (mainApp) mainApp->sendOscBlock1Fb1();
 								}
 								
 								midi2Gui(fb1MixAndKeyLfoMidiActive, fb1MixAndKeyLfo, fb1MixAndKeyLfoMidiGui);
@@ -1589,6 +1656,7 @@ void GuiApp::draw(){
 									}
 									//ADD ALL CHECKBOXES ETC HERE
 									fb1Geo1Lfo1Reset = 0;
+									if (mainApp) mainApp->sendOscBlock1Fb1();
 								}
 								
 								midi2Gui(fb1Geo1Lfo1MidiActive, fb1Geo1Lfo1, fb1Geo1Lfo1MidiGui);
@@ -1639,6 +1707,7 @@ void GuiApp::draw(){
 									}
 									//ADD ALL CHECKBOXES ETC HERE
 									fb1Geo1Lfo2Reset = 0;
+									if (mainApp) mainApp->sendOscBlock1Fb1();
 								}
 								
 								midi2Gui(fb1Geo1Lfo2MidiActive, fb1Geo1Lfo2, fb1Geo1Lfo2MidiGui);
@@ -1693,6 +1762,7 @@ void GuiApp::draw(){
 										fb1Color1Lfo1MidiActive[i] = 0;
 									}
 									fb1Color1Lfo1Reset = 0;
+									if (mainApp) mainApp->sendOscBlock1Fb1();
 								}
 								
 								midi2Gui(fb1Color1Lfo1MidiActive, fb1Color1Lfo1, fb1Color1Lfo1MidiGui);
@@ -1794,6 +1864,7 @@ void GuiApp::draw(){
 								block2InputAdjustMidiActive[i] = 0;
 							}
 							block2InputAdjustReset = 0;
+							if (mainApp) mainApp->sendOscBlock2Input();
 							block2InputVMirror=block2InputHMirror=block2InputVFlip=block2InputHFlip=block2InputHueInvert=0;
 							block2InputSaturationInvert=block2InputBrightInvert=block2InputRGBInvert=block2InputSolarize=0;
 						}
@@ -1894,6 +1965,7 @@ void GuiApp::draw(){
 								block2InputAdjustLfoMidiActive[i] = 0;
 							}
 							block2InputAdjustLfoReset = 0;
+							if (mainApp) mainApp->sendOscBlock2Input();
 						}
 						
 						midi2Gui(block2InputAdjustLfoMidiActive, block2InputAdjustLfo, block2InputAdjustLfoMidiGui);
@@ -1979,6 +2051,7 @@ void GuiApp::draw(){
 										fb2MixAndKeyMidiActive[i] = 0;
 									}
 									fb2MixAndKeyReset = 0;
+									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
 								
 								midi2Gui(fb2MixAndKeyMidiActive, fb2MixAndKey, fb2MixAndKeyMidiGui);
@@ -2068,6 +2141,7 @@ void GuiApp::draw(){
 									fb2GeoOverflow=0;
 									fb2HMirror=fb2VMirror=fb2RotateMode=fb2HFlip=fb2VFlip=0;
 									fb2Geo1Reset = 0;
+									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
 								
 								midi2Gui(fb2Geo1MidiActive, fb2Geo1, fb2Geo1MidiGui);
@@ -2149,6 +2223,7 @@ void GuiApp::draw(){
 									//ADD ALL CHECKBOXES ETC HERE
 									fb2HueInvert=fb2SaturationInvert=fb2BrightInvert=0;
 									fb2Color1Reset = 0;
+									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
 								
 								midi2Gui(fb2Color1MidiActive, fb2Color1, fb2Color1MidiGui);
@@ -2216,6 +2291,7 @@ void GuiApp::draw(){
 									}
 									//ADD ALL CHECKBOXES ETC HERE
 									fb2FiltersReset = 0;
+									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
 								
 								midi2Gui(fb2FiltersMidiActive, fb2Filters, fb2FiltersMidiGui);
@@ -2305,6 +2381,7 @@ void GuiApp::draw(){
 										fb2MixAndKeyLfoMidiActive[i] = 0;
 									}
 									fb2MixAndKeyLfoReset = 0;
+									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
 								
 								midi2Gui(fb2MixAndKeyLfoMidiActive, fb2MixAndKeyLfo, fb2MixAndKeyLfoMidiGui);
@@ -2350,6 +2427,7 @@ void GuiApp::draw(){
 										fb2Geo1Lfo1MidiActive[i] = 0;
 									}
 									fb2Geo1Lfo1Reset = 0;
+									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
 								
 								midi2Gui(fb2Geo1Lfo1MidiActive, fb2Geo1Lfo1, fb2Geo1Lfo1MidiGui);
@@ -2400,6 +2478,7 @@ void GuiApp::draw(){
 									}
 									//ADD ALL CHECKBOXES ETC HERE
 									fb2Geo1Lfo2Reset = 0;
+									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
 								
 								midi2Gui(fb2Geo1Lfo2MidiActive, fb2Geo1Lfo2, fb2Geo1Lfo2MidiGui);
@@ -2454,6 +2533,7 @@ void GuiApp::draw(){
 										fb2Color1Lfo1MidiActive[i] = 0;
 									}
 									fb2Color1Lfo1Reset = 0;
+									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
 								
 								midi2Gui(fb2Color1Lfo1MidiActive, fb2Color1Lfo1, fb2Color1Lfo1MidiGui);
@@ -2556,6 +2636,7 @@ void GuiApp::draw(){
 										block1GeoMidiActive[i] = 0;
 									}
 									block1GeoReset = 0;
+									if (mainApp) mainApp->sendOscBlock3B1();
 									block1HMirror=block1VMirror=block1HFlip=block1VFlip=block1RotateMode=0;
 								}
 								
@@ -2645,6 +2726,7 @@ void GuiApp::draw(){
 										block1ColorizeMidiActive[i] = 0;
 									}
 									block1ColorizeReset = 0;
+									if (mainApp) mainApp->sendOscBlock3B1();
 									block1ColorizeSwitch=block1ColorizeHSB_RGB=0;
 								}
 								
@@ -2743,6 +2825,7 @@ void GuiApp::draw(){
 									}
 									//ADD ALL CHECKBOXES ETC HERE
 									block1FiltersReset = 0;
+									if (mainApp) mainApp->sendOscBlock3B1();
 								}
 								
 								midi2Gui(block1FiltersMidiActive, block1Filters, block1FiltersMidiGui);
@@ -2790,6 +2873,7 @@ void GuiApp::draw(){
 									}
 									//ADD ALL CHECKBOXES ETC HERE
 									block1Geo1Lfo1Reset = 0;
+									if (mainApp) mainApp->sendOscBlock3B1();
 								}
 								
 								midi2Gui(block1Geo1Lfo1MidiActive, block1Geo1Lfo1, block1Geo1Lfo1MidiGui);
@@ -2840,6 +2924,7 @@ void GuiApp::draw(){
 									}
 									//ADD ALL CHECKBOXES ETC HERE
 									block1Geo1Lfo2Reset = 0;
+									if (mainApp) mainApp->sendOscBlock3B1();
 								}
 								
 								midi2Gui(block1Geo1Lfo2MidiActive, block1Geo1Lfo2, block1Geo1Lfo2MidiGui);
@@ -2893,6 +2978,7 @@ void GuiApp::draw(){
 										block1ColorizeLfo1MidiActive[i] = 0;
 									}
 									block1ColorizeLfo1Reset = 0;
+									if (mainApp) mainApp->sendOscBlock3B1();
 								}
 								
 								midi2Gui(block1ColorizeLfo1MidiActive, block1ColorizeLfo1, block1ColorizeLfo1MidiGui);
@@ -2977,6 +3063,7 @@ void GuiApp::draw(){
 										block1ColorizeLfo2MidiActive[i] = 0;
 									}
 									block1ColorizeLfo2Reset = 0;
+									if (mainApp) mainApp->sendOscBlock3B1();
 								}
 								
 								midi2Gui(block1ColorizeLfo2MidiActive, block1ColorizeLfo2, block1ColorizeLfo2MidiGui);
@@ -3062,6 +3149,7 @@ void GuiApp::draw(){
 										block1ColorizeLfo3MidiActive[i] = 0;
 									}
 									block1ColorizeLfo3Reset = 0;
+									if (mainApp) mainApp->sendOscBlock3B1();
 								}
 								
 								midi2Gui(block1ColorizeLfo3MidiActive, block1ColorizeLfo3, block1ColorizeLfo3MidiGui);
@@ -3133,6 +3221,7 @@ void GuiApp::draw(){
 									}
 									//ADD ALL CHECKBOXES ETC HERE
 									block2GeoReset = 0;
+									if (mainApp) mainApp->sendOscBlock3B2();
 									block2HMirror=block2VMirror=block2HFlip=block2VFlip=block2RotateMode=0;
 								}
 								
@@ -3222,6 +3311,7 @@ void GuiApp::draw(){
 										block2ColorizeMidiActive[i] = 0;
 									}
 									block2ColorizeReset = 0;
+									if (mainApp) mainApp->sendOscBlock3B2();
 									block2ColorizeSwitch=block2ColorizeHSB_RGB=0;
 								}
 								
@@ -3322,6 +3412,7 @@ void GuiApp::draw(){
 									}
 									//ADD ALL CHECKBOXES ETC HERE
 									block2FiltersReset = 0;
+									if (mainApp) mainApp->sendOscBlock3B2();
 								}
 								
 								midi2Gui(block2FiltersMidiActive, block2Filters, block2FiltersMidiGui);
@@ -3369,6 +3460,7 @@ void GuiApp::draw(){
 									}
 									//ADD ALL CHECKBOXES ETC HERE
 									block2Geo1Lfo1Reset = 0;
+									if (mainApp) mainApp->sendOscBlock3B2();
 								}
 								
 								midi2Gui(block2Geo1Lfo1MidiActive, block2Geo1Lfo1, block2Geo1Lfo1MidiGui);
@@ -3419,6 +3511,7 @@ void GuiApp::draw(){
 									}
 									//ADD ALL CHECKBOXES ETC HERE
 									block2Geo1Lfo2Reset = 0;
+									if (mainApp) mainApp->sendOscBlock3B2();
 								}
 								
 								midi2Gui(block2Geo1Lfo2MidiActive, block2Geo1Lfo2, block2Geo1Lfo2MidiGui);
@@ -3473,6 +3566,7 @@ void GuiApp::draw(){
 										block2ColorizeLfo1MidiActive[i] = 0;
 									}
 									block2ColorizeLfo1Reset = 0;
+									if (mainApp) mainApp->sendOscBlock3B2();
 								}
 								
 								midi2Gui(block2ColorizeLfo1MidiActive, block2ColorizeLfo1, block2ColorizeLfo1MidiGui);
@@ -3558,6 +3652,7 @@ void GuiApp::draw(){
 										block2ColorizeLfo2MidiActive[i] = 0;
 									}
 									block2ColorizeLfo2Reset = 0;
+									if (mainApp) mainApp->sendOscBlock3B2();
 								}
 								
 								midi2Gui(block2ColorizeLfo2MidiActive, block2ColorizeLfo2, block2ColorizeLfo2MidiGui);
@@ -3643,6 +3738,7 @@ void GuiApp::draw(){
 										block2ColorizeLfo3MidiActive[i] = 0;
 									}
 									block2ColorizeLfo3Reset = 0;
+									if (mainApp) mainApp->sendOscBlock3B2();
 								}
 								
 								midi2Gui(block2ColorizeLfo3MidiActive, block2ColorizeLfo3, block2ColorizeLfo3MidiGui);
@@ -3710,6 +3806,7 @@ void GuiApp::draw(){
 								matrixMixMidiActive[i] = 0;
 							}
 							matrixMixReset = 0;
+						if (mainApp) mainApp->sendOscBlock3MatrixAndFinal();
 							matrixMixType=matrixMixOverflow=0;
 						}
 						
@@ -3820,6 +3917,7 @@ void GuiApp::draw(){
 								finalMixAndKeyMidiActive[i] = 0;
 							}
 							finalMixAndKeyReset = 0;
+						if (mainApp) mainApp->sendOscBlock3MatrixAndFinal();
 							finalKeyMode=finalMixOverflow=finalMixType=0;
 						}
 						
@@ -3902,6 +4000,7 @@ void GuiApp::draw(){
 											matrixMixLfo1MidiActive[i] = 0;
 										}
 										matrixMixLfo1Reset = 0;
+										if (mainApp) mainApp->sendOscBlock3MatrixAndFinal();
 									}
 									
 									ImGui::Separator();
@@ -4027,6 +4126,7 @@ void GuiApp::draw(){
 											matrixMixLfo2MidiActive[i] = 0;
 										}
 										matrixMixLfo2Reset = 0;
+										if (mainApp) mainApp->sendOscBlock3MatrixAndFinal();
 									}
 									
 									ImGui::Separator();
@@ -4117,6 +4217,7 @@ void GuiApp::draw(){
 										finalMixAndKeyLfoMidiActive[i] = 0;
 									}
 									finalMixAndKeyLfoReset = 0;
+									if (mainApp) mainApp->sendOscBlock3MatrixAndFinal();
 								}
 								
 								midi2Gui(finalMixAndKeyLfoMidiActive, finalMixAndKeyLfo, finalMixAndKeyLfoMidiGui);

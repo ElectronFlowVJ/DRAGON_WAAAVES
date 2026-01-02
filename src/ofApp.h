@@ -27,8 +27,29 @@ class ofApp : public ofBaseApp{
 		void processOscMessages();
 		void sendOscParameter(string address, float value);
 		void sendAllOscParameters();
-	void reloadOscSettings();
+		void reloadOscSettings();
 		bool oscEnabled;
+		
+		// OSC Send Helper Functions (split to avoid compiler limits)
+		void sendOscBlock1Ch1();
+		void sendOscBlock1Ch2();
+		void sendOscBlock1Fb1();
+		void sendOscBlock2Fb2();
+		void sendOscBlock2Input();
+		void sendOscBlock3B1();
+		void sendOscBlock3B2();
+		void sendOscBlock3MatrixAndFinal();
+		
+		// OSC Process Helper Functions (split to avoid compiler limits)
+		bool processOscBlock1(const string& address, float value, const ofxOscMessage& m);
+		bool processOscBlock2(const string& address, float value, const ofxOscMessage& m);
+		bool processOscBlock3(const string& address, float value, const ofxOscMessage& m);
+		bool processOscDiscreteParams(const string& address, const ofxOscMessage& m);
+		bool processOscBooleanParams(const string& address, const ofxOscMessage& m);
+		bool processOscLfoParamsFb(const string& address, float value);
+		bool processOscLfoParamsBlock3B1(const string& address, float value);
+		bool processOscLfoParamsBlock3B2AndMatrix(const string& address, float value);
+		bool processOscResetCommands(const string& address);
 	
 	//globals	
 	int inputWidth=640;

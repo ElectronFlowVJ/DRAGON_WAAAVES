@@ -1230,6 +1230,16 @@ public:
 	void resetAll();
 	void allButtonsClear();
 	
+	// OSC-triggered reset switches
+	bool resetAllSwitch = 0;
+	bool block1ResetAllSwitch = 0;
+	bool block1InputResetAllSwitch = 0;
+	bool fb1ResetAllSwitch = 0;
+	bool block2ResetAllSwitch = 0;
+	bool block2InputResetAllSwitch = 0;
+	bool fb2ResetAllSwitch = 0;
+	bool block3ResetAllSwitch = 0;
+	
 	float sdFixX=0;
 	float hdFixY=0;	
 	//check and delete all these later	
