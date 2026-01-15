@@ -105,6 +105,12 @@ void GuiApp::setup(){
 	// Initialize video device list
 	refreshVideoDevices();
 
+	// Initialize OSC parameter registry
+	registerBlock1OscParameters();
+	registerBlock2OscParameters();
+	registerBlock3OscParameters();
+	ofLogNotice("OSC") << "Total OSC parameters registered: " << oscRegistry.size();
+
 }
 
 
@@ -4277,60 +4283,137 @@ void GuiApp::draw(){
 				ImGui::Separator();
 				ImGui::Spacing();
 				
-				// Refresh button
-				if (ImGui::Button("Refresh Device List")) {
+				// Refresh buttons
+				if (ImGui::Button("Refresh Webcams")) {
 					refreshVideoDevices();
 				}
-				ImGui::Spacing();
-				ImGui::Separator();
-				ImGui::Spacing();
-				
-				// Device count
-				ImGui::Text("Found %d video devices", (int)videoDevices.size());
-				ImGui::Spacing();
-				
-				// Input 1 dropdown
-				ImGui::Text("INPUT 1");
-				if (videoDeviceNames.size() > 0) {
-					// Create combo items
-					if (ImGui::BeginCombo("##input1device", 
-						input1DeviceID < videoDeviceNames.size() ? videoDeviceNames[input1DeviceID].c_str() : "Select Device")) {
-						for (int i = 0; i < videoDeviceNames.size(); i++) {
-							bool isSelected = (input1DeviceID == i);
-							if (ImGui::Selectable(videoDeviceNames[i].c_str(), isSelected)) {
-								input1DeviceID = i;
-							}
-							if (isSelected) {
-								ImGui::SetItemDefaultFocus();
-							}
-						}
-						ImGui::EndCombo();
-					}
-				} else {
-					ImGui::Text("No devices found");
+				ImGui::SameLine();
+				if (ImGui::Button("Refresh NDI Sources")) {
+					refreshNdiSources = true;
 				}
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
 				
-				// Input 2 dropdown
-				ImGui::Text("INPUT 2");
-				if (videoDeviceNames.size() > 0) {
-					if (ImGui::BeginCombo("##input2device", 
-						input2DeviceID < videoDeviceNames.size() ? videoDeviceNames[input2DeviceID].c_str() : "Select Device")) {
-						for (int i = 0; i < videoDeviceNames.size(); i++) {
-							bool isSelected = (input2DeviceID == i);
-							if (ImGui::Selectable(videoDeviceNames[i].c_str(), isSelected)) {
-								input2DeviceID = i;
+				// Device counts
+				ImGui::Text("Found %d webcams, %d NDI sources", (int)videoDevices.size(), (int)ndiSourceNames.size());
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+				
+				// ========== INPUT 1 ==========
+				ImGui::Text("INPUT 1");
+				ImGui::Spacing();
+				
+				// Source type selector
+				ImGui::Text("Source Type:");
+				ImGui::SameLine();
+				if (ImGui::RadioButton("Webcam##1", input1SourceType == 0)) {
+					input1SourceType = 0;
+				}
+				ImGui::SameLine();
+				if (ImGui::RadioButton("NDI##1", input1SourceType == 1)) {
+					input1SourceType = 1;
+				}
+				
+				// Show appropriate dropdown based on source type
+				if (input1SourceType == 0) {
+					// Webcam dropdown
+					if (videoDeviceNames.size() > 0) {
+						if (ImGui::BeginCombo("##input1device", 
+							input1DeviceID < videoDeviceNames.size() ? videoDeviceNames[input1DeviceID].c_str() : "Select Device")) {
+							for (int i = 0; i < videoDeviceNames.size(); i++) {
+								bool isSelected = (input1DeviceID == i);
+								if (ImGui::Selectable(videoDeviceNames[i].c_str(), isSelected)) {
+									input1DeviceID = i;
+								}
+								if (isSelected) {
+									ImGui::SetItemDefaultFocus();
+								}
 							}
-							if (isSelected) {
-								ImGui::SetItemDefaultFocus();
-							}
+							ImGui::EndCombo();
 						}
-						ImGui::EndCombo();
+					} else {
+						ImGui::Text("No webcams found");
 					}
 				} else {
-					ImGui::Text("No devices found");
+					// NDI dropdown
+					if (ndiSourceNames.size() > 0) {
+						if (ImGui::BeginCombo("##input1ndi", 
+							input1NdiSourceIndex < ndiSourceNames.size() ? ndiSourceNames[input1NdiSourceIndex].c_str() : "Select NDI Source")) {
+							for (int i = 0; i < ndiSourceNames.size(); i++) {
+								bool isSelected = (input1NdiSourceIndex == i);
+								if (ImGui::Selectable(ndiSourceNames[i].c_str(), isSelected)) {
+									input1NdiSourceIndex = i;
+								}
+								if (isSelected) {
+									ImGui::SetItemDefaultFocus();
+								}
+							}
+							ImGui::EndCombo();
+						}
+					} else {
+						ImGui::Text("No NDI sources found");
+					}
+				}
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+				
+				// ========== INPUT 2 ==========
+				ImGui::Text("INPUT 2");
+				ImGui::Spacing();
+				
+				// Source type selector
+				ImGui::Text("Source Type:");
+				ImGui::SameLine();
+				if (ImGui::RadioButton("Webcam##2", input2SourceType == 0)) {
+					input2SourceType = 0;
+				}
+				ImGui::SameLine();
+				if (ImGui::RadioButton("NDI##2", input2SourceType == 1)) {
+					input2SourceType = 1;
+				}
+				
+				// Show appropriate dropdown based on source type
+				if (input2SourceType == 0) {
+					// Webcam dropdown
+					if (videoDeviceNames.size() > 0) {
+						if (ImGui::BeginCombo("##input2device", 
+							input2DeviceID < videoDeviceNames.size() ? videoDeviceNames[input2DeviceID].c_str() : "Select Device")) {
+							for (int i = 0; i < videoDeviceNames.size(); i++) {
+								bool isSelected = (input2DeviceID == i);
+								if (ImGui::Selectable(videoDeviceNames[i].c_str(), isSelected)) {
+									input2DeviceID = i;
+								}
+								if (isSelected) {
+									ImGui::SetItemDefaultFocus();
+								}
+							}
+							ImGui::EndCombo();
+						}
+					} else {
+						ImGui::Text("No webcams found");
+					}
+				} else {
+					// NDI dropdown
+					if (ndiSourceNames.size() > 0) {
+						if (ImGui::BeginCombo("##input2ndi", 
+							input2NdiSourceIndex < ndiSourceNames.size() ? ndiSourceNames[input2NdiSourceIndex].c_str() : "Select NDI Source")) {
+							for (int i = 0; i < ndiSourceNames.size(); i++) {
+								bool isSelected = (input2NdiSourceIndex == i);
+								if (ImGui::Selectable(ndiSourceNames[i].c_str(), isSelected)) {
+									input2NdiSourceIndex = i;
+								}
+								if (isSelected) {
+									ImGui::SetItemDefaultFocus();
+								}
+							}
+							ImGui::EndCombo();
+						}
+					} else {
+						ImGui::Text("No NDI sources found");
+					}
 				}
 				ImGui::Spacing();
 				ImGui::Separator();
@@ -4338,14 +4421,15 @@ void GuiApp::draw(){
 				
 				// Reinitialize button
 				ImGui::Text("Apply Changes");
-				if (ImGui::Button("Reinitialize Cameras", ImVec2(200, 30))) {
+				if (ImGui::Button("Reinitialize Inputs", ImVec2(200, 30))) {
 					reinitializeInputs = true;
 				}
 				ImGui::Spacing();
 				
 				// Help text
 				ImGui::Separator();
-				ImGui::Text("Select devices and click 'Reinitialize Cameras' to apply.");
+				ImGui::Text("Select source type and device, then click");
+				ImGui::Text("'Reinitialize Inputs' to apply changes.");
 				
 				ImGui::EndTabItem();
 			}
@@ -4357,8 +4441,15 @@ void GuiApp::draw(){
 				ImGui::Separator();
 				ImGui::Spacing();
 				
-				// Display local IP
-				ImGui::Text("Local IP Address: %s", localIP.c_str());
+				// Display all local IPs
+				ImGui::Text("Local IP Addresses:");
+				if (localIPs.size() > 0) {
+					for (int i = 0; i < localIPs.size(); i++) {
+						ImGui::BulletText("%s", localIPs[i].c_str());
+					}
+				} else {
+					ImGui::Text("  No network interfaces found");
+				}
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
@@ -4418,11 +4509,7 @@ void GuiApp::draw(){
 				ImGui::Separator();
 				ImGui::Spacing();
 				ImGui::Text("SEND ALL PARAMETERS");
-				ImGui::Text("Send all current values over OSC (throttled)");
-				ImGui::PushItemWidth(150);
-				ImGui::SliderInt("Messages per frame", &oscMessagesPerFrame, 1, 100);
-				ImGui::PopItemWidth();
-				ImGui::Text("Higher = faster but may drop packets");
+				ImGui::Text("Send all current values over OSC");
 				if (ImGui::Button("Send All Values Now", ImVec2(200, 30))) {
 					sendAllOscValues = true;
 				}
@@ -52643,8 +52730,10 @@ void GuiApp::macroDataResetEverything(){
 
 // Update local IP address for OSC display
 void GuiApp::updateLocalIP() {
+    localIPs.clear();
+    
 #ifdef _WIN32
-    // Windows implementation
+    // Windows implementation - get all network interfaces
     char hostname[256];
     if (gethostname(hostname, sizeof(hostname)) == 0) {
         struct addrinfo hints = {0};
@@ -52657,28 +52746,768 @@ void GuiApp::updateLocalIP() {
                 struct sockaddr_in* addr = (struct sockaddr_in*)ptr->ai_addr;
                 char ip[INET_ADDRSTRLEN];
                 inet_ntop(AF_INET, &(addr->sin_addr), ip, INET_ADDRSTRLEN);
-                localIP = string(ip);
-                break;
+                string ipStr = string(ip);
+                // Avoid duplicates
+                bool found = false;
+                for (const auto& existing : localIPs) {
+                    if (existing == ipStr) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    localIPs.push_back(ipStr);
+                }
             }
             freeaddrinfo(result);
         }
     }
-    if (localIP.empty()) {
-        localIP = "127.0.0.1";
+    if (localIPs.empty()) {
+        localIPs.push_back("127.0.0.1");
     }
 #else
     // Linux/macOS implementation
-    FILE* pipe = popen("hostname -I | awk '{print $1}'", "r");
+    FILE* pipe = popen("hostname -I", "r");
     if (pipe) {
-        char buffer[128];
+        char buffer[512];
         if (fgets(buffer, sizeof(buffer), pipe) != NULL) {
             buffer[strcspn(buffer, "\n")] = 0;
-            localIP = string(buffer);
+            // Split by spaces
+            std::string ips(buffer);
+            size_t pos = 0;
+            while ((pos = ips.find(' ')) != std::string::npos) {
+                std::string ip = ips.substr(0, pos);
+                if (!ip.empty()) {
+                    localIPs.push_back(ip);
+                }
+                ips.erase(0, pos + 1);
+            }
+            if (!ips.empty()) {
+                localIPs.push_back(ips);
+            }
         }
         pclose(pipe);
     }
-    if (localIP.empty()) {
-        localIP = "Unknown";
+    if (localIPs.empty()) {
+        localIPs.push_back("Unknown");
     }
 #endif
+}
+void GuiApp::registerOscParam(const std::string& address, float* ptr) {
+    oscRegistry.emplace_back(address, ptr);
+    oscAddressMap[address] = &oscRegistry.back();
+}
+
+void GuiApp::registerOscParam(const std::string& address, bool* ptr) {
+    oscRegistry.emplace_back(address, ptr);
+    oscAddressMap[address] = &oscRegistry.back();
+}
+
+void GuiApp::registerOscParam(const std::string& address, int* ptr) {
+    oscRegistry.emplace_back(address, ptr);
+    oscAddressMap[address] = &oscRegistry.back();
+}
+
+void GuiApp::registerBlock1OscParameters() {
+    ofLogNotice("OSC") << "Registering Block 1 OSC parameters...";
+    
+    // Reserve space for all blocks (approximately 600 parameters total)
+    oscRegistry.reserve(700);
+    
+    // ============== CH1 ADJUST (15 sliders) ==============
+    registerOscParam("/gravity/block1/ch1/xDisplace", &ch1Adjust[0]);
+    registerOscParam("/gravity/block1/ch1/yDisplace", &ch1Adjust[1]);
+    registerOscParam("/gravity/block1/ch1/zDisplace", &ch1Adjust[2]);
+    registerOscParam("/gravity/block1/ch1/rotate", &ch1Adjust[3]);
+    registerOscParam("/gravity/block1/ch1/hueOffset", &ch1Adjust[4]);
+    registerOscParam("/gravity/block1/ch1/saturationOffset", &ch1Adjust[5]);
+    registerOscParam("/gravity/block1/ch1/brightOffset", &ch1Adjust[6]);
+    registerOscParam("/gravity/block1/ch1/posterize", &ch1Adjust[7]);
+    registerOscParam("/gravity/block1/ch1/kaleidoscopeAmount", &ch1Adjust[8]);
+    registerOscParam("/gravity/block1/ch1/kaleidoscopeSlice", &ch1Adjust[9]);
+    registerOscParam("/gravity/block1/ch1/blurAmount", &ch1Adjust[10]);
+    registerOscParam("/gravity/block1/ch1/blurRadius", &ch1Adjust[11]);
+    registerOscParam("/gravity/block1/ch1/sharpenAmount", &ch1Adjust[12]);
+    registerOscParam("/gravity/block1/ch1/sharpenRadius", &ch1Adjust[13]);
+    registerOscParam("/gravity/block1/ch1/filtersBoost", &ch1Adjust[14]);
+    
+    // CH1 booleans/ints
+    registerOscParam("/gravity/block1/ch1/inputSelect", &ch1InputSelect);
+    registerOscParam("/gravity/block1/ch1/aspectRatio", &ch1AspectRatioSwitch);
+    registerOscParam("/gravity/block1/ch1/hMirror", &ch1HMirror);
+    registerOscParam("/gravity/block1/ch1/vMirror", &ch1VMirror);
+    registerOscParam("/gravity/block1/ch1/hueInvert", &ch1HueInvert);
+    registerOscParam("/gravity/block1/ch1/saturationInvert", &ch1SaturationInvert);
+    registerOscParam("/gravity/block1/ch1/brightInvert", &ch1BrightInvert);
+    registerOscParam("/gravity/block1/ch1/geoOverflow", &ch1GeoOverflow);
+    registerOscParam("/gravity/block1/ch1/hFlip", &ch1HFlip);
+    registerOscParam("/gravity/block1/ch1/vFlip", &ch1VFlip);
+    registerOscParam("/gravity/block1/ch1/rgbInvert", &ch1RGBInvert);
+    registerOscParam("/gravity/block1/ch1/solarize", &ch1Solarize);
+    registerOscParam("/gravity/block1/ch1/reset", &ch1AdjustReset);
+    
+    // ============== CH1 ADJUST LFO (16 params) ==============
+    registerOscParam("/gravity/block1/ch1/lfo/xDisplaceAmp", &ch1AdjustLfo[0]);
+    registerOscParam("/gravity/block1/ch1/lfo/xDisplaceRate", &ch1AdjustLfo[1]);
+    registerOscParam("/gravity/block1/ch1/lfo/yDisplaceAmp", &ch1AdjustLfo[2]);
+    registerOscParam("/gravity/block1/ch1/lfo/yDisplaceRate", &ch1AdjustLfo[3]);
+    registerOscParam("/gravity/block1/ch1/lfo/zDisplaceAmp", &ch1AdjustLfo[4]);
+    registerOscParam("/gravity/block1/ch1/lfo/zDisplaceRate", &ch1AdjustLfo[5]);
+    registerOscParam("/gravity/block1/ch1/lfo/rotateAmp", &ch1AdjustLfo[6]);
+    registerOscParam("/gravity/block1/ch1/lfo/rotateRate", &ch1AdjustLfo[7]);
+    registerOscParam("/gravity/block1/ch1/lfo/hueOffsetAmp", &ch1AdjustLfo[8]);
+    registerOscParam("/gravity/block1/ch1/lfo/hueOffsetRate", &ch1AdjustLfo[9]);
+    registerOscParam("/gravity/block1/ch1/lfo/saturationOffsetAmp", &ch1AdjustLfo[10]);
+    registerOscParam("/gravity/block1/ch1/lfo/saturationOffsetRate", &ch1AdjustLfo[11]);
+    registerOscParam("/gravity/block1/ch1/lfo/brightOffsetAmp", &ch1AdjustLfo[12]);
+    registerOscParam("/gravity/block1/ch1/lfo/brightOffsetRate", &ch1AdjustLfo[13]);
+    registerOscParam("/gravity/block1/ch1/lfo/kaleidoscopeSliceAmp", &ch1AdjustLfo[14]);
+    registerOscParam("/gravity/block1/ch1/lfo/kaleidoscopeSliceRate", &ch1AdjustLfo[15]);
+    registerOscParam("/gravity/block1/ch1/lfo/reset", &ch1AdjustLfoReset);
+    
+    // ============== CH2 MIX AND KEY (6 params) ==============
+    registerOscParam("/gravity/block1/ch2/mixAmount", &ch2MixAndKey[0]);
+    registerOscParam("/gravity/block1/ch2/keyRed", &ch2MixAndKey[1]);
+    registerOscParam("/gravity/block1/ch2/keyGreen", &ch2MixAndKey[2]);
+    registerOscParam("/gravity/block1/ch2/keyBlue", &ch2MixAndKey[3]);
+    registerOscParam("/gravity/block1/ch2/keyThreshold", &ch2MixAndKey[4]);
+    registerOscParam("/gravity/block1/ch2/keySoft", &ch2MixAndKey[5]);
+    
+    // CH2 mix booleans/ints
+    registerOscParam("/gravity/block1/ch2/keyOrder", &ch2KeyOrder);
+    registerOscParam("/gravity/block1/ch2/mixType", &ch2MixType);
+    registerOscParam("/gravity/block1/ch2/keyMode", &ch2KeyMode);
+    registerOscParam("/gravity/block1/ch2/mixOverflow", &ch2MixOverflow);
+    registerOscParam("/gravity/block1/ch2/resetMixAndKey", &ch2MixAndKeyReset);
+    
+    // ============== CH2 MIX AND KEY LFO (6 params) ==============
+    registerOscParam("/gravity/block1/ch2/lfo/mixAmountAmp", &ch2MixAndKeyLfo[0]);
+    registerOscParam("/gravity/block1/ch2/lfo/mixAmountRate", &ch2MixAndKeyLfo[1]);
+    registerOscParam("/gravity/block1/ch2/lfo/keyThresholdAmp", &ch2MixAndKeyLfo[2]);
+    registerOscParam("/gravity/block1/ch2/lfo/keyThresholdRate", &ch2MixAndKeyLfo[3]);
+    registerOscParam("/gravity/block1/ch2/lfo/keySoftAmp", &ch2MixAndKeyLfo[4]);
+    registerOscParam("/gravity/block1/ch2/lfo/keySoftRate", &ch2MixAndKeyLfo[5]);
+    registerOscParam("/gravity/block1/ch2/lfo/resetMixAndKey", &ch2MixAndKeyLfoReset);
+    
+    // ============== CH2 ADJUST (15 sliders) ==============
+    registerOscParam("/gravity/block1/ch2/xDisplace", &ch2Adjust[0]);
+    registerOscParam("/gravity/block1/ch2/yDisplace", &ch2Adjust[1]);
+    registerOscParam("/gravity/block1/ch2/zDisplace", &ch2Adjust[2]);
+    registerOscParam("/gravity/block1/ch2/rotate", &ch2Adjust[3]);
+    registerOscParam("/gravity/block1/ch2/hueOffset", &ch2Adjust[4]);
+    registerOscParam("/gravity/block1/ch2/saturationOffset", &ch2Adjust[5]);
+    registerOscParam("/gravity/block1/ch2/brightOffset", &ch2Adjust[6]);
+    registerOscParam("/gravity/block1/ch2/posterize", &ch2Adjust[7]);
+    registerOscParam("/gravity/block1/ch2/kaleidoscopeAmount", &ch2Adjust[8]);
+    registerOscParam("/gravity/block1/ch2/kaleidoscopeSlice", &ch2Adjust[9]);
+    registerOscParam("/gravity/block1/ch2/blurAmount", &ch2Adjust[10]);
+    registerOscParam("/gravity/block1/ch2/blurRadius", &ch2Adjust[11]);
+    registerOscParam("/gravity/block1/ch2/sharpenAmount", &ch2Adjust[12]);
+    registerOscParam("/gravity/block1/ch2/sharpenRadius", &ch2Adjust[13]);
+    registerOscParam("/gravity/block1/ch2/filtersBoost", &ch2Adjust[14]);
+    
+    // CH2 booleans/ints
+    registerOscParam("/gravity/block1/ch2/inputSelect", &ch2InputSelect);
+    registerOscParam("/gravity/block1/ch2/aspectRatio", &ch2AspectRatioSwitch);
+    registerOscParam("/gravity/block1/ch2/hMirror", &ch2HMirror);
+    registerOscParam("/gravity/block1/ch2/vMirror", &ch2VMirror);
+    registerOscParam("/gravity/block1/ch2/hueInvert", &ch2HueInvert);
+    registerOscParam("/gravity/block1/ch2/saturationInvert", &ch2SaturationInvert);
+    registerOscParam("/gravity/block1/ch2/brightInvert", &ch2BrightInvert);
+    registerOscParam("/gravity/block1/ch2/geoOverflow", &ch2GeoOverflow);
+    registerOscParam("/gravity/block1/ch2/hFlip", &ch2HFlip);
+    registerOscParam("/gravity/block1/ch2/vFlip", &ch2VFlip);
+    registerOscParam("/gravity/block1/ch2/rgbInvert", &ch2RGBInvert);
+    registerOscParam("/gravity/block1/ch2/solarize", &ch2Solarize);
+    registerOscParam("/gravity/block1/ch2/reset", &ch2AdjustReset);
+    
+    // ============== CH2 ADJUST LFO (16 params) ==============
+    registerOscParam("/gravity/block1/ch2/lfo/xDisplaceAmp", &ch2AdjustLfo[0]);
+    registerOscParam("/gravity/block1/ch2/lfo/xDisplaceRate", &ch2AdjustLfo[1]);
+    registerOscParam("/gravity/block1/ch2/lfo/yDisplaceAmp", &ch2AdjustLfo[2]);
+    registerOscParam("/gravity/block1/ch2/lfo/yDisplaceRate", &ch2AdjustLfo[3]);
+    registerOscParam("/gravity/block1/ch2/lfo/zDisplaceAmp", &ch2AdjustLfo[4]);
+    registerOscParam("/gravity/block1/ch2/lfo/zDisplaceRate", &ch2AdjustLfo[5]);
+    registerOscParam("/gravity/block1/ch2/lfo/rotateAmp", &ch2AdjustLfo[6]);
+    registerOscParam("/gravity/block1/ch2/lfo/rotateRate", &ch2AdjustLfo[7]);
+    registerOscParam("/gravity/block1/ch2/lfo/hueOffsetAmp", &ch2AdjustLfo[8]);
+    registerOscParam("/gravity/block1/ch2/lfo/hueOffsetRate", &ch2AdjustLfo[9]);
+    registerOscParam("/gravity/block1/ch2/lfo/saturationOffsetAmp", &ch2AdjustLfo[10]);
+    registerOscParam("/gravity/block1/ch2/lfo/saturationOffsetRate", &ch2AdjustLfo[11]);
+    registerOscParam("/gravity/block1/ch2/lfo/brightOffsetAmp", &ch2AdjustLfo[12]);
+    registerOscParam("/gravity/block1/ch2/lfo/brightOffsetRate", &ch2AdjustLfo[13]);
+    registerOscParam("/gravity/block1/ch2/lfo/kaleidoscopeSliceAmp", &ch2AdjustLfo[14]);
+    registerOscParam("/gravity/block1/ch2/lfo/kaleidoscopeSliceRate", &ch2AdjustLfo[15]);
+    registerOscParam("/gravity/block1/ch2/lfo/reset", &ch2AdjustLfoReset);
+    
+    // ============== FB1 MIX AND KEY (6 params) ==============
+    registerOscParam("/gravity/block1/fb1/mixAmount", &fb1MixAndKey[0]);
+    registerOscParam("/gravity/block1/fb1/keyRed", &fb1MixAndKey[1]);
+    registerOscParam("/gravity/block1/fb1/keyGreen", &fb1MixAndKey[2]);
+    registerOscParam("/gravity/block1/fb1/keyBlue", &fb1MixAndKey[3]);
+    registerOscParam("/gravity/block1/fb1/keyThreshold", &fb1MixAndKey[4]);
+    registerOscParam("/gravity/block1/fb1/keySoft", &fb1MixAndKey[5]);
+    
+    // FB1 mix booleans/ints
+    registerOscParam("/gravity/block1/fb1/keyOrder", &fb1KeyOrder);
+    registerOscParam("/gravity/block1/fb1/mixType", &fb1MixType);
+    registerOscParam("/gravity/block1/fb1/keyMode", &fb1KeyMode);
+    registerOscParam("/gravity/block1/fb1/mixOverflow", &fb1MixOverflow);
+    registerOscParam("/gravity/block1/fb1/resetMixAndKey", &fb1MixAndKeyReset);
+    
+    // ============== FB1 MIX AND KEY LFO (6 params) ==============
+    registerOscParam("/gravity/block1/fb1/lfo/mixAmountAmp", &fb1MixAndKeyLfo[0]);
+    registerOscParam("/gravity/block1/fb1/lfo/mixAmountRate", &fb1MixAndKeyLfo[1]);
+    registerOscParam("/gravity/block1/fb1/lfo/keyThresholdAmp", &fb1MixAndKeyLfo[2]);
+    registerOscParam("/gravity/block1/fb1/lfo/keyThresholdRate", &fb1MixAndKeyLfo[3]);
+    registerOscParam("/gravity/block1/fb1/lfo/keySoftAmp", &fb1MixAndKeyLfo[4]);
+    registerOscParam("/gravity/block1/fb1/lfo/keySoftRate", &fb1MixAndKeyLfo[5]);
+    registerOscParam("/gravity/block1/fb1/lfo/resetMixAndKey", &fb1MixAndKeyLfoReset);
+    
+    // ============== FB1 GEO1 (10 params) ==============
+    registerOscParam("/gravity/block1/fb1/xDisplace", &fb1Geo1[0]);
+    registerOscParam("/gravity/block1/fb1/yDisplace", &fb1Geo1[1]);
+    registerOscParam("/gravity/block1/fb1/zDisplace", &fb1Geo1[2]);
+    registerOscParam("/gravity/block1/fb1/rotate", &fb1Geo1[3]);
+    registerOscParam("/gravity/block1/fb1/xStretch", &fb1Geo1[4]);
+    registerOscParam("/gravity/block1/fb1/yStretch", &fb1Geo1[5]);
+    registerOscParam("/gravity/block1/fb1/xShear", &fb1Geo1[6]);
+    registerOscParam("/gravity/block1/fb1/yShear", &fb1Geo1[7]);
+    registerOscParam("/gravity/block1/fb1/kaleidoscopeAmount", &fb1Geo1[8]);
+    registerOscParam("/gravity/block1/fb1/kaleidoscopeSlice", &fb1Geo1[9]);
+    
+    // FB1 geo booleans/ints
+    registerOscParam("/gravity/block1/fb1/hMirror", &fb1HMirror);
+    registerOscParam("/gravity/block1/fb1/vMirror", &fb1VMirror);
+    registerOscParam("/gravity/block1/fb1/hFlip", &fb1HFlip);
+    registerOscParam("/gravity/block1/fb1/vFlip", &fb1VFlip);
+    registerOscParam("/gravity/block1/fb1/geoOverflow", &fb1GeoOverflow);
+    registerOscParam("/gravity/block1/fb1/rotateMode", &fb1RotateMode);
+    registerOscParam("/gravity/block1/fb1/resetGeo", &fb1Geo1Reset);
+    
+    // ============== FB1 GEO1 LFO1 (8 params) ==============
+    registerOscParam("/gravity/block1/fb1/lfo/xDisplaceAmp", &fb1Geo1Lfo1[0]);
+    registerOscParam("/gravity/block1/fb1/lfo/xDisplaceRate", &fb1Geo1Lfo1[1]);
+    registerOscParam("/gravity/block1/fb1/lfo/yDisplaceAmp", &fb1Geo1Lfo1[2]);
+    registerOscParam("/gravity/block1/fb1/lfo/yDisplaceRate", &fb1Geo1Lfo1[3]);
+    registerOscParam("/gravity/block1/fb1/lfo/zDisplaceAmp", &fb1Geo1Lfo1[4]);
+    registerOscParam("/gravity/block1/fb1/lfo/zDisplaceRate", &fb1Geo1Lfo1[5]);
+    registerOscParam("/gravity/block1/fb1/lfo/rotateAmp", &fb1Geo1Lfo1[6]);
+    registerOscParam("/gravity/block1/fb1/lfo/rotateRate", &fb1Geo1Lfo1[7]);
+    registerOscParam("/gravity/block1/fb1/lfo/resetGeo1", &fb1Geo1Lfo1Reset);
+    
+    // ============== FB1 GEO1 LFO2 (10 params) ==============
+    registerOscParam("/gravity/block1/fb1/lfo/xStretchAmp", &fb1Geo1Lfo2[0]);
+    registerOscParam("/gravity/block1/fb1/lfo/xStretchRate", &fb1Geo1Lfo2[1]);
+    registerOscParam("/gravity/block1/fb1/lfo/yStretchAmp", &fb1Geo1Lfo2[2]);
+    registerOscParam("/gravity/block1/fb1/lfo/yStretchRate", &fb1Geo1Lfo2[3]);
+    registerOscParam("/gravity/block1/fb1/lfo/xShearAmp", &fb1Geo1Lfo2[4]);
+    registerOscParam("/gravity/block1/fb1/lfo/xShearRate", &fb1Geo1Lfo2[5]);
+    registerOscParam("/gravity/block1/fb1/lfo/yShearAmp", &fb1Geo1Lfo2[6]);
+    registerOscParam("/gravity/block1/fb1/lfo/yShearRate", &fb1Geo1Lfo2[7]);
+    registerOscParam("/gravity/block1/fb1/lfo/kaleidoscopeSliceAmp", &fb1Geo1Lfo2[8]);
+    registerOscParam("/gravity/block1/fb1/lfo/kaleidoscopeSliceRate", &fb1Geo1Lfo2[9]);
+    registerOscParam("/gravity/block1/fb1/lfo/resetGeo2", &fb1Geo1Lfo2Reset);
+    
+    // ============== FB1 COLOR1 (11 params) ==============
+    registerOscParam("/gravity/block1/fb1/hueOffset", &fb1Color1[0]);
+    registerOscParam("/gravity/block1/fb1/saturationOffset", &fb1Color1[1]);
+    registerOscParam("/gravity/block1/fb1/brightOffset", &fb1Color1[2]);
+    registerOscParam("/gravity/block1/fb1/hueMultiply", &fb1Color1[3]);
+    registerOscParam("/gravity/block1/fb1/saturationMultiply", &fb1Color1[4]);
+    registerOscParam("/gravity/block1/fb1/brightMultiply", &fb1Color1[5]);
+    registerOscParam("/gravity/block1/fb1/huePowmap", &fb1Color1[6]);
+    registerOscParam("/gravity/block1/fb1/saturationPowmap", &fb1Color1[7]);
+    registerOscParam("/gravity/block1/fb1/brightPowmap", &fb1Color1[8]);
+    registerOscParam("/gravity/block1/fb1/hueShaper", &fb1Color1[9]);
+    registerOscParam("/gravity/block1/fb1/posterize", &fb1Color1[10]);
+    
+    // FB1 color booleans
+    registerOscParam("/gravity/block1/fb1/hueInvert", &fb1HueInvert);
+    registerOscParam("/gravity/block1/fb1/saturationInvert", &fb1SaturationInvert);
+    registerOscParam("/gravity/block1/fb1/brightInvert", &fb1BrightInvert);
+    registerOscParam("/gravity/block1/fb1/resetColor", &fb1Color1Reset);
+    
+    // ============== FB1 COLOR1 LFO1 (6 params) ==============
+    registerOscParam("/gravity/block1/fb1/lfo/huePowmapAmp", &fb1Color1Lfo1[0]);
+    registerOscParam("/gravity/block1/fb1/lfo/huePowmapRate", &fb1Color1Lfo1[1]);
+    registerOscParam("/gravity/block1/fb1/lfo/saturationPowmapAmp", &fb1Color1Lfo1[2]);
+    registerOscParam("/gravity/block1/fb1/lfo/saturationPowmapRate", &fb1Color1Lfo1[3]);
+    registerOscParam("/gravity/block1/fb1/lfo/brightPowmapAmp", &fb1Color1Lfo1[4]);
+    registerOscParam("/gravity/block1/fb1/lfo/brightPowmapRate", &fb1Color1Lfo1[5]);
+    registerOscParam("/gravity/block1/fb1/lfo/resetColor", &fb1Color1Lfo1Reset);
+    
+    // ============== FB1 FILTERS (9 params) ==============
+    registerOscParam("/gravity/block1/fb1/blurAmount", &fb1Filters[0]);
+    registerOscParam("/gravity/block1/fb1/blurRadius", &fb1Filters[1]);
+    registerOscParam("/gravity/block1/fb1/sharpenAmount", &fb1Filters[2]);
+    registerOscParam("/gravity/block1/fb1/sharpenRadius", &fb1Filters[3]);
+    registerOscParam("/gravity/block1/fb1/filtersBoost", &fb1Filters[4]);
+    registerOscParam("/gravity/block1/fb1/temp1Amount", &fb1Filters[5]);
+    registerOscParam("/gravity/block1/fb1/temp1q", &fb1Filters[6]);
+    registerOscParam("/gravity/block1/fb1/temp2Amount", &fb1Filters[7]);
+    registerOscParam("/gravity/block1/fb1/temp2q", &fb1Filters[8]);
+    registerOscParam("/gravity/block1/fb1/resetFilters", &fb1FiltersReset);
+    
+    // FB1 delay time (special float parameter)
+    registerOscParam("/gravity/block1/fb1/delayTime", &fb1DelayTime);
+    
+    // FB1 generator booleans (correct variable names)
+    registerOscParam("/gravity/block1/fb1/clear", &fb1FramebufferClearSwitch);
+    registerOscParam("/gravity/block1/fb1/hypercube", &block1HypercubeSwitch);
+    registerOscParam("/gravity/block1/fb1/lissajousBall", &block1LissaBallSwitch);
+    registerOscParam("/gravity/block1/fb1/septagram", &block1SevenStarSwitch);
+    registerOscParam("/gravity/block1/fb1/dancingLine", &block1LineSwitch);
+    
+    ofLogNotice("OSC") << "Block 1 registration complete. Parameters: " << oscRegistry.size();
+}
+
+void GuiApp::registerBlock2OscParameters() {
+    ofLogNotice("OSC") << "Registering Block 2 OSC parameters...";
+    
+    // ============== BLOCK 2 INPUT ADJUST (15 sliders) ==============
+    registerOscParam("/gravity/block2/input/xDisplace", &block2InputAdjust[0]);
+    registerOscParam("/gravity/block2/input/yDisplace", &block2InputAdjust[1]);
+    registerOscParam("/gravity/block2/input/zDisplace", &block2InputAdjust[2]);
+    registerOscParam("/gravity/block2/input/rotate", &block2InputAdjust[3]);
+    registerOscParam("/gravity/block2/input/hueOffset", &block2InputAdjust[4]);
+    registerOscParam("/gravity/block2/input/saturationOffset", &block2InputAdjust[5]);
+    registerOscParam("/gravity/block2/input/brightOffset", &block2InputAdjust[6]);
+    registerOscParam("/gravity/block2/input/posterize", &block2InputAdjust[7]);
+    registerOscParam("/gravity/block2/input/kaleidoscopeAmount", &block2InputAdjust[8]);
+    registerOscParam("/gravity/block2/input/kaleidoscopeSlice", &block2InputAdjust[9]);
+    registerOscParam("/gravity/block2/input/blurAmount", &block2InputAdjust[10]);
+    registerOscParam("/gravity/block2/input/blurRadius", &block2InputAdjust[11]);
+    registerOscParam("/gravity/block2/input/sharpenAmount", &block2InputAdjust[12]);
+    registerOscParam("/gravity/block2/input/sharpenRadius", &block2InputAdjust[13]);
+    registerOscParam("/gravity/block2/input/filtersBoost", &block2InputAdjust[14]);
+    
+    // Block 2 input booleans/ints
+    registerOscParam("/gravity/block2/input/inputSelect", &block2InputSelect);
+    registerOscParam("/gravity/block2/input/aspectRatio", &block2InputAspectRatioSwitch);
+    registerOscParam("/gravity/block2/input/hMirror", &block2InputHMirror);
+    registerOscParam("/gravity/block2/input/vMirror", &block2InputVMirror);
+    registerOscParam("/gravity/block2/input/hueInvert", &block2InputHueInvert);
+    registerOscParam("/gravity/block2/input/saturationInvert", &block2InputSaturationInvert);
+    registerOscParam("/gravity/block2/input/brightInvert", &block2InputBrightInvert);
+    registerOscParam("/gravity/block2/input/geoOverflow", &block2InputGeoOverflow);
+    registerOscParam("/gravity/block2/input/hFlip", &block2InputHFlip);
+    registerOscParam("/gravity/block2/input/vFlip", &block2InputVFlip);
+    registerOscParam("/gravity/block2/input/rgbInvert", &block2InputRGBInvert);
+    registerOscParam("/gravity/block2/input/solarize", &block2InputSolarize);
+    registerOscParam("/gravity/block2/input/reset", &block2InputAdjustReset);
+    
+    // ============== BLOCK 2 INPUT ADJUST LFO (16 params) ==============
+    registerOscParam("/gravity/block2/input/lfo/xDisplaceAmp", &block2InputAdjustLfo[0]);
+    registerOscParam("/gravity/block2/input/lfo/xDisplaceRate", &block2InputAdjustLfo[1]);
+    registerOscParam("/gravity/block2/input/lfo/yDisplaceAmp", &block2InputAdjustLfo[2]);
+    registerOscParam("/gravity/block2/input/lfo/yDisplaceRate", &block2InputAdjustLfo[3]);
+    registerOscParam("/gravity/block2/input/lfo/zDisplaceAmp", &block2InputAdjustLfo[4]);
+    registerOscParam("/gravity/block2/input/lfo/zDisplaceRate", &block2InputAdjustLfo[5]);
+    registerOscParam("/gravity/block2/input/lfo/rotateAmp", &block2InputAdjustLfo[6]);
+    registerOscParam("/gravity/block2/input/lfo/rotateRate", &block2InputAdjustLfo[7]);
+    registerOscParam("/gravity/block2/input/lfo/hueOffsetAmp", &block2InputAdjustLfo[8]);
+    registerOscParam("/gravity/block2/input/lfo/hueOffsetRate", &block2InputAdjustLfo[9]);
+    registerOscParam("/gravity/block2/input/lfo/saturationOffsetAmp", &block2InputAdjustLfo[10]);
+    registerOscParam("/gravity/block2/input/lfo/saturationOffsetRate", &block2InputAdjustLfo[11]);
+    registerOscParam("/gravity/block2/input/lfo/brightOffsetAmp", &block2InputAdjustLfo[12]);
+    registerOscParam("/gravity/block2/input/lfo/brightOffsetRate", &block2InputAdjustLfo[13]);
+    registerOscParam("/gravity/block2/input/lfo/kaleidoscopeSliceAmp", &block2InputAdjustLfo[14]);
+    registerOscParam("/gravity/block2/input/lfo/kaleidoscopeSliceRate", &block2InputAdjustLfo[15]);
+    registerOscParam("/gravity/block2/input/lfo/reset", &block2InputAdjustLfoReset);
+    
+    // ============== FB2 MIX AND KEY (6 params) ==============
+    registerOscParam("/gravity/block2/fb2/mixAmount", &fb2MixAndKey[0]);
+    registerOscParam("/gravity/block2/fb2/keyRed", &fb2MixAndKey[1]);
+    registerOscParam("/gravity/block2/fb2/keyGreen", &fb2MixAndKey[2]);
+    registerOscParam("/gravity/block2/fb2/keyBlue", &fb2MixAndKey[3]);
+    registerOscParam("/gravity/block2/fb2/keyThreshold", &fb2MixAndKey[4]);
+    registerOscParam("/gravity/block2/fb2/keySoft", &fb2MixAndKey[5]);
+    
+    // FB2 mix booleans/ints
+    registerOscParam("/gravity/block2/fb2/keyOrder", &fb2KeyOrder);
+    registerOscParam("/gravity/block2/fb2/mixType", &fb2MixType);
+    registerOscParam("/gravity/block2/fb2/keyMode", &fb2KeyMode);
+    registerOscParam("/gravity/block2/fb2/mixOverflow", &fb2MixOverflow);
+    registerOscParam("/gravity/block2/fb2/resetMixAndKey", &fb2MixAndKeyReset);
+    
+    // ============== FB2 MIX AND KEY LFO (6 params) ==============
+    registerOscParam("/gravity/block2/fb2/lfo/mixAmountAmp", &fb2MixAndKeyLfo[0]);
+    registerOscParam("/gravity/block2/fb2/lfo/mixAmountRate", &fb2MixAndKeyLfo[1]);
+    registerOscParam("/gravity/block2/fb2/lfo/keyThresholdAmp", &fb2MixAndKeyLfo[2]);
+    registerOscParam("/gravity/block2/fb2/lfo/keyThresholdRate", &fb2MixAndKeyLfo[3]);
+    registerOscParam("/gravity/block2/fb2/lfo/keySoftAmp", &fb2MixAndKeyLfo[4]);
+    registerOscParam("/gravity/block2/fb2/lfo/keySoftRate", &fb2MixAndKeyLfo[5]);
+    registerOscParam("/gravity/block2/fb2/lfo/resetMixAndKey", &fb2MixAndKeyLfoReset);
+    
+    // ============== FB2 GEO1 (10 params) ==============
+    registerOscParam("/gravity/block2/fb2/xDisplace", &fb2Geo1[0]);
+    registerOscParam("/gravity/block2/fb2/yDisplace", &fb2Geo1[1]);
+    registerOscParam("/gravity/block2/fb2/zDisplace", &fb2Geo1[2]);
+    registerOscParam("/gravity/block2/fb2/rotate", &fb2Geo1[3]);
+    registerOscParam("/gravity/block2/fb2/xStretch", &fb2Geo1[4]);
+    registerOscParam("/gravity/block2/fb2/yStretch", &fb2Geo1[5]);
+    registerOscParam("/gravity/block2/fb2/xShear", &fb2Geo1[6]);
+    registerOscParam("/gravity/block2/fb2/yShear", &fb2Geo1[7]);
+    registerOscParam("/gravity/block2/fb2/kaleidoscopeAmount", &fb2Geo1[8]);
+    registerOscParam("/gravity/block2/fb2/kaleidoscopeSlice", &fb2Geo1[9]);
+    
+    // FB2 geo booleans/ints
+    registerOscParam("/gravity/block2/fb2/hMirror", &fb2HMirror);
+    registerOscParam("/gravity/block2/fb2/vMirror", &fb2VMirror);
+    registerOscParam("/gravity/block2/fb2/hFlip", &fb2HFlip);
+    registerOscParam("/gravity/block2/fb2/vFlip", &fb2VFlip);
+    registerOscParam("/gravity/block2/fb2/geoOverflow", &fb2GeoOverflow);
+    registerOscParam("/gravity/block2/fb2/rotateMode", &fb2RotateMode);
+    registerOscParam("/gravity/block2/fb2/resetGeo", &fb2Geo1Reset);
+    
+    // ============== FB2 GEO1 LFO1 (8 params) ==============
+    registerOscParam("/gravity/block2/fb2/lfo/xDisplaceAmp", &fb2Geo1Lfo1[0]);
+    registerOscParam("/gravity/block2/fb2/lfo/xDisplaceRate", &fb2Geo1Lfo1[1]);
+    registerOscParam("/gravity/block2/fb2/lfo/yDisplaceAmp", &fb2Geo1Lfo1[2]);
+    registerOscParam("/gravity/block2/fb2/lfo/yDisplaceRate", &fb2Geo1Lfo1[3]);
+    registerOscParam("/gravity/block2/fb2/lfo/zDisplaceAmp", &fb2Geo1Lfo1[4]);
+    registerOscParam("/gravity/block2/fb2/lfo/zDisplaceRate", &fb2Geo1Lfo1[5]);
+    registerOscParam("/gravity/block2/fb2/lfo/rotateAmp", &fb2Geo1Lfo1[6]);
+    registerOscParam("/gravity/block2/fb2/lfo/rotateRate", &fb2Geo1Lfo1[7]);
+    registerOscParam("/gravity/block2/fb2/lfo/resetGeo1", &fb2Geo1Lfo1Reset);
+    
+    // ============== FB2 GEO1 LFO2 (10 params) ==============
+    registerOscParam("/gravity/block2/fb2/lfo/xStretchAmp", &fb2Geo1Lfo2[0]);
+    registerOscParam("/gravity/block2/fb2/lfo/xStretchRate", &fb2Geo1Lfo2[1]);
+    registerOscParam("/gravity/block2/fb2/lfo/yStretchAmp", &fb2Geo1Lfo2[2]);
+    registerOscParam("/gravity/block2/fb2/lfo/yStretchRate", &fb2Geo1Lfo2[3]);
+    registerOscParam("/gravity/block2/fb2/lfo/xShearAmp", &fb2Geo1Lfo2[4]);
+    registerOscParam("/gravity/block2/fb2/lfo/xShearRate", &fb2Geo1Lfo2[5]);
+    registerOscParam("/gravity/block2/fb2/lfo/yShearAmp", &fb2Geo1Lfo2[6]);
+    registerOscParam("/gravity/block2/fb2/lfo/yShearRate", &fb2Geo1Lfo2[7]);
+    registerOscParam("/gravity/block2/fb2/lfo/kaleidoscopeSliceAmp", &fb2Geo1Lfo2[8]);
+    registerOscParam("/gravity/block2/fb2/lfo/kaleidoscopeSliceRate", &fb2Geo1Lfo2[9]);
+    registerOscParam("/gravity/block2/fb2/lfo/resetGeo2", &fb2Geo1Lfo2Reset);
+    
+    // ============== FB2 COLOR1 (11 params) ==============
+    registerOscParam("/gravity/block2/fb2/hueOffset", &fb2Color1[0]);
+    registerOscParam("/gravity/block2/fb2/saturationOffset", &fb2Color1[1]);
+    registerOscParam("/gravity/block2/fb2/brightOffset", &fb2Color1[2]);
+    registerOscParam("/gravity/block2/fb2/hueMultiply", &fb2Color1[3]);
+    registerOscParam("/gravity/block2/fb2/saturationMultiply", &fb2Color1[4]);
+    registerOscParam("/gravity/block2/fb2/brightMultiply", &fb2Color1[5]);
+    registerOscParam("/gravity/block2/fb2/huePowmap", &fb2Color1[6]);
+    registerOscParam("/gravity/block2/fb2/saturationPowmap", &fb2Color1[7]);
+    registerOscParam("/gravity/block2/fb2/brightPowmap", &fb2Color1[8]);
+    registerOscParam("/gravity/block2/fb2/hueShaper", &fb2Color1[9]);
+    registerOscParam("/gravity/block2/fb2/posterize", &fb2Color1[10]);
+    
+    // FB2 color booleans
+    registerOscParam("/gravity/block2/fb2/hueInvert", &fb2HueInvert);
+    registerOscParam("/gravity/block2/fb2/saturationInvert", &fb2SaturationInvert);
+    registerOscParam("/gravity/block2/fb2/brightInvert", &fb2BrightInvert);
+    registerOscParam("/gravity/block2/fb2/resetColor", &fb2Color1Reset);
+    
+    // ============== FB2 COLOR1 LFO1 (6 params) ==============
+    registerOscParam("/gravity/block2/fb2/lfo/huePowmapAmp", &fb2Color1Lfo1[0]);
+    registerOscParam("/gravity/block2/fb2/lfo/huePowmapRate", &fb2Color1Lfo1[1]);
+    registerOscParam("/gravity/block2/fb2/lfo/saturationPowmapAmp", &fb2Color1Lfo1[2]);
+    registerOscParam("/gravity/block2/fb2/lfo/saturationPowmapRate", &fb2Color1Lfo1[3]);
+    registerOscParam("/gravity/block2/fb2/lfo/brightPowmapAmp", &fb2Color1Lfo1[4]);
+    registerOscParam("/gravity/block2/fb2/lfo/brightPowmapRate", &fb2Color1Lfo1[5]);
+    registerOscParam("/gravity/block2/fb2/lfo/resetColor", &fb2Color1Lfo1Reset);
+    
+    // ============== FB2 FILTERS (9 params) ==============
+    registerOscParam("/gravity/block2/fb2/blurAmount", &fb2Filters[0]);
+    registerOscParam("/gravity/block2/fb2/blurRadius", &fb2Filters[1]);
+    registerOscParam("/gravity/block2/fb2/sharpenAmount", &fb2Filters[2]);
+    registerOscParam("/gravity/block2/fb2/sharpenRadius", &fb2Filters[3]);
+    registerOscParam("/gravity/block2/fb2/filtersBoost", &fb2Filters[4]);
+    registerOscParam("/gravity/block2/fb2/temp1Amount", &fb2Filters[5]);
+    registerOscParam("/gravity/block2/fb2/temp1q", &fb2Filters[6]);
+    registerOscParam("/gravity/block2/fb2/temp2Amount", &fb2Filters[7]);
+    registerOscParam("/gravity/block2/fb2/temp2q", &fb2Filters[8]);
+    registerOscParam("/gravity/block2/fb2/resetFilters", &fb2FiltersReset);
+    
+    // FB2 delay time
+    registerOscParam("/gravity/block2/fb2/delayTime", &fb2DelayTime);
+    
+    // FB2 generator booleans
+    registerOscParam("/gravity/block2/fb2/clear", &fb2FramebufferClearSwitch);
+    registerOscParam("/gravity/block2/fb2/hypercube", &block2HypercubeSwitch);
+    registerOscParam("/gravity/block2/fb2/lissajousBall", &block2LissaBallSwitch);
+    registerOscParam("/gravity/block2/fb2/septagram", &block2SevenStarSwitch);
+    registerOscParam("/gravity/block2/fb2/dancingLine", &block2LineSwitch);
+    
+    ofLogNotice("OSC") << "Block 2 registration complete. Total parameters: " << oscRegistry.size();
+}
+
+void GuiApp::registerBlock3OscParameters() {
+    ofLogNotice("OSC") << "Registering Block 3 OSC parameters...";
+    
+    // ============== BLOCK 3 - B1 GEO (10 params) ==============
+    registerOscParam("/gravity/block3/b1/xDisplace", &block1Geo[0]);
+    registerOscParam("/gravity/block3/b1/yDisplace", &block1Geo[1]);
+    registerOscParam("/gravity/block3/b1/zDisplace", &block1Geo[2]);
+    registerOscParam("/gravity/block3/b1/rotate", &block1Geo[3]);
+    registerOscParam("/gravity/block3/b1/xStretch", &block1Geo[4]);
+    registerOscParam("/gravity/block3/b1/yStretch", &block1Geo[5]);
+    registerOscParam("/gravity/block3/b1/xShear", &block1Geo[6]);
+    registerOscParam("/gravity/block3/b1/yShear", &block1Geo[7]);
+    registerOscParam("/gravity/block3/b1/kaleidoscopeAmount", &block1Geo[8]);
+    registerOscParam("/gravity/block3/b1/kaleidoscopeSlice", &block1Geo[9]);
+    registerOscParam("/gravity/block3/b1/geoOverflow", &block1GeoOverflow);
+    registerOscParam("/gravity/block3/b1/resetGeo", &block1GeoReset);
+    
+    // ============== BLOCK 3 - B1 GEO LFO1 (8 params) ==============
+    registerOscParam("/gravity/block3/lfo/b1/xDisplaceAmp", &block1Geo1Lfo1[0]);
+    registerOscParam("/gravity/block3/lfo/b1/xDisplaceRate", &block1Geo1Lfo1[1]);
+    registerOscParam("/gravity/block3/lfo/b1/yDisplaceAmp", &block1Geo1Lfo1[2]);
+    registerOscParam("/gravity/block3/lfo/b1/yDisplaceRate", &block1Geo1Lfo1[3]);
+    registerOscParam("/gravity/block3/lfo/b1/zDisplaceAmp", &block1Geo1Lfo1[4]);
+    registerOscParam("/gravity/block3/lfo/b1/zDisplaceRate", &block1Geo1Lfo1[5]);
+    registerOscParam("/gravity/block3/lfo/b1/rotateAmp", &block1Geo1Lfo1[6]);
+    registerOscParam("/gravity/block3/lfo/b1/rotateRate", &block1Geo1Lfo1[7]);
+    registerOscParam("/gravity/block3/lfo/b1/resetGeo1", &block1Geo1Lfo1Reset);
+    
+    // ============== BLOCK 3 - B1 GEO LFO2 (10 params) ==============
+    registerOscParam("/gravity/block3/lfo/b1/xStretchAmp", &block1Geo1Lfo2[0]);
+    registerOscParam("/gravity/block3/lfo/b1/xStretchRate", &block1Geo1Lfo2[1]);
+    registerOscParam("/gravity/block3/lfo/b1/yStretchAmp", &block1Geo1Lfo2[2]);
+    registerOscParam("/gravity/block3/lfo/b1/yStretchRate", &block1Geo1Lfo2[3]);
+    registerOscParam("/gravity/block3/lfo/b1/xShearAmp", &block1Geo1Lfo2[4]);
+    registerOscParam("/gravity/block3/lfo/b1/xShearRate", &block1Geo1Lfo2[5]);
+    registerOscParam("/gravity/block3/lfo/b1/yShearAmp", &block1Geo1Lfo2[6]);
+    registerOscParam("/gravity/block3/lfo/b1/yShearRate", &block1Geo1Lfo2[7]);
+    registerOscParam("/gravity/block3/lfo/b1/kaleidoscopeSliceAmp", &block1Geo1Lfo2[8]);
+    registerOscParam("/gravity/block3/lfo/b1/kaleidoscopeSliceRate", &block1Geo1Lfo2[9]);
+    registerOscParam("/gravity/block3/lfo/b1/resetGeo2", &block1Geo1Lfo2Reset);
+    
+    // ============== BLOCK 3 - B1 COLORIZE (15 params) ==============
+    registerOscParam("/gravity/block3/b1/colorize/hueBand1", &block1Colorize[0]);
+    registerOscParam("/gravity/block3/b1/colorize/saturationBand1", &block1Colorize[1]);
+    registerOscParam("/gravity/block3/b1/colorize/brightBand1", &block1Colorize[2]);
+    registerOscParam("/gravity/block3/b1/colorize/hueBand2", &block1Colorize[3]);
+    registerOscParam("/gravity/block3/b1/colorize/saturationBand2", &block1Colorize[4]);
+    registerOscParam("/gravity/block3/b1/colorize/brightBand2", &block1Colorize[5]);
+    registerOscParam("/gravity/block3/b1/colorize/hueBand3", &block1Colorize[6]);
+    registerOscParam("/gravity/block3/b1/colorize/saturationBand3", &block1Colorize[7]);
+    registerOscParam("/gravity/block3/b1/colorize/brightBand3", &block1Colorize[8]);
+    registerOscParam("/gravity/block3/b1/colorize/hueBand4", &block1Colorize[9]);
+    registerOscParam("/gravity/block3/b1/colorize/saturationBand4", &block1Colorize[10]);
+    registerOscParam("/gravity/block3/b1/colorize/brightBand4", &block1Colorize[11]);
+    registerOscParam("/gravity/block3/b1/colorize/hueBand5", &block1Colorize[12]);
+    registerOscParam("/gravity/block3/b1/colorize/saturationBand5", &block1Colorize[13]);
+    registerOscParam("/gravity/block3/b1/colorize/brightBand5", &block1Colorize[14]);
+    registerOscParam("/gravity/block3/b1/colorize/active", &block1ColorizeSwitch);
+    registerOscParam("/gravity/block3/b1/colorize/colorspace", &block1ColorizeHSB_RGB);
+    registerOscParam("/gravity/block3/b1/colorize/reset", &block1ColorizeReset);
+    
+    // ============== BLOCK 3 - B1 COLORIZE LFO1 (12 params) ==============
+    registerOscParam("/gravity/block3/lfo/b1/hueBand1Amp", &block1ColorizeLfo1[0]);
+    registerOscParam("/gravity/block3/lfo/b1/saturationBand1Amp", &block1ColorizeLfo1[1]);
+    registerOscParam("/gravity/block3/lfo/b1/brightBand1Amp", &block1ColorizeLfo1[2]);
+    registerOscParam("/gravity/block3/lfo/b1/hueBand1Rate", &block1ColorizeLfo1[3]);
+    registerOscParam("/gravity/block3/lfo/b1/saturationBand1Rate", &block1ColorizeLfo1[4]);
+    registerOscParam("/gravity/block3/lfo/b1/brightBand1Rate", &block1ColorizeLfo1[5]);
+    registerOscParam("/gravity/block3/lfo/b1/hueBand2Amp", &block1ColorizeLfo1[6]);
+    registerOscParam("/gravity/block3/lfo/b1/saturationBand2Amp", &block1ColorizeLfo1[7]);
+    registerOscParam("/gravity/block3/lfo/b1/brightBand2Amp", &block1ColorizeLfo1[8]);
+    registerOscParam("/gravity/block3/lfo/b1/hueBand2Rate", &block1ColorizeLfo1[9]);
+    registerOscParam("/gravity/block3/lfo/b1/saturationBand2Rate", &block1ColorizeLfo1[10]);
+    registerOscParam("/gravity/block3/lfo/b1/brightBand2Rate", &block1ColorizeLfo1[11]);
+    registerOscParam("/gravity/block3/lfo/b1/resetLfo1", &block1ColorizeLfo1Reset);
+    
+    // ============== BLOCK 3 - B1 COLORIZE LFO2 (12 params) ==============
+    registerOscParam("/gravity/block3/lfo/b1/hueBand3Amp", &block1ColorizeLfo2[0]);
+    registerOscParam("/gravity/block3/lfo/b1/saturationBand3Amp", &block1ColorizeLfo2[1]);
+    registerOscParam("/gravity/block3/lfo/b1/brightBand3Amp", &block1ColorizeLfo2[2]);
+    registerOscParam("/gravity/block3/lfo/b1/hueBand3Rate", &block1ColorizeLfo2[3]);
+    registerOscParam("/gravity/block3/lfo/b1/saturationBand3Rate", &block1ColorizeLfo2[4]);
+    registerOscParam("/gravity/block3/lfo/b1/brightBand3Rate", &block1ColorizeLfo2[5]);
+    registerOscParam("/gravity/block3/lfo/b1/hueBand4Amp", &block1ColorizeLfo2[6]);
+    registerOscParam("/gravity/block3/lfo/b1/saturationBand4Amp", &block1ColorizeLfo2[7]);
+    registerOscParam("/gravity/block3/lfo/b1/brightBand4Amp", &block1ColorizeLfo2[8]);
+    registerOscParam("/gravity/block3/lfo/b1/hueBand4Rate", &block1ColorizeLfo2[9]);
+    registerOscParam("/gravity/block3/lfo/b1/saturationBand4Rate", &block1ColorizeLfo2[10]);
+    registerOscParam("/gravity/block3/lfo/b1/brightBand4Rate", &block1ColorizeLfo2[11]);
+    registerOscParam("/gravity/block3/lfo/b1/resetLfo2", &block1ColorizeLfo2Reset);
+    
+    // ============== BLOCK 3 - B1 COLORIZE LFO3 (6 params) ==============
+    registerOscParam("/gravity/block3/lfo/b1/hueBand5Amp", &block1ColorizeLfo3[0]);
+    registerOscParam("/gravity/block3/lfo/b1/saturationBand5Amp", &block1ColorizeLfo3[1]);
+    registerOscParam("/gravity/block3/lfo/b1/brightBand5Amp", &block1ColorizeLfo3[2]);
+    registerOscParam("/gravity/block3/lfo/b1/hueBand5Rate", &block1ColorizeLfo3[3]);
+    registerOscParam("/gravity/block3/lfo/b1/saturationBand5Rate", &block1ColorizeLfo3[4]);
+    registerOscParam("/gravity/block3/lfo/b1/brightBand5Rate", &block1ColorizeLfo3[5]);
+    registerOscParam("/gravity/block3/lfo/b1/resetLfo3", &block1ColorizeLfo3Reset);
+    
+    // ============== BLOCK 3 - B1 FILTERS (5 params) ==============
+    registerOscParam("/gravity/block3/b1/blurAmount", &block1Filters[0]);
+    registerOscParam("/gravity/block3/b1/blurRadius", &block1Filters[1]);
+    registerOscParam("/gravity/block3/b1/sharpenAmount", &block1Filters[2]);
+    registerOscParam("/gravity/block3/b1/sharpenRadius", &block1Filters[3]);
+    registerOscParam("/gravity/block3/b1/filtersBoost", &block1Filters[4]);
+    
+    // ============== BLOCK 3 - B2 GEO (10 params) ==============
+    registerOscParam("/gravity/block3/b2/xDisplace", &block2Geo[0]);
+    registerOscParam("/gravity/block3/b2/yDisplace", &block2Geo[1]);
+    registerOscParam("/gravity/block3/b2/zDisplace", &block2Geo[2]);
+    registerOscParam("/gravity/block3/b2/rotate", &block2Geo[3]);
+    registerOscParam("/gravity/block3/b2/xStretch", &block2Geo[4]);
+    registerOscParam("/gravity/block3/b2/yStretch", &block2Geo[5]);
+    registerOscParam("/gravity/block3/b2/xShear", &block2Geo[6]);
+    registerOscParam("/gravity/block3/b2/yShear", &block2Geo[7]);
+    registerOscParam("/gravity/block3/b2/kaleidoscopeAmount", &block2Geo[8]);
+    registerOscParam("/gravity/block3/b2/kaleidoscopeSlice", &block2Geo[9]);
+    registerOscParam("/gravity/block3/b2/geoOverflow", &block2GeoOverflow);
+    registerOscParam("/gravity/block3/b2/resetGeo", &block2GeoReset);
+    
+    // ============== BLOCK 3 - B2 GEO LFO1 (8 params) ==============
+    registerOscParam("/gravity/block3/lfo/b2/xDisplaceAmp", &block2Geo1Lfo1[0]);
+    registerOscParam("/gravity/block3/lfo/b2/xDisplaceRate", &block2Geo1Lfo1[1]);
+    registerOscParam("/gravity/block3/lfo/b2/yDisplaceAmp", &block2Geo1Lfo1[2]);
+    registerOscParam("/gravity/block3/lfo/b2/yDisplaceRate", &block2Geo1Lfo1[3]);
+    registerOscParam("/gravity/block3/lfo/b2/zDisplaceAmp", &block2Geo1Lfo1[4]);
+    registerOscParam("/gravity/block3/lfo/b2/zDisplaceRate", &block2Geo1Lfo1[5]);
+    registerOscParam("/gravity/block3/lfo/b2/rotateAmp", &block2Geo1Lfo1[6]);
+    registerOscParam("/gravity/block3/lfo/b2/rotateRate", &block2Geo1Lfo1[7]);
+    registerOscParam("/gravity/block3/lfo/b2/resetGeo1", &block2Geo1Lfo1Reset);
+    
+    // ============== BLOCK 3 - B2 GEO LFO2 (10 params) ==============
+    registerOscParam("/gravity/block3/lfo/b2/xStretchAmp", &block2Geo1Lfo2[0]);
+    registerOscParam("/gravity/block3/lfo/b2/xStretchRate", &block2Geo1Lfo2[1]);
+    registerOscParam("/gravity/block3/lfo/b2/yStretchAmp", &block2Geo1Lfo2[2]);
+    registerOscParam("/gravity/block3/lfo/b2/yStretchRate", &block2Geo1Lfo2[3]);
+    registerOscParam("/gravity/block3/lfo/b2/xShearAmp", &block2Geo1Lfo2[4]);
+    registerOscParam("/gravity/block3/lfo/b2/xShearRate", &block2Geo1Lfo2[5]);
+    registerOscParam("/gravity/block3/lfo/b2/yShearAmp", &block2Geo1Lfo2[6]);
+    registerOscParam("/gravity/block3/lfo/b2/yShearRate", &block2Geo1Lfo2[7]);
+    registerOscParam("/gravity/block3/lfo/b2/kaleidoscopeSliceAmp", &block2Geo1Lfo2[8]);
+    registerOscParam("/gravity/block3/lfo/b2/kaleidoscopeSliceRate", &block2Geo1Lfo2[9]);
+    registerOscParam("/gravity/block3/lfo/b2/resetGeo2", &block2Geo1Lfo2Reset);
+    
+    // ============== BLOCK 3 - B2 COLORIZE (15 params) ==============
+    registerOscParam("/gravity/block3/b2/colorize/hueBand1", &block2Colorize[0]);
+    registerOscParam("/gravity/block3/b2/colorize/saturationBand1", &block2Colorize[1]);
+    registerOscParam("/gravity/block3/b2/colorize/brightBand1", &block2Colorize[2]);
+    registerOscParam("/gravity/block3/b2/colorize/hueBand2", &block2Colorize[3]);
+    registerOscParam("/gravity/block3/b2/colorize/saturationBand2", &block2Colorize[4]);
+    registerOscParam("/gravity/block3/b2/colorize/brightBand2", &block2Colorize[5]);
+    registerOscParam("/gravity/block3/b2/colorize/hueBand3", &block2Colorize[6]);
+    registerOscParam("/gravity/block3/b2/colorize/saturationBand3", &block2Colorize[7]);
+    registerOscParam("/gravity/block3/b2/colorize/brightBand3", &block2Colorize[8]);
+    registerOscParam("/gravity/block3/b2/colorize/hueBand4", &block2Colorize[9]);
+    registerOscParam("/gravity/block3/b2/colorize/saturationBand4", &block2Colorize[10]);
+    registerOscParam("/gravity/block3/b2/colorize/brightBand4", &block2Colorize[11]);
+    registerOscParam("/gravity/block3/b2/colorize/hueBand5", &block2Colorize[12]);
+    registerOscParam("/gravity/block3/b2/colorize/saturationBand5", &block2Colorize[13]);
+    registerOscParam("/gravity/block3/b2/colorize/brightBand5", &block2Colorize[14]);
+    registerOscParam("/gravity/block3/b2/colorize/active", &block2ColorizeSwitch);
+    registerOscParam("/gravity/block3/b2/colorize/colorspace", &block2ColorizeHSB_RGB);
+    registerOscParam("/gravity/block3/b2/colorize/reset", &block2ColorizeReset);
+    
+    // ============== BLOCK 3 - B2 COLORIZE LFO1 (12 params) ==============
+    registerOscParam("/gravity/block3/lfo/b2/hueBand1Amp", &block2ColorizeLfo1[0]);
+    registerOscParam("/gravity/block3/lfo/b2/saturationBand1Amp", &block2ColorizeLfo1[1]);
+    registerOscParam("/gravity/block3/lfo/b2/brightBand1Amp", &block2ColorizeLfo1[2]);
+    registerOscParam("/gravity/block3/lfo/b2/hueBand1Rate", &block2ColorizeLfo1[3]);
+    registerOscParam("/gravity/block3/lfo/b2/saturationBand1Rate", &block2ColorizeLfo1[4]);
+    registerOscParam("/gravity/block3/lfo/b2/brightBand1Rate", &block2ColorizeLfo1[5]);
+    registerOscParam("/gravity/block3/lfo/b2/hueBand2Amp", &block2ColorizeLfo1[6]);
+    registerOscParam("/gravity/block3/lfo/b2/saturationBand2Amp", &block2ColorizeLfo1[7]);
+    registerOscParam("/gravity/block3/lfo/b2/brightBand2Amp", &block2ColorizeLfo1[8]);
+    registerOscParam("/gravity/block3/lfo/b2/hueBand2Rate", &block2ColorizeLfo1[9]);
+    registerOscParam("/gravity/block3/lfo/b2/saturationBand2Rate", &block2ColorizeLfo1[10]);
+    registerOscParam("/gravity/block3/lfo/b2/brightBand2Rate", &block2ColorizeLfo1[11]);
+    registerOscParam("/gravity/block3/lfo/b2/resetLfo1", &block2ColorizeLfo1Reset);
+    
+    // ============== BLOCK 3 - B2 COLORIZE LFO2 (12 params) ==============
+    registerOscParam("/gravity/block3/lfo/b2/hueBand3Amp", &block2ColorizeLfo2[0]);
+    registerOscParam("/gravity/block3/lfo/b2/saturationBand3Amp", &block2ColorizeLfo2[1]);
+    registerOscParam("/gravity/block3/lfo/b2/brightBand3Amp", &block2ColorizeLfo2[2]);
+    registerOscParam("/gravity/block3/lfo/b2/hueBand3Rate", &block2ColorizeLfo2[3]);
+    registerOscParam("/gravity/block3/lfo/b2/saturationBand3Rate", &block2ColorizeLfo2[4]);
+    registerOscParam("/gravity/block3/lfo/b2/brightBand3Rate", &block2ColorizeLfo2[5]);
+    registerOscParam("/gravity/block3/lfo/b2/hueBand4Amp", &block2ColorizeLfo2[6]);
+    registerOscParam("/gravity/block3/lfo/b2/saturationBand4Amp", &block2ColorizeLfo2[7]);
+    registerOscParam("/gravity/block3/lfo/b2/brightBand4Amp", &block2ColorizeLfo2[8]);
+    registerOscParam("/gravity/block3/lfo/b2/hueBand4Rate", &block2ColorizeLfo2[9]);
+    registerOscParam("/gravity/block3/lfo/b2/saturationBand4Rate", &block2ColorizeLfo2[10]);
+    registerOscParam("/gravity/block3/lfo/b2/brightBand4Rate", &block2ColorizeLfo2[11]);
+    registerOscParam("/gravity/block3/lfo/b2/resetLfo2", &block2ColorizeLfo2Reset);
+    
+    // ============== BLOCK 3 - B2 COLORIZE LFO3 (6 params) ==============
+    registerOscParam("/gravity/block3/lfo/b2/hueBand5Amp", &block2ColorizeLfo3[0]);
+    registerOscParam("/gravity/block3/lfo/b2/saturationBand5Amp", &block2ColorizeLfo3[1]);
+    registerOscParam("/gravity/block3/lfo/b2/brightBand5Amp", &block2ColorizeLfo3[2]);
+    registerOscParam("/gravity/block3/lfo/b2/hueBand5Rate", &block2ColorizeLfo3[3]);
+    registerOscParam("/gravity/block3/lfo/b2/saturationBand5Rate", &block2ColorizeLfo3[4]);
+    registerOscParam("/gravity/block3/lfo/b2/brightBand5Rate", &block2ColorizeLfo3[5]);
+    registerOscParam("/gravity/block3/lfo/b2/resetLfo3", &block2ColorizeLfo3Reset);
+    
+    // ============== BLOCK 3 - B2 FILTERS (5 params) ==============
+    registerOscParam("/gravity/block3/b2/blurAmount", &block2Filters[0]);
+    registerOscParam("/gravity/block3/b2/blurRadius", &block2Filters[1]);
+    registerOscParam("/gravity/block3/b2/sharpenAmount", &block2Filters[2]);
+    registerOscParam("/gravity/block3/b2/sharpenRadius", &block2Filters[3]);
+    registerOscParam("/gravity/block3/b2/filtersBoost", &block2Filters[4]);
+    
+    // ============== BLOCK 3 - MATRIX MIX (9 params) ==============
+    registerOscParam("/gravity/block3/matrixMix/b1RedToB2Red", &matrixMix[0]);
+    registerOscParam("/gravity/block3/matrixMix/b1GreenToB2Red", &matrixMix[1]);
+    registerOscParam("/gravity/block3/matrixMix/b1BlueToB2Red", &matrixMix[2]);
+    registerOscParam("/gravity/block3/matrixMix/b1RedToB2Green", &matrixMix[3]);
+    registerOscParam("/gravity/block3/matrixMix/b1GreenToB2Green", &matrixMix[4]);
+    registerOscParam("/gravity/block3/matrixMix/b1BlueToB2Green", &matrixMix[5]);
+    registerOscParam("/gravity/block3/matrixMix/b1RedToB2Blue", &matrixMix[6]);
+    registerOscParam("/gravity/block3/matrixMix/b1GreenToB2Blue", &matrixMix[7]);
+    registerOscParam("/gravity/block3/matrixMix/b1BlueToB2Blue", &matrixMix[8]);
+    registerOscParam("/gravity/block3/matrixMix/mixType", &matrixMixType);
+    registerOscParam("/gravity/block3/matrixMix/overflow", &matrixMixOverflow);
+    registerOscParam("/gravity/block3/matrixMix/reset", &matrixMixReset);
+    
+    // ============== BLOCK 3 - MATRIX MIX LFO1 (12 params) ==============
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2RedAmp", &matrixMixLfo1[0]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2RedRate", &matrixMixLfo1[1]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1GreenToB2RedAmp", &matrixMixLfo1[2]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1GreenToB2RedRate", &matrixMixLfo1[3]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2RedAmp", &matrixMixLfo1[4]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2RedRate", &matrixMixLfo1[5]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2GreenAmp", &matrixMixLfo1[6]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2GreenRate", &matrixMixLfo1[7]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1GreenToB2GreenAmp", &matrixMixLfo1[8]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1GreenToB2GreenRate", &matrixMixLfo1[9]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2GreenAmp", &matrixMixLfo1[10]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2GreenRate", &matrixMixLfo1[11]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/resetLfo1", &matrixMixLfo1Reset);
+    
+    // ============== BLOCK 3 - MATRIX MIX LFO2 (6 params) ==============
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2BlueAmp", &matrixMixLfo2[0]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2BlueRate", &matrixMixLfo2[1]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1GreenToB2BlueAmp", &matrixMixLfo2[2]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1GreenToB2BlueRate", &matrixMixLfo2[3]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2RedAmp", &matrixMixLfo2[4]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2RedRate", &matrixMixLfo2[5]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/resetLfo2", &matrixMixLfo2Reset);
+    
+    // ============== BLOCK 3 - FINAL MIX AND KEY (6 params) ==============
+    registerOscParam("/gravity/block3/final/mixAmount", &finalMixAndKey[0]);
+    registerOscParam("/gravity/block3/final/keyRed", &finalMixAndKey[1]);
+    registerOscParam("/gravity/block3/final/keyGreen", &finalMixAndKey[2]);
+    registerOscParam("/gravity/block3/final/keyInvert", &finalMixAndKey[3]);
+    registerOscParam("/gravity/block3/final/keyThreshold", &finalMixAndKey[4]);
+    registerOscParam("/gravity/block3/final/keySoft", &finalMixAndKey[5]);
+    registerOscParam("/gravity/block3/final/keyOrder", &finalKeyOrder);
+    registerOscParam("/gravity/block3/final/mixType", &finalMixType);
+    registerOscParam("/gravity/block3/final/keyMode", &finalKeyMode);
+    registerOscParam("/gravity/block3/final/mixOverflow", &finalMixOverflow);
+    registerOscParam("/gravity/block3/final/reset", &finalMixAndKeyReset);
+    
+    // ============== BLOCK 3 - FINAL MIX AND KEY LFO (6 params) ==============
+    registerOscParam("/gravity/block3/lfo/final/mixAmountAmp", &finalMixAndKeyLfo[0]);
+    registerOscParam("/gravity/block3/lfo/final/mixAmountRate", &finalMixAndKeyLfo[1]);
+    registerOscParam("/gravity/block3/lfo/final/keyThresholdAmp", &finalMixAndKeyLfo[2]);
+    registerOscParam("/gravity/block3/lfo/final/keyThresholdRate", &finalMixAndKeyLfo[3]);
+    registerOscParam("/gravity/block3/lfo/final/keySoftAmp", &finalMixAndKeyLfo[4]);
+    registerOscParam("/gravity/block3/lfo/final/keySoftRate", &finalMixAndKeyLfo[5]);
+    registerOscParam("/gravity/block3/lfo/final/reset", &finalMixAndKeyLfoReset);
+    
+    ofLogNotice("OSC") << "Block 3 registration complete. Total parameters: " << oscRegistry.size();
 }

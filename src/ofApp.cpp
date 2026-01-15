@@ -43,12 +43,17 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
 	processOscMessages();
-	processOscQueue();  // Process queued OSC messages
 
 	// Check if video inputs need to be reinitialized
 	if(gui->reinitializeInputs){
 		reinitializeInputs();
 		gui->reinitializeInputs = false;
+	}
+	
+	// Check if NDI sources need to be refreshed
+	if(gui->refreshNdiSources){
+		refreshNdiSources();
+		gui->refreshNdiSources = false;
 	}
 
 	inputUpdate();
@@ -698,11 +703,21 @@ void ofApp::draw(){
 	
 	//channel selection
 	if(gui->ch1InputSelect==0){
-		shader1.setUniformTexture("ch1Tex",input1.getTexture(),2);
+		// Use input1 (webcam or NDI depending on source type)
+		if (gui->input1SourceType == 0) {
+			shader1.setUniformTexture("ch1Tex",input1.getTexture(),2);
+		} else {
+			shader1.setUniformTexture("ch1Tex",ndiFbo1.getTexture(),2);
+		}
 	
 	}
 	if(gui->ch1InputSelect==1){
-		shader1.setUniformTexture("ch1Tex",input2.getTexture(),2);
+		// Use input2 (webcam or NDI depending on source type)
+		if (gui->input2SourceType == 0) {
+			shader1.setUniformTexture("ch1Tex",input2.getTexture(),2);
+		} else {
+			shader1.setUniformTexture("ch1Tex",ndiFbo2.getTexture(),2);
+		}
 	
 	}	
 	//ch1 parameters
@@ -792,10 +807,20 @@ void ofApp::draw(){
 	
 	//channel selection
 	if(gui->ch2InputSelect==0){
-		shader1.setUniformTexture("ch2Tex",input1.getTexture(),3);
+		// Use input1 (webcam or NDI depending on source type)
+		if (gui->input1SourceType == 0) {
+			shader1.setUniformTexture("ch2Tex",input1.getTexture(),3);
+		} else {
+			shader1.setUniformTexture("ch2Tex",ndiFbo1.getTexture(),3);
+		}
 	}
 	if(gui->ch2InputSelect==1){
-		shader1.setUniformTexture("ch2Tex",input2.getTexture(),3);
+		// Use input2 (webcam or NDI depending on source type)
+		if (gui->input2SourceType == 0) {
+			shader1.setUniformTexture("ch2Tex",input2.getTexture(),3);
+		} else {
+			shader1.setUniformTexture("ch2Tex",ndiFbo2.getTexture(),3);
+		}
 	}
 	
 	
@@ -998,7 +1023,12 @@ void ofApp::draw(){
 	if(gui->block2InputSelect==1){
 		ratio=input1.getWidth()/ofGetWidth();
 		block2InputMasterSwitch=1;
-		shader2.setUniformTexture("block2InputTex",input1.getTexture(),6);
+		// Use input1 (webcam or NDI depending on source type)
+		if (gui->input1SourceType == 0) {
+			shader2.setUniformTexture("block2InputTex",input1.getTexture(),6);
+		} else {
+			shader2.setUniformTexture("block2InputTex",ndiFbo1.getTexture(),6);
+		}
 		block2InputWidth=640;
 		block2InputHeight=480;
 		block2InputWidthHalf=320;
@@ -1009,7 +1039,12 @@ void ofApp::draw(){
 	if(gui->block2InputSelect==2){
 		ratio=input2.getWidth()/ofGetWidth();
 		block2InputMasterSwitch=1;
-		shader2.setUniformTexture("block2InputTex",input2.getTexture(),6);
+		// Use input2 (webcam or NDI depending on source type)
+		if (gui->input2SourceType == 0) {
+			shader2.setUniformTexture("block2InputTex",input2.getTexture(),6);
+		} else {
+			shader2.setUniformTexture("block2InputTex",ndiFbo2.getTexture(),6);
+		}
 		block2InputWidth=640;
 		block2InputHeight=480;
 		block2InputWidthHalf=320;
@@ -1394,31 +1429,129 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::inputSetup(){
-	//i guess we might just be 
-	//stuck at sd inputs!
-	//lets just get to work and
-	//if we get the chance to fix this later
-	//then do so
+	// List webcam devices
 	input1.listDevices();
-	input1.setVerbose(true);
-	input1.setDeviceID(gui->input1DeviceID);
-	input1.setDesiredFrameRate(30);
-	//input1.setPixelFormat(OF_PIXELS_NATIVE);
-	input1.initGrabber(640,480);
 	
-	input2.setVerbose(true);
-	input2.setDeviceID(gui->input2DeviceID);
-	input2.setDesiredFrameRate(30);
-	input2.initGrabber(640,480);
-
+	// Allocate NDI FBOs at target resolution for scaling
+	ndiFbo1.allocate(640, 480, GL_RGBA);
+	ndiFbo2.allocate(640, 480, GL_RGBA);
+	
+	// Clear FBOs to black
+	ndiFbo1.begin();
+	ofClear(0, 0, 0, 255);
+	ndiFbo1.end();
+	
+	ndiFbo2.begin();
+	ofClear(0, 0, 0, 255);
+	ndiFbo2.end();
+	
+	// Always allocate NDI textures so they're ready when needed
+	// (ofxNDI needs these pre-allocated)
+	ndiTexture1.allocate(640, 480, GL_RGBA);
+	ndiTexture2.allocate(640, 480, GL_RGBA);
+	
+	// Clear them to black
+	ofPixels blackPixels;
+	blackPixels.allocate(640, 480, OF_PIXELS_RGBA);
+	blackPixels.setColor(ofColor::black);
+	ndiTexture1.loadData(blackPixels);
+	ndiTexture2.loadData(blackPixels);
+	
+	// Initialize Input 1 based on source type
+	if (gui->input1SourceType == 0) {
+		// Webcam
+		input1.setVerbose(true);
+		input1.setDeviceID(gui->input1DeviceID);
+		input1.setDesiredFrameRate(30);
+		input1.initGrabber(640,480);
+	}
+	
+	// Initialize Input 2 based on source type
+	if (gui->input2SourceType == 0) {
+		// Webcam
+		input2.setVerbose(true);
+		input2.setDeviceID(gui->input2DeviceID);
+		input2.setDesiredFrameRate(30);
+		input2.initGrabber(640,480);
+	}
+	
+	// Initial NDI source scan
+	refreshNdiSources();
 }
 
 //--------------------------------------------------------------
 void ofApp::inputUpdate(){
-	//inputUpdate
-	input1.update();
-	input2.update();
-
+	// Update Input 1 based on source type
+	if (gui->input1SourceType == 0) {
+		// Webcam
+		input1.update();
+	} else {
+		// NDI - receive then scale into FBO with aspect ratio preserved
+		ndiReceiver1.ReceiveImage(ndiTexture1);
+		ndiFbo1.begin();
+		ofClear(0, 0, 0, 255);
+		
+		// Calculate fit scaling to preserve aspect ratio
+		float srcW = ndiTexture1.getWidth();
+		float srcH = ndiTexture1.getHeight();
+		if (srcW > 0 && srcH > 0) {
+			float srcAspect = srcW / srcH;
+			float targetAspect = 640.0f / 480.0f;
+			float drawW, drawH, drawX, drawY;
+			
+			if (srcAspect > targetAspect) {
+				// Source is wider - fit to width
+				drawW = 640;
+				drawH = 640 / srcAspect;
+				drawX = 0;
+				drawY = (480 - drawH) / 2;
+			} else {
+				// Source is taller - fit to height
+				drawH = 480;
+				drawW = 480 * srcAspect;
+				drawX = (640 - drawW) / 2;
+				drawY = 0;
+			}
+			ndiTexture1.draw(drawX, drawY, drawW, drawH);
+		}
+		ndiFbo1.end();
+	}
+	
+	// Update Input 2 based on source type
+	if (gui->input2SourceType == 0) {
+		// Webcam
+		input2.update();
+	} else {
+		// NDI - receive then scale into FBO with aspect ratio preserved
+		ndiReceiver2.ReceiveImage(ndiTexture2);
+		ndiFbo2.begin();
+		ofClear(0, 0, 0, 255);
+		
+		// Calculate fit scaling to preserve aspect ratio
+		float srcW = ndiTexture2.getWidth();
+		float srcH = ndiTexture2.getHeight();
+		if (srcW > 0 && srcH > 0) {
+			float srcAspect = srcW / srcH;
+			float targetAspect = 640.0f / 480.0f;
+			float drawW, drawH, drawX, drawY;
+			
+			if (srcAspect > targetAspect) {
+				// Source is wider - fit to width
+				drawW = 640;
+				drawH = 640 / srcAspect;
+				drawX = 0;
+				drawY = (480 - drawH) / 2;
+			} else {
+				// Source is taller - fit to height
+				drawH = 480;
+				drawW = 480 * srcAspect;
+				drawX = (640 - drawW) / 2;
+				drawY = 0;
+			}
+			ndiTexture2.draw(drawX, drawY, drawW, drawH);
+		}
+		ndiFbo2.end();
+	}
 }
 
 
@@ -1426,10 +1559,18 @@ void ofApp::inputUpdate(){
 void ofApp::inputTest(){
 	
 	if(testSwitch1==1){
-		input1.draw(0, 0);
+		if (gui->input1SourceType == 0) {
+			input1.draw(0, 0);
+		} else {
+			ndiFbo1.draw(0, 0);
+		}
 	}
 	if(testSwitch1==2){
-		input2.draw(0, 0);
+		if (gui->input2SourceType == 0) {
+			input2.draw(0, 0);
+		} else {
+			ndiFbo2.draw(0, 0);
+		}
 	}
 	
 }
@@ -1437,25 +1578,79 @@ void ofApp::inputTest(){
 //--------------------------------------------------------------
 void ofApp::reinitializeInputs(){
 	ofLogNotice("Video Input") << "Reinitializing video inputs...";
-	ofLogNotice("Video Input") << "Input 1: Device " << gui->input1DeviceID;
-	ofLogNotice("Video Input") << "Input 2: Device " << gui->input2DeviceID;
 	
-	// Close existing grabbers
-	input1.close();
-	input2.close();
+	// Handle Input 1
+	if (gui->input1SourceType == 0) {
+		// Webcam
+		ofLogNotice("Video Input") << "Input 1: Webcam Device " << gui->input1DeviceID;
+		ndiReceiver1.ReleaseReceiver();
+		input1.close();
+		input1.setVerbose(true);
+		input1.setDeviceID(gui->input1DeviceID);
+		input1.setDesiredFrameRate(30);
+		input1.initGrabber(640,480);
+	} else {
+		// NDI
+		input1.close();
+		if (gui->input1NdiSourceIndex < gui->ndiSourceNames.size()) {
+			string sourceName = gui->ndiSourceNames[gui->input1NdiSourceIndex];
+			ofLogNotice("Video Input") << "Input 1: NDI Source " << sourceName;
+			ndiReceiver1.SetSenderName(sourceName);
+			ndiReceiver1.CreateReceiver();
+			if (!ndiTexture1.isAllocated()) {
+				ndiTexture1.allocate(640, 480, GL_RGBA);
+			}
+		}
+	}
 	
-	// Reinitialize with new device IDs
-	input1.setVerbose(true);
-	input1.setDeviceID(gui->input1DeviceID);
-	input1.setDesiredFrameRate(30);
-	input1.initGrabber(640,480);
-	
-	input2.setVerbose(true);
-	input2.setDeviceID(gui->input2DeviceID);
-	input2.setDesiredFrameRate(30);
-	input2.initGrabber(640,480);
+	// Handle Input 2
+	if (gui->input2SourceType == 0) {
+		// Webcam
+		ofLogNotice("Video Input") << "Input 2: Webcam Device " << gui->input2DeviceID;
+		ndiReceiver2.ReleaseReceiver();
+		input2.close();
+		input2.setVerbose(true);
+		input2.setDeviceID(gui->input2DeviceID);
+		input2.setDesiredFrameRate(30);
+		input2.initGrabber(640,480);
+	} else {
+		// NDI
+		input2.close();
+		if (gui->input2NdiSourceIndex < gui->ndiSourceNames.size()) {
+			string sourceName = gui->ndiSourceNames[gui->input2NdiSourceIndex];
+			ofLogNotice("Video Input") << "Input 2: NDI Source " << sourceName;
+			ndiReceiver2.SetSenderName(sourceName);
+			ndiReceiver2.CreateReceiver();
+			if (!ndiTexture2.isAllocated()) {
+				ndiTexture2.allocate(640, 480, GL_RGBA);
+			}
+		}
+	}
 	
 	ofLogNotice("Video Input") << "Reinitialization complete";
+}
+
+//--------------------------------------------------------------
+void ofApp::refreshNdiSources(){
+	ofLogNotice("NDI") << "Scanning for NDI sources (this may take a moment)...";
+	
+	gui->ndiSourceNames.clear();
+	
+	// Call FindSenders to discover sources - returns the count found
+	int numFound = ndiReceiver1.FindSenders();
+	ofLogNotice("NDI") << "FindSenders found: " << numFound;
+	
+	// Use the return value from FindSenders as our count
+	// (GetSenderCount sometimes returns different values)
+	for (int i = 0; i < numFound; i++) {
+		std::string name = ndiReceiver1.GetSenderName(i);
+		ofLogNotice("NDI") << "  Sender " << i << ": " << name;
+		if (!name.empty()) {
+			gui->ndiSourceNames.push_back(name);
+		}
+	}
+	
+	ofLogNotice("NDI") << "Total NDI sources added: " << gui->ndiSourceNames.size();
 }
 
 //---------------------------------------------------------
@@ -1851,6 +2046,9 @@ void ofApp::setupOsc() {
 void ofApp::processOscMessages() {
     if (!oscEnabled || !gui->oscEnabled) return;
     
+    // Skip processing if paused (during sendAll)
+    if (gui->oscReceivePaused) return;
+    
     while(oscReceiver.hasWaitingMessages()) {
         ofxOscMessage m;
         oscReceiver.getNextMessage(m);
@@ -1860,7 +2058,14 @@ void ofApp::processOscMessages() {
         
         ofLogNotice("OSC") << "Received: " << address << " = " << value;
         
-        // Try each handler in sequence - stop when one handles the message
+        // Try registry lookup first (handles all registered parameters)
+        auto it = gui->oscAddressMap.find(address);
+        if (it != gui->oscAddressMap.end()) {
+            it->second->setValueFromFloat(value);
+            continue;  // Found in registry, skip the helper functions
+        }
+        
+        // Fallback to helper functions for any unregistered parameters
         if (processOscBlock1(address, value, m)) continue;
         if (processOscBlock2(address, value, m)) continue;
         if (processOscBlock3(address, value, m)) continue;
@@ -2670,55 +2875,10 @@ bool ofApp::processOscResetCommands(const string& address) {
 void ofApp::sendOscParameter(string address, float value) {
     if (!oscEnabled || !gui->oscEnabled) return;
 
-    // If in batch sending mode, queue instead of sending immediately
-    if (oscBatchSending) {
-        queueOscParameter(address, value);
-        return;
-    }
-
     ofxOscMessage m;
     m.setAddress(address);
     m.addFloatArg(value);
     oscSender.sendMessage(m, true);
-}
-//--------------------------------------------------------------
-void ofApp::queueOscParameter(string address, float value) {
-    OscQueueItem item;
-    item.address = address;
-    item.value = value;
-    oscSendQueue.push_back(item);
-}
-//--------------------------------------------------------------
-void ofApp::processOscQueue() {
-    if (oscSendQueue.empty()) {
-        if (oscBatchSending) {
-            oscBatchSending = false;
-            ofLogNotice("OSC") << "Finished sending all queued OSC parameters";
-        }
-        return;
-    }
-    
-    if (!oscEnabled || !gui->oscEnabled) {
-        oscSendQueue.clear();
-        oscBatchSending = false;
-        return;
-    }
-    
-    // Send up to oscMessagesPerFrame messages this frame
-    int queueSize = (int)oscSendQueue.size();
-    int maxMessages = gui->oscMessagesPerFrame;
-    int messagesToSend = (queueSize < maxMessages) ? queueSize : maxMessages;
-    
-    for (int i = 0; i < messagesToSend; i++) {
-        OscQueueItem& item = oscSendQueue[i];
-        ofxOscMessage m;
-        m.setAddress(item.address);
-        m.addFloatArg(item.value);
-        oscSender.sendMessage(m, true);
-    }
-    
-    // Remove sent messages from queue
-    oscSendQueue.erase(oscSendQueue.begin(), oscSendQueue.begin() + messagesToSend);
 }
 //--------------------------------------------------------------
 void ofApp::reloadOscSettings() {
@@ -2729,575 +2889,77 @@ void ofApp::reloadOscSettings() {
 }
 //--------------------------------------------------------------
 //--------------------------------------------------------------
-// OSC SEND HELPER FUNCTIONS - Split to avoid MSVC compiler limits
+// OSC SEND HELPER FUNCTIONS - Registry-based
+//--------------------------------------------------------------
+void ofApp::sendOscParametersByPrefix(const std::string& prefix) {
+    for (const auto& param : gui->oscRegistry) {
+        if (param.address.find(prefix) == 0) {
+            sendOscParameter(param.address, param.getValueAsFloat());
+        }
+    }
+}
+
 //--------------------------------------------------------------
 void ofApp::sendOscBlock1Ch1() {
-    sendOscParameter("/gravity/block1/ch1/blurAmount", gui->ch1Adjust[10]);
-    sendOscParameter("/gravity/block1/ch1/blurRadius", gui->ch1Adjust[11]);
-    sendOscParameter("/gravity/block1/ch1/brightInvert", gui->ch1BrightInvert);
-    sendOscParameter("/gravity/block1/ch1/brightOffset", gui->ch1Adjust[6]);
-    sendOscParameter("/gravity/block1/ch1/filtersBoost", gui->ch1Adjust[14]);
-    sendOscParameter("/gravity/block1/ch1/geoOverflow", gui->ch1GeoOverflow);
-    sendOscParameter("/gravity/block1/ch1/hFlip", gui->ch1HFlip);
-    sendOscParameter("/gravity/block1/ch1/hMirror", gui->ch1HMirror);
-    sendOscParameter("/gravity/block1/ch1/hueInvert", gui->ch1HueInvert);
-    sendOscParameter("/gravity/block1/ch1/hueOffset", gui->ch1Adjust[4]);
-    sendOscParameter("/gravity/block1/ch1/inputSelect", gui->ch1InputSelect);
-    sendOscParameter("/gravity/block1/ch1/kaleidoscopeAmount", gui->ch1Adjust[8]);
-    sendOscParameter("/gravity/block1/ch1/kaleidoscopeSlice", gui->ch1Adjust[9]);
-    sendOscParameter("/gravity/block1/ch1/lfo/brightOffsetAmp", gui->ch1AdjustLfo[12]);
-    sendOscParameter("/gravity/block1/ch1/lfo/brightOffsetRate", gui->ch1AdjustLfo[13]);
-    sendOscParameter("/gravity/block1/ch1/lfo/hueOffsetAmp", gui->ch1AdjustLfo[8]);
-    sendOscParameter("/gravity/block1/ch1/lfo/hueOffsetRate", gui->ch1AdjustLfo[9]);
-    sendOscParameter("/gravity/block1/ch1/lfo/kaleidoscopeSliceAmp", gui->ch1AdjustLfo[14]);
-    sendOscParameter("/gravity/block1/ch1/lfo/kaleidoscopeSliceRate", gui->ch1AdjustLfo[15]);
-    sendOscParameter("/gravity/block1/ch1/lfo/rotateAmp", gui->ch1AdjustLfo[6]);
-    sendOscParameter("/gravity/block1/ch1/lfo/rotateRate", gui->ch1AdjustLfo[7]);
-    sendOscParameter("/gravity/block1/ch1/lfo/saturationOffsetAmp", gui->ch1AdjustLfo[10]);
-    sendOscParameter("/gravity/block1/ch1/lfo/saturationOffsetRate", gui->ch1AdjustLfo[11]);
-    sendOscParameter("/gravity/block1/ch1/lfo/xDisplaceAmp", gui->ch1AdjustLfo[0]);
-    sendOscParameter("/gravity/block1/ch1/lfo/xDisplaceRate", gui->ch1AdjustLfo[1]);
-    sendOscParameter("/gravity/block1/ch1/lfo/yDisplaceAmp", gui->ch1AdjustLfo[2]);
-    sendOscParameter("/gravity/block1/ch1/lfo/yDisplaceRate", gui->ch1AdjustLfo[3]);
-    sendOscParameter("/gravity/block1/ch1/lfo/zDisplaceAmp", gui->ch1AdjustLfo[4]);
-    sendOscParameter("/gravity/block1/ch1/lfo/zDisplaceRate", gui->ch1AdjustLfo[5]);
-    sendOscParameter("/gravity/block1/ch1/posterize", gui->ch1Adjust[7]);
-    sendOscParameter("/gravity/block1/ch1/rgbInvert", gui->ch1RGBInvert);
-    sendOscParameter("/gravity/block1/ch1/rotate", gui->ch1Adjust[3]);
-    sendOscParameter("/gravity/block1/ch1/saturationInvert", gui->ch1SaturationInvert);
-    sendOscParameter("/gravity/block1/ch1/saturationOffset", gui->ch1Adjust[5]);
-    sendOscParameter("/gravity/block1/ch1/sharpenAmount", gui->ch1Adjust[12]);
-    sendOscParameter("/gravity/block1/ch1/sharpenRadius", gui->ch1Adjust[13]);
-    sendOscParameter("/gravity/block1/ch1/solarize", gui->ch1Solarize);
-    sendOscParameter("/gravity/block1/ch1/vFlip", gui->ch1VFlip);
-    sendOscParameter("/gravity/block1/ch1/vMirror", gui->ch1VMirror);
-    sendOscParameter("/gravity/block1/ch1/xDisplace", gui->ch1Adjust[0]);
-    sendOscParameter("/gravity/block1/ch1/yDisplace", gui->ch1Adjust[1]);
-    sendOscParameter("/gravity/block1/ch1/zDisplace", gui->ch1Adjust[2]);
+    sendOscParametersByPrefix("/gravity/block1/ch1");
 }
 
 //--------------------------------------------------------------
 void ofApp::sendOscBlock1Ch2() {
-    sendOscParameter("/gravity/block1/ch2/blurAmount", gui->ch2Adjust[10]);
-    sendOscParameter("/gravity/block1/ch2/blurRadius", gui->ch2Adjust[11]);
-    sendOscParameter("/gravity/block1/ch2/brightInvert", gui->ch2BrightInvert);
-    sendOscParameter("/gravity/block1/ch2/brightOffset", gui->ch2Adjust[6]);
-    sendOscParameter("/gravity/block1/ch2/filtersBoost", gui->ch2Adjust[14]);
-    sendOscParameter("/gravity/block1/ch2/geoOverflow", gui->ch2GeoOverflow);
-    sendOscParameter("/gravity/block1/ch2/hFlip", gui->ch2HFlip);
-    sendOscParameter("/gravity/block1/ch2/hMirror", gui->ch2HMirror);
-    sendOscParameter("/gravity/block1/ch2/hueInvert", gui->ch2HueInvert);
-    sendOscParameter("/gravity/block1/ch2/hueOffset", gui->ch2Adjust[4]);
-    sendOscParameter("/gravity/block1/ch2/inputSelect", gui->ch2InputSelect);
-    sendOscParameter("/gravity/block1/ch2/kaleidoscopeAmount", gui->ch2Adjust[8]);
-    sendOscParameter("/gravity/block1/ch2/kaleidoscopeSlice", gui->ch2Adjust[9]);
-    sendOscParameter("/gravity/block1/ch2/keyBlue", gui->ch2MixAndKey[3]);
-    sendOscParameter("/gravity/block1/ch2/keyGreen", gui->ch2MixAndKey[2]);
-    sendOscParameter("/gravity/block1/ch2/keyMode", gui->ch2KeyMode);
-    sendOscParameter("/gravity/block1/ch2/keyOrder", gui->ch2KeyOrder);
-    sendOscParameter("/gravity/block1/ch2/keyRed", gui->ch2MixAndKey[1]);
-    sendOscParameter("/gravity/block1/ch2/keySoft", gui->ch2MixAndKey[5]);
-    sendOscParameter("/gravity/block1/ch2/keyThreshold", gui->ch2MixAndKey[4]);
-    sendOscParameter("/gravity/block1/ch2/lfo/brightOffsetAmp", gui->ch2AdjustLfo[12]);
-    sendOscParameter("/gravity/block1/ch2/lfo/brightOffsetRate", gui->ch2AdjustLfo[13]);
-    sendOscParameter("/gravity/block1/ch2/lfo/hueOffsetAmp", gui->ch2AdjustLfo[8]);
-    sendOscParameter("/gravity/block1/ch2/lfo/hueOffsetRate", gui->ch2AdjustLfo[9]);
-    sendOscParameter("/gravity/block1/ch2/lfo/kaleidoscopeSliceAmp", gui->ch2AdjustLfo[14]);
-    sendOscParameter("/gravity/block1/ch2/lfo/kaleidoscopeSliceRate", gui->ch2AdjustLfo[15]);
-    sendOscParameter("/gravity/block1/ch2/lfo/keySoftAmp", gui->ch2MixAndKeyLfo[4]);
-    sendOscParameter("/gravity/block1/ch2/lfo/keySoftRate", gui->ch2MixAndKeyLfo[5]);
-    sendOscParameter("/gravity/block1/ch2/lfo/keyThresholdAmp", gui->ch2MixAndKeyLfo[2]);
-    sendOscParameter("/gravity/block1/ch2/lfo/keyThresholdRate", gui->ch2MixAndKeyLfo[3]);
-    sendOscParameter("/gravity/block1/ch2/lfo/mixAmountAmp", gui->ch2MixAndKeyLfo[0]);
-    sendOscParameter("/gravity/block1/ch2/lfo/mixAmountRate", gui->ch2MixAndKeyLfo[1]);
-    sendOscParameter("/gravity/block1/ch2/lfo/rotateAmp", gui->ch2AdjustLfo[6]);
-    sendOscParameter("/gravity/block1/ch2/lfo/rotateRate", gui->ch2AdjustLfo[7]);
-    sendOscParameter("/gravity/block1/ch2/lfo/saturationOffsetAmp", gui->ch2AdjustLfo[10]);
-    sendOscParameter("/gravity/block1/ch2/lfo/saturationOffsetRate", gui->ch2AdjustLfo[11]);
-    sendOscParameter("/gravity/block1/ch2/lfo/xDisplaceAmp", gui->ch2AdjustLfo[0]);
-    sendOscParameter("/gravity/block1/ch2/lfo/xDisplaceRate", gui->ch2AdjustLfo[1]);
-    sendOscParameter("/gravity/block1/ch2/lfo/yDisplaceAmp", gui->ch2AdjustLfo[2]);
-    sendOscParameter("/gravity/block1/ch2/lfo/yDisplaceRate", gui->ch2AdjustLfo[3]);
-    sendOscParameter("/gravity/block1/ch2/lfo/zDisplaceAmp", gui->ch2AdjustLfo[4]);
-    sendOscParameter("/gravity/block1/ch2/lfo/zDisplaceRate", gui->ch2AdjustLfo[5]);
-    sendOscParameter("/gravity/block1/ch2/mixAmount", gui->ch2MixAndKey[0]);
-    sendOscParameter("/gravity/block1/ch2/mixOverflow", gui->ch2MixOverflow);
-    sendOscParameter("/gravity/block1/ch2/mixType", gui->ch2MixType);
-    sendOscParameter("/gravity/block1/ch2/posterize", gui->ch2Adjust[7]);
-    sendOscParameter("/gravity/block1/ch2/rgbInvert", gui->ch2RGBInvert);
-    sendOscParameter("/gravity/block1/ch2/rotate", gui->ch2Adjust[3]);
-    sendOscParameter("/gravity/block1/ch2/saturationInvert", gui->ch2SaturationInvert);
-    sendOscParameter("/gravity/block1/ch2/saturationOffset", gui->ch2Adjust[5]);
-    sendOscParameter("/gravity/block1/ch2/sharpenAmount", gui->ch2Adjust[12]);
-    sendOscParameter("/gravity/block1/ch2/sharpenRadius", gui->ch2Adjust[13]);
-    sendOscParameter("/gravity/block1/ch2/solarize", gui->ch2Solarize);
-    sendOscParameter("/gravity/block1/ch2/vFlip", gui->ch2VFlip);
-    sendOscParameter("/gravity/block1/ch2/vMirror", gui->ch2VMirror);
-    sendOscParameter("/gravity/block1/ch2/xDisplace", gui->ch2Adjust[0]);
-    sendOscParameter("/gravity/block1/ch2/yDisplace", gui->ch2Adjust[1]);
-    sendOscParameter("/gravity/block1/ch2/zDisplace", gui->ch2Adjust[2]);
+    sendOscParametersByPrefix("/gravity/block1/ch2");
 }
 
 //--------------------------------------------------------------
 void ofApp::sendOscBlock1Fb1() {
-    sendOscParameter("/gravity/block1/fb1/brightOffset", gui->fb1Color1[2]);
-    sendOscParameter("/gravity/block1/fb1/blurAmount", gui->fb1Filters[0]);
-    sendOscParameter("/gravity/block1/fb1/blurRadius", gui->fb1Filters[1]);
-    sendOscParameter("/gravity/block1/fb1/brightInvert", gui->fb1BrightInvert);
-    sendOscParameter("/gravity/block1/fb1/brightMultiply", gui->fb1Color1[5]);
-    sendOscParameter("/gravity/block1/fb1/brightPowmap", gui->fb1Color1[8]);
-    sendOscParameter("/gravity/block1/fb1/delayTime", gui->fb1DelayTime);
-    sendOscParameter("/gravity/block1/fb1/filtersBoost", gui->fb1Filters[8]);
-    sendOscParameter("/gravity/block1/fb1/geoOverflow", gui->fb1GeoOverflow);
-    sendOscParameter("/gravity/block1/fb1/hFlip", gui->fb1HFlip);
-    sendOscParameter("/gravity/block1/fb1/hMirror", gui->fb1HMirror);
-    sendOscParameter("/gravity/block1/fb1/hueInvert", gui->fb1HueInvert);
-    sendOscParameter("/gravity/block1/fb1/hueMultiply", gui->fb1Color1[3]);
-    sendOscParameter("/gravity/block1/fb1/hueOffset", gui->fb1Color1[0]);
-    sendOscParameter("/gravity/block1/fb1/huePowmap", gui->fb1Color1[6]);
-    sendOscParameter("/gravity/block1/fb1/hueShaper", gui->fb1Color1[9]);
-    sendOscParameter("/gravity/block1/fb1/kaleidoscopeAmount", gui->fb1Geo1[8]);
-    sendOscParameter("/gravity/block1/fb1/kaleidoscopeSlice", gui->fb1Geo1[9]);
-    sendOscParameter("/gravity/block1/fb1/keyBlue", gui->fb1MixAndKey[3]);
-    sendOscParameter("/gravity/block1/fb1/keyGreen", gui->fb1MixAndKey[2]);
-    sendOscParameter("/gravity/block1/fb1/keyMode", gui->fb1KeyMode);
-    sendOscParameter("/gravity/block1/fb1/keyOrder", gui->fb1KeyOrder);
-    sendOscParameter("/gravity/block1/fb1/keyRed", gui->fb1MixAndKey[1]);
-    sendOscParameter("/gravity/block1/fb1/keySoft", gui->fb1MixAndKey[5]);
-    sendOscParameter("/gravity/block1/fb1/keyThreshold", gui->fb1MixAndKey[4]);
-    sendOscParameter("/gravity/block1/fb1/lfo/brightPowmapAmp", gui->fb1Color1Lfo1[4]);
-    sendOscParameter("/gravity/block1/fb1/lfo/brightPowmapRate", gui->fb1Color1Lfo1[5]);
-    sendOscParameter("/gravity/block1/fb1/lfo/huePowmapAmp", gui->fb1Color1Lfo1[0]);
-    sendOscParameter("/gravity/block1/fb1/lfo/huePowmapRate", gui->fb1Color1Lfo1[1]);
-    sendOscParameter("/gravity/block1/fb1/lfo/kaleidoscopeSliceAmp", gui->fb1Geo1Lfo2[8]);
-    sendOscParameter("/gravity/block1/fb1/lfo/kaleidoscopeSliceRate", gui->fb1Geo1Lfo2[9]);
-    sendOscParameter("/gravity/block1/fb1/lfo/keySoftAmp", gui->fb1MixAndKeyLfo[4]);
-    sendOscParameter("/gravity/block1/fb1/lfo/keySoftRate", gui->fb1MixAndKeyLfo[5]);
-    sendOscParameter("/gravity/block1/fb1/lfo/keyThresholdAmp", gui->fb1MixAndKeyLfo[2]);
-    sendOscParameter("/gravity/block1/fb1/lfo/keyThresholdRate", gui->fb1MixAndKeyLfo[3]);
-    sendOscParameter("/gravity/block1/fb1/lfo/mixAmountAmp", gui->fb1MixAndKeyLfo[0]);
-    sendOscParameter("/gravity/block1/fb1/lfo/mixAmountRate", gui->fb1MixAndKeyLfo[1]);
-    sendOscParameter("/gravity/block1/fb1/lfo/rotateAmp", gui->fb1Geo1Lfo1[6]);
-    sendOscParameter("/gravity/block1/fb1/lfo/rotateRate", gui->fb1Geo1Lfo1[7]);
-    sendOscParameter("/gravity/block1/fb1/lfo/saturationPowmapAmp", gui->fb1Color1Lfo1[2]);
-    sendOscParameter("/gravity/block1/fb1/lfo/saturationPowmapRate", gui->fb1Color1Lfo1[3]);
-    sendOscParameter("/gravity/block1/fb1/lfo/xDisplaceAmp", gui->fb1Geo1Lfo1[0]);
-    sendOscParameter("/gravity/block1/fb1/lfo/xDisplaceRate", gui->fb1Geo1Lfo1[1]);
-    sendOscParameter("/gravity/block1/fb1/lfo/xShearAmp", gui->fb1Geo1Lfo2[4]);
-    sendOscParameter("/gravity/block1/fb1/lfo/xShearRate", gui->fb1Geo1Lfo2[5]);
-    sendOscParameter("/gravity/block1/fb1/lfo/xStretchAmp", gui->fb1Geo1Lfo2[0]);
-    sendOscParameter("/gravity/block1/fb1/lfo/xStretchRate", gui->fb1Geo1Lfo2[1]);
-    sendOscParameter("/gravity/block1/fb1/lfo/yDisplaceAmp", gui->fb1Geo1Lfo1[2]);
-    sendOscParameter("/gravity/block1/fb1/lfo/yDisplaceRate", gui->fb1Geo1Lfo1[3]);
-    sendOscParameter("/gravity/block1/fb1/lfo/yShearAmp", gui->fb1Geo1Lfo2[6]);
-    sendOscParameter("/gravity/block1/fb1/lfo/yShearRate", gui->fb1Geo1Lfo2[7]);
-    sendOscParameter("/gravity/block1/fb1/lfo/yStretchAmp", gui->fb1Geo1Lfo2[2]);
-    sendOscParameter("/gravity/block1/fb1/lfo/yStretchRate", gui->fb1Geo1Lfo2[3]);
-    sendOscParameter("/gravity/block1/fb1/lfo/zDisplaceAmp", gui->fb1Geo1Lfo1[4]);
-    sendOscParameter("/gravity/block1/fb1/lfo/zDisplaceRate", gui->fb1Geo1Lfo1[5]);
-    sendOscParameter("/gravity/block1/fb1/mixAmount", gui->fb1MixAndKey[0]);
-    sendOscParameter("/gravity/block1/fb1/mixOverflow", gui->fb1MixOverflow);
-    sendOscParameter("/gravity/block1/fb1/mixType", gui->fb1MixType);
-    sendOscParameter("/gravity/block1/fb1/posterize", gui->fb1Color1[10]);
-    sendOscParameter("/gravity/block1/fb1/rotate", gui->fb1Geo1[3]);
-    sendOscParameter("/gravity/block1/fb1/rotateMode", gui->fb1RotateMode);
-    sendOscParameter("/gravity/block1/fb1/saturationInvert", gui->fb1SaturationInvert);
-    sendOscParameter("/gravity/block1/fb1/saturationMultiply", gui->fb1Color1[4]);
-    sendOscParameter("/gravity/block1/fb1/saturationOffset", gui->fb1Color1[1]);
-    sendOscParameter("/gravity/block1/fb1/saturationPowmap", gui->fb1Color1[7]);
-    sendOscParameter("/gravity/block1/fb1/sharpenAmount", gui->fb1Filters[2]);
-    sendOscParameter("/gravity/block1/fb1/sharpenRadius", gui->fb1Filters[3]);
-    sendOscParameter("/gravity/block1/fb1/temp1Amount", gui->fb1Filters[4]);
-    sendOscParameter("/gravity/block1/fb1/temp1q", gui->fb1Filters[5]);
-    sendOscParameter("/gravity/block1/fb1/temp2Amount", gui->fb1Filters[6]);
-    sendOscParameter("/gravity/block1/fb1/temp2q", gui->fb1Filters[7]);
-    sendOscParameter("/gravity/block1/fb1/vFlip", gui->fb1VFlip);
-    sendOscParameter("/gravity/block1/fb1/vMirror", gui->fb1VMirror);
-    sendOscParameter("/gravity/block1/fb1/xDisplace", gui->fb1Geo1[0]);
-    sendOscParameter("/gravity/block1/fb1/xShear", gui->fb1Geo1[6]);
-    sendOscParameter("/gravity/block1/fb1/xStretch", gui->fb1Geo1[4]);
-    sendOscParameter("/gravity/block1/fb1/yDisplace", gui->fb1Geo1[1]);
-    sendOscParameter("/gravity/block1/fb1/yShear", gui->fb1Geo1[7]);
-    sendOscParameter("/gravity/block1/fb1/yStretch", gui->fb1Geo1[5]);
-    sendOscParameter("/gravity/block1/fb1/zDisplace", gui->fb1Geo1[2]);
+    sendOscParametersByPrefix("/gravity/block1/fb1");
 }
 
 //--------------------------------------------------------------
 void ofApp::sendOscBlock2Fb2() {
-    sendOscParameter("/gravity/block2/fb2/blurAmount", gui->fb2Filters[0]);
-    sendOscParameter("/gravity/block2/fb2/blurRadius", gui->fb2Filters[1]);
-    sendOscParameter("/gravity/block2/fb2/brightOffset", gui->fb2Color1[2]);
-    sendOscParameter("/gravity/block2/fb2/brightInvert", gui->fb2BrightInvert);
-    sendOscParameter("/gravity/block2/fb2/brightMultiply", gui->fb2Color1[5]);
-    sendOscParameter("/gravity/block2/fb2/brightPowmap", gui->fb2Color1[8]);
-    sendOscParameter("/gravity/block2/fb2/delayTime", gui->fb2DelayTime);
-    sendOscParameter("/gravity/block2/fb2/filtersBoost", gui->fb2Filters[8]);
-    sendOscParameter("/gravity/block2/fb2/geoOverflow", gui->fb2GeoOverflow);
-    sendOscParameter("/gravity/block2/fb2/hFlip", gui->fb2HFlip);
-    sendOscParameter("/gravity/block2/fb2/hMirror", gui->fb2HMirror);
-    sendOscParameter("/gravity/block2/fb2/hueInvert", gui->fb2HueInvert);
-    sendOscParameter("/gravity/block2/fb2/hueMultiply", gui->fb2Color1[3]);
-    sendOscParameter("/gravity/block2/fb2/hueOffset", gui->fb2Color1[0]);
-    sendOscParameter("/gravity/block2/fb2/huePowmap", gui->fb2Color1[6]);
-    sendOscParameter("/gravity/block2/fb2/hueShaper", gui->fb2Color1[9]);
-    sendOscParameter("/gravity/block2/fb2/kaleidoscopeAmount", gui->fb2Geo1[8]);
-    sendOscParameter("/gravity/block2/fb2/kaleidoscopeSlice", gui->fb2Geo1[9]);
-    sendOscParameter("/gravity/block2/fb2/keyBlue", gui->fb2MixAndKey[3]);
-    sendOscParameter("/gravity/block2/fb2/keyGreen", gui->fb2MixAndKey[2]);
-    sendOscParameter("/gravity/block2/fb2/keyMode", gui->fb2KeyMode);
-    sendOscParameter("/gravity/block2/fb2/keyOrder", gui->fb2KeyOrder);
-    sendOscParameter("/gravity/block2/fb2/keyRed", gui->fb2MixAndKey[1]);
-    sendOscParameter("/gravity/block2/fb2/keySoft", gui->fb2MixAndKey[5]);
-    sendOscParameter("/gravity/block2/fb2/keyThreshold", gui->fb2MixAndKey[4]);
-    sendOscParameter("/gravity/block2/fb2/lfo/brightPowmapAmp", gui->fb2Color1Lfo1[4]);
-    sendOscParameter("/gravity/block2/fb2/lfo/brightPowmapRate", gui->fb2Color1Lfo1[5]);
-    sendOscParameter("/gravity/block2/fb2/lfo/huePowmapAmp", gui->fb2Color1Lfo1[0]);
-    sendOscParameter("/gravity/block2/fb2/lfo/huePowmapRate", gui->fb2Color1Lfo1[1]);
-    sendOscParameter("/gravity/block2/fb2/lfo/kaleidoscopeSliceAmp", gui->fb2Geo1Lfo2[8]);
-    sendOscParameter("/gravity/block2/fb2/lfo/kaleidoscopeSliceRate", gui->fb2Geo1Lfo2[9]);
-    sendOscParameter("/gravity/block2/fb2/lfo/keySoftAmp", gui->fb2MixAndKeyLfo[4]);
-    sendOscParameter("/gravity/block2/fb2/lfo/keySoftRate", gui->fb2MixAndKeyLfo[5]);
-    sendOscParameter("/gravity/block2/fb2/lfo/keyThresholdAmp", gui->fb2MixAndKeyLfo[2]);
-    sendOscParameter("/gravity/block2/fb2/lfo/keyThresholdRate", gui->fb2MixAndKeyLfo[3]);
-    sendOscParameter("/gravity/block2/fb2/lfo/mixAmountAmp", gui->fb2MixAndKeyLfo[0]);
-    sendOscParameter("/gravity/block2/fb2/lfo/mixAmountRate", gui->fb2MixAndKeyLfo[1]);
-    sendOscParameter("/gravity/block2/fb2/lfo/rotateAmp", gui->fb2Geo1Lfo1[6]);
-    sendOscParameter("/gravity/block2/fb2/lfo/rotateRate", gui->fb2Geo1Lfo1[7]);
-    sendOscParameter("/gravity/block2/fb2/lfo/saturationPowmapAmp", gui->fb2Color1Lfo1[2]);
-    sendOscParameter("/gravity/block2/fb2/lfo/saturationPowmapRate", gui->fb2Color1Lfo1[3]);
-    sendOscParameter("/gravity/block2/fb2/lfo/xDisplaceAmp", gui->fb2Geo1Lfo1[0]);
-    sendOscParameter("/gravity/block2/fb2/lfo/xDisplaceRate", gui->fb2Geo1Lfo1[1]);
-    sendOscParameter("/gravity/block2/fb2/lfo/xShearAmp", gui->fb2Geo1Lfo2[4]);
-    sendOscParameter("/gravity/block2/fb2/lfo/xShearRate", gui->fb2Geo1Lfo2[5]);
-    sendOscParameter("/gravity/block2/fb2/lfo/xStretchAmp", gui->fb2Geo1Lfo2[0]);
-    sendOscParameter("/gravity/block2/fb2/lfo/xStretchRate", gui->fb2Geo1Lfo2[1]);
-    sendOscParameter("/gravity/block2/fb2/lfo/yDisplaceAmp", gui->fb2Geo1Lfo1[2]);
-    sendOscParameter("/gravity/block2/fb2/lfo/yDisplaceRate", gui->fb2Geo1Lfo1[3]);
-    sendOscParameter("/gravity/block2/fb2/lfo/yShearAmp", gui->fb2Geo1Lfo2[6]);
-    sendOscParameter("/gravity/block2/fb2/lfo/yShearRate", gui->fb2Geo1Lfo2[7]);
-    sendOscParameter("/gravity/block2/fb2/lfo/yStretchAmp", gui->fb2Geo1Lfo2[2]);
-    sendOscParameter("/gravity/block2/fb2/lfo/yStretchRate", gui->fb2Geo1Lfo2[3]);
-    sendOscParameter("/gravity/block2/fb2/lfo/zDisplaceAmp", gui->fb2Geo1Lfo1[4]);
-    sendOscParameter("/gravity/block2/fb2/lfo/zDisplaceRate", gui->fb2Geo1Lfo1[5]);
-    sendOscParameter("/gravity/block2/fb2/mixAmount", gui->fb2MixAndKey[0]);
-    sendOscParameter("/gravity/block2/fb2/mixOverflow", gui->fb2MixOverflow);
-    sendOscParameter("/gravity/block2/fb2/mixType", gui->fb2MixType);
-    sendOscParameter("/gravity/block2/fb2/posterize", gui->fb2Color1[10]);
-    sendOscParameter("/gravity/block2/fb2/rotate", gui->fb2Geo1[3]);
-    sendOscParameter("/gravity/block2/fb2/rotateMode", gui->fb2RotateMode);
-    sendOscParameter("/gravity/block2/fb2/saturationInvert", gui->fb2SaturationInvert);
-    sendOscParameter("/gravity/block2/fb2/saturationMultiply", gui->fb2Color1[4]);
-    sendOscParameter("/gravity/block2/fb2/saturationOffset", gui->fb2Color1[1]);
-    sendOscParameter("/gravity/block2/fb2/saturationPowmap", gui->fb2Color1[7]);
-    sendOscParameter("/gravity/block2/fb2/sharpenAmount", gui->fb2Filters[2]);
-    sendOscParameter("/gravity/block2/fb2/sharpenRadius", gui->fb2Filters[3]);
-    sendOscParameter("/gravity/block2/fb2/temp1Amount", gui->fb2Filters[4]);
-    sendOscParameter("/gravity/block2/fb2/temp1q", gui->fb2Filters[5]);
-    sendOscParameter("/gravity/block2/fb2/temp2Amount", gui->fb2Filters[6]);
-    sendOscParameter("/gravity/block2/fb2/temp2Q", gui->fb2Filters[7]);
-    sendOscParameter("/gravity/block2/fb2/vFlip", gui->fb2VFlip);
-    sendOscParameter("/gravity/block2/fb2/vMirror", gui->fb2VMirror);
-    sendOscParameter("/gravity/block2/fb2/xDisplace", gui->fb2Geo1[0]);
-    sendOscParameter("/gravity/block2/fb2/xShear", gui->fb2Geo1[6]);
-    sendOscParameter("/gravity/block2/fb2/xStretch", gui->fb2Geo1[4]);
-    sendOscParameter("/gravity/block2/fb2/yDisplace", gui->fb2Geo1[1]);
-    sendOscParameter("/gravity/block2/fb2/yShear", gui->fb2Geo1[7]);
-    sendOscParameter("/gravity/block2/fb2/yStretch", gui->fb2Geo1[5]);
-    sendOscParameter("/gravity/block2/fb2/zDisplace", gui->fb2Geo1[2]);
+    sendOscParametersByPrefix("/gravity/block2/fb2");
 }
 
 //--------------------------------------------------------------
 void ofApp::sendOscBlock2Input() {
-    sendOscParameter("/gravity/block2/input/blurRadius", gui->block2InputAdjust[11]);
-    sendOscParameter("/gravity/block2/input/brightInvert", gui->block2InputBrightInvert);
-    sendOscParameter("/gravity/block2/input/brightOffset", gui->block2InputAdjust[6]);
-    sendOscParameter("/gravity/block2/input/blurAmount", gui->block2InputAdjust[10]);
-    sendOscParameter("/gravity/block2/input/filtersBoost", gui->block2InputAdjust[14]);
-    sendOscParameter("/gravity/block2/input/geoOverflow", gui->block2InputGeoOverflow);
-    sendOscParameter("/gravity/block2/input/hFlip", gui->block2InputHFlip);
-    sendOscParameter("/gravity/block2/input/hMirror", gui->block2InputHMirror);
-    sendOscParameter("/gravity/block2/input/hueInvert", gui->block2InputHueInvert);
-    sendOscParameter("/gravity/block2/input/hueOffset", gui->block2InputAdjust[4]);
-    sendOscParameter("/gravity/block2/input/inputSelect", gui->block2InputSelect);
-    sendOscParameter("/gravity/block2/input/kaleidoscopeAmount", gui->block2InputAdjust[8]);
-    sendOscParameter("/gravity/block2/input/kaleidoscopeSlice", gui->block2InputAdjust[9]);
-    sendOscParameter("/gravity/block2/input/lfo/brightOffsetAmp", gui->block2InputAdjustLfo[12]);
-    sendOscParameter("/gravity/block2/input/lfo/brightOffsetRate", gui->block2InputAdjustLfo[13]);
-    sendOscParameter("/gravity/block2/input/lfo/hueOffsetAmp", gui->block2InputAdjustLfo[8]);
-    sendOscParameter("/gravity/block2/input/lfo/hueOffsetRate", gui->block2InputAdjustLfo[9]);
-    sendOscParameter("/gravity/block2/input/lfo/kaleidoscopeSliceAmp", gui->block2InputAdjustLfo[14]);
-    sendOscParameter("/gravity/block2/input/lfo/kaleidoscopeSliceRate", gui->block2InputAdjustLfo[15]);
-    sendOscParameter("/gravity/block2/input/lfo/rotateAmp", gui->block2InputAdjustLfo[6]);
-    sendOscParameter("/gravity/block2/input/lfo/rotateRate", gui->block2InputAdjustLfo[7]);
-    sendOscParameter("/gravity/block2/input/lfo/saturationOffsetAmp", gui->block2InputAdjustLfo[10]);
-    sendOscParameter("/gravity/block2/input/lfo/saturationOffsetRate", gui->block2InputAdjustLfo[11]);
-    sendOscParameter("/gravity/block2/input/lfo/xDisplaceAmp", gui->block2InputAdjustLfo[0]);
-    sendOscParameter("/gravity/block2/input/lfo/xDisplaceRate", gui->block2InputAdjustLfo[1]);
-    sendOscParameter("/gravity/block2/input/lfo/yDisplaceAmp", gui->block2InputAdjustLfo[2]);
-    sendOscParameter("/gravity/block2/input/lfo/yDisplaceRate", gui->block2InputAdjustLfo[3]);
-    sendOscParameter("/gravity/block2/input/lfo/zDisplaceAmp", gui->block2InputAdjustLfo[4]);
-    sendOscParameter("/gravity/block2/input/lfo/zDisplaceRate", gui->block2InputAdjustLfo[5]);
-    sendOscParameter("/gravity/block2/input/posterize", gui->block2InputAdjust[7]);
-    sendOscParameter("/gravity/block2/input/rgbInvert", gui->block2InputRGBInvert);
-    sendOscParameter("/gravity/block2/input/rotate", gui->block2InputAdjust[3]);
-    sendOscParameter("/gravity/block2/input/saturationInvert", gui->block2InputSaturationInvert);
-    sendOscParameter("/gravity/block2/input/saturationOffset", gui->block2InputAdjust[5]);
-    sendOscParameter("/gravity/block2/input/sharpenAmount", gui->block2InputAdjust[12]);
-    sendOscParameter("/gravity/block2/input/sharpenRadius", gui->block2InputAdjust[13]);
-    sendOscParameter("/gravity/block2/input/solarize", gui->block2InputSolarize);
-    sendOscParameter("/gravity/block2/input/vFlip", gui->block2InputVFlip);
-    sendOscParameter("/gravity/block2/input/vMirror", gui->block2InputVMirror);
-    sendOscParameter("/gravity/block2/input/xDisplace", gui->block2InputAdjust[0]);
-    sendOscParameter("/gravity/block2/input/yDisplace", gui->block2InputAdjust[1]);
-    sendOscParameter("/gravity/block2/input/zDisplace", gui->block2InputAdjust[2]);
+    sendOscParametersByPrefix("/gravity/block2/input");
 }
 
 //--------------------------------------------------------------
 void ofApp::sendOscBlock3B1() {
-    sendOscParameter("/gravity/block3/b1/blurAmount", gui->block1Filters[0]);
-    sendOscParameter("/gravity/block3/b1/blurRadius", gui->block1Filters[1]);
-    sendOscParameter("/gravity/block3/b1/colorize/brightBand1", gui->block1Colorize[2]);
-    sendOscParameter("/gravity/block3/b1/colorize/brightBand2", gui->block1Colorize[5]);
-    sendOscParameter("/gravity/block3/b1/colorize/brightBand3", gui->block1Colorize[8]);
-    sendOscParameter("/gravity/block3/b1/colorize/brightBand4", gui->block1Colorize[11]);
-    sendOscParameter("/gravity/block3/b1/colorize/brightBand5", gui->block1Colorize[14]);
-    sendOscParameter("/gravity/block3/b1/colorize/colorspace", gui->block1ColorizeHSB_RGB);
-    sendOscParameter("/gravity/block3/b1/colorize/hueBand1", gui->block1Colorize[0]);
-    sendOscParameter("/gravity/block3/b1/colorize/hueBand2", gui->block1Colorize[3]);
-    sendOscParameter("/gravity/block3/b1/colorize/hueBand3", gui->block1Colorize[6]);
-    sendOscParameter("/gravity/block3/b1/colorize/hueBand4", gui->block1Colorize[9]);
-    sendOscParameter("/gravity/block3/b1/colorize/hueBand5", gui->block1Colorize[12]);
-    sendOscParameter("/gravity/block3/b1/colorize/saturationBand1", gui->block1Colorize[1]);
-    sendOscParameter("/gravity/block3/b1/colorize/saturationBand2", gui->block1Colorize[4]);
-    sendOscParameter("/gravity/block3/b1/colorize/saturationBand3", gui->block1Colorize[7]);
-    sendOscParameter("/gravity/block3/b1/colorize/saturationBand4", gui->block1Colorize[10]);
-    sendOscParameter("/gravity/block3/b1/colorize/saturationBand5", gui->block1Colorize[13]);
-    sendOscParameter("/gravity/block3/lfo/b1/brightBand1Amp", gui->block1ColorizeLfo1[2]);
-    sendOscParameter("/gravity/block3/lfo/b1/brightBand1Rate", gui->block1ColorizeLfo1[5]);
-    sendOscParameter("/gravity/block3/lfo/b1/brightBand2Amp", gui->block1ColorizeLfo1[8]);
-    sendOscParameter("/gravity/block3/lfo/b1/brightBand2Rate", gui->block1ColorizeLfo1[11]);
-    sendOscParameter("/gravity/block3/lfo/b1/hueBand1Amp", gui->block1ColorizeLfo1[0]);
-    sendOscParameter("/gravity/block3/lfo/b1/hueBand1Rate", gui->block1ColorizeLfo1[3]);
-    sendOscParameter("/gravity/block3/lfo/b1/hueBand2Amp", gui->block1ColorizeLfo1[6]);
-    sendOscParameter("/gravity/block3/lfo/b1/hueBand2Rate", gui->block1ColorizeLfo1[9]);
-    sendOscParameter("/gravity/block3/lfo/b1/saturationBand1Amp", gui->block1ColorizeLfo1[1]);
-    sendOscParameter("/gravity/block3/lfo/b1/saturationBand1Rate", gui->block1ColorizeLfo1[4]);
-    sendOscParameter("/gravity/block3/lfo/b1/saturationBand2Amp", gui->block1ColorizeLfo1[7]);
-    sendOscParameter("/gravity/block3/lfo/b1/saturationBand2Rate", gui->block1ColorizeLfo1[10]);
-    sendOscParameter("/gravity/block3/lfo/b1/brightBand3Amp", gui->block1ColorizeLfo2[2]);
-    sendOscParameter("/gravity/block3/lfo/b1/brightBand3Rate", gui->block1ColorizeLfo2[5]);
-    sendOscParameter("/gravity/block3/lfo/b1/brightBand4Amp", gui->block1ColorizeLfo2[8]);
-    sendOscParameter("/gravity/block3/lfo/b1/brightBand4Rate", gui->block1ColorizeLfo2[11]);
-    sendOscParameter("/gravity/block3/lfo/b1/hueBand3Amp", gui->block1ColorizeLfo2[0]);
-    sendOscParameter("/gravity/block3/lfo/b1/hueBand3Rate", gui->block1ColorizeLfo2[3]);
-    sendOscParameter("/gravity/block3/lfo/b1/hueBand4Amp", gui->block1ColorizeLfo2[6]);
-    sendOscParameter("/gravity/block3/lfo/b1/hueBand4Rate", gui->block1ColorizeLfo2[9]);
-    sendOscParameter("/gravity/block3/lfo/b1/saturationBand3Amp", gui->block1ColorizeLfo2[1]);
-    sendOscParameter("/gravity/block3/lfo/b1/saturationBand3Rate", gui->block1ColorizeLfo2[4]);
-    sendOscParameter("/gravity/block3/lfo/b1/saturationBand4Amp", gui->block1ColorizeLfo2[7]);
-    sendOscParameter("/gravity/block3/lfo/b1/saturationBand4Rate", gui->block1ColorizeLfo2[10]);
-    sendOscParameter("/gravity/block3/lfo/b1/brightBand5Amp", gui->block1ColorizeLfo3[2]);
-    sendOscParameter("/gravity/block3/lfo/b1/brightBand5Rate", gui->block1ColorizeLfo3[5]);
-    sendOscParameter("/gravity/block3/lfo/b1/hueBand5Amp", gui->block1ColorizeLfo3[0]);
-    sendOscParameter("/gravity/block3/lfo/b1/hueBand5Rate", gui->block1ColorizeLfo3[3]);
-    sendOscParameter("/gravity/block3/lfo/b1/saturationBand5Amp", gui->block1ColorizeLfo3[1]);
-    sendOscParameter("/gravity/block3/lfo/b1/saturationBand5Rate", gui->block1ColorizeLfo3[4]);
-    sendOscParameter("/gravity/block3/b1/filtersBoost", gui->block1Filters[4]);
-    sendOscParameter("/gravity/block3/b1/geoOverflow", gui->block1GeoOverflow);
-    sendOscParameter("/gravity/block3/b1/hFlip", gui->block1HFlip);
-    sendOscParameter("/gravity/block3/b1/hMirror", gui->block1HMirror);
-    sendOscParameter("/gravity/block3/b1/kaleidoscopeAmount", gui->block1Geo[8]);
-    sendOscParameter("/gravity/block3/b1/kaleidoscopeSlice", gui->block1Geo[9]);
-    sendOscParameter("/gravity/block3/lfo/b1/rotateAmp", gui->block1Geo1Lfo1[6]);
-    sendOscParameter("/gravity/block3/lfo/b1/rotateRate", gui->block1Geo1Lfo1[7]);
-    sendOscParameter("/gravity/block3/lfo/b1/xDisplaceAmp", gui->block1Geo1Lfo1[0]);
-    sendOscParameter("/gravity/block3/lfo/b1/xDisplaceRate", gui->block1Geo1Lfo1[1]);
-    sendOscParameter("/gravity/block3/lfo/b1/yDisplaceAmp", gui->block1Geo1Lfo1[2]);
-    sendOscParameter("/gravity/block3/lfo/b1/yDisplaceRate", gui->block1Geo1Lfo1[3]);
-    sendOscParameter("/gravity/block3/lfo/b1/zDisplaceAmp", gui->block1Geo1Lfo1[4]);
-    sendOscParameter("/gravity/block3/lfo/b1/zDisplaceRate", gui->block1Geo1Lfo1[5]);
-    sendOscParameter("/gravity/block3/lfo/b1/kaleidoscopeSliceAmp", gui->block1Geo1Lfo2[8]);
-    sendOscParameter("/gravity/block3/lfo/b1/kaleidoscopeSliceRate", gui->block1Geo1Lfo2[9]);
-    sendOscParameter("/gravity/block3/lfo/b1/xShearAmp", gui->block1Geo1Lfo2[4]);
-    sendOscParameter("/gravity/block3/lfo/b1/xShearRate", gui->block1Geo1Lfo2[5]);
-    sendOscParameter("/gravity/block3/lfo/b1/xStretchAmp", gui->block1Geo1Lfo2[0]);
-    sendOscParameter("/gravity/block3/lfo/b1/xStretchRate", gui->block1Geo1Lfo2[1]);
-    sendOscParameter("/gravity/block3/lfo/b1/yShearAmp", gui->block1Geo1Lfo2[6]);
-    sendOscParameter("/gravity/block3/lfo/b1/yShearRate", gui->block1Geo1Lfo2[7]);
-    sendOscParameter("/gravity/block3/lfo/b1/yStretchAmp", gui->block1Geo1Lfo2[2]);
-    sendOscParameter("/gravity/block3/lfo/b1/yStretchRate", gui->block1Geo1Lfo2[3]);
-    sendOscParameter("/gravity/block3/b1/rotate", gui->block1Geo[3]);
-    sendOscParameter("/gravity/block3/b1/rotateMode", gui->block1RotateMode);
-    sendOscParameter("/gravity/block3/b1/sharpenAmount", gui->block1Filters[2]);
-    sendOscParameter("/gravity/block3/b1/sharpenRadius", gui->block1Filters[3]);
-    sendOscParameter("/gravity/block3/b1/vFlip", gui->block1VFlip);
-    sendOscParameter("/gravity/block3/b1/vMirror", gui->block1VMirror);
-    sendOscParameter("/gravity/block3/b1/xDisplace", gui->block1Geo[0]);
-    sendOscParameter("/gravity/block3/b1/xShear", gui->block1Geo[6]);
-    sendOscParameter("/gravity/block3/b1/xStretch", gui->block1Geo[4]);
-    sendOscParameter("/gravity/block3/b1/yDisplace", gui->block1Geo[1]);
-    sendOscParameter("/gravity/block3/b1/yShear", gui->block1Geo[7]);
-    sendOscParameter("/gravity/block3/b1/yStretch", gui->block1Geo[5]);
-    sendOscParameter("/gravity/block3/b1/zDisplace", gui->block1Geo[2]);
+    sendOscParametersByPrefix("/gravity/block3/b1");
+    sendOscParametersByPrefix("/gravity/block3/lfo/b1");
 }
 
 //--------------------------------------------------------------
 void ofApp::sendOscBlock3B2() {
-    sendOscParameter("/gravity/block3/b2/blurAmount", gui->block2Filters[0]);
-    sendOscParameter("/gravity/block3/b2/blurRadius", gui->block2Filters[1]);
-    sendOscParameter("/gravity/block3/b2/colorize/brightBand1", gui->block2Colorize[2]);
-    sendOscParameter("/gravity/block3/b2/colorize/brightBand2", gui->block2Colorize[5]);
-    sendOscParameter("/gravity/block3/b2/colorize/brightBand3", gui->block2Colorize[8]);
-    sendOscParameter("/gravity/block3/b2/colorize/brightBand4", gui->block2Colorize[11]);
-    sendOscParameter("/gravity/block3/b2/colorize/brightBand5", gui->block2Colorize[14]);
-    sendOscParameter("/gravity/block3/b2/colorize/colorspace", gui->block2ColorizeHSB_RGB);
-    sendOscParameter("/gravity/block3/b2/colorize/hueBand1", gui->block2Colorize[0]);
-    sendOscParameter("/gravity/block3/b2/colorize/hueBand2", gui->block2Colorize[3]);
-    sendOscParameter("/gravity/block3/b2/colorize/hueBand3", gui->block2Colorize[6]);
-    sendOscParameter("/gravity/block3/b2/colorize/hueBand4", gui->block2Colorize[9]);
-    sendOscParameter("/gravity/block3/b2/colorize/hueBand5", gui->block2Colorize[12]);
-    sendOscParameter("/gravity/block3/b2/colorize/saturationBand1", gui->block2Colorize[1]);
-    sendOscParameter("/gravity/block3/b2/colorize/saturationBand2", gui->block2Colorize[4]);
-    sendOscParameter("/gravity/block3/b2/colorize/saturationBand3", gui->block2Colorize[7]);
-    sendOscParameter("/gravity/block3/b2/colorize/saturationBand4", gui->block2Colorize[10]);
-    sendOscParameter("/gravity/block3/b2/colorize/saturationBand5", gui->block2Colorize[13]);
-    sendOscParameter("/gravity/block3/lfo/b2/brightBand1Amp", gui->block2ColorizeLfo1[2]);
-    sendOscParameter("/gravity/block3/lfo/b2/brightBand1Rate", gui->block2ColorizeLfo1[5]);
-    sendOscParameter("/gravity/block3/lfo/b2/brightBand2Amp", gui->block2ColorizeLfo1[8]);
-    sendOscParameter("/gravity/block3/lfo/b2/brightBand2Rate", gui->block2ColorizeLfo1[11]);
-    sendOscParameter("/gravity/block3/lfo/b2/brightBand3Amp", gui->block2ColorizeLfo2[2]);
-    sendOscParameter("/gravity/block3/lfo/b2/brightBand3Rate", gui->block2ColorizeLfo2[5]);
-    sendOscParameter("/gravity/block3/lfo/b2/brightBand4Amp", gui->block2ColorizeLfo2[8]);
-    sendOscParameter("/gravity/block3/lfo/b2/brightBand4Rate", gui->block2ColorizeLfo2[11]);
-    sendOscParameter("/gravity/block3/lfo/b2/brightBand5Amp", gui->block2ColorizeLfo3[2]);
-    sendOscParameter("/gravity/block3/lfo/b2/brightBand5Rate", gui->block2ColorizeLfo3[5]);
-    sendOscParameter("/gravity/block3/lfo/b2/hueBand1Amp", gui->block2ColorizeLfo1[0]);
-    sendOscParameter("/gravity/block3/lfo/b2/hueBand1Rate", gui->block2ColorizeLfo1[3]);
-    sendOscParameter("/gravity/block3/lfo/b2/hueBand2Amp", gui->block2ColorizeLfo1[6]);
-    sendOscParameter("/gravity/block3/lfo/b2/hueBand2Rate", gui->block2ColorizeLfo1[9]);
-    sendOscParameter("/gravity/block3/lfo/b2/hueBand3Amp", gui->block2ColorizeLfo2[0]);
-    sendOscParameter("/gravity/block3/lfo/b2/hueBand3Rate", gui->block2ColorizeLfo2[3]);
-    sendOscParameter("/gravity/block3/lfo/b2/hueBand4Amp", gui->block2ColorizeLfo2[6]);
-    sendOscParameter("/gravity/block3/lfo/b2/hueBand4Rate", gui->block2ColorizeLfo2[9]);
-    sendOscParameter("/gravity/block3/lfo/b2/hueBand5Amp", gui->block2ColorizeLfo3[0]);
-    sendOscParameter("/gravity/block3/lfo/b2/hueBand5Rate", gui->block2ColorizeLfo3[3]);
-    sendOscParameter("/gravity/block3/lfo/b2/saturationBand1Amp", gui->block2ColorizeLfo1[1]);
-    sendOscParameter("/gravity/block3/lfo/b2/saturationBand1Rate", gui->block2ColorizeLfo1[4]);
-    sendOscParameter("/gravity/block3/lfo/b2/saturationBand2Amp", gui->block2ColorizeLfo1[7]);
-    sendOscParameter("/gravity/block3/lfo/b2/saturationBand2Rate", gui->block2ColorizeLfo1[10]);
-    sendOscParameter("/gravity/block3/lfo/b2/saturationBand3Amp", gui->block2ColorizeLfo2[1]);
-    sendOscParameter("/gravity/block3/lfo/b2/saturationBand3Rate", gui->block2ColorizeLfo2[4]);
-    sendOscParameter("/gravity/block3/lfo/b2/saturationBand4Amp", gui->block2ColorizeLfo2[7]);
-    sendOscParameter("/gravity/block3/lfo/b2/saturationBand4Rate", gui->block2ColorizeLfo2[10]);
-    sendOscParameter("/gravity/block3/lfo/b2/saturationBand5Amp", gui->block2ColorizeLfo3[1]);
-    sendOscParameter("/gravity/block3/lfo/b2/saturationBand5Rate", gui->block2ColorizeLfo3[4]);
-    sendOscParameter("/gravity/block3/b2/filtersBoost", gui->block2Filters[4]);
-    sendOscParameter("/gravity/block3/b2/geoOverflow", gui->block2GeoOverflow);
-    sendOscParameter("/gravity/block3/b2/hFlip", gui->block2HFlip);
-    sendOscParameter("/gravity/block3/b2/hMirror", gui->block2HMirror);
-    sendOscParameter("/gravity/block3/b2/kaleidoscopeAmount", gui->block2Geo[8]);
-    sendOscParameter("/gravity/block3/b2/kaleidoscopeSlice", gui->block2Geo[9]);
-    sendOscParameter("/gravity/block3/lfo/b2/rotateAmp", gui->block2Geo1Lfo1[6]);
-    sendOscParameter("/gravity/block3/lfo/b2/rotateRate", gui->block2Geo1Lfo1[7]);
-    sendOscParameter("/gravity/block3/lfo/b2/xDisplaceAmp", gui->block2Geo1Lfo1[0]);
-    sendOscParameter("/gravity/block3/lfo/b2/xDisplaceRate", gui->block2Geo1Lfo1[1]);
-    sendOscParameter("/gravity/block3/lfo/b2/yDisplaceAmp", gui->block2Geo1Lfo1[2]);
-    sendOscParameter("/gravity/block3/lfo/b2/yDisplaceRate", gui->block2Geo1Lfo1[3]);
-    sendOscParameter("/gravity/block3/lfo/b2/zDisplaceAmp", gui->block2Geo1Lfo1[4]);
-    sendOscParameter("/gravity/block3/lfo/b2/zDisplaceRate", gui->block2Geo1Lfo1[5]);
-    sendOscParameter("/gravity/block3/lfo/b2/kaleidoscopeSliceAmp", gui->block2Geo1Lfo2[8]);
-    sendOscParameter("/gravity/block3/lfo/b2/kaleidoscopeSliceRate", gui->block2Geo1Lfo2[9]);
-    sendOscParameter("/gravity/block3/lfo/b2/xShearAmp", gui->block2Geo1Lfo2[4]);
-    sendOscParameter("/gravity/block3/lfo/b2/xShearRate", gui->block2Geo1Lfo2[5]);
-    sendOscParameter("/gravity/block3/lfo/b2/xStretchAmp", gui->block2Geo1Lfo2[0]);
-    sendOscParameter("/gravity/block3/lfo/b2/xStretchRate", gui->block2Geo1Lfo2[1]);
-    sendOscParameter("/gravity/block3/lfo/b2/yShearAmp", gui->block2Geo1Lfo2[6]);
-    sendOscParameter("/gravity/block3/lfo/b2/yShearRate", gui->block2Geo1Lfo2[7]);
-    sendOscParameter("/gravity/block3/lfo/b2/yStretchAmp", gui->block2Geo1Lfo2[2]);
-    sendOscParameter("/gravity/block3/lfo/b2/yStretchRate", gui->block2Geo1Lfo2[3]);
-    sendOscParameter("/gravity/block3/b2/rotate", gui->block2Geo[3]);
-    sendOscParameter("/gravity/block3/b2/rotateMode", gui->block2RotateMode);
-    sendOscParameter("/gravity/block3/b2/sharpenAmount", gui->block2Filters[2]);
-    sendOscParameter("/gravity/block3/b2/sharpenRadius", gui->block2Filters[3]);
-    sendOscParameter("/gravity/block3/b2/vFlip", gui->block2VFlip);
-    sendOscParameter("/gravity/block3/b2/vMirror", gui->block2VMirror);
-    sendOscParameter("/gravity/block3/b2/xDisplace", gui->block2Geo[0]);
-    sendOscParameter("/gravity/block3/b2/xShear", gui->block2Geo[6]);
-    sendOscParameter("/gravity/block3/b2/xStretch", gui->block2Geo[4]);
-    sendOscParameter("/gravity/block3/b2/yDisplace", gui->block2Geo[1]);
-    sendOscParameter("/gravity/block3/b2/yShear", gui->block2Geo[7]);
-    sendOscParameter("/gravity/block3/b2/yStretch", gui->block2Geo[5]);
-    sendOscParameter("/gravity/block3/b2/zDisplace", gui->block2Geo[2]);
+    sendOscParametersByPrefix("/gravity/block3/b2");
+    sendOscParametersByPrefix("/gravity/block3/lfo/b2");
 }
 
 //--------------------------------------------------------------
 void ofApp::sendOscBlock3MatrixAndFinal() {
-    sendOscParameter("/gravity/block3/final/keyBlue", gui->finalMixAndKey[3]);
-    sendOscParameter("/gravity/block3/final/keyGreen", gui->finalMixAndKey[2]);
-    sendOscParameter("/gravity/block3/final/keyMode", gui->finalKeyMode);
-    sendOscParameter("/gravity/block3/final/keyOrder", gui->finalKeyOrder);
-    sendOscParameter("/gravity/block3/final/keyRed", gui->finalMixAndKey[1]);
-    sendOscParameter("/gravity/block3/final/keySoft", gui->finalMixAndKey[5]);
-    sendOscParameter("/gravity/block3/final/keyThreshold", gui->finalMixAndKey[4]);
-    sendOscParameter("/gravity/block3/lfo/final/keySoftAmp", gui->finalMixAndKeyLfo[4]);
-    sendOscParameter("/gravity/block3/lfo/final/keySoftRate", gui->finalMixAndKeyLfo[5]);
-    sendOscParameter("/gravity/block3/lfo/final/keyThresholdAmp", gui->finalMixAndKeyLfo[2]);
-    sendOscParameter("/gravity/block3/lfo/final/keyThresholdRate", gui->finalMixAndKeyLfo[3]);
-    sendOscParameter("/gravity/block3/lfo/final/mixAmountAmp", gui->finalMixAndKeyLfo[0]);
-    sendOscParameter("/gravity/block3/lfo/final/mixAmountRate", gui->finalMixAndKeyLfo[1]);
-    sendOscParameter("/gravity/block3/final/mixAmount", gui->finalMixAndKey[0]);
-    sendOscParameter("/gravity/block3/final/mixType", gui->finalMixType);
-    sendOscParameter("/gravity/block3/final/overflow", gui->finalMixOverflow);
-    sendOscParameter("/gravity/block3/matrixMix/b1BlueToB2Blue", gui->matrixMix[8]);
-    sendOscParameter("/gravity/block3/matrixMix/b1BlueToB2Green", gui->matrixMix[7]);
-    sendOscParameter("/gravity/block3/matrixMix/b1BlueToB2Red", gui->matrixMix[6]);
-    sendOscParameter("/gravity/block3/matrixMix/b1GreenToB2Blue", gui->matrixMix[5]);
-    sendOscParameter("/gravity/block3/matrixMix/b1GreenToB2Green", gui->matrixMix[4]);
-    sendOscParameter("/gravity/block3/matrixMix/b1GreenToB2Red", gui->matrixMix[3]);
-    sendOscParameter("/gravity/block3/matrixMix/b1RedToB2Blue", gui->matrixMix[2]);
-    sendOscParameter("/gravity/block3/matrixMix/b1RedToB2Green", gui->matrixMix[1]);
-    sendOscParameter("/gravity/block3/matrixMix/b1RedToB2Red", gui->matrixMix[0]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1GreenToB2BlueAmp", gui->matrixMixLfo1[8]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1GreenToB2BlueRate", gui->matrixMixLfo1[11]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1GreenToB2GreenAmp", gui->matrixMixLfo1[7]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1GreenToB2GreenRate", gui->matrixMixLfo1[10]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1GreenToB2RedAmp", gui->matrixMixLfo1[6]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1GreenToB2RedRate", gui->matrixMixLfo1[9]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1RedToB2BlueAmp", gui->matrixMixLfo1[2]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1RedToB2BlueRate", gui->matrixMixLfo1[5]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1RedToB2RedRate", gui->matrixMixLfo1[3]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1RedToB2GreenAmp", gui->matrixMixLfo1[1]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1RedToB2GreenRate", gui->matrixMixLfo1[4]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1RedToB2RedAmp", gui->matrixMixLfo1[0]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1BlueToB2BlueAmp", gui->matrixMixLfo2[2]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1BlueToB2BlueRate", gui->matrixMixLfo2[5]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1BlueToB2GreenAmp", gui->matrixMixLfo2[1]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1BlueToB2GreenRate", gui->matrixMixLfo2[4]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1BlueToB2RedAmp", gui->matrixMixLfo2[0]);
-    sendOscParameter("/gravity/block3/lfo/matrixMix/b1BlueToB2RedRate", gui->matrixMixLfo2[3]);
-    sendOscParameter("/gravity/block3/matrixMix/mixType", gui->matrixMixType);
-    sendOscParameter("/gravity/block3/matrixMix/overflow", gui->matrixMixOverflow);
+    sendOscParametersByPrefix("/gravity/block3/final");
+    sendOscParametersByPrefix("/gravity/block3/lfo/final");
+    sendOscParametersByPrefix("/gravity/block3/matrixMix");
+    sendOscParametersByPrefix("/gravity/block3/lfo/matrixMix");
 }
 
 //--------------------------------------------------------------
 void ofApp::sendAllOscParameters() {
     if (!oscEnabled || !gui->oscEnabled) return;
     
-    ofLogNotice("OSC") << "Queueing all OSC parameters for throttled sending...";
+    // Pause receiving while sending to avoid feedback loops
+    gui->oscReceivePaused = true;
     
-    // Enable batch mode - sendOscParameter will queue instead of send
-    oscBatchSending = true;
+    ofLogNotice("OSC") << "Sending all OSC parameters from registry (" << gui->oscRegistry.size() << " total)...";
     
-    // Call each block's helper function (they will queue messages)
-    sendOscBlock1Ch1();
-    sendOscBlock1Ch2();
-    sendOscBlock1Fb1();
-    sendOscBlock2Fb2();
-    sendOscBlock2Input();
-    sendOscBlock3B1();
-    sendOscBlock3B2();
-    sendOscBlock3MatrixAndFinal();
+    // Send all parameters from the registry
+    for (const auto& param : gui->oscRegistry) {
+        sendOscParameter(param.address, param.getValueAsFloat());
+    }
     
-    ofLogNotice("OSC") << "Queued " << oscSendQueue.size() << " OSC messages for sending";
-    // Note: oscBatchSending will be set to false by processOscQueue when queue is empty
+    // Resume receiving
+    gui->oscReceivePaused = false;
+    
+    ofLogNotice("OSC") << "Finished sending all OSC parameters";
 }

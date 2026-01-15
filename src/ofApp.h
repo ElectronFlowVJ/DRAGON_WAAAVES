@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "GuiApp.h"
 #include "ofxOsc.h"
+#include "ofxNDIreceiver.h"
 
 #define ROOT_THREE 1.73205080757
 
@@ -30,17 +31,8 @@ class ofApp : public ofBaseApp{
 		void reloadOscSettings();
 		bool oscEnabled;
 		
-		// OSC Queue for throttled sending
-		struct OscQueueItem {
-			string address;
-			float value;
-		};
-		std::vector<OscQueueItem> oscSendQueue;
-		bool oscBatchSending = false;
-		void processOscQueue();
-		void queueOscParameter(string address, float value);
-		
-		// OSC Send Helper Functions (split to avoid compiler limits)
+		// OSC Send Helper Functions (registry-based)
+		void sendOscParametersByPrefix(const std::string& prefix);
 		void sendOscBlock1Ch1();
 		void sendOscBlock1Ch2();
 		void sendOscBlock1Fb1();
@@ -75,6 +67,15 @@ class ofApp : public ofBaseApp{
 	void reinitializeInputs();
 	ofVideoGrabber input1;
 	ofVideoGrabber input2;
+	
+	// NDI receivers
+	ofxNDIreceiver ndiReceiver1;
+	ofxNDIreceiver ndiReceiver2;
+	ofTexture ndiTexture1;
+	ofTexture ndiTexture2;
+	ofFbo ndiFbo1;  // FBO for scaling NDI input 1 to 640x480
+	ofFbo ndiFbo2;  // FBO for scaling NDI input 2 to 640x480
+	void refreshNdiSources();
 
 	//framebuffers
 	void framebufferSetup();

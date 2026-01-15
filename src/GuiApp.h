@@ -20,9 +20,62 @@ class ofApp;
 #include "ofMain.h"
 #include "ofxMidi.h"
 #include "ofxImGui.h"
+#include <map>
+#include <atomic>
 
 #define PARAMETER_ARRAY_LENGTH 16
 
+// OSC Parameter types
+enum class OscParamType {
+    FLOAT,
+    BOOL,
+    INT
+};
+
+// Struct to bind a parameter to its OSC address
+struct OscParameter {
+    std::string address;
+    OscParamType type;
+    union {
+        float* floatPtr;
+        bool* boolPtr;
+        int* intPtr;
+    };
+    
+    // Constructors for each type
+    OscParameter(const std::string& addr, float* ptr) 
+        : address(addr), type(OscParamType::FLOAT), floatPtr(ptr) {}
+    OscParameter(const std::string& addr, bool* ptr) 
+        : address(addr), type(OscParamType::BOOL), boolPtr(ptr) {}
+    OscParameter(const std::string& addr, int* ptr) 
+        : address(addr), type(OscParamType::INT), intPtr(ptr) {}
+    OscParameter() : address(""), type(OscParamType::FLOAT), floatPtr(nullptr) {}
+    
+    // Get value as float (for sending)
+    float getValueAsFloat() const {
+        switch(type) {
+            case OscParamType::FLOAT: return floatPtr ? *floatPtr : 0.0f;
+            case OscParamType::BOOL: return boolPtr ? (*boolPtr ? 1.0f : 0.0f) : 0.0f;
+            case OscParamType::INT: return intPtr ? static_cast<float>(*intPtr) : 0.0f;
+        }
+        return 0.0f;
+    }
+    
+    // Set value from float (for receiving)
+    void setValueFromFloat(float value) {
+        switch(type) {
+            case OscParamType::FLOAT: 
+                if(floatPtr) *floatPtr = value; 
+                break;
+            case OscParamType::BOOL: 
+                if(boolPtr) *boolPtr = (value > 0.5f); 
+                break;
+            case OscParamType::INT: 
+                if(intPtr) *intPtr = static_cast<int>(value); 
+                break;
+        }
+    }
+};
 
 // OSC-enabled ImGui wrapper macro
 #define ImGuiSliderFloatOSC(label, var, min, max, address) \
@@ -103,11 +156,10 @@ public:
 	int oscReceivePort = 7000;
 	char oscSendIP[64] = "127.0.0.1";
 	int oscSendPort = 7001;
-	string localIP = "";
 	bool oscConnected = false;
 	bool sendAllOscValues = false;  // Trigger for sending all OSC values
-	int oscMessagesPerFrame = 20;   // Throttle for batch sending
 	void updateLocalIP();
+	std::vector<std::string> localIPs;  // All available network IPs
 	
 	// Video Input Settings
 	std::vector<ofVideoDevice> videoDevices;
@@ -116,6 +168,14 @@ public:
 	int input2DeviceID = 1;
 	bool reinitializeInputs = false;
 	void refreshVideoDevices();
+	
+	// NDI Input Settings
+	int input1SourceType = 0;  // 0 = Webcam, 1 = NDI
+	int input2SourceType = 0;  // 0 = Webcam, 1 = NDI
+	std::vector<std::string> ndiSourceNames;
+	int input1NdiSourceIndex = 0;
+	int input2NdiSourceIndex = 0;
+	bool refreshNdiSources = false;
 	
 	//block1
 	const int ch1AdjustLength=15;
@@ -1757,6 +1817,25 @@ public:
 	float finalMixAndKeyLfo[PARAMETER_ARRAY_LENGTH];
 	bool finalMixAndKeyLfoMidiActive[PARAMETER_ARRAY_LENGTH];
 	
+	// ============== OSC PARAMETER REGISTRY ==============
+	// Registry of all OSC-controllable parameters
+	std::vector<OscParameter> oscRegistry;
+	
+	// Fast lookup map: OSC address -> pointer to registry entry
+	std::map<std::string, OscParameter*> oscAddressMap;
+	
+	// Flag to pause receiving during sendAll
+	std::atomic<bool> oscReceivePaused{false};
+	
+	// Initialize the OSC parameter registry (call in setup)
+	void registerBlock1OscParameters();
+	void registerBlock2OscParameters();
+	void registerBlock3OscParameters();
+	
+	// Helper to add a parameter to the registry
+	void registerOscParam(const std::string& address, float* ptr);
+	void registerOscParam(const std::string& address, bool* ptr);
+	void registerOscParam(const std::string& address, int* ptr);
 
 
 };
