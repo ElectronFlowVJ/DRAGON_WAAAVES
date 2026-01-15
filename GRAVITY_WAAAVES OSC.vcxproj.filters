@@ -130,130 +130,82 @@
 		<ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.cpp">
 			<Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
 		</ClCompile>
-		<ClCompile Include="..\..\..\addons\ofxSpout2\src\ofxSpout2Receiver.cpp">
-			<Filter>addons\ofxSpout2\src</Filter>
-		</ClCompile>
-		<ClCompile Include="..\..\..\addons\ofxSpout2\src\ofxSpout2Sender.cpp">
-			<Filter>addons\ofxSpout2\src</Filter>
-		</ClCompile>
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutDirectX.cpp">
-			<Filter>addons\ofxSpout2\libs\src</Filter>
-		</ClCompile>
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutGLDXinterop.cpp">
-			<Filter>addons\ofxSpout2\libs\src</Filter>
-		</ClCompile>
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutGLextensions.cpp">
-			<Filter>addons\ofxSpout2\libs\src</Filter>
-		</ClCompile>
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutMemoryShare.cpp">
-			<Filter>addons\ofxSpout2\libs\src</Filter>
-		</ClCompile>
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutReceiver.cpp">
-			<Filter>addons\ofxSpout2\libs\src</Filter>
-		</ClCompile>
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutSDK.cpp">
-			<Filter>addons\ofxSpout2\libs\src</Filter>
-		</ClCompile>
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutSender.cpp">
-			<Filter>addons\ofxSpout2\libs\src</Filter>
-		</ClCompile>
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutSenderNames.cpp">
-			<Filter>addons\ofxSpout2\libs\src</Filter>
-		</ClCompile>
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutSharedMemory.cpp">
-			<Filter>addons\ofxSpout2\libs\src</Filter>
-		</ClCompile>
 	</ItemGroup>
 	<ItemGroup>
 		<Filter Include="src">
 			<UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons">
-			<UniqueIdentifier>{4250D54A--ED1-1-41-9E-8-AC8-98E97C4CFC85}</UniqueIdentifier>
+			<UniqueIdentifier>{7F32CF76--1CB-5-4A-A9-A-EBD-44F22006E8DA}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxImGui">
-			<UniqueIdentifier>{108645F5--28F-3-45-FC-A-724-099465F951D6}</UniqueIdentifier>
+			<UniqueIdentifier>{E8C7BE9E--3DE-4-42-7A-8-93C-9F120765AF24}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxImGui\src">
-			<UniqueIdentifier>{A756A2FF--D9C-1-42-C6-8-15D-EDB7B13C03BE}</UniqueIdentifier>
+			<UniqueIdentifier>{DCF15A0A--7AD-0-43-59-B-D9D-84976A4DB211}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxImGui\libs">
-			<UniqueIdentifier>{77B4236D--6E3-D-4E-AA-B-95C-445AA76A066C}</UniqueIdentifier>
+			<UniqueIdentifier>{A69F371B--2E6-F-4F-15-A-46B-9FC198915D8D}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxImGui\libs\imgui">
-			<UniqueIdentifier>{8507B979--D5B-E-41-46-A-439-705715AD39DB}</UniqueIdentifier>
+			<UniqueIdentifier>{19726F1B--A97-4-4A-4F-A-F17-D3DC01AAA618}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxImGui\libs\imgui\src">
-			<UniqueIdentifier>{A8891D8F--DD3-9-48-A2-B-0E7-9A023BEA1833}</UniqueIdentifier>
+			<UniqueIdentifier>{036B832C--D6A-4-43-F5-8-EC7-E673A3901ECA}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxMidi">
-			<UniqueIdentifier>{ED0634F9--2BA-E-44-6D-A-D11-368CB5FB6EB2}</UniqueIdentifier>
+			<UniqueIdentifier>{C28E019D--2AC-8-4D-AC-B-0EB-8A054C8C846A}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxMidi\src">
-			<UniqueIdentifier>{174F0C21--53A-2-49-9C-8-D79-B45D711CE86B}</UniqueIdentifier>
+			<UniqueIdentifier>{0F18ED15--868-2-40-D2-A-215-58E261EA8D63}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxMidi\src\desktop">
-			<UniqueIdentifier>{258F5FEB--836-E-4C-1F-9-295-3970603536E7}</UniqueIdentifier>
+			<UniqueIdentifier>{9C2A1B9E--C8B-D-43-37-8-CD0-F3045496EABE}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxMidi\libs">
-			<UniqueIdentifier>{488BDB38--05C-6-42-CF-9-72F-3F53EF28E716}</UniqueIdentifier>
+			<UniqueIdentifier>{85B4BBC8--96C-D-45-CA-9-473-DCA2097D45C1}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxMidi\libs\rtmidi">
-			<UniqueIdentifier>{A62E26AF--856-5-40-BB-9-2D0-6D9CD94ABB93}</UniqueIdentifier>
+			<UniqueIdentifier>{7E03B8C3--644-A-4E-69-A-170-9137158AA811}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxNDI">
-			<UniqueIdentifier>{C7C5BEA8--20B-8-4B-E7-A-BF8-C3A7A08BF5F5}</UniqueIdentifier>
+			<UniqueIdentifier>{BFC067DD--C30-8-4B-A6-A-F87-291716A56D0E}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxNDI\src">
-			<UniqueIdentifier>{C6C98EED--797-7-4C-D8-A-817-C2C4FC1B3DC8}</UniqueIdentifier>
+			<UniqueIdentifier>{45338BBB--C98-E-40-97-9-B3C-CFE2520EC301}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxNDI\libs">
-			<UniqueIdentifier>{B81813BA--712-E-41-2F-8-DBD-EB0F4A89CCEE}</UniqueIdentifier>
+			<UniqueIdentifier>{1327E871--020-1-41-4B-9-8B6-3020985A62CA}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxNDI\libs\NDI">
-			<UniqueIdentifier>{ACC42ECE--0DD-D-4B-94-8-079-D1A218C6951C}</UniqueIdentifier>
+			<UniqueIdentifier>{CDC6D039--113-E-4C-50-9-539-E9567B76B597}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxNDI\libs\NDI\include">
-			<UniqueIdentifier>{8D45807F--BD9-3-4F-78-B-45B-586B7D97687E}</UniqueIdentifier>
+			<UniqueIdentifier>{285B2D9F--4F2-D-44-CD-A-9A6-BB63318DC7E2}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxOsc">
-			<UniqueIdentifier>{45437366--CBA-F-43-F6-8-9B7-AE1B4CC0A327}</UniqueIdentifier>
+			<UniqueIdentifier>{00F9243D--570-5-41-4C-B-38A-3E5063AAFE10}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxOsc\src">
-			<UniqueIdentifier>{0CFC9B89--ADE-0-46-52-B-1A0-B9D9171541AA}</UniqueIdentifier>
+			<UniqueIdentifier>{057318F3--071-0-4B-CB-B-198-63E542FB55E2}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxOsc\libs">
-			<UniqueIdentifier>{1992A63B--CD9-A-43-A4-8-D1D-9968F0A6654E}</UniqueIdentifier>
+			<UniqueIdentifier>{71747088--857-9-49-E8-B-3BE-BB130D305C06}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxOsc\libs\oscpack">
-			<UniqueIdentifier>{B21AB56E--292-9-47-B4-B-7F8-D4754DFD516C}</UniqueIdentifier>
+			<UniqueIdentifier>{2BD47DFD--05A-0-4F-82-9-F2F-AF7DCE212569}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxOsc\libs\oscpack\src">
-			<UniqueIdentifier>{36BB5766--394-B-40-30-A-C72-BB0C22D7E5EB}</UniqueIdentifier>
+			<UniqueIdentifier>{978055C3--B02-5-45-6A-B-827-0C2F9BD182E3}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxOsc\libs\oscpack\src\ip">
-			<UniqueIdentifier>{7B19A7C6--27D-7-47-EF-B-116-0EFCBEAD696D}</UniqueIdentifier>
+			<UniqueIdentifier>{194EE0C2--E94-0-41-5B-8-19D-52B8840012FF}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxOsc\libs\oscpack\src\ip\win32">
-			<UniqueIdentifier>{6799F97D--083-B-40-7A-A-831-363B82A14351}</UniqueIdentifier>
+			<UniqueIdentifier>{B3B7411E--82F-A-49-C9-A-164-981EF2001A5E}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxOsc\libs\oscpack\src\osc">
-			<UniqueIdentifier>{C1FE5E2B--4A6-E-42-D0-8-178-960A6C11119F}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxSpout2">
-			<UniqueIdentifier>{67262E70--365-7-47-06-A-162-0374CB9415E8}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxSpout2\src">
-			<UniqueIdentifier>{F2C699B6--373-1-49-A5-A-55C-182F687DEED3}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxSpout2\libs">
-			<UniqueIdentifier>{3CFBF588--E61-9-4D-64-B-4CB-CFA8C0916C44}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxSpout2\libs\include">
-			<UniqueIdentifier>{F0B546B3--E8C-5-4D-17-B-28F-A94191C4A55E}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxSpout2\libs\src">
-			<UniqueIdentifier>{C2658D25--CE4-8-42-D9-A-2F0-4501AC50A740}</UniqueIdentifier>
+			<UniqueIdentifier>{EBCCE467--D1F-F-4A-24-9-554-BBCFB03B3F71}</UniqueIdentifier>
 		</Filter>
 	</ItemGroup>
 	<ItemGroup>
@@ -481,45 +433,6 @@
 		</ClInclude>
 		<ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.h">
 			<Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxSpout2\src\ofxSpout2Receiver.h">
-			<Filter>addons\ofxSpout2\src</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxSpout2\src\ofxSpout2Sender.h">
-			<Filter>addons\ofxSpout2\src</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\Spout.h">
-			<Filter>addons\ofxSpout2\libs\include</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutCommon.h">
-			<Filter>addons\ofxSpout2\libs\include</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutDirectX.h">
-			<Filter>addons\ofxSpout2\libs\include</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutGLDXinterop.h">
-			<Filter>addons\ofxSpout2\libs\include</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutGLextensions.h">
-			<Filter>addons\ofxSpout2\libs\include</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutMemoryShare.h">
-			<Filter>addons\ofxSpout2\libs\include</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutReceiver.h">
-			<Filter>addons\ofxSpout2\libs\include</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutSDK.h">
-			<Filter>addons\ofxSpout2\libs\include</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutSender.h">
-			<Filter>addons\ofxSpout2\libs\include</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutSenderNames.h">
-			<Filter>addons\ofxSpout2\libs\include</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutSharedMemory.h">
-			<Filter>addons\ofxSpout2\libs\include</Filter>
 		</ClInclude>
 	</ItemGroup>
 	<ItemGroup>

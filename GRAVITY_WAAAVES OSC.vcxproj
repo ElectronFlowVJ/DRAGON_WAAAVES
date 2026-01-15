@@ -82,7 +82,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions);OSC_HOST_LITTLE_ENDIAN</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxImGui\libs;..\..\..\addons\ofxImGui\libs\imgui;..\..\..\addons\ofxImGui\libs\imgui\src;..\..\..\addons\ofxImGui\src;..\..\..\addons\ofxMidi\libs;..\..\..\addons\ofxMidi\libs\pgmidi;..\..\..\addons\ofxMidi\libs\rtmidi;..\..\..\addons\ofxMidi\src;..\..\..\addons\ofxMidi\src\desktop;..\..\..\addons\ofxMidi\src\ios;..\..\..\addons\ofxNDI\libs\NDI\include;..\..\..\addons\ofxNDI\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxSpout2\libs;..\..\..\addons\ofxSpout2\libs\include;..\..\..\addons\ofxSpout2\libs\src;..\..\..\addons\ofxSpout2\src</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxImGui\libs;..\..\..\addons\ofxImGui\libs\imgui;..\..\..\addons\ofxImGui\libs\imgui\src;..\..\..\addons\ofxImGui\src;..\..\..\addons\ofxMidi\libs;..\..\..\addons\ofxMidi\libs\pgmidi;..\..\..\addons\ofxMidi\libs\rtmidi;..\..\..\addons\ofxMidi\src;..\..\..\addons\ofxMidi\src\desktop;..\..\..\addons\ofxMidi\src\ios;..\..\..\addons\ofxNDI\libs\NDI\include;..\..\..\addons\ofxNDI\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 			<MultiProcessorCompilation>true</MultiProcessorCompilation>
 			<ObjectFileName>$(IntDir)\Build\%(RelativeDir)\$(Configuration)\</ObjectFileName>
@@ -127,7 +127,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions);OSC_HOST_LITTLE_ENDIAN</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxImGui\libs;..\..\..\addons\ofxImGui\libs\imgui;..\..\..\addons\ofxImGui\libs\imgui\src;..\..\..\addons\ofxImGui\src;..\..\..\addons\ofxMidi\libs;..\..\..\addons\ofxMidi\libs\pgmidi;..\..\..\addons\ofxMidi\libs\rtmidi;..\..\..\addons\ofxMidi\src;..\..\..\addons\ofxMidi\src\desktop;..\..\..\addons\ofxMidi\src\ios;..\..\..\addons\ofxNDI\libs\NDI\include;..\..\..\addons\ofxNDI\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxSpout2\libs;..\..\..\addons\ofxSpout2\libs\include;..\..\..\addons\ofxSpout2\libs\src;..\..\..\addons\ofxSpout2\src</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxImGui\libs;..\..\..\addons\ofxImGui\libs\imgui;..\..\..\addons\ofxImGui\libs\imgui\src;..\..\..\addons\ofxImGui\src;..\..\..\addons\ofxMidi\libs;..\..\..\addons\ofxMidi\libs\pgmidi;..\..\..\addons\ofxMidi\libs\rtmidi;..\..\..\addons\ofxMidi\src;..\..\..\addons\ofxMidi\src\desktop;..\..\..\addons\ofxMidi\src\ios;..\..\..\addons\ofxNDI\libs\NDI\include;..\..\..\addons\ofxNDI\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 			<ObjectFileName>$(IntDir)\Build\%(RelativeDir)\$(Configuration)\</ObjectFileName>
 			<LanguageStandard>stdcpplatest</LanguageStandard>
@@ -269,17 +269,6 @@
 		<ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscPrintReceivedElements.cpp" />
 		<ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscReceivedElements.cpp" />
 		<ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.cpp" />
-		<ClCompile Include="..\..\..\addons\ofxSpout2\src\ofxSpout2Receiver.cpp" />
-		<ClCompile Include="..\..\..\addons\ofxSpout2\src\ofxSpout2Sender.cpp" />
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutDirectX.cpp" />
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutGLDXinterop.cpp" />
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutGLextensions.cpp" />
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutMemoryShare.cpp" />
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutReceiver.cpp" />
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutSDK.cpp" />
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutSender.cpp" />
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutSenderNames.cpp" />
-		<ClCompile Include="..\..\..\addons\ofxSpout2\libs\src\SpoutSharedMemory.cpp" />
 	</ItemGroup>
 	<ItemGroup>
 		<ClInclude Include="src\ofApp.h" />
@@ -357,19 +346,6 @@
 		<ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscPrintReceivedElements.h" />
 		<ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscReceivedElements.h" />
 		<ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.h" />
-		<ClInclude Include="..\..\..\addons\ofxSpout2\src\ofxSpout2Receiver.h" />
-		<ClInclude Include="..\..\..\addons\ofxSpout2\src\ofxSpout2Sender.h" />
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\Spout.h" />
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutCommon.h" />
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutDirectX.h" />
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutGLDXinterop.h" />
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutGLextensions.h" />
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutMemoryShare.h" />
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutReceiver.h" />
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutSDK.h" />
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutSender.h" />
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutSenderNames.h" />
-		<ClInclude Include="..\..\..\addons\ofxSpout2\libs\include\SpoutSharedMemory.h" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">

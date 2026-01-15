@@ -1463,7 +1463,7 @@ void ofApp::inputSetup(){
 		input1.setVerbose(true);
 		input1.setDeviceID(gui->input1DeviceID);
 		input1.setDesiredFrameRate(30);
-		input1.initGrabber(640,480);
+		input1.setup(640,480);
 	}
 	
 	// Initialize Input 2 based on source type
@@ -1472,7 +1472,7 @@ void ofApp::inputSetup(){
 		input2.setVerbose(true);
 		input2.setDeviceID(gui->input2DeviceID);
 		input2.setDesiredFrameRate(30);
-		input2.initGrabber(640,480);
+		input2.setup(640,480);
 	}
 	
 	// Initial NDI source scan
@@ -1588,7 +1588,7 @@ void ofApp::reinitializeInputs(){
 		input1.setVerbose(true);
 		input1.setDeviceID(gui->input1DeviceID);
 		input1.setDesiredFrameRate(30);
-		input1.initGrabber(640,480);
+		input1.setup(640,480);
 	} else {
 		// NDI
 		input1.close();
@@ -1612,7 +1612,7 @@ void ofApp::reinitializeInputs(){
 		input2.setVerbose(true);
 		input2.setDeviceID(gui->input2DeviceID);
 		input2.setDesiredFrameRate(30);
-		input2.initGrabber(640,480);
+		input2.setup(640,480);
 	} else {
 		// NDI
 		input2.close();
