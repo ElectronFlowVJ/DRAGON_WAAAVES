@@ -2,3 +2,4 @@ ofxImGui
 ofxMidi
 ofxNDI
 ofxOsc
+ofxSpout

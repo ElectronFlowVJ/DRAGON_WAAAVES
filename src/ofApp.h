@@ -4,6 +4,8 @@
 #include "GuiApp.h"
 #include "ofxOsc.h"
 #include "ofxNDIreceiver.h"
+#include "ofxNDIsender.h"
+#include "ofxSpout.h"
 
 #define ROOT_THREE 1.73205080757
 
@@ -54,11 +56,25 @@ class ofApp : public ofBaseApp{
 		bool processOscResetCommands(const string& address);
 	
 	//globals	
+	// Input resolutions
+	int input1Width = 640;
+	int input1Height = 480;
+	int input2Width = 640;
+	int input2Height = 480;
+	
+	// Legacy inputWidth/inputHeight for compatibility
 	int inputWidth=640;
 	int inputHeight=480;
 
+	// Output and internal resolutions
 	int outputWidth;
 	int outputHeight;
+	int internalWidth;
+	int internalHeight;
+	
+	// Spout send resolution
+	int spoutSendWidth = 1280;
+	int spoutSendHeight = 720;
 
 	//video inputs
 	void inputSetup();
@@ -67,6 +83,8 @@ class ofApp : public ofBaseApp{
 	void reinitializeInputs();
 	ofVideoGrabber input1;
 	ofVideoGrabber input2;
+	ofFbo webcamFbo1;  // FBO for scaling webcam 1 to internal resolution
+	ofFbo webcamFbo2;  // FBO for scaling webcam 2 to internal resolution
 	
 	// NDI receivers
 	ofxNDIreceiver ndiReceiver1;
@@ -76,9 +94,44 @@ class ofApp : public ofBaseApp{
 	ofFbo ndiFbo1;  // FBO for scaling NDI input 1 to 640x480
 	ofFbo ndiFbo2;  // FBO for scaling NDI input 2 to 640x480
 	void refreshNdiSources();
+	
+	// Spout receivers
+	ofxSpout::Receiver spoutReceiver1;
+	ofxSpout::Receiver spoutReceiver2;
+	ofTexture spoutTexture1;  // Texture to receive into
+	ofTexture spoutTexture2;  // Texture to receive into
+	ofFbo spoutFbo1;  // FBO for scaling Spout input 1 to 640x480
+	ofFbo spoutFbo2;  // FBO for scaling Spout input 2 to 640x480
+	
+	// Spout senders (one per output channel)
+	ofxSpout::Sender spoutSenderBlock1;
+	ofxSpout::Sender spoutSenderBlock2;
+	ofxSpout::Sender spoutSenderBlock3;
+	ofFbo spoutSendFbo1;  // FBO for flipping Block 1 output
+	ofFbo spoutSendFbo2;  // FBO for flipping Block 2 output
+	ofFbo spoutSendFbo3;  // FBO for flipping Block 3 output
+	
+	// NDI senders (one per output channel)
+	ofxNDIsender ndiSenderBlock1;
+	ofxNDIsender ndiSenderBlock2;
+	ofxNDIsender ndiSenderBlock3;
+	bool ndiSender1Active = false;  // Track if sender is created
+	bool ndiSender2Active = false;
+	bool ndiSender3Active = false;
+	ofFbo ndiSendFbo1;  // FBO for Block 1 output
+	ofFbo ndiSendFbo2;  // FBO for Block 2 output
+	ofFbo ndiSendFbo3;  // FBO for Block 3 output
+	
+	// NDI send resolution
+	int ndiSendWidth = 1280;
+	int ndiSendHeight = 720;
+	
+	// Spout source management
+	void refreshSpoutSources();
 
 	//framebuffers
 	void framebufferSetup();
+	void reinitializeResolutions();
 	ofFbo framebuffer1;
 	ofFbo framebuffer2;
 	ofFbo framebuffer3;

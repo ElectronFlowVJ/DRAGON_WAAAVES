@@ -1,9 +1,10 @@
 #include "ofApp.h"
+#include "SpoutReceiver.h"  // For Spout sender enumeration
 //globals
 
 
-float ch1HdAspectXFix=.5;
-float ch1HdAspectYFix=.666667;
+float ch1HdAspectXFix=1.0;  // Inputs are now pre-scaled to internal resolution
+float ch1HdAspectYFix=1.0;
 
 
 const int pastFramesSize=120;
@@ -22,8 +23,17 @@ void ofApp::setup(){
 	ofBackground(0);
 	ofHideCursor();
 	
-	outputWidth=1280;
-	outputHeight=720;
+	// Initialize resolutions from GUI defaults
+	input1Width = 640;
+	input1Height = 480;
+	input2Width = 640;
+	input2Height = 480;
+	outputWidth = 1280;
+	outputHeight = 720;
+	internalWidth = 1280;
+	internalHeight = 720;
+	spoutSendWidth = 1280;
+	spoutSendHeight = 720;
 
 	inputSetup();
 	
@@ -34,7 +44,7 @@ void ofApp::setup(){
 	shader2.load("shadersGL4/shader2");
 	shader3.load("shadersGL4/shader3");
 	
-	dummyTex.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+	dummyTex.allocate(internalWidth, internalHeight, GL_RGBA);
 
 	sevenStar1Setup();	
 	setupOsc();
@@ -54,6 +64,34 @@ void ofApp::update(){
 	if(gui->refreshNdiSources){
 		refreshNdiSources();
 		gui->refreshNdiSources = false;
+	}
+	
+	// Check if Spout sources need to be refreshed
+	if(gui->refreshSpoutSources){
+		refreshSpoutSources();
+		gui->refreshSpoutSources = false;
+	}
+	
+	// Check if resolution needs to be changed
+	if(gui->resolutionChangeRequested){
+		input1Width = gui->input1Width;
+		input1Height = gui->input1Height;
+		input2Width = gui->input2Width;
+		input2Height = gui->input2Height;
+		internalWidth = gui->internalWidth;
+		internalHeight = gui->internalHeight;
+		outputWidth = gui->outputWidth;
+		outputHeight = gui->outputHeight;
+		spoutSendWidth = gui->spoutSendWidth;
+		spoutSendHeight = gui->spoutSendHeight;
+		reinitializeResolutions();
+		gui->resolutionChangeRequested = false;
+	}
+	
+	// Check if FPS needs to be changed
+	if(gui->fpsChangeRequested){
+		ofSetFrameRate(gui->targetFPS);
+		gui->fpsChangeRequested = false;
 	}
 
 	inputUpdate();
@@ -675,6 +713,9 @@ void ofApp::draw(){
 	float ratio=input1.getWidth()/ofGetWidth();
 	
 	framebuffer1.begin();
+	// Explicitly set up viewport and projection for current FBO size
+	ofViewport(0, 0, framebuffer1.getWidth(), framebuffer1.getHeight());
+	ofSetupScreenOrtho(framebuffer1.getWidth(), framebuffer1.getHeight());
 	shader1.begin();
 	
 	//various test parameters to delete later
@@ -684,13 +725,16 @@ void ofApp::draw(){
 	float ch1HdZCrib=0;
 	float ch2HdZCrib=0;
 	shader1.setUniform1f("cribY",cribY);
-	shader1.setUniform1f("width",outputWidth);
-	shader1.setUniform1f("height",outputHeight);
-	shader1.setUniform1f("inverseWidth",1.0f/ofGetWidth());
-	shader1.setUniform1f("inverseHeight",1.0f/ofGetHeight());
+	shader1.setUniform1f("width",internalWidth);
+	shader1.setUniform1f("height",internalHeight);
+	shader1.setUniform1f("inverseWidth",1.0f/internalWidth);
+	shader1.setUniform1f("inverseHeight",1.0f/internalHeight);
 	
-	shader1.setUniform1f("inverseWidth1",1.0f/640.0);
-	shader1.setUniform1f("inverseHeight1",1.0f/480.0);
+	// Input resolution uniforms
+	shader1.setUniform1f("input1Width", (float)input1Width);
+	shader1.setUniform1f("input1Height", (float)input1Height);
+	shader1.setUniform1f("inverseWidth1",1.0f/input1Width);
+	shader1.setUniform1f("inverseHeight1",1.0f/input1Height);
 	
 	
 	int fb1DelayTimeMacroBuffer=int((pastFramesSize-1.0)*(gui->fb1DelayTimeMacroBuffer));
@@ -698,25 +742,33 @@ void ofApp::draw(){
 	
 	int pastFrames1Index = (abs(pastFramesOffset - pastFramesSize - (fb1DelayTime_d) + 1) % pastFramesSize);
 	int TemporalFilterIndex = (abs(pastFramesOffset - pastFramesSize + 1) % pastFramesSize);
-	pastFrames1[pastFrames1Index].draw(0,0);
+	pastFrames1[pastFrames1Index].draw(0, 0, internalWidth, internalHeight);
 	shader1.setUniformTexture("fb1TemporalFilter", pastFrames1[TemporalFilterIndex].getTexture(), 1);
 	
 	//channel selection
 	if(gui->ch1InputSelect==0){
-		// Use input1 (webcam or NDI depending on source type)
+		// Use input1 (webcam, NDI, or Spout depending on source type)
 		if (gui->input1SourceType == 0) {
-			shader1.setUniformTexture("ch1Tex",input1.getTexture(),2);
-		} else {
+			if (input1.isInitialized()) {
+				shader1.setUniformTexture("ch1Tex",webcamFbo1.getTexture(),2);
+			}
+		} else if (gui->input1SourceType == 1) {
 			shader1.setUniformTexture("ch1Tex",ndiFbo1.getTexture(),2);
+		} else {
+			shader1.setUniformTexture("ch1Tex",spoutFbo1.getTexture(),2);
 		}
 	
 	}
 	if(gui->ch1InputSelect==1){
-		// Use input2 (webcam or NDI depending on source type)
+		// Use input2 (webcam, NDI, or Spout depending on source type)
 		if (gui->input2SourceType == 0) {
-			shader1.setUniformTexture("ch1Tex",input2.getTexture(),2);
-		} else {
+			if (input2.isInitialized()) {
+				shader1.setUniformTexture("ch1Tex",webcamFbo2.getTexture(),2);
+			}
+		} else if (gui->input2SourceType == 1) {
 			shader1.setUniformTexture("ch1Tex",ndiFbo2.getTexture(),2);
+		} else {
+			shader1.setUniformTexture("ch1Tex",spoutFbo2.getTexture(),2);
 		}
 	
 	}	
@@ -726,17 +778,16 @@ void ofApp::draw(){
 	shader1.setUniform2f("input1XYFix",ofVec2f(gui->input1XFix,gui->input1YFix));
 	
 	//we ADD a logic here for sd pillarbox vs sd fullscreen?
-	float ch1ScaleFix=.5;//fullscreen
+	float ch1ScaleFix=1.0;//fullscreen - inputs now scaled to internal resolution
 	
 	//default aspect ratio is 4:3
 	//but if we are only sending in 640x480 resolutions anyway
 	//we should double check some shit
 	float ch1AspectRatio=1.0+gui->sdFixX;
 	if(gui->ch1AspectRatioSwitch==0){
-		ch1AspectRatio=1.1;
-		ch1CribX=64;//gui->input1XFix;
-		//ch1HdZCrib=-.205;
-		ch1HdZCrib=-.06;//gui->input1ScaleFix;
+		ch1AspectRatio=1.0;  // Inputs are now pre-scaled to internal resolution
+		ch1CribX=0;  // No crib offset needed
+		ch1HdZCrib=0;  // No zoom crib needed
 	}
 	
 	bool ch1HdAspectOn=0;
@@ -807,35 +858,42 @@ void ofApp::draw(){
 	
 	//channel selection
 	if(gui->ch2InputSelect==0){
-		// Use input1 (webcam or NDI depending on source type)
+		// Use input1 (webcam, NDI, or Spout depending on source type)
 		if (gui->input1SourceType == 0) {
-			shader1.setUniformTexture("ch2Tex",input1.getTexture(),3);
-		} else {
+			if (input1.isInitialized()) {
+				shader1.setUniformTexture("ch2Tex",webcamFbo1.getTexture(),3);
+			}
+		} else if (gui->input1SourceType == 1) {
 			shader1.setUniformTexture("ch2Tex",ndiFbo1.getTexture(),3);
+		} else {
+			shader1.setUniformTexture("ch2Tex",spoutFbo1.getTexture(),3);
 		}
 	}
 	if(gui->ch2InputSelect==1){
-		// Use input2 (webcam or NDI depending on source type)
+		// Use input2 (webcam, NDI, or Spout depending on source type)
 		if (gui->input2SourceType == 0) {
-			shader1.setUniformTexture("ch2Tex",input2.getTexture(),3);
-		} else {
+			if (input2.isInitialized()) {
+				shader1.setUniformTexture("ch2Tex",webcamFbo2.getTexture(),3);
+			}
+		} else if (gui->input2SourceType == 1) {
 			shader1.setUniformTexture("ch2Tex",ndiFbo2.getTexture(),3);
+		} else {
+			shader1.setUniformTexture("ch2Tex",spoutFbo2.getTexture(),3);
 		}
 	}
 	
 	
 	//we ADD a logic here for sd pillarbox vs sd fullscreen?
-	float ch2ScaleFix=.5;//fullscreen
+	float ch2ScaleFix=1.0;//fullscreen - inputs now scaled to internal resolution
 	
 	//default aspect ratio is 4:3
 	//but if we are only sending in 640x480 resolutions anyway
 	//we should double check some shit
 	float ch2AspectRatio=1.0+gui->sdFixX;
 	if(gui->ch2AspectRatioSwitch==0){
-		ch2AspectRatio=1.1;
-		ch2CribX=64;//gui->input1XFix;
-		//ch2HdZCrib=-.205;
-		ch2HdZCrib=-.06;//gui->input1ScaleFix;
+		ch2AspectRatio=1.0;  // Inputs are now pre-scaled to internal resolution
+		ch2CribX=0;  // No crib offset needed
+		ch2HdZCrib=0;  // No zoom crib needed
 	}
 	
 	bool ch2HdAspectOn=0;
@@ -956,6 +1014,11 @@ void ofApp::draw(){
 	shader1.end();
 
 	
+    // Switch to perspective for 3D geometry drawing
+    if(gui->block1LineSwitch==1 || gui->block1SevenStarSwitch==1 || 
+       gui->block1LissaBallSwitch==1 || gui->block1HypercubeSwitch==1){
+        ofSetupScreenPerspective(framebuffer1.getWidth(), framebuffer1.getHeight());
+    }
     
     if(gui->block1LineSwitch==1){
     	line_draw();
@@ -971,7 +1034,31 @@ void ofApp::draw(){
     }
 	framebuffer1.end();
 	
+	// Spout send for Block 1
+	if(gui->spoutSendBlock1){
+		glFlush();
+		// Draw flipped into FBO then send (scale from internal to spout send resolution)
+		spoutSendFbo1.begin();
+		framebuffer1.getTexture().draw(0, spoutSendHeight, spoutSendWidth, -spoutSendHeight);  // Flip vertically
+		spoutSendFbo1.end();
+		spoutSenderBlock1.send(spoutSendFbo1.getTexture());
+	}
 	
+	// NDI send for Block 1
+	if(gui->ndiSendBlock1){
+		if(!ndiSender1Active) {
+			ndiSenderBlock1.CreateSender("GwBlock1", ndiSendWidth, ndiSendHeight);
+			ndiSender1Active = true;
+		}
+		glFlush();
+		ndiSendFbo1.begin();
+		framebuffer1.getTexture().draw(0, 0, ndiSendWidth, ndiSendHeight);
+		ndiSendFbo1.end();
+		ndiSenderBlock1.SendImage(ndiSendFbo1);
+	} else if(ndiSender1Active) {
+		ndiSenderBlock1.ReleaseSender();
+		ndiSender1Active = false;
+	}
 	
 	
 	
@@ -987,31 +1074,37 @@ void ofApp::draw(){
 	//BLOCK_2
 	
 	framebuffer2.begin();
+	// Explicitly set up viewport and projection for current FBO size
+	ofViewport(0, 0, framebuffer2.getWidth(), framebuffer2.getHeight());
+	ofSetupScreenOrtho(framebuffer2.getWidth(), framebuffer2.getHeight());
 	shader2.begin();
 	
-	shader2.setUniform1f("width",outputWidth);
-	shader2.setUniform1f("height",outputHeight);
-	shader2.setUniform1f("inverseWidth",1.0f/ofGetWidth());
-	shader2.setUniform1f("inverseHeight",1.0f/ofGetHeight());
+	shader2.setUniform1f("width",internalWidth);
+	shader2.setUniform1f("height",internalHeight);
+	shader2.setUniform1f("inverseWidth",1.0f/internalWidth);
+	shader2.setUniform1f("inverseHeight",1.0f/internalHeight);
 	
-	shader2.setUniform1f("inverseWidth1",1.0f/640.0);
-	shader2.setUniform1f("inverseHeight1",1.0f/480.0);
+	// Input resolution uniforms for block2 input processing
+	shader2.setUniform1f("input1Width", (float)input1Width);
+	shader2.setUniform1f("input1Height", (float)input1Height);
+	shader2.setUniform1f("inverseWidth1",1.0f/input1Width);
+	shader2.setUniform1f("inverseHeight1",1.0f/input1Height);
 	
 	int fb2DelayTimeMacroBuffer=int((pastFramesSize-1.0)*(gui->fb2DelayTimeMacroBuffer));
 	int fb2DelayTime_d=(gui->fb2DelayTime)+fb2DelayTimeMacroBuffer;
 	
 	//draw pastframes2
 	int pastFrames2Index =  (abs(pastFramesOffset - pastFramesSize - (fb2DelayTime_d) + 1) % pastFramesSize);
-	pastFrames2[pastFrames2Index].draw(0, 0);
+	pastFrames2[pastFrames2Index].draw(0, 0, internalWidth, internalHeight);
 	//send the temporal filter
 	int fb2TemporalFilterIndex = (abs(pastFramesOffset - pastFramesSize + 1) % pastFramesSize);
 	shader2.setUniformTexture("fb2TemporalFilter", pastFrames2[fb2TemporalFilterIndex].getTexture(), 5);
 	
 	bool block2InputMasterSwitch=0;
-	float block2InputWidth=1280;
-	float block2InputHeight=720;
-	float block2InputWidthHalf=640;
-	float block2InputHeightHalf=360;
+	float block2InputWidth=internalWidth;
+	float block2InputHeight=internalHeight;
+	float block2InputWidthHalf=internalWidth/2;
+	float block2InputHeightHalf=internalHeight/2;
 	//choose block2 input
 	float block2AspectRatio=1.0;
 	if(gui->block2InputSelect==0){
@@ -1023,11 +1116,15 @@ void ofApp::draw(){
 	if(gui->block2InputSelect==1){
 		ratio=input1.getWidth()/ofGetWidth();
 		block2InputMasterSwitch=1;
-		// Use input1 (webcam or NDI depending on source type)
+		// Use input1 (webcam, NDI, or Spout depending on source type)
 		if (gui->input1SourceType == 0) {
-			shader2.setUniformTexture("block2InputTex",input1.getTexture(),6);
-		} else {
+			if (input1.isInitialized()) {
+				shader2.setUniformTexture("block2InputTex",webcamFbo1.getTexture(),6);
+			}
+		} else if (gui->input1SourceType == 1) {
 			shader2.setUniformTexture("block2InputTex",ndiFbo1.getTexture(),6);
+		} else {
+			shader2.setUniformTexture("block2InputTex",spoutFbo1.getTexture(),6);
 		}
 		block2InputWidth=640;
 		block2InputHeight=480;
@@ -1039,11 +1136,15 @@ void ofApp::draw(){
 	if(gui->block2InputSelect==2){
 		ratio=input2.getWidth()/ofGetWidth();
 		block2InputMasterSwitch=1;
-		// Use input2 (webcam or NDI depending on source type)
+		// Use input2 (webcam, NDI, or Spout depending on source type)
 		if (gui->input2SourceType == 0) {
-			shader2.setUniformTexture("block2InputTex",input2.getTexture(),6);
-		} else {
+			if (input2.isInitialized()) {
+				shader2.setUniformTexture("block2InputTex",webcamFbo2.getTexture(),6);
+			}
+		} else if (gui->input2SourceType == 1) {
 			shader2.setUniformTexture("block2InputTex",ndiFbo2.getTexture(),6);
+		} else {
+			shader2.setUniformTexture("block2InputTex",spoutFbo2.getTexture(),6);
 		}
 		block2InputWidth=640;
 		block2InputHeight=480;
@@ -1058,7 +1159,7 @@ void ofApp::draw(){
 	shader2.setUniform1f("block2InputWidthHalf",block2InputWidthHalf);
 	shader2.setUniform1f("block2InputHeightHalf",block2InputHeightHalf);
 	//we ADD a logic here for sd pillarbox vs sd fullscreen?
-	float block2InputScaleFix=.5;//fullscreen
+	float block2InputScaleFix=1.0;//fullscreen - inputs now scaled to internal resolution
 	float block2InputCribX=0;
 	float block2InputHdZCrib=0;
 	//default aspect ratio is 4:3
@@ -1066,10 +1167,9 @@ void ofApp::draw(){
 	//we should double check some shit
 	float block2InputAspectRatio=1.0+gui->sdFixX;
 	if(gui->block2InputAspectRatioSwitch==0){
-		block2InputAspectRatio=1.1;
-		block2InputCribX=64;//gui->input1XFix;
-		//block2InputHdZCrib=-.205;
-		block2InputHdZCrib=-.06;//gui->input1ScaleFix;
+		block2InputAspectRatio=1.0;  // Inputs are now pre-scaled to internal resolution
+		block2InputCribX=0;  // No crib offset needed
+		block2InputHdZCrib=0;  // No zoom crib needed
 	}
 
 	
@@ -1178,6 +1278,11 @@ void ofApp::draw(){
 	shader2.end();
 	
 	
+    // Switch to perspective for 3D geometry drawing
+    if(gui->block2LineSwitch==1 || gui->block2SevenStarSwitch==1 || 
+       gui->block2LissaBallSwitch==1 || gui->block2HypercubeSwitch==1){
+        ofSetupScreenPerspective(framebuffer2.getWidth(), framebuffer2.getHeight());
+    }
     
     if(gui->block2LineSwitch==1){
     	line_draw();
@@ -1192,6 +1297,32 @@ void ofApp::draw(){
         hypercube_draw();
     }
 	framebuffer2.end();
+
+	// Spout send for Block 2
+	if(gui->spoutSendBlock2){
+		glFlush();
+		// Draw flipped into FBO then send (scale from internal to spout send resolution)
+		spoutSendFbo2.begin();
+		framebuffer2.getTexture().draw(0, spoutSendHeight, spoutSendWidth, -spoutSendHeight);  // Flip vertically
+		spoutSendFbo2.end();
+		spoutSenderBlock2.send(spoutSendFbo2.getTexture());
+	}
+	
+	// NDI send for Block 2
+	if(gui->ndiSendBlock2){
+		if(!ndiSender2Active) {
+			ndiSenderBlock2.CreateSender("GwBlock2", ndiSendWidth, ndiSendHeight);
+			ndiSender2Active = true;
+		}
+		glFlush();
+		ndiSendFbo2.begin();
+		framebuffer2.getTexture().draw(0, 0, ndiSendWidth, ndiSendHeight);
+		ndiSendFbo2.end();
+		ndiSenderBlock2.SendImage(ndiSendFbo2);
+	} else if(ndiSender2Active) {
+		ndiSenderBlock2.ReleaseSender();
+		ndiSender2Active = false;
+	}
 
 
 
@@ -1210,16 +1341,19 @@ void ofApp::draw(){
 	
 	//FINAL MIX OUT
 	framebuffer3.begin();
+	// Explicitly set up viewport and projection for current FBO size
+	ofViewport(0, 0, framebuffer3.getWidth(), framebuffer3.getHeight());
+	ofSetupScreenOrtho(framebuffer3.getWidth(), framebuffer3.getHeight());
 	shader3.begin();
-	dummyTex.draw(0,0);
+	dummyTex.draw(0, 0, internalWidth, internalHeight);
 	
 	shader3.setUniformTexture("block2Output",framebuffer2.getTexture(),8);
 	shader3.setUniformTexture("block1Output",framebuffer1.getTexture(),9);
 	
-	shader3.setUniform1f("width",outputWidth);
-	shader3.setUniform1f("height",outputHeight);
-	shader3.setUniform1f("inverseWidth",1.0f/ofGetWidth());
-	shader3.setUniform1f("inverseHeight",1.0f/ofGetHeight());
+	shader3.setUniform1f("width",internalWidth);
+	shader3.setUniform1f("height",internalHeight);
+	shader3.setUniform1f("inverseWidth",1.0f/internalWidth);
+	shader3.setUniform1f("inverseHeight",1.0f/internalHeight);
 	
 	//block1geo1
 	shader3.setUniform2f("block1XYDisplace",ofVec2f(block1XDisplace,block1YDisplace));
@@ -1363,7 +1497,35 @@ void ofApp::draw(){
 	shader3.end();
 	framebuffer3.end();
 	
-	//draw to screen
+	// Spout send for Block 3 (final output)
+	if(gui->spoutSendBlock3){
+		glFlush();
+		// Draw flipped into FBO then send (scale from internal to spout send resolution)
+		spoutSendFbo3.begin();
+		framebuffer3.getTexture().draw(0, spoutSendHeight, spoutSendWidth, -spoutSendHeight);  // Flip vertically
+		spoutSendFbo3.end();
+		spoutSenderBlock3.send(spoutSendFbo3.getTexture());
+	}
+	
+	// NDI send for Block 3 (final output)
+	if(gui->ndiSendBlock3){
+		if(!ndiSender3Active) {
+			ndiSenderBlock3.CreateSender("GwBlock3", ndiSendWidth, ndiSendHeight);
+			ndiSender3Active = true;
+		}
+		glFlush();
+		ndiSendFbo3.begin();
+		framebuffer3.getTexture().draw(0, 0, ndiSendWidth, ndiSendHeight);
+		ndiSendFbo3.end();
+		ndiSenderBlock3.SendImage(ndiSendFbo3);
+	} else if(ndiSender3Active) {
+		ndiSenderBlock3.ReleaseSender();
+		ndiSender3Active = false;
+	}
+	
+	//draw to screen - reset viewport and projection to window size
+	ofSetupScreen();
+	
 	if(gui->drawMode==0){	
 		framebuffer1.draw(0, 0, ofGetWidth(), ofGetHeight());
 	}
@@ -1381,11 +1543,11 @@ void ofApp::draw(){
 
 
 	pastFrames1[abs(pastFramesSize - pastFramesOffset)-1].begin();
-	framebuffer1.draw(0, 0);
+	framebuffer1.draw(0, 0, internalWidth, internalHeight);
 	pastFrames1[abs(pastFramesSize - pastFramesOffset)-1].end();
 	
 	pastFrames2[abs(pastFramesSize-pastFramesOffset)-1].begin();
-    framebuffer2.draw(0,0);
+    framebuffer2.draw(0, 0, internalWidth, internalHeight);
     //ofSetColor(255);
 	//ofDrawRectangle(ofGetWidth()/2,ofGetHeight()/2,ofGetWidth()/4,ofGetHeight()/4);
     pastFrames2[abs(pastFramesSize-pastFramesOffset)-1].end();
@@ -1432,9 +1594,19 @@ void ofApp::inputSetup(){
 	// List webcam devices
 	input1.listDevices();
 	
-	// Allocate NDI FBOs at target resolution for scaling
-	ndiFbo1.allocate(640, 480, GL_RGBA);
-	ndiFbo2.allocate(640, 480, GL_RGBA);
+	// Allocate webcam FBOs at INTERNAL resolution - webcam textures will be scaled to fill
+	webcamFbo1.allocate(internalWidth, internalHeight, GL_RGBA);
+	webcamFbo2.allocate(internalWidth, internalHeight, GL_RGBA);
+	webcamFbo1.begin();
+	ofClear(0, 0, 0, 255);
+	webcamFbo1.end();
+	webcamFbo2.begin();
+	ofClear(0, 0, 0, 255);
+	webcamFbo2.end();
+	
+	// Allocate NDI FBOs at INTERNAL resolution - received textures will be scaled to fill
+	ndiFbo1.allocate(internalWidth, internalHeight, GL_RGBA);
+	ndiFbo2.allocate(internalWidth, internalHeight, GL_RGBA);
 	
 	// Clear FBOs to black
 	ndiFbo1.begin();
@@ -1446,16 +1618,52 @@ void ofApp::inputSetup(){
 	ndiFbo2.end();
 	
 	// Always allocate NDI textures so they're ready when needed
-	// (ofxNDI needs these pre-allocated)
-	ndiTexture1.allocate(640, 480, GL_RGBA);
-	ndiTexture2.allocate(640, 480, GL_RGBA);
+	// (ofxNDI receives at native resolution, we scale into FBO)
+	ndiTexture1.allocate(1920, 1080, GL_RGBA);
+	ndiTexture2.allocate(1920, 1080, GL_RGBA);
 	
 	// Clear them to black
 	ofPixels blackPixels;
-	blackPixels.allocate(640, 480, OF_PIXELS_RGBA);
+	blackPixels.allocate(1920, 1080, OF_PIXELS_RGBA);
 	blackPixels.setColor(ofColor::black);
 	ndiTexture1.loadData(blackPixels);
 	ndiTexture2.loadData(blackPixels);
+	
+	// Allocate Spout FBOs at INTERNAL resolution - received textures will be scaled to fill
+	spoutFbo1.allocate(internalWidth, internalHeight, GL_RGBA);
+	spoutFbo2.allocate(internalWidth, internalHeight, GL_RGBA);
+	
+	// Clear Spout FBOs to black
+	spoutFbo1.begin();
+	ofClear(0, 0, 0, 255);
+	spoutFbo1.end();
+	
+	spoutFbo2.begin();
+	ofClear(0, 0, 0, 255);
+	spoutFbo2.end();
+	
+	// Initialize Spout receivers
+	spoutReceiver1.init();
+	spoutReceiver2.init();
+	
+	// Allocate Spout sender FBOs at spout send resolution
+	spoutSendFbo1.allocate(spoutSendWidth, spoutSendHeight, GL_RGBA);
+	spoutSendFbo2.allocate(spoutSendWidth, spoutSendHeight, GL_RGBA);
+	spoutSendFbo3.allocate(spoutSendWidth, spoutSendHeight, GL_RGBA);
+	
+	// Initialize Spout senders at spout send resolution
+	spoutSenderBlock1.init("GwBlock1", spoutSendWidth, spoutSendHeight, GL_RGBA);
+	spoutSenderBlock2.init("GwBlock2", spoutSendWidth, spoutSendHeight, GL_RGBA);
+	spoutSenderBlock3.init("GwBlock3", spoutSendWidth, spoutSendHeight, GL_RGBA);
+	
+	// Allocate NDI sender FBOs at ndi send resolution
+	ndiSendWidth = gui->ndiSendWidth;
+	ndiSendHeight = gui->ndiSendHeight;
+	ndiSendFbo1.allocate(ndiSendWidth, ndiSendHeight, GL_RGBA);
+	ndiSendFbo2.allocate(ndiSendWidth, ndiSendHeight, GL_RGBA);
+	ndiSendFbo3.allocate(ndiSendWidth, ndiSendHeight, GL_RGBA);
+	
+	// NDI senders are created on-demand when enabled in GUI
 	
 	// Initialize Input 1 based on source type
 	if (gui->input1SourceType == 0) {
@@ -1463,7 +1671,7 @@ void ofApp::inputSetup(){
 		input1.setVerbose(true);
 		input1.setDeviceID(gui->input1DeviceID);
 		input1.setDesiredFrameRate(30);
-		input1.setup(640,480);
+		input1.setup(input1Width, input1Height);
 	}
 	
 	// Initialize Input 2 based on source type
@@ -1472,7 +1680,7 @@ void ofApp::inputSetup(){
 		input2.setVerbose(true);
 		input2.setDeviceID(gui->input2DeviceID);
 		input2.setDesiredFrameRate(30);
-		input2.setup(640,480);
+		input2.setup(input2Width, input2Height);
 	}
 	
 	// Initial NDI source scan
@@ -1483,74 +1691,102 @@ void ofApp::inputSetup(){
 void ofApp::inputUpdate(){
 	// Update Input 1 based on source type
 	if (gui->input1SourceType == 0) {
-		// Webcam
-		input1.update();
-	} else {
-		// NDI - receive then scale into FBO with aspect ratio preserved
+		// Webcam - update and scale into FBO at internal resolution
+		if (input1.isInitialized()) {
+			input1.update();
+			if (input1.isFrameNew()) {
+				webcamFbo1.begin();
+				ofViewport(0, 0, webcamFbo1.getWidth(), webcamFbo1.getHeight());
+				ofSetupScreenOrtho(webcamFbo1.getWidth(), webcamFbo1.getHeight());
+				ofClear(0, 0, 0, 255);
+				// Scale webcam to fill FBO
+				input1.draw(0, 0, webcamFbo1.getWidth(), webcamFbo1.getHeight());
+				webcamFbo1.end();
+			}
+		}
+	} else if (gui->input1SourceType == 1) {
+		// NDI - receive then scale into FBO
 		ndiReceiver1.ReceiveImage(ndiTexture1);
 		ndiFbo1.begin();
+		ofViewport(0, 0, ndiFbo1.getWidth(), ndiFbo1.getHeight());
+		ofSetupScreenOrtho(ndiFbo1.getWidth(), ndiFbo1.getHeight());
 		ofClear(0, 0, 0, 255);
 		
-		// Calculate fit scaling to preserve aspect ratio
+		// Simple fill - stretch to fit FBO dimensions
 		float srcW = ndiTexture1.getWidth();
 		float srcH = ndiTexture1.getHeight();
 		if (srcW > 0 && srcH > 0) {
-			float srcAspect = srcW / srcH;
-			float targetAspect = 640.0f / 480.0f;
-			float drawW, drawH, drawX, drawY;
-			
-			if (srcAspect > targetAspect) {
-				// Source is wider - fit to width
-				drawW = 640;
-				drawH = 640 / srcAspect;
-				drawX = 0;
-				drawY = (480 - drawH) / 2;
-			} else {
-				// Source is taller - fit to height
-				drawH = 480;
-				drawW = 480 * srcAspect;
-				drawX = (640 - drawW) / 2;
-				drawY = 0;
-			}
-			ndiTexture1.draw(drawX, drawY, drawW, drawH);
+			ndiTexture1.draw(0, 0, ndiFbo1.getWidth(), ndiFbo1.getHeight());
 		}
 		ndiFbo1.end();
+	} else if (gui->input1SourceType == 2) {
+		// Spout - receive from active sender and scale into FBO
+		if (spoutReceiver1.isInitialized()) {
+			spoutReceiver1.receive(spoutTexture1);
+		}
+		
+		spoutFbo1.begin();
+		ofViewport(0, 0, spoutFbo1.getWidth(), spoutFbo1.getHeight());
+		ofSetupScreenOrtho(spoutFbo1.getWidth(), spoutFbo1.getHeight());
+		ofClear(0, 0, 0, 255);
+		
+		// Simple fill - stretch to fit FBO dimensions
+		float srcW = spoutTexture1.getWidth();
+		float srcH = spoutTexture1.getHeight();
+		if (srcW > 0 && srcH > 0) {
+			spoutTexture1.draw(0, 0, spoutFbo1.getWidth(), spoutFbo1.getHeight());
+		}
+		spoutFbo1.end();
 	}
 	
 	// Update Input 2 based on source type
 	if (gui->input2SourceType == 0) {
-		// Webcam
-		input2.update();
-	} else {
-		// NDI - receive then scale into FBO with aspect ratio preserved
+		// Webcam - update and scale into FBO at internal resolution
+		if (input2.isInitialized()) {
+			input2.update();
+			if (input2.isFrameNew()) {
+				webcamFbo2.begin();
+				ofViewport(0, 0, webcamFbo2.getWidth(), webcamFbo2.getHeight());
+				ofSetupScreenOrtho(webcamFbo2.getWidth(), webcamFbo2.getHeight());
+				ofClear(0, 0, 0, 255);
+				// Scale webcam to fill FBO
+				input2.draw(0, 0, webcamFbo2.getWidth(), webcamFbo2.getHeight());
+				webcamFbo2.end();
+			}
+		}
+	} else if (gui->input2SourceType == 1) {
+		// NDI - receive then scale into FBO
 		ndiReceiver2.ReceiveImage(ndiTexture2);
 		ndiFbo2.begin();
+		ofViewport(0, 0, ndiFbo2.getWidth(), ndiFbo2.getHeight());
+		ofSetupScreenOrtho(ndiFbo2.getWidth(), ndiFbo2.getHeight());
 		ofClear(0, 0, 0, 255);
 		
-		// Calculate fit scaling to preserve aspect ratio
+		// Simple fill - stretch to fit FBO dimensions
 		float srcW = ndiTexture2.getWidth();
 		float srcH = ndiTexture2.getHeight();
 		if (srcW > 0 && srcH > 0) {
-			float srcAspect = srcW / srcH;
-			float targetAspect = 640.0f / 480.0f;
-			float drawW, drawH, drawX, drawY;
-			
-			if (srcAspect > targetAspect) {
-				// Source is wider - fit to width
-				drawW = 640;
-				drawH = 640 / srcAspect;
-				drawX = 0;
-				drawY = (480 - drawH) / 2;
-			} else {
-				// Source is taller - fit to height
-				drawH = 480;
-				drawW = 480 * srcAspect;
-				drawX = (640 - drawW) / 2;
-				drawY = 0;
-			}
-			ndiTexture2.draw(drawX, drawY, drawW, drawH);
+			ndiTexture2.draw(0, 0, ndiFbo2.getWidth(), ndiFbo2.getHeight());
 		}
 		ndiFbo2.end();
+	} else if (gui->input2SourceType == 2) {
+		// Spout - receive from active sender and scale into FBO
+		if (spoutReceiver2.isInitialized()) {
+			spoutReceiver2.receive(spoutTexture2);
+		}
+		
+		spoutFbo2.begin();
+		ofViewport(0, 0, spoutFbo2.getWidth(), spoutFbo2.getHeight());
+		ofSetupScreenOrtho(spoutFbo2.getWidth(), spoutFbo2.getHeight());
+		ofClear(0, 0, 0, 255);
+		
+		// Simple fill - stretch to fit FBO dimensions
+		float srcW = spoutTexture2.getWidth();
+		float srcH = spoutTexture2.getHeight();
+		if (srcW > 0 && srcH > 0) {
+			spoutTexture2.draw(0, 0, spoutFbo2.getWidth(), spoutFbo2.getHeight());
+		}
+		spoutFbo2.end();
 	}
 }
 
@@ -1561,15 +1797,19 @@ void ofApp::inputTest(){
 	if(testSwitch1==1){
 		if (gui->input1SourceType == 0) {
 			input1.draw(0, 0);
-		} else {
+		} else if (gui->input1SourceType == 1) {
 			ndiFbo1.draw(0, 0);
+		} else {
+			spoutFbo1.draw(0, 0);
 		}
 	}
 	if(testSwitch1==2){
 		if (gui->input2SourceType == 0) {
 			input2.draw(0, 0);
-		} else {
+		} else if (gui->input2SourceType == 1) {
 			ndiFbo2.draw(0, 0);
+		} else {
+			spoutFbo2.draw(0, 0);
 		}
 	}
 	
@@ -1584,14 +1824,16 @@ void ofApp::reinitializeInputs(){
 		// Webcam
 		ofLogNotice("Video Input") << "Input 1: Webcam Device " << gui->input1DeviceID;
 		ndiReceiver1.ReleaseReceiver();
+		spoutReceiver1.release();
 		input1.close();
 		input1.setVerbose(true);
 		input1.setDeviceID(gui->input1DeviceID);
 		input1.setDesiredFrameRate(30);
-		input1.setup(640,480);
-	} else {
+		input1.setup(input1Width, input1Height);
+	} else if (gui->input1SourceType == 1) {
 		// NDI
 		input1.close();
+		spoutReceiver1.release();
 		if (gui->input1NdiSourceIndex < gui->ndiSourceNames.size()) {
 			string sourceName = gui->ndiSourceNames[gui->input1NdiSourceIndex];
 			ofLogNotice("Video Input") << "Input 1: NDI Source " << sourceName;
@@ -1601,6 +1843,20 @@ void ofApp::reinitializeInputs(){
 				ndiTexture1.allocate(640, 480, GL_RGBA);
 			}
 		}
+	} else if (gui->input1SourceType == 2) {
+		// Spout
+		input1.close();
+		ndiReceiver1.ReleaseReceiver();
+		spoutReceiver1.release();
+		if (gui->input1SpoutSourceIndex < gui->spoutSourceNames.size()) {
+			string sourceName = gui->spoutSourceNames[gui->input1SpoutSourceIndex];
+			ofLogNotice("Video Input") << "Input 1: Spout Source " << sourceName;
+			spoutReceiver1.init(sourceName);
+		} else {
+			// No specific sender selected, connect to active sender
+			ofLogNotice("Video Input") << "Input 1: Spout (active sender)";
+			spoutReceiver1.init();
+		}
 	}
 	
 	// Handle Input 2
@@ -1608,14 +1864,16 @@ void ofApp::reinitializeInputs(){
 		// Webcam
 		ofLogNotice("Video Input") << "Input 2: Webcam Device " << gui->input2DeviceID;
 		ndiReceiver2.ReleaseReceiver();
+		spoutReceiver2.release();
 		input2.close();
 		input2.setVerbose(true);
 		input2.setDeviceID(gui->input2DeviceID);
 		input2.setDesiredFrameRate(30);
-		input2.setup(640,480);
-	} else {
+		input2.setup(input2Width, input2Height);
+	} else if (gui->input2SourceType == 1) {
 		// NDI
 		input2.close();
+		spoutReceiver2.release();
 		if (gui->input2NdiSourceIndex < gui->ndiSourceNames.size()) {
 			string sourceName = gui->ndiSourceNames[gui->input2NdiSourceIndex];
 			ofLogNotice("Video Input") << "Input 2: NDI Source " << sourceName;
@@ -1624,6 +1882,20 @@ void ofApp::reinitializeInputs(){
 			if (!ndiTexture2.isAllocated()) {
 				ndiTexture2.allocate(640, 480, GL_RGBA);
 			}
+		}
+	} else if (gui->input2SourceType == 2) {
+		// Spout
+		input2.close();
+		ndiReceiver2.ReleaseReceiver();
+		spoutReceiver2.release();
+		if (gui->input2SpoutSourceIndex < gui->spoutSourceNames.size()) {
+			string sourceName = gui->spoutSourceNames[gui->input2SpoutSourceIndex];
+			ofLogNotice("Video Input") << "Input 2: Spout Source " << sourceName;
+			spoutReceiver2.init(sourceName);
+		} else {
+			// No specific sender selected, connect to active sender
+			ofLogNotice("Video Input") << "Input 2: Spout (active sender)";
+			spoutReceiver2.init();
 		}
 	}
 	
@@ -1645,7 +1917,8 @@ void ofApp::refreshNdiSources(){
 	for (int i = 0; i < numFound; i++) {
 		std::string name = ndiReceiver1.GetSenderName(i);
 		ofLogNotice("NDI") << "  Sender " << i << ": " << name;
-		if (!name.empty()) {
+		// Skip empty names and our own senders (GwBlock1, GwBlock2, GwBlock3)
+		if (!name.empty() && name.rfind("Gw", 0) != 0) {
 			gui->ndiSourceNames.push_back(name);
 		}
 	}
@@ -1654,10 +1927,37 @@ void ofApp::refreshNdiSources(){
 }
 
 //---------------------------------------------------------
+void ofApp::refreshSpoutSources(){
+	ofLogNotice("Spout") << "Scanning for Spout senders...";
+	
+	gui->spoutSourceNames.clear();
+	
+	// Use a temporary SpoutReceiver to enumerate senders
+	SpoutReceiver tempReceiver;
+	int numSenders = tempReceiver.GetSenderCount();
+	ofLogNotice("Spout") << "Found " << numSenders << " Spout senders";
+	
+	char senderName[256];
+	for (int i = 0; i < numSenders; i++) {
+		if (tempReceiver.GetSender(i, senderName, 256)) {
+			ofLogNotice("Spout") << "  Sender " << i << ": " << senderName;
+			// Skip our own senders (GwBlock1, GwBlock2, GwBlock3)
+			std::string nameStr(senderName);
+			if (nameStr.rfind("Gw", 0) != 0) {
+				gui->spoutSourceNames.push_back(nameStr);
+			}
+		}
+	}
+	
+	ofLogNotice("Spout") << "Total Spout senders added: " << gui->spoutSourceNames.size();
+}
+
+//---------------------------------------------------------
 void ofApp::framebufferSetup(){
-	framebuffer1.allocate(outputWidth,outputHeight);
-	framebuffer2.allocate(outputWidth,outputHeight);
-	framebuffer3.allocate(outputWidth,outputHeight);
+	// Use internal resolution for all processing buffers
+	framebuffer1.allocate(internalWidth, internalHeight);
+	framebuffer2.allocate(internalWidth, internalHeight);
+	framebuffer3.allocate(internalWidth, internalHeight);
 
 	framebuffer1.begin();
 	ofClear(0,0,0,255);
@@ -1671,9 +1971,10 @@ void ofApp::framebufferSetup(){
 	ofClear(0,0,0,255);
 	framebuffer3.end();
 	
-	 for(int i=0;i<pastFramesSize;i++){
-        pastFrames1[i].allocate(ofGetWidth(),ofGetHeight());
-        pastFrames2[i].allocate(ofGetWidth(),ofGetHeight());
+	// pastFrames also use internal resolution
+	for(int i=0;i<pastFramesSize;i++){
+        pastFrames1[i].allocate(internalWidth, internalHeight);
+        pastFrames2[i].allocate(internalWidth, internalHeight);
         
         pastFrames1[i].begin();
         ofClear(0,0,0,255);
@@ -1685,6 +1986,140 @@ void ofApp::framebufferSetup(){
     }
 	
 }
+
+//--------------------------------------------------------------
+void ofApp::reinitializeResolutions(){
+	ofLogNotice("Resolution") << "Reinitializing resolutions:";
+	ofLogNotice("Resolution") << "  Input 1: " << input1Width << "x" << input1Height;
+	ofLogNotice("Resolution") << "  Input 2: " << input2Width << "x" << input2Height;
+	ofLogNotice("Resolution") << "  Internal: " << internalWidth << "x" << internalHeight;
+	ofLogNotice("Resolution") << "  Output: " << outputWidth << "x" << outputHeight;
+	ofLogNotice("Resolution") << "  Spout Send: " << spoutSendWidth << "x" << spoutSendHeight;
+	
+	// Reinitialize webcams at new resolution if they're the active source
+	if (gui->input1SourceType == 0) {
+		input1.close();
+		input1.setDeviceID(gui->input1DeviceID);
+		input1.setDesiredFrameRate(30);
+		input1.setup(input1Width, input1Height);
+		ofLogNotice("Resolution") << "  Webcam 1 reinitialized at " << input1Width << "x" << input1Height;
+	}
+	if (gui->input2SourceType == 0) {
+		input2.close();
+		input2.setDeviceID(gui->input2DeviceID);
+		input2.setDesiredFrameRate(30);
+		input2.setup(input2Width, input2Height);
+		ofLogNotice("Resolution") << "  Webcam 2 reinitialized at " << input2Width << "x" << input2Height;
+	}
+	
+	// Reallocate webcam FBOs at internal resolution
+	webcamFbo1.allocate(internalWidth, internalHeight, GL_RGBA);
+	webcamFbo2.allocate(internalWidth, internalHeight, GL_RGBA);
+	webcamFbo1.begin();
+	ofClear(0,0,0,255);
+	webcamFbo1.end();
+	webcamFbo2.begin();
+	ofClear(0,0,0,255);
+	webcamFbo2.end();
+	
+	// Reallocate main framebuffers at internal resolution
+	framebuffer1.allocate(internalWidth, internalHeight);
+	framebuffer2.allocate(internalWidth, internalHeight);
+	framebuffer3.allocate(internalWidth, internalHeight);
+	
+	// Reallocate dummyTex at internal resolution
+	dummyTex.allocate(internalWidth, internalHeight, GL_RGBA);
+	
+	framebuffer1.begin();
+	ofClear(0,0,0,255);
+	framebuffer1.end();
+	
+	framebuffer2.begin();
+	ofClear(0,0,0,255);
+	framebuffer2.end();
+	
+	framebuffer3.begin();
+	ofClear(0,0,0,255);
+	framebuffer3.end();
+	
+	// Reallocate pastFrames at internal resolution
+	for(int i=0; i<pastFramesSize; i++){
+		pastFrames1[i].allocate(internalWidth, internalHeight);
+		pastFrames2[i].allocate(internalWidth, internalHeight);
+		
+		pastFrames1[i].begin();
+		ofClear(0,0,0,255);
+		pastFrames1[i].end();
+		
+		pastFrames2[i].begin();
+		ofClear(0,0,0,255);
+		pastFrames2[i].end();
+	}
+	
+	// Reallocate NDI input FBOs at INTERNAL resolution
+	ndiFbo1.allocate(internalWidth, internalHeight, GL_RGBA);
+	ndiFbo2.allocate(internalWidth, internalHeight, GL_RGBA);
+	ndiFbo1.begin();
+	ofClear(0,0,0,255);
+	ndiFbo1.end();
+	ndiFbo2.begin();
+	ofClear(0,0,0,255);
+	ndiFbo2.end();
+	
+	// Reallocate Spout input FBOs at INTERNAL resolution
+	spoutFbo1.allocate(internalWidth, internalHeight, GL_RGBA);
+	spoutFbo2.allocate(internalWidth, internalHeight, GL_RGBA);
+	spoutFbo1.begin();
+	ofClear(0,0,0,255);
+	spoutFbo1.end();
+	spoutFbo2.begin();
+	ofClear(0,0,0,255);
+	spoutFbo2.end();
+	
+	// Reallocate Spout send FBOs at spout send resolution
+	spoutSendFbo1.allocate(spoutSendWidth, spoutSendHeight, GL_RGBA);
+	spoutSendFbo2.allocate(spoutSendWidth, spoutSendHeight, GL_RGBA);
+	spoutSendFbo3.allocate(spoutSendWidth, spoutSendHeight, GL_RGBA);
+	spoutSendFbo1.begin();
+	ofClear(0,0,0,255);
+	spoutSendFbo1.end();
+	spoutSendFbo2.begin();
+	ofClear(0,0,0,255);
+	spoutSendFbo2.end();
+	spoutSendFbo3.begin();
+	ofClear(0,0,0,255);
+	spoutSendFbo3.end();
+	
+	// Reallocate NDI send FBOs at ndi send resolution
+	ndiSendWidth = gui->ndiSendWidth;
+	ndiSendHeight = gui->ndiSendHeight;
+	ndiSendFbo1.allocate(ndiSendWidth, ndiSendHeight, GL_RGBA);
+	ndiSendFbo2.allocate(ndiSendWidth, ndiSendHeight, GL_RGBA);
+	ndiSendFbo3.allocate(ndiSendWidth, ndiSendHeight, GL_RGBA);
+	ndiSendFbo1.begin();
+	ofClear(0,0,0,255);
+	ndiSendFbo1.end();
+	ndiSendFbo2.begin();
+	ofClear(0,0,0,255);
+	ndiSendFbo2.end();
+	ndiSendFbo3.begin();
+	ofClear(0,0,0,255);
+	ndiSendFbo3.end();
+	
+	// Update NDI senders with new resolution (only if active)
+	if(ndiSender1Active) {
+		ndiSenderBlock1.UpdateSender(ndiSendWidth, ndiSendHeight);
+	}
+	if(ndiSender2Active) {
+		ndiSenderBlock2.UpdateSender(ndiSendWidth, ndiSendHeight);
+	}
+	if(ndiSender3Active) {
+		ndiSenderBlock3.UpdateSender(ndiSendWidth, ndiSendHeight);
+	}
+	
+	ofLogNotice("Resolution") << "Resolution reinitialization complete";
+}
+
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 	
@@ -2404,7 +2839,12 @@ bool ofApp::processOscDiscreteParams(const string& address, const ofxOscMessage&
     
     // BLOCK 1 - FB1 Geometry Discrete Parameters
     else if (address == "/gravity/block1/fb1/geoOverflow") gui->fb1GeoOverflow = m.getArgAsInt(0);
-    else if (address == "/gravity/block1/fb1/delayTime") gui->fb1DelayTime = m.getArgAsInt(0);
+    else if (address == "/gravity/block1/fb1/delayTime") {
+        gui->fb1DelayTime = m.getArgAsInt(0);
+        // Send delay in seconds
+        float secDelay = (float)gui->fb1DelayTime / (float)gui->targetFPS;
+        sendOscParameter("/gravity/block1/fb1/secDelay", roundf(secDelay * 100.0f) / 100.0f);
+    }
     
     // BLOCK 2 - Input Adjust Discrete Parameters
     else if (address == "/gravity/block2/input/inputSelect") gui->block2InputSelect = m.getArgAsInt(0);
@@ -2418,7 +2858,12 @@ bool ofApp::processOscDiscreteParams(const string& address, const ofxOscMessage&
     
     // BLOCK 2 - FB2 Geometry Discrete Parameters
     else if (address == "/gravity/block2/fb2/geoOverflow") gui->fb2GeoOverflow = m.getArgAsInt(0);
-    else if (address == "/gravity/block2/fb2/delayTime") gui->fb2DelayTime = m.getArgAsInt(0);
+    else if (address == "/gravity/block2/fb2/delayTime") {
+        gui->fb2DelayTime = m.getArgAsInt(0);
+        // Send delay in seconds
+        float secDelay = (float)gui->fb2DelayTime / (float)gui->targetFPS;
+        sendOscParameter("/gravity/block2/fb2/secDelay", roundf(secDelay * 100.0f) / 100.0f);
+    }
     
     // BLOCK 3 - Block 1 Geometry Discrete Parameters
     else if (address == "/gravity/block3/b1/geoOverflow") gui->block1GeoOverflow = m.getArgAsInt(0);
@@ -2439,6 +2884,15 @@ bool ofApp::processOscDiscreteParams(const string& address, const ofxOscMessage&
     else if (address == "/gravity/block3/final/mixType") gui->finalMixType = m.getArgAsInt(0);
     else if (address == "/gravity/block3/final/overflow") gui->finalMixOverflow = m.getArgAsInt(0);
     else if (address == "/gravity/block3/final/keyMode") gui->finalKeyMode = m.getArgAsInt(0);
+    
+    // SETTINGS - Performance
+    else if (address == "/gravity/settings/fps") {
+        int fps = m.getArgAsInt(0);
+        if (fps < 1) fps = 1;
+        if (fps > 60) fps = 60;
+        gui->targetFPS = fps;
+        gui->fpsChangeRequested = true;
+    }
     
     else return false;
     return true;

@@ -105,6 +105,15 @@ void GuiApp::setup(){
 	// Initialize video device list
 	refreshVideoDevices();
 
+	// Load saved video/OSC settings (if file exists)
+	loadVideoOscSettings();
+
+	// Trigger source refresh and apply loaded settings on startup
+	refreshNdiSources = true;
+	refreshSpoutSources = true;
+	resolutionChangeRequested = true;
+	oscSettingsReloadRequested = true;
+
 	// Initialize OSC parameter registry
 	registerBlock1OscParameters();
 	registerBlock2OscParameters();
@@ -194,6 +203,14 @@ void GuiApp::update(){
 			mainApp->sendAllOscParameters();
 		}
 		sendAllOscValues = 0;
+	}
+	
+	// Apply OSC settings (triggered on startup after loading settings)
+	if (oscSettingsReloadRequested == 1) {
+		if (mainApp) {
+			mainApp->reloadOscSettings();
+		}
+		oscSettingsReloadRequested = 0;
 	}
 	
 	// OSC-triggered reset handlers
@@ -1265,7 +1282,12 @@ void GuiApp::draw(){
 						//reset all fb1 parameters
 						
 						if (ImGui::SliderInt("fb1 delay time         ",&fb1DelayTime,1,pastFramesSize)) {
-							if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/delayTime", static_cast<float>(fb1DelayTime));
+							if (mainApp) {
+								mainApp->sendOscParameter("/gravity/block1/fb1/delayTime", static_cast<float>(fb1DelayTime));
+								// Send delay in seconds (delayTime / fps)
+								float secDelay = (float)fb1DelayTime / (float)targetFPS;
+								mainApp->sendOscParameter("/gravity/block1/fb1/secDelay", roundf(secDelay * 100.0f) / 100.0f);
+							}
 						}
 						ImGui::SameLine();
 						fb1FramebufferClearSwitch=0;
@@ -2045,7 +2067,12 @@ void GuiApp::draw(){
 					{
 						//reset all fb2 parameters
 						if (ImGui::SliderInt("fb2 delay time     ",&fb2DelayTime,1,pastFramesSize)) {
-							if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/delayTime", static_cast<float>(fb2DelayTime));
+							if (mainApp) {
+								mainApp->sendOscParameter("/gravity/block2/fb2/delayTime", static_cast<float>(fb2DelayTime));
+								// Send delay in seconds (delayTime / fps)
+								float secDelay = (float)fb2DelayTime / (float)targetFPS;
+								mainApp->sendOscParameter("/gravity/block2/fb2/secDelay", roundf(secDelay * 100.0f) / 100.0f);
+							}
 						}
 						ImGui::SameLine();
 						fb2FramebufferClearSwitch=0;
@@ -4276,9 +4303,33 @@ void GuiApp::draw(){
 			}//end block3
        		ImGui::PopStyleColor(12);	
 
-			// VIDEO INPUT TAB
-			if (ImGui::BeginTabItem("Video Input")) {
+			// VIDEO SETTINGS TAB
+			if (ImGui::BeginTabItem("VIDEO SETTINGS")) {
 				
+				ImGui::Text("Video Settings");
+				ImGui::Separator();
+				ImGui::Spacing();
+				
+				// ========== FRAME RATE ==========
+				ImGui::Text("FRAME RATE");
+				ImGui::Spacing();
+				if (ImGui::SliderInt("Target FPS", &targetFPS, 1, 60)) {
+					// Set flag for main app to apply
+					fpsChangeRequested = true;
+					// Send OSC
+					if (mainApp) {
+						mainApp->sendOscParameter("/gravity/settings/fps", (float)targetFPS);
+						// Send delay time in seconds (pastFramesSize=120 / fps)
+						float secDelay = 120.0f / (float)targetFPS;
+						mainApp->sendOscParameter("/gravity/settings/secDelay", roundf(secDelay * 100.0f) / 100.0f);
+					}
+				}
+				ImGui::TextDisabled("Current: %.1f FPS | Max Delay: %.2f sec", ofGetFrameRate(), 120.0f / (float)targetFPS);
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+				
+				// ========== VIDEO INPUT DEVICES ==========
 				ImGui::Text("Video Input Device Selection");
 				ImGui::Separator();
 				ImGui::Spacing();
@@ -4291,12 +4342,17 @@ void GuiApp::draw(){
 				if (ImGui::Button("Refresh NDI Sources")) {
 					refreshNdiSources = true;
 				}
+				ImGui::SameLine();
+				if (ImGui::Button("Refresh Spout Sources")) {
+					refreshSpoutSources = true;
+				}
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
 				
 				// Device counts
-				ImGui::Text("Found %d webcams, %d NDI sources", (int)videoDevices.size(), (int)ndiSourceNames.size());
+				ImGui::Text("Found %d webcams, %d NDI sources, %d Spout senders", 
+					(int)videoDevices.size(), (int)ndiSourceNames.size(), (int)spoutSourceNames.size());
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
@@ -4314,6 +4370,10 @@ void GuiApp::draw(){
 				ImGui::SameLine();
 				if (ImGui::RadioButton("NDI##1", input1SourceType == 1)) {
 					input1SourceType = 1;
+				}
+				ImGui::SameLine();
+				if (ImGui::RadioButton("Spout##1", input1SourceType == 2)) {
+					input1SourceType = 2;
 				}
 				
 				// Show appropriate dropdown based on source type
@@ -4336,7 +4396,7 @@ void GuiApp::draw(){
 					} else {
 						ImGui::Text("No webcams found");
 					}
-				} else {
+				} else if (input1SourceType == 1) {
 					// NDI dropdown
 					if (ndiSourceNames.size() > 0) {
 						if (ImGui::BeginCombo("##input1ndi", 
@@ -4354,6 +4414,26 @@ void GuiApp::draw(){
 						}
 					} else {
 						ImGui::Text("No NDI sources found");
+					}
+				} else if (input1SourceType == 2) {
+					// Spout dropdown
+					if (spoutSourceNames.size() > 0) {
+						if (ImGui::BeginCombo("##input1spout", 
+							input1SpoutSourceIndex < spoutSourceNames.size() ? spoutSourceNames[input1SpoutSourceIndex].c_str() : "Select Spout Sender")) {
+							for (int i = 0; i < spoutSourceNames.size(); i++) {
+								bool isSelected = (input1SpoutSourceIndex == i);
+								if (ImGui::Selectable(spoutSourceNames[i].c_str(), isSelected)) {
+									input1SpoutSourceIndex = i;
+								}
+								if (isSelected) {
+									ImGui::SetItemDefaultFocus();
+								}
+							}
+							ImGui::EndCombo();
+						}
+					} else {
+						ImGui::Text("No Spout senders found");
+						ImGui::TextDisabled("Click 'Refresh Spout Sources'");
 					}
 				}
 				ImGui::Spacing();
@@ -4373,6 +4453,10 @@ void GuiApp::draw(){
 				ImGui::SameLine();
 				if (ImGui::RadioButton("NDI##2", input2SourceType == 1)) {
 					input2SourceType = 1;
+				}
+				ImGui::SameLine();
+				if (ImGui::RadioButton("Spout##2", input2SourceType == 2)) {
+					input2SourceType = 2;
 				}
 				
 				// Show appropriate dropdown based on source type
@@ -4395,7 +4479,7 @@ void GuiApp::draw(){
 					} else {
 						ImGui::Text("No webcams found");
 					}
-				} else {
+				} else if (input2SourceType == 1) {
 					// NDI dropdown
 					if (ndiSourceNames.size() > 0) {
 						if (ImGui::BeginCombo("##input2ndi", 
@@ -4414,6 +4498,26 @@ void GuiApp::draw(){
 					} else {
 						ImGui::Text("No NDI sources found");
 					}
+				} else if (input2SourceType == 2) {
+					// Spout dropdown
+					if (spoutSourceNames.size() > 0) {
+						if (ImGui::BeginCombo("##input2spout", 
+							input2SpoutSourceIndex < spoutSourceNames.size() ? spoutSourceNames[input2SpoutSourceIndex].c_str() : "Select Spout Sender")) {
+							for (int i = 0; i < spoutSourceNames.size(); i++) {
+								bool isSelected = (input2SpoutSourceIndex == i);
+								if (ImGui::Selectable(spoutSourceNames[i].c_str(), isSelected)) {
+									input2SpoutSourceIndex = i;
+								}
+								if (isSelected) {
+									ImGui::SetItemDefaultFocus();
+								}
+							}
+							ImGui::EndCombo();
+						}
+					} else {
+						ImGui::Text("No Spout senders found");
+						ImGui::TextDisabled("Click 'Refresh Spout Sources'");
+					}
 				}
 				ImGui::Spacing();
 				ImGui::Separator();
@@ -4421,7 +4525,7 @@ void GuiApp::draw(){
 				
 				// Reinitialize button
 				ImGui::Text("Apply Changes");
-				if (ImGui::Button("Reinitialize Inputs", ImVec2(200, 30))) {
+				if (ImGui::Button("REINITIALIZE INPUTS", ImVec2(220, 30))) {
 					reinitializeInputs = true;
 				}
 				ImGui::Spacing();
@@ -4431,11 +4535,266 @@ void GuiApp::draw(){
 				ImGui::Text("Select source type and device, then click");
 				ImGui::Text("'Reinitialize Inputs' to apply changes.");
 				
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+				
+				// ========== SPOUT OUTPUT ==========
+				ImGui::Text("SPOUT OUTPUT");
+				ImGui::Spacing();
+				
+				ImGui::Checkbox("Send Block 1 (GwBlock1)", &spoutSendBlock1);
+				ImGui::Checkbox("Send Block 2 (GwBlock2)", &spoutSendBlock2);
+				ImGui::Checkbox("Send Block 3 - Final (GwBlock3)", &spoutSendBlock3);
+				
+				ImGui::Spacing();
+				ImGui::TextDisabled("Enable to share framebuffers via Spout");
+				
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+				
+				// ========== NDI OUTPUT ==========
+				ImGui::Text("NDI OUTPUT");
+				ImGui::Spacing();
+				
+				ImGui::Checkbox("Send Block 1 (GwBlock1)##ndi", &ndiSendBlock1);
+				ImGui::Checkbox("Send Block 2 (GwBlock2)##ndi", &ndiSendBlock2);
+				ImGui::Checkbox("Send Block 3 - Final (GwBlock3)##ndi", &ndiSendBlock3);
+				
+				ImGui::Spacing();
+				ImGui::TextDisabled("Enable to share framebuffers via NDI");
+				
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+				
+				// ========== RESOLUTION SETTINGS ==========
+				ImGui::Text("RESOLUTION SETTINGS");
+				ImGui::Spacing();
+				
+				// Input 1 Resolution
+				ImGui::Text("Input 1 Resolution:");
+				ImGui::SetNextItemWidth(80);
+				ImGui::InputScalar("##in1Width", ImGuiDataType_S32, &input1Width);
+				ImGui::SameLine();
+				ImGui::Text("x");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(80);
+				ImGui::InputScalar("##in1Height", ImGuiDataType_S32, &input1Height);
+				
+				// Input 2 Resolution
+				ImGui::Text("Input 2 Resolution:");
+				ImGui::SetNextItemWidth(80);
+				ImGui::InputScalar("##in2Width", ImGuiDataType_S32, &input2Width);
+				ImGui::SameLine();
+				ImGui::Text("x");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(80);
+				ImGui::InputScalar("##in2Height", ImGuiDataType_S32, &input2Height);
+				
+				ImGui::Spacing();
+				
+				// Internal Resolution
+				ImGui::Text("Internal Resolution (Feedback Buffers):");
+				ImGui::SetNextItemWidth(80);
+				ImGui::InputScalar("##intWidth", ImGuiDataType_S32, &internalWidth);
+				ImGui::SameLine();
+				ImGui::Text("x");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(80);
+				ImGui::InputScalar("##intHeight", ImGuiDataType_S32, &internalHeight);
+				
+				ImGui::Spacing();
+				
+				// Output Resolution
+				ImGui::Text("Output Resolution:");
+				ImGui::SetNextItemWidth(80);
+				ImGui::InputScalar("##outWidth", ImGuiDataType_S32, &outputWidth);
+				ImGui::SameLine();
+				ImGui::Text("x");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(80);
+				ImGui::InputScalar("##outHeight", ImGuiDataType_S32, &outputHeight);
+				
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+				
+				// Spout Send Resolution
+				ImGui::Text("Spout Send Resolution:");
+				ImGui::SetNextItemWidth(80);
+				ImGui::InputScalar("##spoutWidth", ImGuiDataType_S32, &spoutSendWidth);
+				ImGui::SameLine();
+				ImGui::Text("x");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(80);
+				ImGui::InputScalar("##spoutHeight", ImGuiDataType_S32, &spoutSendHeight);
+				
+				// NDI Send Resolution
+				ImGui::Text("NDI Send Resolution:");
+				ImGui::SetNextItemWidth(80);
+				ImGui::InputScalar("##ndiWidth", ImGuiDataType_S32, &ndiSendWidth);
+				ImGui::SameLine();
+				ImGui::Text("x");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(80);
+				ImGui::InputScalar("##ndiHeight", ImGuiDataType_S32, &ndiSendHeight);
+				
+				// Clamp all values
+				if (input1Width < 160) input1Width = 160;
+				if (input1Width > 3840) input1Width = 3840;
+				if (input1Height < 120) input1Height = 120;
+				if (input1Height > 2160) input1Height = 2160;
+				
+				if (input2Width < 160) input2Width = 160;
+				if (input2Width > 3840) input2Width = 3840;
+				if (input2Height < 120) input2Height = 120;
+				if (input2Height > 2160) input2Height = 2160;
+				
+				if (internalWidth < 320) internalWidth = 320;
+				if (internalWidth > 3840) internalWidth = 3840;
+				if (internalHeight < 240) internalHeight = 240;
+				if (internalHeight > 2160) internalHeight = 2160;
+				
+				if (outputWidth < 320) outputWidth = 320;
+				if (outputWidth > 3840) outputWidth = 3840;
+				if (outputHeight < 240) outputHeight = 240;
+				if (outputHeight > 2160) outputHeight = 2160;
+				
+				if (spoutSendWidth < 320) spoutSendWidth = 320;
+				if (spoutSendWidth > 3840) spoutSendWidth = 3840;
+				if (spoutSendHeight < 240) spoutSendHeight = 240;
+				if (spoutSendHeight > 2160) spoutSendHeight = 2160;
+				
+				if (ndiSendWidth < 320) ndiSendWidth = 320;
+				if (ndiSendWidth > 3840) ndiSendWidth = 3840;
+				if (ndiSendHeight < 240) ndiSendHeight = 240;
+				if (ndiSendHeight > 2160) ndiSendHeight = 2160;
+				
+				ImGui::Spacing();
+				if (ImGui::Button("Apply Resolution Changes")) {
+					resolutionChangeRequested = true;
+				}
+				ImGui::Spacing();
+				ImGui::TextDisabled("Warning: Changing resolutions will clear all buffers.");
+				ImGui::TextDisabled("Higher resolutions require more GPU memory.");
+				
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+				
+				// ========== SAVE SETTINGS ==========
+				ImGui::Text("SAVE/LOAD SETTINGS");
+				ImGui::Spacing();
+				if (ImGui::Button("Save Video & OSC Settings", ImVec2(260, 30))) {
+					saveVideoOscSettings();
+				}
+				ImGui::Spacing();
+				ImGui::TextDisabled("Saves to data/settings.json");
+				ImGui::TextDisabled("Settings auto-load on startup");
+				
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+				
+				// ========== ATTRIBUTIONS ==========
+				ImGui::Text("ATTRIBUTIONS");
+				ImGui::Spacing();
+				if (ImGui::Button("View Attributions", ImVec2(260, 30))) {
+					showAttributionsPopup = true;
+				}
+				ImGui::Spacing();
+				ImGui::TextDisabled("View licenses and credits for");
+				ImGui::TextDisabled("third-party libraries used in this app");
+				
+				// Attributions Popup Window
+				if (showAttributionsPopup) {
+					ImGui::OpenPopup("Attributions");
+				}
+				
+				// Calculate center of viewport (compatible with older ImGui versions)
+				ImGuiViewport* viewport = ImGui::GetMainViewport();
+				ImVec2 center(viewport->Pos.x + viewport->Size.x * 0.5f, viewport->Pos.y + viewport->Size.y * 0.5f);
+				ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+				ImGui::SetNextWindowSize(ImVec2(500, 450), ImGuiCond_Appearing);
+				
+				if (ImGui::BeginPopupModal("Attributions", &showAttributionsPopup, ImGuiWindowFlags_AlwaysAutoResize)) {
+					
+					// Original Author
+					ImGui::TextColored(ImVec4(1.0f, 0.9f, 0.4f, 1.0f), "GRAVITY_WAAAVES");
+					ImGui::TextWrapped("Original software by Andrei Jay");
+					ImGui::TextWrapped("https://andreijaycreativecoding.com");
+					ImGui::Spacing();
+					
+					ImGui::Separator();
+					ImGui::Spacing();
+					ImGui::Text("This application uses the following third-party libraries:");
+					ImGui::Separator();
+					ImGui::Spacing();
+					
+					// NDI
+					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "NDI SDK");
+					ImGui::TextWrapped("NDI(R) is a registered trademark of Vizrt NDI AB.");
+					ImGui::TextWrapped("For more information, visit: ndi.video");
+					ImGui::Spacing();
+					
+					// Spout2
+					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "Spout2");
+					ImGui::TextWrapped("Copyright (c) 2020-2024, Lynn Jarvis. All rights reserved.");
+					ImGui::TextWrapped("BSD 2-Clause License");
+					ImGui::TextWrapped("https://github.com/leadedge/Spout2");
+					ImGui::Spacing();
+					
+					// ofxNDI
+					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "ofxNDI");
+					ImGui::TextWrapped("Copyright (c) Lynn Jarvis. LGPL v3 License.");
+					ImGui::TextWrapped("https://github.com/leadedge/ofxNDI");
+					ImGui::Spacing();
+					
+					// ofxMidi
+					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "ofxMidi");
+					ImGui::TextWrapped("Copyright (c) Dan Wilcox. BSD Simplified License.");
+					ImGui::TextWrapped("https://github.com/danomatika/ofxMidi");
+					ImGui::Spacing();
+					
+					// ofxOsc
+					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "ofxOsc");
+					ImGui::TextWrapped("Part of openFrameworks. LGPL v3 License.");
+					ImGui::Spacing();
+					
+					// Dear ImGui
+					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "Dear ImGui");
+					ImGui::TextWrapped("Copyright (c) Omar Cornut. MIT License.");
+					ImGui::TextWrapped("https://github.com/ocornut/imgui");
+					ImGui::Spacing();
+					
+					// ofxImGui
+					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "ofxImGui");
+					ImGui::TextWrapped("https://github.com/jvcleave/ofxImGui");
+					ImGui::Spacing();
+					
+					// openFrameworks
+					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "openFrameworks");
+					ImGui::TextWrapped("MIT License. https://openframeworks.cc");
+					ImGui::Spacing();
+					
+					ImGui::Separator();
+					ImGui::Spacing();
+					
+					if (ImGui::Button("Close", ImVec2(120, 30))) {
+						showAttributionsPopup = false;
+						ImGui::CloseCurrentPopup();
+					}
+					
+					ImGui::EndPopup();
+				}
+				
 				ImGui::EndTabItem();
 			}
 
 			// OSC SETTINGS TAB
-			if (ImGui::BeginTabItem("OSC Settings")) {
+			if (ImGui::BeginTabItem("OSC SETTINGS")) {
 				
 				ImGui::Text("OSC Communication Settings");
 				ImGui::Separator();
@@ -4510,13 +4869,13 @@ void GuiApp::draw(){
 				ImGui::Spacing();
 				ImGui::Text("SEND ALL PARAMETERS");
 				ImGui::Text("Send all current values over OSC");
-				if (ImGui::Button("Send All Values Now", ImVec2(200, 30))) {
+				if (ImGui::Button("SEND ALL VALUES", ImVec2(220, 30))) {
 					sendAllOscValues = true;
 				}
 				ImGui::Spacing();
 				
 				// Apply/Restart button
-				if (ImGui::Button("Apply Settings", ImVec2(200, 30))) {
+				if (ImGui::Button("APPLY SETTINGS", ImVec2(200, 30))) {
 					if (mainApp) {
 						mainApp->reloadOscSettings();
 					}
@@ -53510,4 +53869,241 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/final/reset", &finalMixAndKeyLfoReset);
     
     ofLogNotice("OSC") << "Block 3 registration complete. Total parameters: " << oscRegistry.size();
+}
+
+//--------------------------------------------------------------
+void GuiApp::saveVideoOscSettings() {
+    ofJson settings;
+    
+    // ========== VIDEO SETTINGS ==========
+    settings["video"]["targetFPS"] = targetFPS;
+    
+    // Input 1
+    settings["video"]["input1"]["sourceType"] = input1SourceType;
+    settings["video"]["input1"]["webcamDeviceID"] = input1DeviceID;
+    settings["video"]["input1"]["ndiSourceIndex"] = input1NdiSourceIndex;
+    settings["video"]["input1"]["spoutSourceIndex"] = input1SpoutSourceIndex;
+    // Save source names for matching
+    if (input1NdiSourceIndex < ndiSourceNames.size()) {
+        settings["video"]["input1"]["ndiSourceName"] = ndiSourceNames[input1NdiSourceIndex];
+    } else {
+        settings["video"]["input1"]["ndiSourceName"] = "";
+    }
+    if (input1SpoutSourceIndex < spoutSourceNames.size()) {
+        settings["video"]["input1"]["spoutSourceName"] = spoutSourceNames[input1SpoutSourceIndex];
+    } else {
+        settings["video"]["input1"]["spoutSourceName"] = "";
+    }
+    
+    // Input 2
+    settings["video"]["input2"]["sourceType"] = input2SourceType;
+    settings["video"]["input2"]["webcamDeviceID"] = input2DeviceID;
+    settings["video"]["input2"]["ndiSourceIndex"] = input2NdiSourceIndex;
+    settings["video"]["input2"]["spoutSourceIndex"] = input2SpoutSourceIndex;
+    // Save source names for matching
+    if (input2NdiSourceIndex < ndiSourceNames.size()) {
+        settings["video"]["input2"]["ndiSourceName"] = ndiSourceNames[input2NdiSourceIndex];
+    } else {
+        settings["video"]["input2"]["ndiSourceName"] = "";
+    }
+    if (input2SpoutSourceIndex < spoutSourceNames.size()) {
+        settings["video"]["input2"]["spoutSourceName"] = spoutSourceNames[input2SpoutSourceIndex];
+    } else {
+        settings["video"]["input2"]["spoutSourceName"] = "";
+    }
+    
+    // Spout outputs
+    settings["video"]["spoutOutput"]["sendBlock1"] = spoutSendBlock1;
+    settings["video"]["spoutOutput"]["sendBlock2"] = spoutSendBlock2;
+    settings["video"]["spoutOutput"]["sendBlock3"] = spoutSendBlock3;
+    
+    // NDI outputs
+    settings["video"]["ndiOutput"]["sendBlock1"] = ndiSendBlock1;
+    settings["video"]["ndiOutput"]["sendBlock2"] = ndiSendBlock2;
+    settings["video"]["ndiOutput"]["sendBlock3"] = ndiSendBlock3;
+    
+    // Resolutions
+    settings["video"]["resolution"]["input1Width"] = input1Width;
+    settings["video"]["resolution"]["input1Height"] = input1Height;
+    settings["video"]["resolution"]["input2Width"] = input2Width;
+    settings["video"]["resolution"]["input2Height"] = input2Height;
+    settings["video"]["resolution"]["internalWidth"] = internalWidth;
+    settings["video"]["resolution"]["internalHeight"] = internalHeight;
+    settings["video"]["resolution"]["outputWidth"] = outputWidth;
+    settings["video"]["resolution"]["outputHeight"] = outputHeight;
+    settings["video"]["resolution"]["spoutSendWidth"] = spoutSendWidth;
+    settings["video"]["resolution"]["spoutSendHeight"] = spoutSendHeight;
+    settings["video"]["resolution"]["ndiSendWidth"] = ndiSendWidth;
+    settings["video"]["resolution"]["ndiSendHeight"] = ndiSendHeight;
+    
+    // ========== OSC SETTINGS ==========
+    settings["osc"]["enabled"] = oscEnabled;
+    settings["osc"]["receivePort"] = oscReceivePort;
+    settings["osc"]["sendIP"] = std::string(oscSendIP);
+    settings["osc"]["sendPort"] = oscSendPort;
+    
+    // Save to file
+    ofFile file("settings.json", ofFile::WriteOnly);
+    file << settings.dump(4);
+    file.close();
+    
+    ofLogNotice("Settings") << "Video/OSC settings saved to settings.json";
+}
+
+//--------------------------------------------------------------
+void GuiApp::loadVideoOscSettings() {
+    // Check if file exists
+    ofFile file("settings.json");
+    if (!file.exists()) {
+        ofLogNotice("Settings") << "No settings.json found, using defaults";
+        return;
+    }
+    
+    // Load JSON
+    ofJson settings;
+    file >> settings;
+    file.close();
+    
+    // ========== VIDEO SETTINGS ==========
+    if (settings.contains("video")) {
+        if (settings["video"].contains("targetFPS")) {
+            targetFPS = settings["video"]["targetFPS"];
+        }
+        
+        // Input 1
+        if (settings["video"].contains("input1")) {
+            if (settings["video"]["input1"].contains("sourceType")) {
+                input1SourceType = settings["video"]["input1"]["sourceType"];
+            }
+            if (settings["video"]["input1"].contains("webcamDeviceID")) {
+                input1DeviceID = settings["video"]["input1"]["webcamDeviceID"];
+            }
+            if (settings["video"]["input1"].contains("ndiSourceIndex")) {
+                input1NdiSourceIndex = settings["video"]["input1"]["ndiSourceIndex"];
+            }
+            if (settings["video"]["input1"].contains("spoutSourceIndex")) {
+                input1SpoutSourceIndex = settings["video"]["input1"]["spoutSourceIndex"];
+            }
+            // Load saved names for later matching
+            if (settings["video"]["input1"].contains("ndiSourceName")) {
+                savedInput1NdiName = settings["video"]["input1"]["ndiSourceName"];
+            }
+            if (settings["video"]["input1"].contains("spoutSourceName")) {
+                savedInput1SpoutName = settings["video"]["input1"]["spoutSourceName"];
+            }
+        }
+        
+        // Input 2
+        if (settings["video"].contains("input2")) {
+            if (settings["video"]["input2"].contains("sourceType")) {
+                input2SourceType = settings["video"]["input2"]["sourceType"];
+            }
+            if (settings["video"]["input2"].contains("webcamDeviceID")) {
+                input2DeviceID = settings["video"]["input2"]["webcamDeviceID"];
+            }
+            if (settings["video"]["input2"].contains("ndiSourceIndex")) {
+                input2NdiSourceIndex = settings["video"]["input2"]["ndiSourceIndex"];
+            }
+            if (settings["video"]["input2"].contains("spoutSourceIndex")) {
+                input2SpoutSourceIndex = settings["video"]["input2"]["spoutSourceIndex"];
+            }
+            // Load saved names for later matching
+            if (settings["video"]["input2"].contains("ndiSourceName")) {
+                savedInput2NdiName = settings["video"]["input2"]["ndiSourceName"];
+            }
+            if (settings["video"]["input2"].contains("spoutSourceName")) {
+                savedInput2SpoutName = settings["video"]["input2"]["spoutSourceName"];
+            }
+        }
+        
+        // Spout outputs
+        if (settings["video"].contains("spoutOutput")) {
+            if (settings["video"]["spoutOutput"].contains("sendBlock1")) {
+                spoutSendBlock1 = settings["video"]["spoutOutput"]["sendBlock1"];
+            }
+            if (settings["video"]["spoutOutput"].contains("sendBlock2")) {
+                spoutSendBlock2 = settings["video"]["spoutOutput"]["sendBlock2"];
+            }
+            if (settings["video"]["spoutOutput"].contains("sendBlock3")) {
+                spoutSendBlock3 = settings["video"]["spoutOutput"]["sendBlock3"];
+            }
+        }
+        
+        // NDI outputs
+        if (settings["video"].contains("ndiOutput")) {
+            if (settings["video"]["ndiOutput"].contains("sendBlock1")) {
+                ndiSendBlock1 = settings["video"]["ndiOutput"]["sendBlock1"];
+            }
+            if (settings["video"]["ndiOutput"].contains("sendBlock2")) {
+                ndiSendBlock2 = settings["video"]["ndiOutput"]["sendBlock2"];
+            }
+            if (settings["video"]["ndiOutput"].contains("sendBlock3")) {
+                ndiSendBlock3 = settings["video"]["ndiOutput"]["sendBlock3"];
+            }
+        }
+        
+        // Resolutions
+        if (settings["video"].contains("resolution")) {
+            if (settings["video"]["resolution"].contains("input1Width")) {
+                input1Width = settings["video"]["resolution"]["input1Width"];
+            }
+            if (settings["video"]["resolution"].contains("input1Height")) {
+                input1Height = settings["video"]["resolution"]["input1Height"];
+            }
+            if (settings["video"]["resolution"].contains("input2Width")) {
+                input2Width = settings["video"]["resolution"]["input2Width"];
+            }
+            if (settings["video"]["resolution"].contains("input2Height")) {
+                input2Height = settings["video"]["resolution"]["input2Height"];
+            }
+            if (settings["video"]["resolution"].contains("internalWidth")) {
+                internalWidth = settings["video"]["resolution"]["internalWidth"];
+            }
+            if (settings["video"]["resolution"].contains("internalHeight")) {
+                internalHeight = settings["video"]["resolution"]["internalHeight"];
+            }
+            if (settings["video"]["resolution"].contains("outputWidth")) {
+                outputWidth = settings["video"]["resolution"]["outputWidth"];
+            }
+            if (settings["video"]["resolution"].contains("outputHeight")) {
+                outputHeight = settings["video"]["resolution"]["outputHeight"];
+            }
+            if (settings["video"]["resolution"].contains("spoutSendWidth")) {
+                spoutSendWidth = settings["video"]["resolution"]["spoutSendWidth"];
+            }
+            if (settings["video"]["resolution"].contains("spoutSendHeight")) {
+                spoutSendHeight = settings["video"]["resolution"]["spoutSendHeight"];
+            }
+            if (settings["video"]["resolution"].contains("ndiSendWidth")) {
+                ndiSendWidth = settings["video"]["resolution"]["ndiSendWidth"];
+            }
+            if (settings["video"]["resolution"].contains("ndiSendHeight")) {
+                ndiSendHeight = settings["video"]["resolution"]["ndiSendHeight"];
+            }
+        }
+    }
+    
+    // ========== OSC SETTINGS ==========
+    if (settings.contains("osc")) {
+        if (settings["osc"].contains("enabled")) {
+            oscEnabled = settings["osc"]["enabled"];
+        }
+        if (settings["osc"].contains("receivePort")) {
+            oscReceivePort = settings["osc"]["receivePort"];
+        }
+        if (settings["osc"].contains("sendIP")) {
+            std::string ip = settings["osc"]["sendIP"];
+            strncpy(oscSendIP, ip.c_str(), 63);
+            oscSendIP[63] = '\0';
+        }
+        if (settings["osc"].contains("sendPort")) {
+            oscSendPort = settings["osc"]["sendPort"];
+        }
+    }
+    
+    ofLogNotice("Settings") << "Video/OSC settings loaded from settings.json";
+    
+    // Note: NDI/Spout source name matching will happen when sources are refreshed
+    // The saved names are stored in savedInput1NdiName, savedInput2NdiName, etc.
+    // for matching when the source lists become available
 }

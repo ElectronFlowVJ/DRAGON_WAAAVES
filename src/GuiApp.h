@@ -158,6 +158,7 @@ public:
 	int oscSendPort = 7001;
 	bool oscConnected = false;
 	bool sendAllOscValues = false;  // Trigger for sending all OSC values
+	bool oscSettingsReloadRequested = false;  // Trigger for reloading OSC settings
 	void updateLocalIP();
 	std::vector<std::string> localIPs;  // All available network IPs
 	
@@ -170,12 +171,57 @@ public:
 	void refreshVideoDevices();
 	
 	// NDI Input Settings
-	int input1SourceType = 0;  // 0 = Webcam, 1 = NDI
-	int input2SourceType = 0;  // 0 = Webcam, 1 = NDI
+	int input1SourceType = 0;  // 0 = Webcam, 1 = NDI, 2 = Spout
+	int input2SourceType = 0;  // 0 = Webcam, 1 = NDI, 2 = Spout
 	std::vector<std::string> ndiSourceNames;
 	int input1NdiSourceIndex = 0;
 	int input2NdiSourceIndex = 0;
 	bool refreshNdiSources = false;
+	
+	// Spout Input Settings
+	std::vector<std::string> spoutSourceNames;  // Available Spout senders
+	int input1SpoutSourceIndex = 0;
+	int input2SpoutSourceIndex = 0;
+	bool refreshSpoutSources = false;
+	
+	// Spout Output Settings
+	bool spoutSendBlock1 = false;  // Enable Spout output for Block 1
+	bool spoutSendBlock2 = false;  // Enable Spout output for Block 2
+	bool spoutSendBlock3 = false;  // Enable Spout output for Block 3 (final)
+	
+	// NDI Output Settings
+	bool ndiSendBlock1 = false;  // Enable NDI output for Block 1
+	bool ndiSendBlock2 = false;  // Enable NDI output for Block 2
+	bool ndiSendBlock3 = false;  // Enable NDI output for Block 3 (final)
+	
+	// NDI send resolution (separate from Spout)
+	int ndiSendWidth = 1280;
+	int ndiSendHeight = 720;
+	
+	// Performance Settings
+	int targetFPS = 30;  // Target frame rate (1-60)
+	bool fpsChangeRequested = false;  // Flag to apply FPS change in main app
+	
+	// Resolution Settings
+	// Input resolutions (for webcam/NDI/Spout capture scaling)
+	int input1Width = 640;
+	int input1Height = 480;
+	int input2Width = 640;
+	int input2Height = 480;
+	
+	// Internal processing resolution (framebuffers, pastFrames)
+	int internalWidth = 1280;
+	int internalHeight = 720;
+	
+	// Output resolution (final render to window)
+	int outputWidth = 1280;
+	int outputHeight = 720;
+	
+	// Spout send resolution (separate from internal)
+	int spoutSendWidth = 1280;
+	int spoutSendHeight = 720;
+	
+	bool resolutionChangeRequested = false;
 	
 	//block1
 	const int ch1AdjustLength=15;
@@ -1837,6 +1883,18 @@ public:
 	void registerOscParam(const std::string& address, bool* ptr);
 	void registerOscParam(const std::string& address, int* ptr);
 
+	// Video/OSC Settings save/load
+	void saveVideoOscSettings();
+	void loadVideoOscSettings();
+	
+	// Saved source names (for matching on load)
+	std::string savedInput1NdiName;
+	std::string savedInput2NdiName;
+	std::string savedInput1SpoutName;
+	std::string savedInput2SpoutName;
+	
+	// Attributions popup
+	bool showAttributionsPopup = false;
 
 };
 
