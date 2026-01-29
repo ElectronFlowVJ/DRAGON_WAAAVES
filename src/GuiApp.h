@@ -1367,6 +1367,10 @@ public:
 	float input1YFix=0;
 	float input1ScaleFix=0;
 	
+	float input2XFix=0;
+	float input2YFix=0;
+	float input2ScaleFix=0;
+	
 	
 	//global coefficients
 	

@@ -6,6 +6,9 @@
 float ch1HdAspectXFix=1.0;  // Inputs are now pre-scaled to internal resolution
 float ch1HdAspectYFix=1.0;
 
+float ch2HdAspectXFix=1.0;  // Inputs are now pre-scaled to internal resolution
+float ch2HdAspectYFix=1.0;
+
 
 const int pastFramesSize=120;
 ofFbo pastFrames1[pastFramesSize];
@@ -17,6 +20,21 @@ unsigned int pastFramesCount=0;
 ofTexture dummyTex;
 //testing variables
 int testSwitch1=1;
+
+// Helper function to allocate GPU-only FBOs (no CPU backing = less RAM usage)
+void allocateGpuOnlyFbo(ofFbo& fbo, int width, int height) {
+	ofFboSettings settings;
+	settings.width = width;
+	settings.height = height;
+	settings.internalformat = GL_RGBA8;
+	settings.useDepth = false;
+	settings.useStencil = false;
+	fbo.allocate(settings);
+	fbo.begin();
+	ofClear(0, 0, 0, 255);
+	fbo.end();
+}
+
 //--------------------------------------------------------------
 void ofApp::setup(){
 	ofSetFrameRate(30);	
@@ -315,7 +333,7 @@ void ofApp::draw(){
 	//ch2 adjust parameters
 	float ch2XDisplace=ch2XDisplaceC*(gui->ch2Adjust[0]);
 	float ch2YDisplace=ch2YDisplaceC*(gui->ch2Adjust[1]);
-	float ch2ZDisplace=ch2ZDisplaceC*(1.0+gui->ch2Adjust[2]);
+	float ch2ZDisplace=(1.0f+gui->ch2Adjust[2]);
 	float ch2Rotate=ch2RotateC*(gui->ch2Adjust[3]);
 	float ch2HueAttenuate=1.0f+(gui->ch2Adjust[4]);
 	float ch2SaturationAttenuate=1.0f+(gui->ch2Adjust[5]);
@@ -901,6 +919,8 @@ void ofApp::draw(){
 		ch2HdAspectOn=1;
 	}
 	shader1.setUniform1i("ch2HdAspectOn",ch2HdAspectOn);
+	shader1.setUniform2f("ch2HdAspectXYFix",ofVec2f(ch2HdAspectXFix,ch2HdAspectYFix));
+	shader1.setUniform2f("input2XYFix",ofVec2f(gui->input2XFix,gui->input2YFix));
 	
 	shader1.setUniform1f("ch2ScaleFix",ch2ScaleFix);
 	shader1.setUniform1f("ch2CribX",ch2CribX);
@@ -924,12 +944,15 @@ void ofApp::draw(){
 	//ch2 adjust
 	shader1.setUniform2f("ch2XYDisplace",ofVec2f(ch2XDisplace,ch2YDisplace));
 	//remapping z
+	//but maybe not anymore
+	/*
 	float ch2ZDisplaceMapped=ch2ZDisplace;
 	if(ch2ZDisplaceMapped>1.0){
 		ch2ZDisplaceMapped=pow(2,(ch2ZDisplaceMapped-1.0f)*8.0f);
 		if(ch2ZDisplace>=2.0){ch2ZDisplaceMapped=1000;}
 	}
-	shader1.setUniform1f("ch2ZDisplace",ch2ZDisplaceMapped);
+	*/
+	shader1.setUniform1f("ch2ZDisplace",ch2ZDisplace);
 	shader1.setUniform1f("ch2Rotate",ch2Rotate);
 	shader1.setUniform3f("ch2HSBAttenuate",ofVec3f(ch2HueAttenuate,ch2SaturationAttenuate,ch2BrightAttenuate));
 	if(gui->ch2Adjust[7]>0){
@@ -1126,10 +1149,7 @@ void ofApp::draw(){
 		} else {
 			shader2.setUniformTexture("block2InputTex",spoutFbo1.getTexture(),6);
 		}
-		block2InputWidth=640;
-		block2InputHeight=480;
-		block2InputWidthHalf=320;
-		block2InputHeightHalf=240;	
+		// Inputs are now pre-scaled to internal resolution
 		
 	}
 	
@@ -1146,10 +1166,7 @@ void ofApp::draw(){
 		} else {
 			shader2.setUniformTexture("block2InputTex",spoutFbo2.getTexture(),6);
 		}
-		block2InputWidth=640;
-		block2InputHeight=480;
-		block2InputWidthHalf=320;
-		block2InputHeightHalf=240;
+		// Inputs are now pre-scaled to internal resolution
 	}
 	
 	shader2.setUniform1f("ratio",ratio);
@@ -1189,12 +1206,15 @@ void ofApp::draw(){
 	
 	shader2.setUniform2f("block2InputXYDisplace",ofVec2f(block2InputXDisplace,block2InputYDisplace));
 	//remapping z
+	//but maybe not anymore
+	/*
 	float block2InputZDisplaceMapped=block2InputZDisplace;
 	if(block2InputZDisplaceMapped>1.0){
 		block2InputZDisplaceMapped=pow(2,(block2InputZDisplaceMapped-1.0f)*8.0f);
 		if(block2InputZDisplace>=2.0){block2InputZDisplaceMapped=1000;}
 	}
-	shader2.setUniform1f("block2InputZDisplace",block2InputZDisplaceMapped);
+	*/
+	shader2.setUniform1f("block2InputZDisplace",block2InputZDisplace);
 	shader2.setUniform1f("block2InputRotate",block2InputRotate);
 	shader2.setUniform3f("block2InputHSBAttenuate",ofVec3f(block2InputHueAttenuate,block2InputSaturationAttenuate,block2InputBrightAttenuate));
 	if(gui->block2InputAdjust[7]>0){
@@ -1594,28 +1614,13 @@ void ofApp::inputSetup(){
 	// List webcam devices
 	input1.listDevices();
 	
-	// Allocate webcam FBOs at INTERNAL resolution - webcam textures will be scaled to fill
-	webcamFbo1.allocate(internalWidth, internalHeight, GL_RGBA);
-	webcamFbo2.allocate(internalWidth, internalHeight, GL_RGBA);
-	webcamFbo1.begin();
-	ofClear(0, 0, 0, 255);
-	webcamFbo1.end();
-	webcamFbo2.begin();
-	ofClear(0, 0, 0, 255);
-	webcamFbo2.end();
+	// Allocate webcam FBOs at INTERNAL resolution - GPU-only (no CPU access needed)
+	allocateGpuOnlyFbo(webcamFbo1, internalWidth, internalHeight);
+	allocateGpuOnlyFbo(webcamFbo2, internalWidth, internalHeight);
 	
-	// Allocate NDI FBOs at INTERNAL resolution - received textures will be scaled to fill
-	ndiFbo1.allocate(internalWidth, internalHeight, GL_RGBA);
-	ndiFbo2.allocate(internalWidth, internalHeight, GL_RGBA);
-	
-	// Clear FBOs to black
-	ndiFbo1.begin();
-	ofClear(0, 0, 0, 255);
-	ndiFbo1.end();
-	
-	ndiFbo2.begin();
-	ofClear(0, 0, 0, 255);
-	ndiFbo2.end();
+	// Allocate NDI input FBOs at INTERNAL resolution - GPU-only
+	allocateGpuOnlyFbo(ndiFbo1, internalWidth, internalHeight);
+	allocateGpuOnlyFbo(ndiFbo2, internalWidth, internalHeight);
 	
 	// Always allocate NDI textures so they're ready when needed
 	// (ofxNDI receives at native resolution, we scale into FBO)
@@ -1629,27 +1634,18 @@ void ofApp::inputSetup(){
 	ndiTexture1.loadData(blackPixels);
 	ndiTexture2.loadData(blackPixels);
 	
-	// Allocate Spout FBOs at INTERNAL resolution - received textures will be scaled to fill
-	spoutFbo1.allocate(internalWidth, internalHeight, GL_RGBA);
-	spoutFbo2.allocate(internalWidth, internalHeight, GL_RGBA);
-	
-	// Clear Spout FBOs to black
-	spoutFbo1.begin();
-	ofClear(0, 0, 0, 255);
-	spoutFbo1.end();
-	
-	spoutFbo2.begin();
-	ofClear(0, 0, 0, 255);
-	spoutFbo2.end();
+	// Allocate Spout input FBOs at INTERNAL resolution - GPU-only
+	allocateGpuOnlyFbo(spoutFbo1, internalWidth, internalHeight);
+	allocateGpuOnlyFbo(spoutFbo2, internalWidth, internalHeight);
 	
 	// Initialize Spout receivers
 	spoutReceiver1.init();
 	spoutReceiver2.init();
 	
-	// Allocate Spout sender FBOs at spout send resolution
-	spoutSendFbo1.allocate(spoutSendWidth, spoutSendHeight, GL_RGBA);
-	spoutSendFbo2.allocate(spoutSendWidth, spoutSendHeight, GL_RGBA);
-	spoutSendFbo3.allocate(spoutSendWidth, spoutSendHeight, GL_RGBA);
+	// Allocate Spout sender FBOs at spout send resolution - GPU-only (Spout uses texture sharing)
+	allocateGpuOnlyFbo(spoutSendFbo1, spoutSendWidth, spoutSendHeight);
+	allocateGpuOnlyFbo(spoutSendFbo2, spoutSendWidth, spoutSendHeight);
+	allocateGpuOnlyFbo(spoutSendFbo3, spoutSendWidth, spoutSendHeight);
 	
 	// Initialize Spout senders at spout send resolution
 	spoutSenderBlock1.init("GwBlock1", spoutSendWidth, spoutSendHeight, GL_RGBA);
@@ -1657,6 +1653,7 @@ void ofApp::inputSetup(){
 	spoutSenderBlock3.init("GwBlock3", spoutSendWidth, spoutSendHeight, GL_RGBA);
 	
 	// Allocate NDI sender FBOs at ndi send resolution
+	// NOTE: These NEED CPU backing because NDI reads pixels back to CPU for network transmission
 	ndiSendWidth = gui->ndiSendWidth;
 	ndiSendHeight = gui->ndiSendHeight;
 	ndiSendFbo1.allocate(ndiSendWidth, ndiSendHeight, GL_RGBA);
@@ -1955,34 +1952,15 @@ void ofApp::refreshSpoutSources(){
 //---------------------------------------------------------
 void ofApp::framebufferSetup(){
 	// Use internal resolution for all processing buffers
-	framebuffer1.allocate(internalWidth, internalHeight);
-	framebuffer2.allocate(internalWidth, internalHeight);
-	framebuffer3.allocate(internalWidth, internalHeight);
-
-	framebuffer1.begin();
-	ofClear(0,0,0,255);
-	framebuffer1.end();
+	// These are GPU-only (no CPU backing needed)
+	allocateGpuOnlyFbo(framebuffer1, internalWidth, internalHeight);
+	allocateGpuOnlyFbo(framebuffer2, internalWidth, internalHeight);
+	allocateGpuOnlyFbo(framebuffer3, internalWidth, internalHeight);
 	
-	framebuffer2.begin();
-	ofClear(0,0,0,255);
-	framebuffer2.end();
-	
-	framebuffer3.begin();
-	ofClear(0,0,0,255);
-	framebuffer3.end();
-	
-	// pastFrames also use internal resolution
+	// pastFrames also use internal resolution - GPU-only for major RAM savings
 	for(int i=0;i<pastFramesSize;i++){
-        pastFrames1[i].allocate(internalWidth, internalHeight);
-        pastFrames2[i].allocate(internalWidth, internalHeight);
-        
-        pastFrames1[i].begin();
-        ofClear(0,0,0,255);
-        pastFrames1[i].end();
-        
-        pastFrames2[i].begin();
-        ofClear(0,0,0,255);
-        pastFrames2[i].end();
+        allocateGpuOnlyFbo(pastFrames1[i], internalWidth, internalHeight);
+        allocateGpuOnlyFbo(pastFrames2[i], internalWidth, internalHeight);
     }
 	
 }
@@ -2012,85 +1990,39 @@ void ofApp::reinitializeResolutions(){
 		ofLogNotice("Resolution") << "  Webcam 2 reinitialized at " << input2Width << "x" << input2Height;
 	}
 	
-	// Reallocate webcam FBOs at internal resolution
-	webcamFbo1.allocate(internalWidth, internalHeight, GL_RGBA);
-	webcamFbo2.allocate(internalWidth, internalHeight, GL_RGBA);
-	webcamFbo1.begin();
-	ofClear(0,0,0,255);
-	webcamFbo1.end();
-	webcamFbo2.begin();
-	ofClear(0,0,0,255);
-	webcamFbo2.end();
+	// Reallocate webcam FBOs at internal resolution - GPU-only
+	allocateGpuOnlyFbo(webcamFbo1, internalWidth, internalHeight);
+	allocateGpuOnlyFbo(webcamFbo2, internalWidth, internalHeight);
 	
-	// Reallocate main framebuffers at internal resolution
-	framebuffer1.allocate(internalWidth, internalHeight);
-	framebuffer2.allocate(internalWidth, internalHeight);
-	framebuffer3.allocate(internalWidth, internalHeight);
+	// Reallocate main framebuffers at internal resolution - GPU-only
+	allocateGpuOnlyFbo(framebuffer1, internalWidth, internalHeight);
+	allocateGpuOnlyFbo(framebuffer2, internalWidth, internalHeight);
+	allocateGpuOnlyFbo(framebuffer3, internalWidth, internalHeight);
 	
 	// Reallocate dummyTex at internal resolution
 	dummyTex.allocate(internalWidth, internalHeight, GL_RGBA);
 	
-	framebuffer1.begin();
-	ofClear(0,0,0,255);
-	framebuffer1.end();
-	
-	framebuffer2.begin();
-	ofClear(0,0,0,255);
-	framebuffer2.end();
-	
-	framebuffer3.begin();
-	ofClear(0,0,0,255);
-	framebuffer3.end();
-	
-	// Reallocate pastFrames at internal resolution
+	// Reallocate pastFrames at internal resolution - GPU-only for major RAM savings
 	for(int i=0; i<pastFramesSize; i++){
-		pastFrames1[i].allocate(internalWidth, internalHeight);
-		pastFrames2[i].allocate(internalWidth, internalHeight);
-		
-		pastFrames1[i].begin();
-		ofClear(0,0,0,255);
-		pastFrames1[i].end();
-		
-		pastFrames2[i].begin();
-		ofClear(0,0,0,255);
-		pastFrames2[i].end();
+		allocateGpuOnlyFbo(pastFrames1[i], internalWidth, internalHeight);
+		allocateGpuOnlyFbo(pastFrames2[i], internalWidth, internalHeight);
 	}
 	
-	// Reallocate NDI input FBOs at INTERNAL resolution
-	ndiFbo1.allocate(internalWidth, internalHeight, GL_RGBA);
-	ndiFbo2.allocate(internalWidth, internalHeight, GL_RGBA);
-	ndiFbo1.begin();
-	ofClear(0,0,0,255);
-	ndiFbo1.end();
-	ndiFbo2.begin();
-	ofClear(0,0,0,255);
-	ndiFbo2.end();
+	// Reallocate NDI input FBOs at INTERNAL resolution - GPU-only
+	allocateGpuOnlyFbo(ndiFbo1, internalWidth, internalHeight);
+	allocateGpuOnlyFbo(ndiFbo2, internalWidth, internalHeight);
 	
-	// Reallocate Spout input FBOs at INTERNAL resolution
-	spoutFbo1.allocate(internalWidth, internalHeight, GL_RGBA);
-	spoutFbo2.allocate(internalWidth, internalHeight, GL_RGBA);
-	spoutFbo1.begin();
-	ofClear(0,0,0,255);
-	spoutFbo1.end();
-	spoutFbo2.begin();
-	ofClear(0,0,0,255);
-	spoutFbo2.end();
+	// Reallocate Spout input FBOs at INTERNAL resolution - GPU-only
+	allocateGpuOnlyFbo(spoutFbo1, internalWidth, internalHeight);
+	allocateGpuOnlyFbo(spoutFbo2, internalWidth, internalHeight);
 	
-	// Reallocate Spout send FBOs at spout send resolution
-	spoutSendFbo1.allocate(spoutSendWidth, spoutSendHeight, GL_RGBA);
-	spoutSendFbo2.allocate(spoutSendWidth, spoutSendHeight, GL_RGBA);
-	spoutSendFbo3.allocate(spoutSendWidth, spoutSendHeight, GL_RGBA);
-	spoutSendFbo1.begin();
-	ofClear(0,0,0,255);
-	spoutSendFbo1.end();
-	spoutSendFbo2.begin();
-	ofClear(0,0,0,255);
-	spoutSendFbo2.end();
-	spoutSendFbo3.begin();
-	ofClear(0,0,0,255);
-	spoutSendFbo3.end();
+	// Reallocate Spout send FBOs at spout send resolution - GPU-only (Spout uses texture sharing)
+	allocateGpuOnlyFbo(spoutSendFbo1, spoutSendWidth, spoutSendHeight);
+	allocateGpuOnlyFbo(spoutSendFbo2, spoutSendWidth, spoutSendHeight);
+	allocateGpuOnlyFbo(spoutSendFbo3, spoutSendWidth, spoutSendHeight);
 	
 	// Reallocate NDI send FBOs at ndi send resolution
+	// NOTE: These NEED CPU backing because NDI reads pixels back to CPU for network transmission
 	ndiSendWidth = gui->ndiSendWidth;
 	ndiSendHeight = gui->ndiSendHeight;
 	ndiSendFbo1.allocate(ndiSendWidth, ndiSendHeight, GL_RGBA);
