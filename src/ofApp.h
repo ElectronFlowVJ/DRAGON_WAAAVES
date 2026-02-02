@@ -18,11 +18,11 @@ class ofApp : public ofBaseApp{
 
 		void keyPressed(int key);
 		void keyReleased(int key);
-		
-		
+
+
 		shared_ptr<GuiApp> gui;
 		shared_ptr<ofAppBaseWindow> mainWindow;  // Reference to output window
-	
+
 		// OSC Communication
 		ofxOscReceiver oscReceiver;
 		ofxOscSender oscSender;
@@ -32,7 +32,7 @@ class ofApp : public ofBaseApp{
 		void sendAllOscParameters();
 		void reloadOscSettings();
 		bool oscEnabled;
-		
+
 		// OSC Send Helper Functions (registry-based)
 		void sendOscParametersByPrefix(const std::string& prefix);
 		void sendOscBlock1Ch1();
@@ -43,7 +43,7 @@ class ofApp : public ofBaseApp{
 		void sendOscBlock3B1();
 		void sendOscBlock3B2();
 		void sendOscBlock3MatrixAndFinal();
-		
+
 		// OSC Process Helper Functions (split to avoid compiler limits)
 		bool processOscBlock1(const string& address, float value, const ofxOscMessage& m);
 		bool processOscBlock2(const string& address, float value, const ofxOscMessage& m);
@@ -54,14 +54,14 @@ class ofApp : public ofBaseApp{
 		bool processOscLfoParamsBlock3B1(const string& address, float value);
 		bool processOscLfoParamsBlock3B2AndMatrix(const string& address, float value);
 		bool processOscResetCommands(const string& address);
-	
-	//globals	
+
+	//globals
 	// Input resolutions
 	int input1Width = 640;
 	int input1Height = 480;
 	int input2Width = 640;
 	int input2Height = 480;
-	
+
 	// Legacy inputWidth/inputHeight for compatibility
 	int inputWidth=640;
 	int inputHeight=480;
@@ -71,7 +71,7 @@ class ofApp : public ofBaseApp{
 	int outputHeight;
 	int internalWidth;
 	int internalHeight;
-	
+
 	// Spout send resolution
 	int spoutSendWidth = 1280;
 	int spoutSendHeight = 720;
@@ -85,7 +85,7 @@ class ofApp : public ofBaseApp{
 	ofVideoGrabber input2;
 	ofFbo webcamFbo1;  // FBO for scaling webcam 1 to internal resolution
 	ofFbo webcamFbo2;  // FBO for scaling webcam 2 to internal resolution
-	
+
 	// NDI receivers
 	ofxNDIreceiver ndiReceiver1;
 	ofxNDIreceiver ndiReceiver2;
@@ -94,7 +94,7 @@ class ofApp : public ofBaseApp{
 	ofFbo ndiFbo1;  // FBO for scaling NDI input 1 to 640x480
 	ofFbo ndiFbo2;  // FBO for scaling NDI input 2 to 640x480
 	void refreshNdiSources();
-	
+
 	// Spout receivers
 	ofxSpout::Receiver spoutReceiver1;
 	ofxSpout::Receiver spoutReceiver2;
@@ -102,7 +102,7 @@ class ofApp : public ofBaseApp{
 	ofTexture spoutTexture2;  // Texture to receive into
 	ofFbo spoutFbo1;  // FBO for scaling Spout input 1 to 640x480
 	ofFbo spoutFbo2;  // FBO for scaling Spout input 2 to 640x480
-	
+
 	// Spout senders (one per output channel)
 	ofxSpout::Sender spoutSenderBlock1;
 	ofxSpout::Sender spoutSenderBlock2;
@@ -110,7 +110,7 @@ class ofApp : public ofBaseApp{
 	ofFbo spoutSendFbo1;  // FBO for flipping Block 1 output
 	ofFbo spoutSendFbo2;  // FBO for flipping Block 2 output
 	ofFbo spoutSendFbo3;  // FBO for flipping Block 3 output
-	
+
 	// NDI senders (one per output channel)
 	ofxNDIsender ndiSenderBlock1;
 	ofxNDIsender ndiSenderBlock2;
@@ -121,11 +121,11 @@ class ofApp : public ofBaseApp{
 	ofFbo ndiSendFbo1;  // FBO for Block 1 output
 	ofFbo ndiSendFbo2;  // FBO for Block 2 output
 	ofFbo ndiSendFbo3;  // FBO for Block 3 output
-	
+
 	// NDI send resolution
 	int ndiSendWidth = 1280;
 	int ndiSendHeight = 720;
-	
+
 	// Spout source management
 	void refreshSpoutSources();
 
@@ -140,16 +140,16 @@ class ofApp : public ofBaseApp{
 	ofShader shader1;
 	ofShader shader2;
 	ofShader shader3;
-	
-	
+
+
 	//COEFFICIENTS
 	//mix and key coefficients
 	float mixAmountC=2.0;
 	float keyC=1.0;//use for r g b value
 	float keyThresholdC=ROOT_THREE+.001;
-	
+
 	//BLOCK 1
-	
+
 	//ch1 adjust coefficients
 	float ch1XDisplaceC=-640.0;//make x negative for better intuitive controls
 	float ch1YDisplaceC=480.0;
@@ -158,10 +158,10 @@ class ofApp : public ofBaseApp{
 	float ch1PosterizeC=15.0;
 	float ch1KaleidoscopeAmountC=21;
 	float ch1KaleidoscopeSliceC=PI;
-	
+
 	float ch1FilterRadiusC=9.0;
 	float ch1SharpenAmountC=1.0;
-	
+
 	//ch2 adjust coefficients
 	float ch2XDisplaceC=-640.0;//make x negative for better intuitive controls
 	float ch2YDisplaceC=480.0;
@@ -172,7 +172,7 @@ class ofApp : public ofBaseApp{
 	float ch2KaleidoscopeSliceC=PI;
 	float ch2FilterRadiusC=9.0;
 	float ch2SharpenAmountC=1.0;
-	
+
 	//fb1 geo1 coefficiens
 	float fb1XDisplaceC=-80;
 	float fb1YDisplaceC=80;
@@ -184,7 +184,7 @@ class ofApp : public ofBaseApp{
 	float fb1ShearMatrix4C=.25;
 	float fb1KaleidoscopeAmountC=21;
 	float fb1KaleidoscopeSliceC=PI;
-	
+
 	//fb1 color coefficients
 	float fb1HueOffsetC=.25;
 	float fb1SaturationOffsetC=.25;
@@ -194,18 +194,18 @@ class ofApp : public ofBaseApp{
 	float fb1BrightAttenuateC=.25;
 	float fb1HuePowmapC=.1;
 	float fb1SaturationPowmapC=.1;
-	float fb1BrightPowmapC=.1;			
+	float fb1BrightPowmapC=.1;
 	float fb1HueShaperC=1.0;
 	float fb1PosterizeC=15.0;
-	
+
 	//fb1 filters coefficients
 	float fb1FilterRadiusC=9.0;
 	float fb1SharpenAmountC=.6;
 	float fb1TemporalFilterAmountC=2.0;
-	
-	
+
+
 	//BLOCK 2
-			
+
 	//block2Input adjust coefficients
 	float block2InputXDisplaceC=-640.0;//make x negative for better intuitive controls
 	float block2InputYDisplaceC=480.0;
@@ -216,7 +216,7 @@ class ofApp : public ofBaseApp{
 	float block2InputKaleidoscopeSliceC=PI;
 	float block2InputFilterRadiusC=9.0;
 	float block2InputSharpenAmountC=1.0;
-	
+
 	//fb2 geo1 coefficiens
 	float fb2XDisplaceC=-80;
 	float fb2YDisplaceC=80;
@@ -228,7 +228,7 @@ class ofApp : public ofBaseApp{
 	float fb2ShearMatrix4C=.25;
 	float fb2KaleidoscopeAmountC=21;
 	float fb2KaleidoscopeSliceC=PI;
-	
+
 	//fb2 color coefficients
 	float fb2HueOffsetC=.25;
 	float fb2SaturationOffsetC=.25;
@@ -238,17 +238,17 @@ class ofApp : public ofBaseApp{
 	float fb2BrightAttenuateC=.25;
 	float fb2HuePowmapC=.1;
 	float fb2SaturationPowmapC=.1;
-	float fb2BrightPowmapC=.1;			
+	float fb2BrightPowmapC=.1;
 	float fb2HueShaperC=1.0;
 	float fb2PosterizeC=15.0;
-	
+
 	//fb2 filters coefficients
 	float fb2FilterRadiusC=9.0;
 	float fb2SharpenAmountC=.6;
 	float fb2TemporalFilterAmountC=2.0;
-	
+
 	//BLOCK3
-	
+
 	//block1 geo1 coefficiens
 	float block1XDisplaceC=-1280;
 	float block1YDisplaceC=720;
@@ -260,13 +260,13 @@ class ofApp : public ofBaseApp{
 	float block1ShearMatrix4C=1;
 	float block1KaleidoscopeAmountC=21;
 	float block1KaleidoscopeSliceC=PI;
-	
+
 	//block1 filters coefficients
 	float block1FilterRadiusC=9.0;
 	float block1SharpenAmountC=1.0;
 	float block1TemporalFilterAmountC=2.0;
 	float block1DitherC=15.0;
-	
+
 	//block2 geo1 coefficiens
 	float block2XDisplaceC=-1280;
 	float block2YDisplaceC=720;
@@ -278,23 +278,23 @@ class ofApp : public ofBaseApp{
 	float block2ShearMatrix4C=1;
 	float block2KaleidoscopeAmountC=21;
 	float block2KaleidoscopeSliceC=PI;
-	
+
 	//block2 filters coefficients
 	float block2FilterRadiusC=9.0;
 	float block2SharpenAmountC=1.0;
 	float block2TemporalFilterAmountC=2.0;
 	float block2DitherC=15.0;
-	
+
 	//mix coefficients
 	float matrixMixC=6.0;
-	
-	
-	
+
+
+
 	//lfos
 	float lfo(float amp, float rate,int shape);
 	void lfoUpdate();
 	float lfoRateC=.15;
-	
+
 	//BLOCK 1
 	float ch1XDisplaceTheta=0;
 	float ch1YDisplaceTheta=0;
@@ -304,11 +304,11 @@ class ofApp : public ofBaseApp{
 	float ch1SaturationAttenuateTheta=0;
 	float ch1BrightAttenuateTheta=0;
 	float ch1KaleidoscopeSliceTheta=0;
-	
+
 	float ch2MixAmountTheta=0;
 	float ch2KeyThresholdTheta=0;
 	float ch2KeySoftTheta=0;
-	
+
 	float ch2XDisplaceTheta=0;
 	float ch2YDisplaceTheta=0;
 	float ch2ZDisplaceTheta=0;
@@ -317,27 +317,27 @@ class ofApp : public ofBaseApp{
 	float ch2SaturationAttenuateTheta=0;
 	float ch2BrightAttenuateTheta=0;
 	float ch2KaleidoscopeSliceTheta=0;
-	
+
 	float fb1MixAmountTheta=0;
 	float fb1KeyThresholdTheta=0;
 	float fb1KeySoftTheta=0;
-	
+
 	float fb1XDisplaceTheta=0;
 	float fb1YDisplaceTheta=0;
 	float fb1ZDisplaceTheta=0;
 	float fb1RotateTheta=0;
-	
+
 	float fb1ShearMatrix1Theta=0;
 	float fb1ShearMatrix2Theta=0;
 	float fb1ShearMatrix3Theta=0;
 	float fb1ShearMatrix4Theta=0;
 	float fb1KaleidoscopeSliceTheta=0;
-	
+
 	float fb1HueAttenuateTheta=0;
 	float fb1SaturationAttenuateTheta=0;
 	float fb1BrightAttenuateTheta=0;
-	
-	
+
+
 	//BLOCK 2
 	float block2InputXDisplaceTheta=0;
 	float block2InputYDisplaceTheta=0;
@@ -347,40 +347,40 @@ class ofApp : public ofBaseApp{
 	float block2InputSaturationAttenuateTheta=0;
 	float block2InputBrightAttenuateTheta=0;
 	float block2InputKaleidoscopeSliceTheta=0;
-	
+
 	float fb2MixAmountTheta=0;
 	float fb2KeyThresholdTheta=0;
 	float fb2KeySoftTheta=0;
-	
+
 	float fb2XDisplaceTheta=0;
 	float fb2YDisplaceTheta=0;
 	float fb2ZDisplaceTheta=0;
 	float fb2RotateTheta=0;
-	
+
 	float fb2ShearMatrix1Theta=0;
 	float fb2ShearMatrix2Theta=0;
 	float fb2ShearMatrix3Theta=0;
 	float fb2ShearMatrix4Theta=0;
 	float fb2KaleidoscopeSliceTheta=0;
-	
+
 	float fb2HueAttenuateTheta=0;
 	float fb2SaturationAttenuateTheta=0;
 	float fb2BrightAttenuateTheta=0;
-	
-    //BLOCK 3	
-	
+
+    //BLOCK 3
+
 	//block1 geo
 	float block1XDisplaceTheta=0;
 	float block1YDisplaceTheta=0;
 	float block1ZDisplaceTheta=0;
 	float block1RotateTheta=0;
-	
+
 	float block1ShearMatrix1Theta=0;
 	float block1ShearMatrix2Theta=0;
 	float block1ShearMatrix3Theta=0;
 	float block1ShearMatrix4Theta=0;
 	float block1KaleidoscopeSliceTheta=0;
-	
+
 	//block1 colorize
 	float block1ColorizeHueBand1Theta=0;
 	float block1ColorizeSaturationBand1Theta=0;
@@ -397,19 +397,19 @@ class ofApp : public ofBaseApp{
 	float block1ColorizeHueBand5Theta=0;
 	float block1ColorizeSaturationBand5Theta=0;
 	float block1ColorizeBrightBand5Theta=0;
-	
+
 	//block2 geo
 	float block2XDisplaceTheta=0;
 	float block2YDisplaceTheta=0;
 	float block2ZDisplaceTheta=0;
 	float block2RotateTheta=0;
-	
+
 	float block2ShearMatrix1Theta=0;
 	float block2ShearMatrix2Theta=0;
 	float block2ShearMatrix3Theta=0;
 	float block2ShearMatrix4Theta=0;
 	float block2KaleidoscopeSliceTheta=0;
-	
+
 	//block2 colorize
 	float block2ColorizeHueBand1Theta=0;
 	float block2ColorizeSaturationBand1Theta=0;
@@ -426,39 +426,39 @@ class ofApp : public ofBaseApp{
 	float block2ColorizeHueBand5Theta=0;
 	float block2ColorizeSaturationBand5Theta=0;
 	float block2ColorizeBrightBand5Theta=0;
-	
-	
+
+
 	//matrix mix
 	float matrixMixBgRedIntoFgRedTheta=0;
 	float matrixMixBgGreenIntoFgRedTheta=0;
 	float matrixMixBgBlueIntoFgRedTheta=0;
-	
+
 	float matrixMixBgRedIntoFgGreenTheta=0;
 	float matrixMixBgGreenIntoFgGreenTheta=0;
 	float matrixMixBgBlueIntoFgGreenTheta=0;
-	
+
 	float matrixMixBgRedIntoFgBlueTheta=0;
 	float matrixMixBgGreenIntoFgBlueTheta=0;
 	float matrixMixBgBlueIntoFgBlueTheta=0;
-	
+
 	//final mix
 	float finalMixAmountTheta=0;
 	float finalKeyThresholdTheta=0;
 	float finalKeySoftTheta=0;
-	
+
 	//hypercube
 	void hypercube_draw();
-    
+
     float hypercube_theta=0;
     float hypercube_phi=0;
     float hypercube_r=0.0;
-    
+
     float hypercube_x[8];
     float hypercube_y[8];
     float hypercube_z[8];
-    
+
     float hypercube_color_theta=0;
-    
+
     //line
     void line_draw();
     float line_theta=0;
