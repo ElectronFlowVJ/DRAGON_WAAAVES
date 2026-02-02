@@ -37,6 +37,7 @@ void allocateGpuOnlyFbo(ofFbo& fbo, int width, int height) {
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+	ofDisableArbTex();
 	ofSetFrameRate(30);
 	ofBackground(0);
 	ofHideCursor();

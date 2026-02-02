@@ -4,8 +4,8 @@ const float PI=3.1415926535;
 const float TWO_PI=6.2831855;
 
 
-uniform sampler2DRect block2Output;
-uniform sampler2DRect block1Output;
+uniform sampler2D block2Output;
+uniform sampler2D block1Output;
 
 uniform float ratio;
 
@@ -399,18 +399,18 @@ float dither2(float inColor,vec2 inCoord,float ditherPalette){
 	return (colorDiff < indexValue) ? closestColor : secondClosestColor;
 }
 
-vec4 blurAndSharpen(sampler2DRect blurAndSharpenTex,vec2 coord, float sharpenAmount, float sharpenRadius, float sharpenBoost,float blurRadius,float blurAmount){
-	vec4 originalColor=texture2DRect(blurAndSharpenTex,coord);
+vec4 blurAndSharpen(sampler2D blurAndSharpenTex,vec2 coord, float sharpenAmount, float sharpenRadius, float sharpenBoost,float blurRadius,float blurAmount){
+	vec4 originalColor=texture(blurAndSharpenTex,coord);
 
 	//blur
-	vec4 colorBlur=texture2DRect(blurAndSharpenTex,coord+vec2(blurRadius,blurRadius))
-    + texture2DRect(blurAndSharpenTex,coord+vec2(0,blurRadius))
-    + texture2DRect(blurAndSharpenTex,coord+vec2(-blurRadius,blurRadius))
-    +texture2DRect(blurAndSharpenTex,coord+vec2(-blurRadius,0.0))
-    +texture2DRect(blurAndSharpenTex,coord+vec2(-blurRadius,-blurRadius))
-    +texture2DRect(blurAndSharpenTex,coord+vec2(0.0,-blurRadius))
-    +texture2DRect(blurAndSharpenTex,coord+vec2(blurRadius,-blurRadius))
-    +texture2DRect(blurAndSharpenTex,coord+vec2(blurRadius,0.0));
+	vec4 colorBlur = texture(blurAndSharpenTex,coord+vec2(blurRadius,blurRadius))
+                  + texture(blurAndSharpenTex,coord+vec2(0,blurRadius))
+                  + texture(blurAndSharpenTex,coord+vec2(-blurRadius,blurRadius))
+                  + texture(blurAndSharpenTex,coord+vec2(-blurRadius,0.0))
+                  + texture(blurAndSharpenTex,coord+vec2(-blurRadius,-blurRadius))
+                  + texture(blurAndSharpenTex,coord+vec2(0.0,-blurRadius))
+                  + texture(blurAndSharpenTex,coord+vec2(blurRadius,-blurRadius))
+                  + texture(blurAndSharpenTex,coord+vec2(blurRadius,0.0));
 
 	colorBlur*=.125;
 
@@ -418,16 +418,16 @@ vec4 blurAndSharpen(sampler2DRect blurAndSharpenTex,vec2 coord, float sharpenAmo
 
 	//sharpen
     float color_sharpen_bright=
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(sharpenRadius,0)).rgb).z+
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(-sharpenRadius,0)).rgb).z+
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(0,sharpenRadius)).rgb).z+
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(0,-sharpenRadius)).rgb).z+
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(sharpenRadius,sharpenRadius)).rgb).z+
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(-sharpenRadius,sharpenRadius)).rgb).z+
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(sharpenRadius,-sharpenRadius)).rgb).z+
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(-sharpenRadius,-sharpenRadius)).rgb).z;
+    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(sharpenRadius,0)).rgb).z+
+    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(-sharpenRadius,0)).rgb).z+
+    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(0,sharpenRadius)).rgb).z+
+    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(0,-sharpenRadius)).rgb).z+
+    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(sharpenRadius,sharpenRadius)).rgb).z+
+    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(-sharpenRadius,sharpenRadius)).rgb).z+
+    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(sharpenRadius,-sharpenRadius)).rgb).z+
+    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(-sharpenRadius,-sharpenRadius)).rgb).z;
 
-    color_sharpen_bright*=.125;
+    color_sharpen_bright=color_sharpen_bright*.125;
 
     vec3 colorBlurHsb=rgb2hsb(colorBlur.rgb);
     colorBlurHsb.z-=(sharpenAmount)*color_sharpen_bright;
@@ -435,7 +435,7 @@ vec4 blurAndSharpen(sampler2DRect blurAndSharpenTex,vec2 coord, float sharpenAmo
     //try baking in the sharpenBoost into the amount
     //this does not work so well over here lol
     if(sharpenAmount>0){
-        colorBlurHsb.z*=(1.0+1.75*sharpenAmount+sharpenBoost);
+        colorBlurHsb.z*=(1.0+sharpenAmount+sharpenBoost);
     }
 
     return vec4(hsb2rgb(colorBlurHsb),1.0);
