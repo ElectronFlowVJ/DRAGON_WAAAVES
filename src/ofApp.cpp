@@ -37,10 +37,10 @@ void allocateGpuOnlyFbo(ofFbo& fbo, int width, int height) {
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	ofSetFrameRate(30);	
+	ofSetFrameRate(30);
 	ofBackground(0);
 	ofHideCursor();
-	
+
 	// Initialize resolutions from GUI defaults
 	input1Width = 640;
 	input1Height = 480;
@@ -54,17 +54,17 @@ void ofApp::setup(){
 	spoutSendHeight = 720;
 
 	inputSetup();
-	
+
 	framebufferSetup();
-	
+
 	//keep this last in setup for easier debugging
 	shader1.load("shadersGL4/shader1");
 	shader2.load("shadersGL4/shader2");
 	shader3.load("shadersGL4/shader3");
-	
+
 	dummyTex.allocate(internalWidth, internalHeight, GL_RGBA);
 
-	sevenStar1Setup();	
+	sevenStar1Setup();
 	setupOsc();
 }
 
@@ -77,19 +77,19 @@ void ofApp::update(){
 		reinitializeInputs();
 		gui->reinitializeInputs = false;
 	}
-	
+
 	// Check if NDI sources need to be refreshed
 	if(gui->refreshNdiSources){
 		refreshNdiSources();
 		gui->refreshNdiSources = false;
 	}
-	
+
 	// Check if Spout sources need to be refreshed
 	if(gui->refreshSpoutSources){
 		refreshSpoutSources();
 		gui->refreshSpoutSources = false;
 	}
-	
+
 	// Check if resolution needs to be changed
 	if(gui->resolutionChangeRequested){
 		input1Width = gui->input1Width;
@@ -105,7 +105,7 @@ void ofApp::update(){
 		reinitializeResolutions();
 		gui->resolutionChangeRequested = false;
 	}
-	
+
 	// Check if FPS needs to be changed
 	if(gui->fpsChangeRequested){
 		ofSetFrameRate(gui->targetFPS);
@@ -114,11 +114,11 @@ void ofApp::update(){
 
 	inputUpdate();
 	lfoUpdate();
-	
+
 }
 //------------------------------------------------------------
 float ofApp::lfo(float amp, float rate,int shape){
-    
+
     return amp*sin(rate);
 }
 
@@ -136,12 +136,12 @@ void ofApp::lfoUpdate(){
 	ch1SaturationAttenuateTheta+=lfoRateC*(gui->ch1AdjustLfo[11]);
 	ch1BrightAttenuateTheta+=lfoRateC*(gui->ch1AdjustLfo[13]);
 	ch1KaleidoscopeSliceTheta+=lfoRateC*(gui->ch1AdjustLfo[15]);
-	
+
 	//ch2 mix and key
 	ch2MixAmountTheta+=lfoRateC*(gui->ch2MixAndKeyLfo[1]);
 	ch2KeyThresholdTheta+=lfoRateC*(gui->ch2MixAndKeyLfo[3]);
 	ch2KeySoftTheta+=lfoRateC*(gui->ch2MixAndKeyLfo[5]);
-	
+
 	//ch2 adjust
 	ch2XDisplaceTheta+=lfoRateC*(gui->ch2AdjustLfo[1]);
 	ch2YDisplaceTheta+=lfoRateC*(gui->ch2AdjustLfo[3]);
@@ -151,29 +151,29 @@ void ofApp::lfoUpdate(){
 	ch2SaturationAttenuateTheta+=lfoRateC*(gui->ch2AdjustLfo[11]);
 	ch2BrightAttenuateTheta+=lfoRateC*(gui->ch2AdjustLfo[13]);
 	ch2KaleidoscopeSliceTheta+=lfoRateC*(gui->ch2AdjustLfo[15]);
-			
+
 	//fb1 mix and key
 	fb1MixAmountTheta+=lfoRateC*(gui->fb1MixAndKeyLfo[1]);
 	fb1KeyThresholdTheta+=lfoRateC*(gui->fb1MixAndKeyLfo[3]);
 	fb1KeySoftTheta+=lfoRateC*(gui->fb1MixAndKeyLfo[5]);
-	
+
 	//fb1 geo1
 	fb1XDisplaceTheta+=lfoRateC*(gui->fb1Geo1Lfo1[1]);
 	fb1YDisplaceTheta+=lfoRateC*(gui->fb1Geo1Lfo1[3]);
 	fb1ZDisplaceTheta+=lfoRateC*(gui->fb1Geo1Lfo1[5]);
 	fb1RotateTheta+=lfoRateC*(gui->fb1Geo1Lfo1[7]);
-	
+
 	//fb1 geo2
 	fb1ShearMatrix1Theta+=lfoRateC*(gui->fb1Geo1Lfo2[1]);
 	fb1ShearMatrix2Theta+=lfoRateC*(gui->fb1Geo1Lfo2[5]);
 	fb1ShearMatrix3Theta+=lfoRateC*(gui->fb1Geo1Lfo2[7]);
 	fb1ShearMatrix4Theta+=lfoRateC*(gui->fb1Geo1Lfo2[3]);
 	fb1KaleidoscopeSliceTheta+=lfoRateC*(gui->fb1Geo1Lfo2[9]);
-	
+
 	fb1HueAttenuateTheta+=lfoRateC*(gui->fb1Color1Lfo1[1]);
 	fb1SaturationAttenuateTheta+=lfoRateC*(gui->fb1Color1Lfo1[3]);
 	fb1BrightAttenuateTheta+=lfoRateC*(gui->fb1Color1Lfo1[5]);
-	
+
 	//block2Input adjust
 	block2InputXDisplaceTheta+=lfoRateC*(gui->block2InputAdjustLfo[1]);
 	block2InputYDisplaceTheta+=lfoRateC*(gui->block2InputAdjustLfo[3]);
@@ -183,12 +183,12 @@ void ofApp::lfoUpdate(){
 	block2InputSaturationAttenuateTheta+=lfoRateC*(gui->block2InputAdjustLfo[11]);
 	block2InputBrightAttenuateTheta+=lfoRateC*(gui->block2InputAdjustLfo[13]);
 	block2InputKaleidoscopeSliceTheta+=lfoRateC*(gui->block2InputAdjustLfo[15]);
-	
+
 	//fb2 mix and key
 	fb2MixAmountTheta+=lfoRateC*(gui->fb2MixAndKeyLfo[1]);
 	fb2KeyThresholdTheta+=lfoRateC*(gui->fb2MixAndKeyLfo[3]);
 	fb2KeySoftTheta+=lfoRateC*(gui->fb2MixAndKeyLfo[5]);
-	
+
 	//fb2 geo1
 	fb2XDisplaceTheta+=lfoRateC*(gui->fb2Geo1Lfo1[1]);
 	fb2YDisplaceTheta+=lfoRateC*(gui->fb2Geo1Lfo1[3]);
@@ -200,26 +200,26 @@ void ofApp::lfoUpdate(){
 	fb2ShearMatrix3Theta+=lfoRateC*(gui->fb2Geo1Lfo2[7]);
 	fb2ShearMatrix4Theta+=lfoRateC*(gui->fb2Geo1Lfo2[3]);
 	fb2KaleidoscopeSliceTheta+=lfoRateC*(gui->fb2Geo1Lfo2[9]);
-	
+
 	//fb2 color
 	fb2HueAttenuateTheta+=lfoRateC*(gui->fb2Color1Lfo1[1]);
 	fb2SaturationAttenuateTheta+=lfoRateC*(gui->fb2Color1Lfo1[3]);
 	fb2BrightAttenuateTheta+=lfoRateC*(gui->fb2Color1Lfo1[5]);
-	
+
 	//BLOCK 3
-	
+
 	//block1 geo
 	block1XDisplaceTheta+=lfoRateC*(gui->block1Geo1Lfo1[1]);
 	block1YDisplaceTheta+=lfoRateC*(gui->block1Geo1Lfo1[3]);
 	block1ZDisplaceTheta+=lfoRateC*(gui->block1Geo1Lfo1[5]);
 	block1RotateTheta+=lfoRateC*(gui->block1Geo1Lfo1[7]);
-	
+
 	block1ShearMatrix1Theta+=lfoRateC*(gui->block1Geo1Lfo2[1]);
 	block1ShearMatrix2Theta+=lfoRateC*(gui->block1Geo1Lfo2[5]);
 	block1ShearMatrix3Theta+=lfoRateC*(gui->block1Geo1Lfo2[7]);
 	block1ShearMatrix4Theta+=lfoRateC*(gui->block1Geo1Lfo2[3]);
 	block1KaleidoscopeSliceTheta+=lfoRateC*(gui->block1Geo1Lfo2[9]);
-	
+
 	//block1 colorize
 	block1ColorizeHueBand1Theta+=lfoRateC*(gui->block1ColorizeLfo1[3]);
 	block1ColorizeSaturationBand1Theta+=lfoRateC*(gui->block1ColorizeLfo1[4]);
@@ -227,30 +227,30 @@ void ofApp::lfoUpdate(){
 	block1ColorizeHueBand2Theta+=lfoRateC*(gui->block1ColorizeLfo1[9]);
 	block1ColorizeSaturationBand2Theta+=lfoRateC*(gui->block1ColorizeLfo1[10]);
 	block1ColorizeBrightBand2Theta+=lfoRateC*(gui->block1ColorizeLfo1[11]);
-	
+
 	block1ColorizeHueBand3Theta+=lfoRateC*(gui->block1ColorizeLfo2[3]);;
 	block1ColorizeSaturationBand3Theta+=lfoRateC*(gui->block1ColorizeLfo2[4]);
 	block1ColorizeBrightBand3Theta+=lfoRateC*(gui->block1ColorizeLfo2[5]);
 	block1ColorizeHueBand4Theta+=lfoRateC*(gui->block1ColorizeLfo2[9]);
 	block1ColorizeSaturationBand4Theta+=lfoRateC*(gui->block1ColorizeLfo2[10]);
 	block1ColorizeBrightBand4Theta+=lfoRateC*(gui->block1ColorizeLfo2[11]);
-	
+
 	block1ColorizeHueBand5Theta+=lfoRateC*(gui->block1ColorizeLfo3[3]);
 	block1ColorizeSaturationBand5Theta+=lfoRateC*(gui->block1ColorizeLfo3[4]);
 	block1ColorizeBrightBand5Theta+=lfoRateC*(gui->block1ColorizeLfo3[5]);
-	
+
 	//block2 geo
 	block2XDisplaceTheta+=lfoRateC*(gui->block2Geo1Lfo1[1]);
 	block2YDisplaceTheta+=lfoRateC*(gui->block2Geo1Lfo1[3]);
 	block2ZDisplaceTheta+=lfoRateC*(gui->block2Geo1Lfo1[5]);
 	block2RotateTheta+=lfoRateC*(gui->block2Geo1Lfo1[7]);
-	
+
 	block2ShearMatrix1Theta+=lfoRateC*(gui->block2Geo1Lfo2[1]);
 	block2ShearMatrix2Theta+=lfoRateC*(gui->block2Geo1Lfo2[5]);
 	block2ShearMatrix3Theta+=lfoRateC*(gui->block2Geo1Lfo2[7]);
 	block2ShearMatrix4Theta+=lfoRateC*(gui->block2Geo1Lfo2[3]);
 	block2KaleidoscopeSliceTheta+=lfoRateC*(gui->block2Geo1Lfo2[9]);
-	
+
 	//block2 colorize
 	block2ColorizeHueBand1Theta+=lfoRateC*(gui->block2ColorizeLfo1[3]);
 	block2ColorizeSaturationBand1Theta+=lfoRateC*(gui->block2ColorizeLfo1[4]);
@@ -258,41 +258,41 @@ void ofApp::lfoUpdate(){
 	block2ColorizeHueBand2Theta+=lfoRateC*(gui->block2ColorizeLfo1[9]);
 	block2ColorizeSaturationBand2Theta+=lfoRateC*(gui->block2ColorizeLfo1[10]);
 	block2ColorizeBrightBand2Theta+=lfoRateC*(gui->block2ColorizeLfo1[11]);
-	
+
 	block2ColorizeHueBand3Theta+=lfoRateC*(gui->block2ColorizeLfo2[3]);;
 	block2ColorizeSaturationBand3Theta+=lfoRateC*(gui->block2ColorizeLfo2[4]);
 	block2ColorizeBrightBand3Theta+=lfoRateC*(gui->block2ColorizeLfo2[5]);
 	block2ColorizeHueBand4Theta+=lfoRateC*(gui->block2ColorizeLfo2[9]);
 	block2ColorizeSaturationBand4Theta+=lfoRateC*(gui->block2ColorizeLfo2[10]);
 	block2ColorizeBrightBand4Theta+=lfoRateC*(gui->block2ColorizeLfo2[11]);
-	
+
 	block2ColorizeHueBand5Theta+=lfoRateC*(gui->block2ColorizeLfo3[3]);
 	block2ColorizeSaturationBand5Theta+=lfoRateC*(gui->block2ColorizeLfo3[4]);
 	block2ColorizeBrightBand5Theta+=lfoRateC*(gui->block2ColorizeLfo3[5]);
-	
+
 	//matrix mixer
 	matrixMixBgRedIntoFgRedTheta+=lfoRateC*(gui->matrixMixLfo1[3]);
 	matrixMixBgGreenIntoFgRedTheta+=lfoRateC*(gui->matrixMixLfo1[4]);
 	matrixMixBgBlueIntoFgRedTheta+=lfoRateC*(gui->matrixMixLfo1[5]);
-	
+
 	matrixMixBgRedIntoFgGreenTheta+=lfoRateC*(gui->matrixMixLfo1[9]);
 	matrixMixBgGreenIntoFgGreenTheta+=lfoRateC*(gui->matrixMixLfo1[10]);
 	matrixMixBgBlueIntoFgGreenTheta+=lfoRateC*(gui->matrixMixLfo1[11]);
-	
+
 	matrixMixBgRedIntoFgBlueTheta+=lfoRateC*(gui->matrixMixLfo2[3]);
 	matrixMixBgGreenIntoFgBlueTheta+=lfoRateC*(gui->matrixMixLfo2[4]);
 	matrixMixBgBlueIntoFgBlueTheta+=lfoRateC*(gui->matrixMixLfo2[5]);
-	
+
 	//final mix and key
 	finalMixAmountTheta+=lfoRateC*(gui->finalMixAndKeyLfo[1]);
 	finalKeyThresholdTheta+=lfoRateC*(gui->finalMixAndKeyLfo[3]);
 	finalKeySoftTheta+=lfoRateC*(gui->finalMixAndKeyLfo[5]);
-	
+
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-	
+
 
 	//coefficients for parameters
 	//namespacing shit up here
@@ -300,9 +300,9 @@ void ofApp::draw(){
 	//we should properly name things here i think
 	//coefficients will just be the name plus C at the end
 	//eventually we will want to use gui stuff to rescale Coefficients
-	
+
 	//ch1 coefficients
-	
+
 
 	//ch1 adjust parameters
 	float ch1XDisplace=ch1XDisplaceC*(gui->ch1Adjust[0]);
@@ -321,15 +321,15 @@ void ofApp::draw(){
 	float ch1BlurRadius=ch1FilterRadiusC*(gui->ch1Adjust[11])+1.0;
 	float ch1SharpenAmount=ch1SharpenAmountC*(gui->ch1Adjust[12]);
 	float ch1SharpenRadius=ch1FilterRadiusC*(gui->ch1Adjust[13])+1.0;
-	float ch1FiltersBoost=(gui->ch1Adjust[14]);	
-	//ch2 mix and key 
+	float ch1FiltersBoost=(gui->ch1Adjust[14]);
+	//ch2 mix and key
 	float ch2MixAmount=mixAmountC*(gui->ch2MixAndKey[0]);
 	float ch2KeyValueRed=keyC*(gui->ch2MixAndKey[1]);
 	float ch2KeyValueGreen=keyC*(gui->ch2MixAndKey[2]);
 	float ch2KeyValueBlue=keyC*(gui->ch2MixAndKey[3]);
 	float ch2KeyThreshold=keyThresholdC*(gui->ch2MixAndKey[4]);
 	float ch2KeySoft=(gui->ch2MixAndKey[5]);
-	
+
 	//ch2 adjust parameters
 	float ch2XDisplace=ch2XDisplaceC*(gui->ch2Adjust[0]);
 	float ch2YDisplace=ch2YDisplaceC*(gui->ch2Adjust[1]);
@@ -347,16 +347,16 @@ void ofApp::draw(){
 	float ch2BlurRadius=ch2FilterRadiusC*(gui->ch2Adjust[11])+1.0;
 	float ch2SharpenAmount=ch2SharpenAmountC*(gui->ch2Adjust[12]);
 	float ch2SharpenRadius=ch2FilterRadiusC*(gui->ch2Adjust[13])+1.0;
-	float ch2FiltersBoost=(gui->ch2Adjust[14]);	
-	
-	//fb1 mix and key 
+	float ch2FiltersBoost=(gui->ch2Adjust[14]);
+
+	//fb1 mix and key
 	float fb1MixAmount=mixAmountC*(gui->fb1MixAndKey[0]);
 	float fb1KeyValueRed=keyC*(gui->fb1MixAndKey[1]);
 	float fb1KeyValueGreen=keyC*(gui->fb1MixAndKey[2]);
 	float fb1KeyValueBlue=keyC*(gui->fb1MixAndKey[3]);
 	float fb1KeyThreshold=keyThresholdC*(gui->fb1MixAndKey[4]);
 	float fb1KeySoft=(gui->fb1MixAndKey[5]);
-	
+
 	//fb1 geo1
 	float fb1XDisplace=fb1XDisplaceC*(gui->fb1Geo1[0]);
 	float fb1YDisplace=fb1YDisplaceC*(gui->fb1Geo1[1]);
@@ -368,7 +368,7 @@ void ofApp::draw(){
 	float fb1ShearMatrix4=fb1ShearMatrix4C*( 1.0f/fb1ShearMatrix1C + gui->fb1Geo1[5] );
 	float fb1KaleidoscopeAmount= floor(fb1KaleidoscopeAmountC*(gui->fb1Geo1[8]));
 	float fb1KaleidoscopeSlice=fb1KaleidoscopeSliceC*(gui->fb1Geo1[9]);
-	
+
 	//fb1 color1
 	float fb1HueOffset=fb1HueOffsetC*(gui->fb1Color1[0]);
 	float fb1SaturationOffset=fb1SaturationOffsetC*(gui->fb1Color1[1]);
@@ -383,8 +383,8 @@ void ofApp::draw(){
 	float fb1Posterize=fb1PosterizeC*(1.0f-gui->fb1Color1[10])+1.0;
 	float fb1PosterizeInvert=1.0f/fb1Posterize;
 	bool fb1PosterizeSwitch=0;
-	
-	//fb1 filters 
+
+	//fb1 filters
 	float fb1BlurAmount=gui->fb1Filters[0];
 	float fb1BlurRadius=fb1FilterRadiusC*(gui->fb1Filters[1])+1.0;
 	float fb1SharpenAmount=fb1SharpenAmountC*(gui->fb1Filters[2]);
@@ -394,9 +394,9 @@ void ofApp::draw(){
 	float fb1TemporalFilter2Amount=fb1TemporalFilterAmountC*(gui->fb1Filters[6]);
 	float fb1TemporalFilter2Resonance=(gui->fb1Filters[7]);
 	float fb1FiltersBoost=(gui->fb1Filters[8]);
-	
+
 	//BLOCK 2
-	
+
 	//block2Input adjust parameters
 	float block2InputXDisplace=block2InputXDisplaceC*(gui->block2InputAdjust[0]);
 	float block2InputYDisplace=block2InputYDisplaceC*(gui->block2InputAdjust[1]);
@@ -414,16 +414,16 @@ void ofApp::draw(){
 	float block2InputBlurRadius=block2InputFilterRadiusC*(gui->block2InputAdjust[11])+1.0;
 	float block2InputSharpenAmount=block2InputSharpenAmountC*(gui->block2InputAdjust[12]);
 	float block2InputSharpenRadius=block2InputFilterRadiusC*(gui->block2InputAdjust[13])+1.0;
-	float block2InputFiltersBoost=(gui->block2InputAdjust[14]);	
-	
-	//fb2 mix and key 
+	float block2InputFiltersBoost=(gui->block2InputAdjust[14]);
+
+	//fb2 mix and key
 	float fb2MixAmount=mixAmountC*(gui->fb2MixAndKey[0]);
 	float fb2KeyValueRed=keyC*(gui->fb2MixAndKey[1]);
 	float fb2KeyValueGreen=keyC*(gui->fb2MixAndKey[2]);
 	float fb2KeyValueBlue=keyC*(gui->fb2MixAndKey[3]);
 	float fb2KeyThreshold=keyThresholdC*(gui->fb2MixAndKey[4]);
 	float fb2KeySoft=(gui->fb2MixAndKey[5]);
-	
+
 	//fb2 geo1
 	float fb2XDisplace=fb2XDisplaceC*(gui->fb2Geo1[0]);
 	float fb2YDisplace=fb2YDisplaceC*(gui->fb2Geo1[1]);
@@ -435,7 +435,7 @@ void ofApp::draw(){
 	float fb2ShearMatrix4=fb2ShearMatrix4C*( 1.0f/fb2ShearMatrix1C + gui->fb2Geo1[5] );
 	float fb2KaleidoscopeAmount=floor(fb2KaleidoscopeAmountC*(gui->fb2Geo1[8]));
 	float fb2KaleidoscopeSlice=fb2KaleidoscopeSliceC*(gui->fb2Geo1[9]);
-	
+
 	//fb2 color1
 	float fb2HueOffset=fb2HueOffsetC*(gui->fb2Color1[0]);
 	float fb2SaturationOffset=fb2SaturationOffsetC*(gui->fb2Color1[1]);
@@ -450,8 +450,8 @@ void ofApp::draw(){
 	float fb2Posterize=fb2PosterizeC*(1.0f-gui->fb2Color1[10])+1.0;
 	float fb2PosterizeInvert=1.0f/fb2Posterize;
 	bool fb2PosterizeSwitch=0;
-	
-	//fb2 filters 
+
+	//fb2 filters
 	float fb2BlurAmount=gui->fb2Filters[0];
 	float fb2BlurRadius=fb2FilterRadiusC*(gui->fb2Filters[1])+1.0;
 	float fb2SharpenAmount=fb2SharpenAmountC*(gui->fb2Filters[2]);
@@ -462,9 +462,9 @@ void ofApp::draw(){
 	float fb2TemporalFilter2Resonance=(gui->fb2Filters[7]);
 	float fb2FiltersBoost=(gui->fb2Filters[8]);
 
-	
+
 	//BLOCK3
-	
+
 	//block1 Geo
 	float block1XDisplace=block1XDisplaceC*(gui->block1Geo[0]);
 	float block1YDisplace=block1YDisplaceC*(gui->block1Geo[1]);
@@ -476,7 +476,7 @@ void ofApp::draw(){
 	float block1ShearMatrix4=block1ShearMatrix4C*( 1.0f/block1ShearMatrix1C + gui->block1Geo[5] );
 	float block1KaleidoscopeAmount=floor(block1KaleidoscopeAmountC*(gui->block1Geo[8]));
 	float block1KaleidoscopeSlice=block1KaleidoscopeSliceC*(gui->block1Geo[9]);
-	
+
 	//block1 colorize
 	//yes these are poorly named b/c HSB and RGB switching.  deal with it
 	float block1ColorizeHueBand1=(gui->block1Colorize[0]);
@@ -494,15 +494,15 @@ void ofApp::draw(){
 	float block1ColorizeHueBand5=(gui->block1Colorize[12]);
 	float block1ColorizeSaturationBand5=(gui->block1Colorize[13]);
 	float block1ColorizeBrightBand5=(gui->block1Colorize[14]);
-	
-	//block1 filters 
+
+	//block1 filters
 	float block1BlurAmount=gui->block1Filters[0];
 	float block1BlurRadius=block1FilterRadiusC*(gui->block1Filters[1])+1.0;
 	float block1SharpenAmount=block1SharpenAmountC*(gui->block1Filters[2]);
 	float block1SharpenRadius=block1FilterRadiusC*(gui->block1Filters[3])+1.0;
-	float block1FiltersBoost=(gui->block1Filters[4]);	
+	float block1FiltersBoost=(gui->block1Filters[4]);
 	float block1Dither=block1DitherC*(1.0-gui->block1Filters[5])+1.0;
-	
+
 	//block2 Geo
 	float block2XDisplace=block2XDisplaceC*(gui->block2Geo[0]);
 	float block2YDisplace=block2YDisplaceC*(gui->block2Geo[1]);
@@ -514,7 +514,7 @@ void ofApp::draw(){
 	float block2ShearMatrix4=block2ShearMatrix4C*( 1.0f/block2ShearMatrix1C + gui->block2Geo[5] );
 	float block2KaleidoscopeAmount=floor(block2KaleidoscopeAmountC*(gui->block2Geo[8]));
 	float block2KaleidoscopeSlice=block2KaleidoscopeSliceC*(gui->block2Geo[9]);
-	
+
 	// block2 colorize
 	float block2ColorizeHueBand1=(gui->block2Colorize[0]);
 	float block2ColorizeSaturationBand1=(gui->block2Colorize[1]);
@@ -531,40 +531,40 @@ void ofApp::draw(){
 	float block2ColorizeHueBand5=(gui->block2Colorize[12]);
 	float block2ColorizeSaturationBand5=(gui->block2Colorize[13]);
 	float block2ColorizeBrightBand5=(gui->block2Colorize[14]);
-	
-	//block2 filters 
+
+	//block2 filters
 	float block2BlurAmount=gui->block2Filters[0];
 	float block2BlurRadius=block2FilterRadiusC*(gui->block2Filters[1])+1.0;
 	float block2SharpenAmount=block2SharpenAmountC*(gui->block2Filters[2]);
 	float block2SharpenRadius=block2FilterRadiusC*(gui->block2Filters[3])+1.0;
-	float block2FiltersBoost=(gui->block2Filters[4]);	
+	float block2FiltersBoost=(gui->block2Filters[4]);
 	float block2Dither=block2DitherC*(1.0-gui->block2Filters[5])+1.0;
-	
+
 	//matrixMixer
 	float matrixMixBgRedIntoFgRed=matrixMixC*(gui->matrixMix[0]);
 	float matrixMixBgGreenIntoFgRed=matrixMixC*(gui->matrixMix[1]);
 	float matrixMixBgBlueIntoFgRed=matrixMixC*(gui->matrixMix[2]);
-	
+
 	float matrixMixBgRedIntoFgGreen=matrixMixC*(gui->matrixMix[3]);
 	float matrixMixBgGreenIntoFgGreen=matrixMixC*(gui->matrixMix[4]);
 	float matrixMixBgBlueIntoFgGreen=matrixMixC*(gui->matrixMix[5]);
-	
+
 	float matrixMixBgRedIntoFgBlue=matrixMixC*(gui->matrixMix[6]);
 	float matrixMixBgGreenIntoFgBlue=matrixMixC*(gui->matrixMix[7]);
 	float matrixMixBgBlueIntoFgBlue=matrixMixC*(gui->matrixMix[8]);
-	
-	//final mix and key 
+
+	//final mix and key
 	float finalMixAmount=mixAmountC*(gui->finalMixAndKey[0]);
 	float finalKeyValueRed=keyC*(gui->finalMixAndKey[1]);
 	float finalKeyValueGreen=keyC*(gui->finalMixAndKey[2]);
 	float finalKeyValueBlue=keyC*(gui->finalMixAndKey[3]);
 	float finalKeyThreshold=keyThresholdC*(gui->finalMixAndKey[4]);
 	float finalKeySoft=(gui->finalMixAndKey[5]);
-	
+
 	//lfo shit up
-	
+
 	//BLOCK1 inputs lfo
-	
+
 	//ch1
 	ch1XDisplace+=lfo(ch1XDisplaceC*(gui->ch1AdjustLfo[0]),ch1XDisplaceTheta,0);
 	ch1YDisplace+=lfo(ch1YDisplaceC*(gui->ch1AdjustLfo[2]),ch1YDisplaceTheta,0);
@@ -574,12 +574,12 @@ void ofApp::draw(){
 	ch1SaturationAttenuate+=lfo((gui->ch1AdjustLfo[10]),ch1SaturationAttenuateTheta,0);
 	ch1BrightAttenuate+=lfo((gui->ch1AdjustLfo[12]),ch1BrightAttenuateTheta,0);
 	ch1KaleidoscopeSlice+=lfo( ch1KaleidoscopeSliceC*(gui->ch1AdjustLfo[14]),ch1KaleidoscopeSliceTheta ,0 );
-	
+
 	//ch2 lfo add on
 	ch2MixAmount+=lfo(mixAmountC*(gui->ch2MixAndKeyLfo[0]),ch2MixAmountTheta,0);
 	ch2KeyThreshold+=lfo(keyThresholdC*(gui->ch2MixAndKeyLfo[2]),ch2KeyThresholdTheta,0);
 	ch2KeySoft+=lfo((gui->ch2MixAndKeyLfo[4]),ch2KeySoftTheta,0);
-	
+
 	ch2XDisplace+=lfo(ch2XDisplaceC*(gui->ch2AdjustLfo[0]),ch2XDisplaceTheta,0);
 	ch2YDisplace+=lfo(ch2YDisplaceC*(gui->ch2AdjustLfo[2]),ch2YDisplaceTheta,0);
 	ch2ZDisplace+=lfo(ch2ZDisplaceC*(gui->ch2AdjustLfo[4]),ch2ZDisplaceTheta,0);
@@ -588,28 +588,28 @@ void ofApp::draw(){
 	ch2SaturationAttenuate+=lfo((gui->ch2AdjustLfo[10]),ch2SaturationAttenuateTheta,0);
 	ch2BrightAttenuate+=lfo((gui->ch2AdjustLfo[12]),ch2BrightAttenuateTheta,0);
 	ch2KaleidoscopeSlice+=lfo( ch2KaleidoscopeSliceC*(gui->ch2AdjustLfo[14]),ch2KaleidoscopeSliceTheta ,0 );
-	
+
 	//fb1 lfo add on
 	fb1MixAmount+=lfo(mixAmountC*(gui->fb1MixAndKeyLfo[0]),fb1MixAmountTheta,0);
 	fb1KeyThreshold+=lfo(keyThresholdC*(gui->fb1MixAndKeyLfo[2]),fb1KeyThresholdTheta,0);
 	fb1KeySoft+=lfo((gui->fb1MixAndKeyLfo[4]),fb1KeySoftTheta,0);
-	
+
 	fb1XDisplace+=lfo(fb1XDisplaceC*(gui->fb1Geo1Lfo1[0]),fb1XDisplaceTheta,0);
 	fb1YDisplace+=lfo(fb1YDisplaceC*(gui->fb1Geo1Lfo1[2]),fb1YDisplaceTheta,0);
 	fb1ZDisplace+=lfo(fb1ZDisplaceC*(gui->fb1Geo1Lfo1[4]),fb1ZDisplaceTheta,0);
 	fb1Rotate+=lfo(fb1RotateC*(gui->fb1Geo1Lfo1[6]),fb1RotateTheta,0);
-	
+
 	fb1ShearMatrix1+=lfo(fb1ShearMatrix1C*(gui->fb1Geo1Lfo2[0]),fb1ShearMatrix1Theta,0);
 	fb1ShearMatrix2+=lfo(fb1ShearMatrix2C*(gui->fb1Geo1Lfo2[4]),fb1ShearMatrix2Theta,0);
 	fb1ShearMatrix3+=lfo(fb1ShearMatrix3C*(gui->fb1Geo1Lfo2[6]),fb1ShearMatrix3Theta,0);
 	fb1ShearMatrix4+=lfo(fb1ShearMatrix4C*(gui->fb1Geo1Lfo2[2]),fb1ShearMatrix4Theta,0);
 	fb1KaleidoscopeSlice+=lfo(fb1KaleidoscopeSliceC*(gui->fb1Geo1Lfo2[8]),fb1KaleidoscopeSliceTheta,0);
-	
+
 	fb1HueAttenuate+=lfo(fb1HueAttenuateC*(gui->fb1Color1Lfo1[0]),fb1HueAttenuateTheta,0);
 	fb1SaturationAttenuate+=lfo(fb1SaturationAttenuateC*(gui->fb1Color1Lfo1[2]),fb1SaturationAttenuateTheta,0);
 	fb1BrightAttenuate+=lfo(fb1BrightAttenuateC*(gui->fb1Color1Lfo1[4]),fb1BrightAttenuateTheta,0);
-	
-	
+
+
 	//block2Input
 	block2InputXDisplace+=lfo(block2InputXDisplaceC*(gui->block2InputAdjustLfo[0]),block2InputXDisplaceTheta,0);
 	block2InputYDisplace+=lfo(block2InputYDisplaceC*(gui->block2InputAdjustLfo[2]),block2InputYDisplaceTheta,0);
@@ -620,42 +620,42 @@ void ofApp::draw(){
 	block2InputBrightAttenuate+=lfo((gui->block2InputAdjustLfo[12]),block2InputBrightAttenuateTheta,0);
 	block2InputKaleidoscopeSlice+=lfo( block2InputKaleidoscopeSliceC*(gui->block2InputAdjustLfo[14]),
 		block2InputKaleidoscopeSliceTheta ,0 );
-	
+
 	//fb2 lfo addon
 	fb2MixAmount+=lfo(mixAmountC*(gui->fb2MixAndKeyLfo[0]),fb2MixAmountTheta,0);
 	fb2KeyThreshold+=lfo(keyThresholdC*(gui->fb2MixAndKeyLfo[2]),fb2KeyThresholdTheta,0);
 	fb2KeySoft+=lfo((gui->fb2MixAndKeyLfo[4]),fb2KeySoftTheta,0);
-	
+
 	fb2XDisplace+=lfo(fb2XDisplaceC*(gui->fb2Geo1Lfo1[0]),fb2XDisplaceTheta,0);
 	fb2YDisplace+=lfo(fb2YDisplaceC*(gui->fb2Geo1Lfo1[2]),fb2YDisplaceTheta,0);
 	fb2ZDisplace+=lfo(fb2ZDisplaceC*(gui->fb2Geo1Lfo1[4]),fb2ZDisplaceTheta,0);
 	fb2Rotate+=lfo(fb2RotateC*(gui->fb2Geo1Lfo1[6]),fb2RotateTheta,0);
-	
-	
+
+
 	fb2ShearMatrix1+=lfo(fb2ShearMatrix1C*(gui->fb2Geo1Lfo2[0]),fb2ShearMatrix1Theta,0);
 	fb2ShearMatrix2+=lfo(fb2ShearMatrix2C*(gui->fb2Geo1Lfo2[4]),fb2ShearMatrix2Theta,0);
 	fb2ShearMatrix3+=lfo(fb2ShearMatrix3C*(gui->fb2Geo1Lfo2[6]),fb2ShearMatrix3Theta,0);
 	fb2ShearMatrix4+=lfo(fb2ShearMatrix4C*(gui->fb2Geo1Lfo2[2]),fb2ShearMatrix4Theta,0);
 	fb2KaleidoscopeSlice+=lfo(fb2KaleidoscopeSliceC*(gui->fb2Geo1Lfo2[8]),fb2KaleidoscopeSliceTheta,0);
-	
+
 	fb2HueAttenuate+=lfo(fb2HueAttenuateC*(gui->fb2Color1Lfo1[0]),fb2HueAttenuateTheta,0);
 	fb2SaturationAttenuate+=lfo(fb2SaturationAttenuateC*(gui->fb2Color1Lfo1[2]),fb2SaturationAttenuateTheta,0);
 	fb2BrightAttenuate+=lfo(fb2BrightAttenuateC*(gui->fb2Color1Lfo1[4]),fb2BrightAttenuateTheta,0);
-	
-	//BLOCK3 
-	
+
+	//BLOCK3
+
 	//block1 geo
 	block1XDisplace+=lfo(block1XDisplaceC*(gui->block1Geo1Lfo1[0]),block1XDisplaceTheta,0);
 	block1YDisplace+=lfo(block1YDisplaceC*(gui->block1Geo1Lfo1[2]),block1YDisplaceTheta,0);
 	block1ZDisplace+=lfo(block1ZDisplaceC*(gui->block1Geo1Lfo1[4]),block1ZDisplaceTheta,0);
 	block1Rotate+=lfo(block1RotateC*(gui->block1Geo1Lfo1[6]),block1RotateTheta,0);
-	
+
 	block1ShearMatrix1+=lfo(block1ShearMatrix1C*(gui->block1Geo1Lfo2[0]),block1ShearMatrix1Theta,0);
 	block1ShearMatrix2+=lfo(block1ShearMatrix2C*(gui->block1Geo1Lfo2[4]),block1ShearMatrix2Theta,0);
 	block1ShearMatrix3+=lfo(block1ShearMatrix3C*(gui->block1Geo1Lfo2[6]),block1ShearMatrix3Theta,0);
 	block1ShearMatrix4+=lfo(block1ShearMatrix4C*(gui->block1Geo1Lfo2[2]),block1ShearMatrix4Theta,0);
 	block1KaleidoscopeSlice+=lfo(block1KaleidoscopeSliceC*(gui->block1Geo1Lfo2[8]),block1KaleidoscopeSliceTheta,0);
-	
+
 	//block1 colorize
 	block1ColorizeHueBand1+=lfo( (gui->block1ColorizeLfo1[0]) , block1ColorizeHueBand1Theta , 0  );
 	block1ColorizeSaturationBand1+=lfo( (gui->block1ColorizeLfo1[1]) , block1ColorizeSaturationBand1Theta , 0  );
@@ -663,30 +663,30 @@ void ofApp::draw(){
 	block1ColorizeHueBand2+=lfo( (gui->block1ColorizeLfo1[6]) , block1ColorizeHueBand2Theta , 0  );
 	block1ColorizeSaturationBand2+=lfo( (gui->block1ColorizeLfo1[7]) , block1ColorizeSaturationBand2Theta , 0  );
 	block1ColorizeBrightBand2+=lfo( (gui->block1ColorizeLfo1[8]) , block1ColorizeBrightBand2Theta , 0  );
-	
+
 	block1ColorizeHueBand3+=lfo( (gui->block1ColorizeLfo2[0]) , block1ColorizeHueBand3Theta , 0  );
 	block1ColorizeSaturationBand3+=lfo( (gui->block1ColorizeLfo2[1]) , block1ColorizeSaturationBand3Theta , 0  );
 	block1ColorizeBrightBand3+=lfo( (gui->block1ColorizeLfo2[2]) , block1ColorizeBrightBand3Theta , 0  );
 	block1ColorizeHueBand4+=lfo( (gui->block1ColorizeLfo2[6]) , block1ColorizeHueBand4Theta , 0  );
 	block1ColorizeSaturationBand4+=lfo( (gui->block1ColorizeLfo2[7]) , block1ColorizeSaturationBand4Theta , 0  );
 	block1ColorizeBrightBand4+=lfo( (gui->block1ColorizeLfo2[8]) , block1ColorizeBrightBand4Theta , 0  );
-	
+
 	block1ColorizeHueBand5+=lfo( (gui->block1ColorizeLfo3[0]) , block1ColorizeHueBand5Theta , 0  );
 	block1ColorizeSaturationBand5+=lfo( (gui->block1ColorizeLfo3[1]) , block1ColorizeSaturationBand5Theta , 0  );
 	block1ColorizeBrightBand5+=lfo( (gui->block1ColorizeLfo3[2]) , block1ColorizeBrightBand5Theta , 0  );
-	
+
 	//block2 geo
 	block2XDisplace+=lfo(block2XDisplaceC*(gui->block2Geo1Lfo1[0]),block2XDisplaceTheta,0);
 	block2YDisplace+=lfo(block2YDisplaceC*(gui->block2Geo1Lfo1[2]),block2YDisplaceTheta,0);
 	block2ZDisplace+=lfo(block2ZDisplaceC*(gui->block2Geo1Lfo1[4]),block2ZDisplaceTheta,0);
 	block2Rotate+=lfo(block2RotateC*(gui->block2Geo1Lfo1[6]),block2RotateTheta,0);
-	
+
 	block2ShearMatrix1+=lfo(block2ShearMatrix1C*(gui->block2Geo1Lfo2[0]),block2ShearMatrix1Theta,0);
 	block2ShearMatrix2+=lfo(block2ShearMatrix2C*(gui->block2Geo1Lfo2[4]),block2ShearMatrix2Theta,0);
 	block2ShearMatrix3+=lfo(block2ShearMatrix3C*(gui->block2Geo1Lfo2[6]),block2ShearMatrix3Theta,0);
 	block2ShearMatrix4+=lfo(block2ShearMatrix4C*(gui->block2Geo1Lfo2[2]),block2ShearMatrix4Theta,0);
 	block2KaleidoscopeSlice+=lfo(block2KaleidoscopeSliceC*(gui->block2Geo1Lfo2[8]),block2KaleidoscopeSliceTheta,0);
-	
+
 	//block2 colorize
 	block2ColorizeHueBand1+=lfo( (gui->block2ColorizeLfo1[0]) , block2ColorizeHueBand1Theta , 0  );
 	block2ColorizeSaturationBand1+=lfo( (gui->block2ColorizeLfo1[1]) , block2ColorizeSaturationBand1Theta , 0  );
@@ -694,48 +694,48 @@ void ofApp::draw(){
 	block2ColorizeHueBand2+=lfo( (gui->block2ColorizeLfo1[6]) , block2ColorizeHueBand2Theta , 0  );
 	block2ColorizeSaturationBand2+=lfo( (gui->block2ColorizeLfo1[7]) , block2ColorizeSaturationBand2Theta , 0  );
 	block2ColorizeBrightBand2+=lfo( (gui->block2ColorizeLfo1[8]) , block2ColorizeBrightBand2Theta , 0  );
-	
+
 	block2ColorizeHueBand3+=lfo( (gui->block2ColorizeLfo2[0]) , block2ColorizeHueBand3Theta , 0  );
 	block2ColorizeSaturationBand3+=lfo( (gui->block2ColorizeLfo2[1]) , block2ColorizeSaturationBand3Theta , 0  );
 	block2ColorizeBrightBand3+=lfo( (gui->block2ColorizeLfo2[2]) , block2ColorizeBrightBand3Theta , 0  );
 	block2ColorizeHueBand4+=lfo( (gui->block2ColorizeLfo2[6]) , block2ColorizeHueBand4Theta , 0  );
 	block2ColorizeSaturationBand4+=lfo( (gui->block2ColorizeLfo2[7]) , block2ColorizeSaturationBand4Theta , 0  );
 	block2ColorizeBrightBand4+=lfo( (gui->block2ColorizeLfo2[8]) , block2ColorizeBrightBand4Theta , 0  );
-	
+
 	block2ColorizeHueBand5+=lfo( (gui->block2ColorizeLfo3[0]) , block2ColorizeHueBand5Theta , 0  );
 	block2ColorizeSaturationBand5+=lfo( (gui->block2ColorizeLfo3[1]) , block2ColorizeSaturationBand5Theta , 0  );
 	block2ColorizeBrightBand5+=lfo( (gui->block2ColorizeLfo3[2]) , block2ColorizeBrightBand5Theta , 0  );
-	
-	
+
+
 	//matrix mixer
 	matrixMixBgRedIntoFgRed+=lfo( matrixMixC*(gui->matrixMixLfo1[0]), matrixMixBgRedIntoFgRedTheta , 0 );
 	matrixMixBgGreenIntoFgRed+=lfo( matrixMixC*(gui->matrixMixLfo1[1]), matrixMixBgGreenIntoFgRedTheta , 0 );
 	matrixMixBgBlueIntoFgRed+=lfo( matrixMixC*(gui->matrixMixLfo1[2]), matrixMixBgBlueIntoFgRedTheta , 0 );
-	
+
 	matrixMixBgRedIntoFgGreen+=lfo( matrixMixC*(gui->matrixMixLfo1[6]), matrixMixBgRedIntoFgGreenTheta , 0 );
 	matrixMixBgGreenIntoFgGreen+=lfo( matrixMixC*(gui->matrixMixLfo1[7]), matrixMixBgGreenIntoFgGreenTheta , 0 );
 	matrixMixBgBlueIntoFgGreen+=lfo( matrixMixC*(gui->matrixMixLfo1[8]), matrixMixBgBlueIntoFgGreenTheta , 0 );
-	
+
 	matrixMixBgRedIntoFgBlue+=lfo( matrixMixC*(gui->matrixMixLfo2[0]), matrixMixBgRedIntoFgBlueTheta , 0 );
 	matrixMixBgGreenIntoFgBlue+=lfo( matrixMixC*(gui->matrixMixLfo2[1]), matrixMixBgGreenIntoFgBlueTheta , 0 );
 	matrixMixBgBlueIntoFgBlue+=lfo( matrixMixC*(gui->matrixMixLfo2[2]), matrixMixBgBlueIntoFgBlueTheta , 0 );
-	
+
 	//final lfo addon
 	finalMixAmount+=lfo(mixAmountC*(gui->finalMixAndKeyLfo[0]),finalMixAmountTheta,0);
 	finalKeyThreshold+=lfo(keyThresholdC*(gui->finalMixAndKeyLfo[2]),finalKeyThresholdTheta,0);
 	finalKeySoft+=lfo((gui->finalMixAndKeyLfo[4]),finalKeySoftTheta,0);
-	
-	
-	
+
+
+
 	//is this still used...
 	float ratio=input1.getWidth()/ofGetWidth();
-	
+
 	framebuffer1.begin();
 	// Explicitly set up viewport and projection for current FBO size
 	ofViewport(0, 0, framebuffer1.getWidth(), framebuffer1.getHeight());
 	ofSetupScreenOrtho(framebuffer1.getWidth(), framebuffer1.getHeight());
 	shader1.begin();
-	
+
 	//various test parameters to delete later
 	float ch1CribX=0;
 	float ch2CribX=0;
@@ -747,22 +747,22 @@ void ofApp::draw(){
 	shader1.setUniform1f("height",internalHeight);
 	shader1.setUniform1f("inverseWidth",1.0f/internalWidth);
 	shader1.setUniform1f("inverseHeight",1.0f/internalHeight);
-	
+
 	// Input resolution uniforms
 	shader1.setUniform1f("input1Width", (float)input1Width);
 	shader1.setUniform1f("input1Height", (float)input1Height);
 	shader1.setUniform1f("inverseWidth1",1.0f/input1Width);
 	shader1.setUniform1f("inverseHeight1",1.0f/input1Height);
-	
-	
+
+
 	int fb1DelayTimeMacroBuffer=int((pastFramesSize-1.0)*(gui->fb1DelayTimeMacroBuffer));
 	int fb1DelayTime_d=(gui->fb1DelayTime)+fb1DelayTimeMacroBuffer;
-	
+
 	int pastFrames1Index = (abs(pastFramesOffset - pastFramesSize - (fb1DelayTime_d) + 1) % pastFramesSize);
 	int TemporalFilterIndex = (abs(pastFramesOffset - pastFramesSize + 1) % pastFramesSize);
 	pastFrames1[pastFrames1Index].draw(0, 0, internalWidth, internalHeight);
 	shader1.setUniformTexture("fb1TemporalFilter", pastFrames1[TemporalFilterIndex].getTexture(), 1);
-	
+
 	//channel selection
 	if(gui->ch1InputSelect==0){
 		// Use input1 (webcam, NDI, or Spout depending on source type)
@@ -775,7 +775,7 @@ void ofApp::draw(){
 		} else {
 			shader1.setUniformTexture("ch1Tex",spoutFbo1.getTexture(),2);
 		}
-	
+
 	}
 	if(gui->ch1InputSelect==1){
 		// Use input2 (webcam, NDI, or Spout depending on source type)
@@ -788,16 +788,16 @@ void ofApp::draw(){
 		} else {
 			shader1.setUniformTexture("ch1Tex",spoutFbo2.getTexture(),2);
 		}
-	
-	}	
+
+	}
 	//ch1 parameters
-	
+
 	//we can use this to fix the uncentering of the hd version for now
 	shader1.setUniform2f("input1XYFix",ofVec2f(gui->input1XFix,gui->input1YFix));
-	
+
 	//we ADD a logic here for sd pillarbox vs sd fullscreen?
 	float ch1ScaleFix=1.0;//fullscreen - inputs now scaled to internal resolution
-	
+
 	//default aspect ratio is 4:3
 	//but if we are only sending in 640x480 resolutions anyway
 	//we should double check some shit
@@ -807,10 +807,10 @@ void ofApp::draw(){
 		ch1CribX=0;  // No crib offset needed
 		ch1HdZCrib=0;  // No zoom crib needed
 	}
-	
+
 	bool ch1HdAspectOn=0;
-	
-	
+
+
 	if(gui->ch1AspectRatioSwitch==1){
 		ch1HdAspectOn=1;
 		//ch1HdAspectXFix=.5;
@@ -824,13 +824,13 @@ void ofApp::draw(){
 	}
 	shader1.setUniform1i("ch1HdAspectOn",ch1HdAspectOn);
 	shader1.setUniform2f("ch1HdAspectXYFix",ofVec2f(ch1HdAspectXFix,ch1HdAspectYFix));
-	
+
 	shader1.setUniform1f("ch1ScaleFix",ch1ScaleFix);
-	
+
 	shader1.setUniform1f("ch1HdZCrib",ch1HdZCrib);
 	shader1.setUniform1f("ch1CribX",ch1CribX);
 	shader1.setUniform1f("ch1AspectRatio",ch1AspectRatio);
-	
+
 	shader1.setUniform2f("ch1XYDisplace",ofVec2f(ch1XDisplace,ch1YDisplace));
 	//remapping z
 	//but maybe not anymore
@@ -841,7 +841,7 @@ void ofApp::draw(){
 		if(ch1ZDisplace>=2.0){ch1ZDisplaceMapped=1000;}
 	}
 	*/
-	
+
 	shader1.setUniform1f("ch1ZDisplace",ch1ZDisplace);
 	shader1.setUniform1f("ch1Rotate",ch1Rotate);
 	shader1.setUniform3f("ch1HSBAttenuate",ofVec3f(ch1HueAttenuate,ch1SaturationAttenuate,ch1BrightAttenuate));
@@ -858,7 +858,7 @@ void ofApp::draw(){
 	shader1.setUniform1f("ch1SharpenAmount",ch1SharpenAmount);
 	shader1.setUniform1f("ch1SharpenRadius",ch1SharpenRadius);
 	shader1.setUniform1f("ch1FiltersBoost",ch1FiltersBoost);
-	
+
 	shader1.setUniform1i("ch1GeoOverflow",gui->ch1GeoOverflow);
 	shader1.setUniform1i("ch1HMirror",gui->ch1HMirror);
 	shader1.setUniform1i("ch1VMirror",gui->ch1VMirror);
@@ -869,11 +869,11 @@ void ofApp::draw(){
 	shader1.setUniform1i("ch1BrightInvert",gui->ch1BrightInvert);
 	shader1.setUniform1i("ch1RGBInvert",gui->ch1RGBInvert);
 	shader1.setUniform1i("ch1Solarize",gui->ch1Solarize);
-	
-	
-	
-	
-	
+
+
+
+
+
 	//channel selection
 	if(gui->ch2InputSelect==0){
 		// Use input1 (webcam, NDI, or Spout depending on source type)
@@ -899,11 +899,11 @@ void ofApp::draw(){
 			shader1.setUniformTexture("ch2Tex",spoutFbo2.getTexture(),3);
 		}
 	}
-	
-	
+
+
 	//we ADD a logic here for sd pillarbox vs sd fullscreen?
 	float ch2ScaleFix=1.0;//fullscreen - inputs now scaled to internal resolution
-	
+
 	//default aspect ratio is 4:3
 	//but if we are only sending in 640x480 resolutions anyway
 	//we should double check some shit
@@ -913,7 +913,7 @@ void ofApp::draw(){
 		ch2CribX=0;  // No crib offset needed
 		ch2HdZCrib=0;  // No zoom crib needed
 	}
-	
+
 	bool ch2HdAspectOn=0;
 	if(gui->ch2AspectRatioSwitch==1){
 		ch2HdAspectOn=1;
@@ -921,15 +921,15 @@ void ofApp::draw(){
 	shader1.setUniform1i("ch2HdAspectOn",ch2HdAspectOn);
 	shader1.setUniform2f("ch2HdAspectXYFix",ofVec2f(ch2HdAspectXFix,ch2HdAspectYFix));
 	shader1.setUniform2f("input2XYFix",ofVec2f(gui->input2XFix,gui->input2YFix));
-	
+
 	shader1.setUniform1f("ch2ScaleFix",ch2ScaleFix);
 	shader1.setUniform1f("ch2CribX",ch2CribX);
 	shader1.setUniform1f("ch2AspectRatio",ch2AspectRatio);
 	shader1.setUniform1f("ch2HdZCrib",ch2HdZCrib);
-	
-	
-	
-	
+
+
+
+
 	shader1.setUniform1f("ratio",ratio);
 
 	//ch2 mix parameters
@@ -968,7 +968,7 @@ void ofApp::draw(){
 	shader1.setUniform1f("ch2SharpenAmount",ch2SharpenAmount);
 	shader1.setUniform1f("ch2SharpenRadius",ch2SharpenRadius);
 	shader1.setUniform1f("ch2FiltersBoost",ch2FiltersBoost);
-	
+
 	shader1.setUniform1i("ch2GeoOverflow",gui->ch2GeoOverflow);
 	shader1.setUniform1i("ch2HMirror",gui->ch2HMirror);
 	shader1.setUniform1i("ch2VMirror",gui->ch2VMirror);
@@ -979,10 +979,10 @@ void ofApp::draw(){
 	shader1.setUniform1i("ch2BrightInvert",gui->ch2BrightInvert);
 	shader1.setUniform1i("ch2RGBInvert",gui->ch2RGBInvert);
 	shader1.setUniform1i("ch2Solarize",gui->ch2Solarize);
-	
+
 
 	//fb1 parameters
-	//fb1mixnkey	
+	//fb1mixnkey
 	shader1.setUniform1f("fb1MixAmount",fb1MixAmount);
 	shader1.setUniform3f("fb1KeyValue",ofVec3f(fb1KeyValueRed,fb1KeyValueGreen,fb1KeyValueBlue));
 	shader1.setUniform1f("fb1KeyThreshold",fb1KeyThreshold);
@@ -997,31 +997,31 @@ void ofApp::draw(){
 	shader1.setUniform4f("fb1ShearMatrix",ofVec4f(fb1ShearMatrix1, fb1ShearMatrix2, fb1ShearMatrix3, fb1ShearMatrix4) );
 	shader1.setUniform1f("fb1KaleidoscopeAmount",fb1KaleidoscopeAmount);
 	shader1.setUniform1f("fb1KaleidoscopeSlice",fb1KaleidoscopeSlice);
-		
+
 	shader1.setUniform1i("fb1HMirror",gui->fb1HMirror);
 	shader1.setUniform1i("fb1VMirror",gui->fb1VMirror);
 	shader1.setUniform1i("fb1HFlip",gui->fb1HFlip);
 	shader1.setUniform1i("fb1VFlip",gui->fb1VFlip);
 	shader1.setUniform1i("fb1RotateMode",gui->fb1RotateMode);
 	shader1.setUniform1i("fb1GeoOverflow",gui->fb1GeoOverflow);
-	
+
 	shader1.setUniform3f("fb1HSBOffset",ofVec3f(fb1HueOffset,fb1SaturationOffset,fb1BrightOffset));
 	shader1.setUniform3f("fb1HSBAttenuate",ofVec3f(fb1HueAttenuate,fb1SaturationAttenuate,fb1BrightAttenuate));
 	shader1.setUniform3f("fb1HSBPowmap",ofVec3f(fb1HuePowmap,fb1SaturationPowmap,fb1BrightPowmap));
 	shader1.setUniform1f("fb1HueShaper",fb1HueShaper);
-	
+
 	if(gui->fb1Color1[10]>0){
 		fb1PosterizeSwitch=1;
 	}
 	shader1.setUniform1f("fb1Posterize",fb1Posterize);
 	shader1.setUniform1f("fb1PosterizeInvert",fb1PosterizeInvert);
 	shader1.setUniform1i("fb1PosterizeSwitch",fb1PosterizeSwitch);
-	
+
 	shader1.setUniform1i("fb1HueInvert",gui->fb1HueInvert);
 	shader1.setUniform1i("fb1SaturationInvert",gui->fb1SaturationInvert);
 	shader1.setUniform1i("fb1BrightInvert",gui->fb1BrightInvert);
-	
-	
+
+
 	//fb1 filters
 	shader1.setUniform1f("fb1BlurAmount",fb1BlurAmount);
 	shader1.setUniform1f("fb1BlurRadius",fb1BlurRadius);
@@ -1032,17 +1032,17 @@ void ofApp::draw(){
 	shader1.setUniform1f("fb1TemporalFilter2Amount",fb1TemporalFilter2Amount);
 	shader1.setUniform1f("fb1TemporalFilter2Resonance",fb1TemporalFilter2Resonance);
 	shader1.setUniform1f("fb1FiltersBoost",fb1FiltersBoost);
-	
-	
+
+
 	shader1.end();
 
-	
+
     // Switch to perspective for 3D geometry drawing
-    if(gui->block1LineSwitch==1 || gui->block1SevenStarSwitch==1 || 
+    if(gui->block1LineSwitch==1 || gui->block1SevenStarSwitch==1 ||
        gui->block1LissaBallSwitch==1 || gui->block1HypercubeSwitch==1){
         ofSetupScreenPerspective(framebuffer1.getWidth(), framebuffer1.getHeight());
     }
-    
+
     if(gui->block1LineSwitch==1){
     	line_draw();
     }
@@ -1056,7 +1056,7 @@ void ofApp::draw(){
         hypercube_draw();
     }
 	framebuffer1.end();
-	
+
 	// Spout send for Block 1
 	if(gui->spoutSendBlock1){
 		glFlush();
@@ -1066,7 +1066,7 @@ void ofApp::draw(){
 		spoutSendFbo1.end();
 		spoutSenderBlock1.send(spoutSendFbo1.getTexture());
 	}
-	
+
 	// NDI send for Block 1
 	if(gui->ndiSendBlock1){
 		if(!ndiSender1Active) {
@@ -1082,47 +1082,47 @@ void ofApp::draw(){
 		ndiSenderBlock1.ReleaseSender();
 		ndiSender1Active = false;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
 	//BLOCK_2
-	
+
 	framebuffer2.begin();
 	// Explicitly set up viewport and projection for current FBO size
 	ofViewport(0, 0, framebuffer2.getWidth(), framebuffer2.getHeight());
 	ofSetupScreenOrtho(framebuffer2.getWidth(), framebuffer2.getHeight());
 	shader2.begin();
-	
+
 	shader2.setUniform1f("width",internalWidth);
 	shader2.setUniform1f("height",internalHeight);
 	shader2.setUniform1f("inverseWidth",1.0f/internalWidth);
 	shader2.setUniform1f("inverseHeight",1.0f/internalHeight);
-	
+
 	// Input resolution uniforms for block2 input processing
 	shader2.setUniform1f("input1Width", (float)input1Width);
 	shader2.setUniform1f("input1Height", (float)input1Height);
 	shader2.setUniform1f("inverseWidth1",1.0f/input1Width);
 	shader2.setUniform1f("inverseHeight1",1.0f/input1Height);
-	
+
 	int fb2DelayTimeMacroBuffer=int((pastFramesSize-1.0)*(gui->fb2DelayTimeMacroBuffer));
 	int fb2DelayTime_d=(gui->fb2DelayTime)+fb2DelayTimeMacroBuffer;
-	
+
 	//draw pastframes2
 	int pastFrames2Index =  (abs(pastFramesOffset - pastFramesSize - (fb2DelayTime_d) + 1) % pastFramesSize);
 	pastFrames2[pastFrames2Index].draw(0, 0, internalWidth, internalHeight);
 	//send the temporal filter
 	int fb2TemporalFilterIndex = (abs(pastFramesOffset - pastFramesSize + 1) % pastFramesSize);
 	shader2.setUniformTexture("fb2TemporalFilter", pastFrames2[fb2TemporalFilterIndex].getTexture(), 5);
-	
+
 	bool block2InputMasterSwitch=0;
 	float block2InputWidth=internalWidth;
 	float block2InputHeight=internalHeight;
@@ -1133,9 +1133,9 @@ void ofApp::draw(){
 	if(gui->block2InputSelect==0){
 		ratio=1.0;
 		shader2.setUniformTexture("block2InputTex",framebuffer1.getTexture(),6);
-		
+
 	}
-	
+
 	if(gui->block2InputSelect==1){
 		ratio=input1.getWidth()/ofGetWidth();
 		block2InputMasterSwitch=1;
@@ -1150,9 +1150,9 @@ void ofApp::draw(){
 			shader2.setUniformTexture("block2InputTex",spoutFbo1.getTexture(),6);
 		}
 		// Inputs are now pre-scaled to internal resolution
-		
+
 	}
-	
+
 	if(gui->block2InputSelect==2){
 		ratio=input2.getWidth()/ofGetWidth();
 		block2InputMasterSwitch=1;
@@ -1168,7 +1168,7 @@ void ofApp::draw(){
 		}
 		// Inputs are now pre-scaled to internal resolution
 	}
-	
+
 	shader2.setUniform1f("ratio",ratio);
 	shader2.setUniform1i("block2InputMasterSwitch",block2InputMasterSwitch);
 	shader2.setUniform1f("block2InputWidth",block2InputWidth);
@@ -1189,21 +1189,21 @@ void ofApp::draw(){
 		block2InputHdZCrib=0;  // No zoom crib needed
 	}
 
-	
-	
-	
+
+
+
 	bool block2InputHdAspectOn=0;
 	if(gui->block2InputAspectRatioSwitch==1){
 		block2InputHdAspectOn=1;
 	}
 	shader2.setUniform1i("block2InputHdAspectOn",block2InputHdAspectOn);
 	shader2.setUniform2f("block2InputHdAspectXYFix",ofVec2f(ch1HdAspectXFix,ch1HdAspectYFix));
-	
+
 	shader2.setUniform1f("block2InputScaleFix",block2InputScaleFix);
 	shader2.setUniform1f("block2InputHdZCrib",block2InputHdZCrib);
 	shader2.setUniform1f("block2InputCribX",block2InputCribX);
 	shader2.setUniform1f("block2InputAspectRatio",block2InputAspectRatio);
-	
+
 	shader2.setUniform2f("block2InputXYDisplace",ofVec2f(block2InputXDisplace,block2InputYDisplace));
 	//remapping z
 	//but maybe not anymore
@@ -1230,7 +1230,7 @@ void ofApp::draw(){
 	shader2.setUniform1f("block2InputSharpenAmount",block2InputSharpenAmount);
 	shader2.setUniform1f("block2InputSharpenRadius",block2InputSharpenRadius);
 	shader2.setUniform1f("block2InputFiltersBoost",block2InputFiltersBoost);
-	
+
 	shader2.setUniform1i("block2InputGeoOverflow",gui->block2InputGeoOverflow);
 	shader2.setUniform1i("block2InputHMirror",gui->block2InputHMirror);
 	shader2.setUniform1i("block2InputVMirror",gui->block2InputVMirror);
@@ -1241,9 +1241,9 @@ void ofApp::draw(){
 	shader2.setUniform1i("block2InputBrightInvert",gui->block2InputBrightInvert);
 	shader2.setUniform1i("block2InputRGBInvert",gui->block2InputRGBInvert);
 	shader2.setUniform1i("block2InputSolarize",gui->block2InputSolarize);
-		
+
 	//fb2 parameters
-	//fb2mixnkey	
+	//fb2mixnkey
 	shader2.setUniform1f("fb2MixAmount",fb2MixAmount);
 	shader2.setUniform3f("fb2KeyValue",ofVec3f(fb2KeyValueRed,fb2KeyValueGreen,fb2KeyValueBlue));
 	shader2.setUniform1f("fb2KeyThreshold",fb2KeyThreshold);
@@ -1258,31 +1258,31 @@ void ofApp::draw(){
 	shader2.setUniform4f("fb2ShearMatrix",ofVec4f(fb2ShearMatrix1, fb2ShearMatrix2, fb2ShearMatrix3, fb2ShearMatrix4) );
 	shader2.setUniform1f("fb2KaleidoscopeAmount",fb2KaleidoscopeAmount);
 	shader2.setUniform1f("fb2KaleidoscopeSlice",fb2KaleidoscopeSlice);
-		
+
 	shader2.setUniform1i("fb2HMirror",gui->fb2HMirror);
 	shader2.setUniform1i("fb2VMirror",gui->fb2VMirror);
 	shader2.setUniform1i("fb2HFlip",gui->fb2HFlip);
 	shader2.setUniform1i("fb2VFlip",gui->fb2VFlip);
 	shader2.setUniform1i("fb2RotateMode",gui->fb2RotateMode);
 	shader2.setUniform1i("fb2GeoOverflow",gui->fb2GeoOverflow);
-	
+
 	shader2.setUniform3f("fb2HSBOffset",ofVec3f(fb2HueOffset,fb2SaturationOffset,fb2BrightOffset));
 	shader2.setUniform3f("fb2HSBAttenuate",ofVec3f(fb2HueAttenuate,fb2SaturationAttenuate,fb2BrightAttenuate));
 	shader2.setUniform3f("fb2HSBPowmap",ofVec3f(fb2HuePowmap,fb2SaturationPowmap,fb2BrightPowmap));
 	shader2.setUniform1f("fb2HueShaper",fb2HueShaper);
-	
+
 	if(gui->fb2Color1[10]>0){
 		fb2PosterizeSwitch=1;
 	}
 	shader2.setUniform1f("fb2Posterize",fb2Posterize);
 	shader2.setUniform1f("fb2PosterizeInvert",fb2PosterizeInvert);
 	shader2.setUniform1i("fb2PosterizeSwitch",fb2PosterizeSwitch);
-	
+
 	shader2.setUniform1i("fb2HueInvert",gui->fb2HueInvert);
 	shader2.setUniform1i("fb2SaturationInvert",gui->fb2SaturationInvert);
 	shader2.setUniform1i("fb2BrightInvert",gui->fb2BrightInvert);
-	
-	
+
+
 	//fb2 filters
 	shader2.setUniform1f("fb2BlurAmount",fb2BlurAmount);
 	shader2.setUniform1f("fb2BlurRadius",fb2BlurRadius);
@@ -1293,17 +1293,17 @@ void ofApp::draw(){
 	shader2.setUniform1f("fb2TemporalFilter2Amount",fb2TemporalFilter2Amount);
 	shader2.setUniform1f("fb2TemporalFilter2Resonance",fb2TemporalFilter2Resonance);
 	shader2.setUniform1f("fb2FiltersBoost",fb2FiltersBoost);
-	
-	
+
+
 	shader2.end();
-	
-	
+
+
     // Switch to perspective for 3D geometry drawing
-    if(gui->block2LineSwitch==1 || gui->block2SevenStarSwitch==1 || 
+    if(gui->block2LineSwitch==1 || gui->block2SevenStarSwitch==1 ||
        gui->block2LissaBallSwitch==1 || gui->block2HypercubeSwitch==1){
         ofSetupScreenPerspective(framebuffer2.getWidth(), framebuffer2.getHeight());
     }
-    
+
     if(gui->block2LineSwitch==1){
     	line_draw();
     }
@@ -1327,7 +1327,7 @@ void ofApp::draw(){
 		spoutSendFbo2.end();
 		spoutSenderBlock2.send(spoutSendFbo2.getTexture());
 	}
-	
+
 	// NDI send for Block 2
 	if(gui->ndiSendBlock2){
 		if(!ndiSender2Active) {
@@ -1357,8 +1357,8 @@ void ofApp::draw(){
 
 
 
-	
-	
+
+
 	//FINAL MIX OUT
 	framebuffer3.begin();
 	// Explicitly set up viewport and projection for current FBO size
@@ -1366,15 +1366,15 @@ void ofApp::draw(){
 	ofSetupScreenOrtho(framebuffer3.getWidth(), framebuffer3.getHeight());
 	shader3.begin();
 	dummyTex.draw(0, 0, internalWidth, internalHeight);
-	
+
 	shader3.setUniformTexture("block2Output",framebuffer2.getTexture(),8);
 	shader3.setUniformTexture("block1Output",framebuffer1.getTexture(),9);
-	
+
 	shader3.setUniform1f("width",internalWidth);
 	shader3.setUniform1f("height",internalHeight);
 	shader3.setUniform1f("inverseWidth",1.0f/internalWidth);
 	shader3.setUniform1f("inverseHeight",1.0f/internalHeight);
-	
+
 	//block1geo1
 	shader3.setUniform2f("block1XYDisplace",ofVec2f(block1XDisplace,block1YDisplace));
 	//remapping z
@@ -1389,7 +1389,7 @@ void ofApp::draw(){
 		 block1ShearMatrix2, block1ShearMatrix3, block1ShearMatrix4) );
 	shader3.setUniform1f("block1KaleidoscopeAmount",block1KaleidoscopeAmount);
 	shader3.setUniform1f("block1KaleidoscopeSlice",block1KaleidoscopeSlice);
-		
+
 	shader3.setUniform1i("block1HMirror",gui->block1HMirror);
 	shader3.setUniform1i("block1VMirror",gui->block1VMirror);
 	shader3.setUniform1i("block1HFlip",gui->block1HFlip);
@@ -1400,18 +1400,18 @@ void ofApp::draw(){
 	//block1 colorize
 	shader3.setUniform1i("block1ColorizeSwitch",gui->block1ColorizeSwitch);
 	shader3.setUniform1i("block1ColorizeHSB_RGB",gui->block1ColorizeHSB_RGB);
-	
+
 	shader3.setUniform3f("block1ColorizeBand1",ofVec3f(block1ColorizeHueBand1,
 				block1ColorizeSaturationBand1,block1ColorizeBrightBand1));
 	shader3.setUniform3f("block1ColorizeBand2",ofVec3f(block1ColorizeHueBand2,
-				block1ColorizeSaturationBand2,block1ColorizeBrightBand2));			
+				block1ColorizeSaturationBand2,block1ColorizeBrightBand2));
 	shader3.setUniform3f("block1ColorizeBand3",ofVec3f(block1ColorizeHueBand3,
 				block1ColorizeSaturationBand3,block1ColorizeBrightBand3));
 	shader3.setUniform3f("block1ColorizeBand4",ofVec3f(block1ColorizeHueBand4,
 				block1ColorizeSaturationBand4,block1ColorizeBrightBand4));
 	shader3.setUniform3f("block1ColorizeBand5",ofVec3f(block1ColorizeHueBand5,
 				block1ColorizeSaturationBand5,block1ColorizeBrightBand5));
-			
+
 	//block1 filters
 	shader3.setUniform1f("block1BlurAmount",block1BlurAmount);
 	shader3.setUniform1f("block1BlurRadius",block1BlurRadius);
@@ -1421,9 +1421,9 @@ void ofApp::draw(){
 	shader3.setUniform1f("block1Dither",block1Dither);
 	bool block1DitherSwitch=0;
 	if(gui->block1Filters[5] >0){block1DitherSwitch=1;}
-	shader3.setUniform1i("block1DitherSwitch",block1DitherSwitch);	
-	
-	
+	shader3.setUniform1i("block1DitherSwitch",block1DitherSwitch);
+
+
 	//block2geo1
 	shader3.setUniform2f("block2XYDisplace",ofVec2f(block2XDisplace,block2YDisplace));
 	//remapping z
@@ -1438,7 +1438,7 @@ void ofApp::draw(){
 		 block2ShearMatrix2, block2ShearMatrix3, block2ShearMatrix4) );
 	shader3.setUniform1f("block2KaleidoscopeAmount",block2KaleidoscopeAmount);
 	shader3.setUniform1f("block2KaleidoscopeSlice",block2KaleidoscopeSlice);
-		
+
 	shader3.setUniform1i("block2HMirror",gui->block2HMirror);
 	shader3.setUniform1i("block2VMirror",gui->block2VMirror);
 	shader3.setUniform1i("block2HFlip",gui->block2HFlip);
@@ -1449,18 +1449,18 @@ void ofApp::draw(){
 	//block2 colorize
 	shader3.setUniform1i("block2ColorizeSwitch",gui->block2ColorizeSwitch);
 	shader3.setUniform1i("block2ColorizeHSB_RGB",gui->block2ColorizeHSB_RGB);
-	
+
 	shader3.setUniform3f("block2ColorizeBand1",ofVec3f(block2ColorizeHueBand1,
 				block2ColorizeSaturationBand1,block2ColorizeBrightBand1));
 	shader3.setUniform3f("block2ColorizeBand2",ofVec3f(block2ColorizeHueBand2,
-				block2ColorizeSaturationBand2,block2ColorizeBrightBand2));			
+				block2ColorizeSaturationBand2,block2ColorizeBrightBand2));
 	shader3.setUniform3f("block2ColorizeBand3",ofVec3f(block2ColorizeHueBand3,
 				block2ColorizeSaturationBand3,block2ColorizeBrightBand3));
 	shader3.setUniform3f("block2ColorizeBand4",ofVec3f(block2ColorizeHueBand4,
 				block2ColorizeSaturationBand4,block2ColorizeBrightBand4));
 	shader3.setUniform3f("block2ColorizeBand5",ofVec3f(block2ColorizeHueBand5,
 				block2ColorizeSaturationBand5,block2ColorizeBrightBand5));
-			
+
 	//block2 filters
 	shader3.setUniform1f("block2BlurAmount",block2BlurAmount);
 	shader3.setUniform1f("block2BlurRadius",block2BlurRadius);
@@ -1470,10 +1470,10 @@ void ofApp::draw(){
 	shader3.setUniform1f("block2Dither",block2Dither);
 	bool block2DitherSwitch=0;
 	if(gui->block2Filters[5] >0){block2DitherSwitch=1;}
-	shader3.setUniform1i("block2DitherSwitch",block2DitherSwitch);	
-	
-	
-		
+	shader3.setUniform1i("block2DitherSwitch",block2DitherSwitch);
+
+
+
 	//final mix parameters
 	shader3.setUniform1f("finalMixAmount",finalMixAmount);
 	shader3.setUniform3f("finalKeyValue",ofVec3f(finalKeyValueRed,finalKeyValueGreen,finalKeyValueBlue));
@@ -1482,7 +1482,7 @@ void ofApp::draw(){
 	shader3.setUniform1i("finalKeyOrder",gui->finalKeyOrder);
 	shader3.setUniform1i("finalMixType",gui->finalMixType);
 	shader3.setUniform1i("finalMixOverflow",gui->finalMixOverflow);
-	
+
 	//matrixMixer
 	shader3.setUniform1i("matrixMixType",gui->matrixMixType);
 	shader3.setUniform1i("matrixMixOverflow",gui->matrixMixOverflow);
@@ -1494,29 +1494,29 @@ void ofApp::draw(){
 											  matrixMixBgBlueIntoFgGreen) );
 	shader3.setUniform3f("bgRGBIntoFgBlue",ofVec3f(matrixMixBgRedIntoFgBlue,
 											  matrixMixBgGreenIntoFgBlue,
-											  matrixMixBgBlueIntoFgBlue) );											 
-											  
-	
-	/*			
+											  matrixMixBgBlueIntoFgBlue) );
+
+
+	/*
 				//block2 colorize
 	shader3.setUniform1i("block2ColorizeSwitch",gui->block2ColorizeSwitch);
 	shader3.setUniform1i("block2ColorizeHSB_RGB",gui->block2ColorizeHSB_RGB);
 	shader3.setUniform3f("block2ColorizeBand1",ofVec3f(block2ColorizeHueBand1,
 				block2ColorizeSaturationBand1,block2ColorizeBrightBand1));
 	shader3.setUniform3f("block2ColorizeBand2",ofVec3f(block2ColorizeHueBand2,
-				block2ColorizeSaturationBand2,block2ColorizeBrightBand2));			
+				block2ColorizeSaturationBand2,block2ColorizeBrightBand2));
 	shader3.setUniform3f("block2ColorizeBand3",ofVec3f(block2ColorizeHueBand3,
 				block2ColorizeSaturationBand3,block2ColorizeBrightBand3));
 	shader3.setUniform3f("block2ColorizeBand4",ofVec3f(block2ColorizeHueBand4,
 				block2ColorizeSaturationBand4,block2ColorizeBrightBand4));
 	shader3.setUniform3f("block2ColorizeBand5",ofVec3f(block2ColorizeHueBand5,
 				block2ColorizeSaturationBand5,block2ColorizeBrightBand5));
-	
-	*/			
-							
+
+	*/
+
 	shader3.end();
 	framebuffer3.end();
-	
+
 	// Spout send for Block 3 (final output)
 	if(gui->spoutSendBlock3){
 		glFlush();
@@ -1526,7 +1526,7 @@ void ofApp::draw(){
 		spoutSendFbo3.end();
 		spoutSenderBlock3.send(spoutSendFbo3.getTexture());
 	}
-	
+
 	// NDI send for Block 3 (final output)
 	if(gui->ndiSendBlock3){
 		if(!ndiSender3Active) {
@@ -1542,20 +1542,20 @@ void ofApp::draw(){
 		ndiSenderBlock3.ReleaseSender();
 		ndiSender3Active = false;
 	}
-	
+
 	//draw to screen - reset viewport and projection to window size
 	ofSetupScreen();
-	
-	if(gui->drawMode==0){	
+
+	if(gui->drawMode==0){
 		framebuffer1.draw(0, 0, ofGetWidth(), ofGetHeight());
 	}
-	if(gui->drawMode==1){	
+	if(gui->drawMode==1){
 		framebuffer2.draw(0, 0, ofGetWidth(), ofGetHeight());
 	}
-	if(gui->drawMode==2){	
+	if(gui->drawMode==2){
 		framebuffer3.draw(0, 0, ofGetWidth(), ofGetHeight());
 	}
-	if(gui->drawMode==3){	
+	if(gui->drawMode==3){
 		framebuffer1.draw(0, 0, ofGetWidth() / 2, ofGetHeight() / 2);
 		framebuffer2.draw(ofGetWidth() / 2, 0, ofGetWidth() / 2, ofGetHeight() / 2);
 		framebuffer3.draw(0,ofGetHeight()/2,ofGetWidth()/2, ofGetHeight()/2);
@@ -1565,32 +1565,32 @@ void ofApp::draw(){
 	pastFrames1[abs(pastFramesSize - pastFramesOffset)-1].begin();
 	framebuffer1.draw(0, 0, internalWidth, internalHeight);
 	pastFrames1[abs(pastFramesSize - pastFramesOffset)-1].end();
-	
+
 	pastFrames2[abs(pastFramesSize-pastFramesOffset)-1].begin();
     framebuffer2.draw(0, 0, internalWidth, internalHeight);
     //ofSetColor(255);
 	//ofDrawRectangle(ofGetWidth()/2,ofGetHeight()/2,ofGetWidth()/4,ofGetHeight()/4);
     pastFrames2[abs(pastFramesSize-pastFramesOffset)-1].end();
-	
+
 	pastFramesOffset++;
     pastFramesOffset=pastFramesOffset % pastFramesSize;
 
 	//inputTest();
-	
+
 	//clear the framebuffers
 	framebuffer1.begin();
 	ofClear(0,0,0,255);
 	framebuffer1.end();
-	
+
 	framebuffer2.begin();
 	ofClear(0,0,0,255);
 	framebuffer2.end();
-	
+
 	framebuffer3.begin();
 	ofClear(0,0,0,255);
 	framebuffer3.end();
-	
-	
+
+
 	if(gui->fb1FramebufferClearSwitch==1){
 		for(int i=0;i<pastFramesSize;i++){
         	pastFrames1[i].begin();
@@ -1598,7 +1598,7 @@ void ofApp::draw(){
         	pastFrames1[i].end();
         }
 	}
-	
+
 	if(gui->fb2FramebufferClearSwitch==1){
 		for(int i=0;i<pastFramesSize;i++){
         	pastFrames2[i].begin();
@@ -1613,45 +1613,45 @@ void ofApp::draw(){
 void ofApp::inputSetup(){
 	// List webcam devices
 	input1.listDevices();
-	
+
 	// Allocate webcam FBOs at INTERNAL resolution - GPU-only (no CPU access needed)
 	allocateGpuOnlyFbo(webcamFbo1, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(webcamFbo2, internalWidth, internalHeight);
-	
+
 	// Allocate NDI input FBOs at INTERNAL resolution - GPU-only
 	allocateGpuOnlyFbo(ndiFbo1, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(ndiFbo2, internalWidth, internalHeight);
-	
+
 	// Always allocate NDI textures so they're ready when needed
 	// (ofxNDI receives at native resolution, we scale into FBO)
 	ndiTexture1.allocate(1920, 1080, GL_RGBA);
 	ndiTexture2.allocate(1920, 1080, GL_RGBA);
-	
+
 	// Clear them to black
 	ofPixels blackPixels;
 	blackPixels.allocate(1920, 1080, OF_PIXELS_RGBA);
 	blackPixels.setColor(ofColor::black);
 	ndiTexture1.loadData(blackPixels);
 	ndiTexture2.loadData(blackPixels);
-	
+
 	// Allocate Spout input FBOs at INTERNAL resolution - GPU-only
 	allocateGpuOnlyFbo(spoutFbo1, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(spoutFbo2, internalWidth, internalHeight);
-	
+
 	// Initialize Spout receivers
 	spoutReceiver1.init();
 	spoutReceiver2.init();
-	
+
 	// Allocate Spout sender FBOs at spout send resolution - GPU-only (Spout uses texture sharing)
 	allocateGpuOnlyFbo(spoutSendFbo1, spoutSendWidth, spoutSendHeight);
 	allocateGpuOnlyFbo(spoutSendFbo2, spoutSendWidth, spoutSendHeight);
 	allocateGpuOnlyFbo(spoutSendFbo3, spoutSendWidth, spoutSendHeight);
-	
+
 	// Initialize Spout senders at spout send resolution
 	spoutSenderBlock1.init("GwBlock1", spoutSendWidth, spoutSendHeight, GL_RGBA);
 	spoutSenderBlock2.init("GwBlock2", spoutSendWidth, spoutSendHeight, GL_RGBA);
 	spoutSenderBlock3.init("GwBlock3", spoutSendWidth, spoutSendHeight, GL_RGBA);
-	
+
 	// Allocate NDI sender FBOs at ndi send resolution
 	// NOTE: These NEED CPU backing because NDI reads pixels back to CPU for network transmission
 	ndiSendWidth = gui->ndiSendWidth;
@@ -1659,9 +1659,9 @@ void ofApp::inputSetup(){
 	ndiSendFbo1.allocate(ndiSendWidth, ndiSendHeight, GL_RGBA);
 	ndiSendFbo2.allocate(ndiSendWidth, ndiSendHeight, GL_RGBA);
 	ndiSendFbo3.allocate(ndiSendWidth, ndiSendHeight, GL_RGBA);
-	
+
 	// NDI senders are created on-demand when enabled in GUI
-	
+
 	// Initialize Input 1 based on source type
 	if (gui->input1SourceType == 0) {
 		// Webcam
@@ -1670,7 +1670,7 @@ void ofApp::inputSetup(){
 		input1.setDesiredFrameRate(30);
 		input1.setup(input1Width, input1Height);
 	}
-	
+
 	// Initialize Input 2 based on source type
 	if (gui->input2SourceType == 0) {
 		// Webcam
@@ -1679,7 +1679,7 @@ void ofApp::inputSetup(){
 		input2.setDesiredFrameRate(30);
 		input2.setup(input2Width, input2Height);
 	}
-	
+
 	// Initial NDI source scan
 	refreshNdiSources();
 }
@@ -1708,7 +1708,7 @@ void ofApp::inputUpdate(){
 		ofViewport(0, 0, ndiFbo1.getWidth(), ndiFbo1.getHeight());
 		ofSetupScreenOrtho(ndiFbo1.getWidth(), ndiFbo1.getHeight());
 		ofClear(0, 0, 0, 255);
-		
+
 		// Simple fill - stretch to fit FBO dimensions
 		float srcW = ndiTexture1.getWidth();
 		float srcH = ndiTexture1.getHeight();
@@ -1721,12 +1721,12 @@ void ofApp::inputUpdate(){
 		if (spoutReceiver1.isInitialized()) {
 			spoutReceiver1.receive(spoutTexture1);
 		}
-		
+
 		spoutFbo1.begin();
 		ofViewport(0, 0, spoutFbo1.getWidth(), spoutFbo1.getHeight());
 		ofSetupScreenOrtho(spoutFbo1.getWidth(), spoutFbo1.getHeight());
 		ofClear(0, 0, 0, 255);
-		
+
 		// Simple fill - stretch to fit FBO dimensions
 		float srcW = spoutTexture1.getWidth();
 		float srcH = spoutTexture1.getHeight();
@@ -1735,7 +1735,7 @@ void ofApp::inputUpdate(){
 		}
 		spoutFbo1.end();
 	}
-	
+
 	// Update Input 2 based on source type
 	if (gui->input2SourceType == 0) {
 		// Webcam - update and scale into FBO at internal resolution
@@ -1758,7 +1758,7 @@ void ofApp::inputUpdate(){
 		ofViewport(0, 0, ndiFbo2.getWidth(), ndiFbo2.getHeight());
 		ofSetupScreenOrtho(ndiFbo2.getWidth(), ndiFbo2.getHeight());
 		ofClear(0, 0, 0, 255);
-		
+
 		// Simple fill - stretch to fit FBO dimensions
 		float srcW = ndiTexture2.getWidth();
 		float srcH = ndiTexture2.getHeight();
@@ -1771,12 +1771,12 @@ void ofApp::inputUpdate(){
 		if (spoutReceiver2.isInitialized()) {
 			spoutReceiver2.receive(spoutTexture2);
 		}
-		
+
 		spoutFbo2.begin();
 		ofViewport(0, 0, spoutFbo2.getWidth(), spoutFbo2.getHeight());
 		ofSetupScreenOrtho(spoutFbo2.getWidth(), spoutFbo2.getHeight());
 		ofClear(0, 0, 0, 255);
-		
+
 		// Simple fill - stretch to fit FBO dimensions
 		float srcW = spoutTexture2.getWidth();
 		float srcH = spoutTexture2.getHeight();
@@ -1790,7 +1790,7 @@ void ofApp::inputUpdate(){
 
 //--------------------------------------------------------------
 void ofApp::inputTest(){
-	
+
 	if(testSwitch1==1){
 		if (gui->input1SourceType == 0) {
 			input1.draw(0, 0);
@@ -1809,13 +1809,13 @@ void ofApp::inputTest(){
 			spoutFbo2.draw(0, 0);
 		}
 	}
-	
+
 }
 
 //--------------------------------------------------------------
 void ofApp::reinitializeInputs(){
 	ofLogNotice("Video Input") << "Reinitializing video inputs...";
-	
+
 	// Handle Input 1
 	if (gui->input1SourceType == 0) {
 		// Webcam
@@ -1855,7 +1855,7 @@ void ofApp::reinitializeInputs(){
 			spoutReceiver1.init();
 		}
 	}
-	
+
 	// Handle Input 2
 	if (gui->input2SourceType == 0) {
 		// Webcam
@@ -1895,20 +1895,20 @@ void ofApp::reinitializeInputs(){
 			spoutReceiver2.init();
 		}
 	}
-	
+
 	ofLogNotice("Video Input") << "Reinitialization complete";
 }
 
 //--------------------------------------------------------------
 void ofApp::refreshNdiSources(){
 	ofLogNotice("NDI") << "Scanning for NDI sources (this may take a moment)...";
-	
+
 	gui->ndiSourceNames.clear();
-	
+
 	// Call FindSenders to discover sources - returns the count found
 	int numFound = ndiReceiver1.FindSenders();
 	ofLogNotice("NDI") << "FindSenders found: " << numFound;
-	
+
 	// Use the return value from FindSenders as our count
 	// (GetSenderCount sometimes returns different values)
 	for (int i = 0; i < numFound; i++) {
@@ -1919,21 +1919,21 @@ void ofApp::refreshNdiSources(){
 			gui->ndiSourceNames.push_back(name);
 		}
 	}
-	
+
 	ofLogNotice("NDI") << "Total NDI sources added: " << gui->ndiSourceNames.size();
 }
 
 //---------------------------------------------------------
 void ofApp::refreshSpoutSources(){
 	ofLogNotice("Spout") << "Scanning for Spout senders...";
-	
+
 	gui->spoutSourceNames.clear();
-	
+
 	// Use a temporary SpoutReceiver to enumerate senders
 	SpoutReceiver tempReceiver;
 	int numSenders = tempReceiver.GetSenderCount();
 	ofLogNotice("Spout") << "Found " << numSenders << " Spout senders";
-	
+
 	char senderName[256];
 	for (int i = 0; i < numSenders; i++) {
 		if (tempReceiver.GetSender(i, senderName, 256)) {
@@ -1945,7 +1945,7 @@ void ofApp::refreshSpoutSources(){
 			}
 		}
 	}
-	
+
 	ofLogNotice("Spout") << "Total Spout senders added: " << gui->spoutSourceNames.size();
 }
 
@@ -1956,13 +1956,13 @@ void ofApp::framebufferSetup(){
 	allocateGpuOnlyFbo(framebuffer1, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(framebuffer2, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(framebuffer3, internalWidth, internalHeight);
-	
+
 	// pastFrames also use internal resolution - GPU-only for major RAM savings
 	for(int i=0;i<pastFramesSize;i++){
         allocateGpuOnlyFbo(pastFrames1[i], internalWidth, internalHeight);
         allocateGpuOnlyFbo(pastFrames2[i], internalWidth, internalHeight);
     }
-	
+
 }
 
 //--------------------------------------------------------------
@@ -1973,7 +1973,7 @@ void ofApp::reinitializeResolutions(){
 	ofLogNotice("Resolution") << "  Internal: " << internalWidth << "x" << internalHeight;
 	ofLogNotice("Resolution") << "  Output: " << outputWidth << "x" << outputHeight;
 	ofLogNotice("Resolution") << "  Spout Send: " << spoutSendWidth << "x" << spoutSendHeight;
-	
+
 	// Reinitialize webcams at new resolution if they're the active source
 	if (gui->input1SourceType == 0) {
 		input1.close();
@@ -1989,38 +1989,38 @@ void ofApp::reinitializeResolutions(){
 		input2.setup(input2Width, input2Height);
 		ofLogNotice("Resolution") << "  Webcam 2 reinitialized at " << input2Width << "x" << input2Height;
 	}
-	
+
 	// Reallocate webcam FBOs at internal resolution - GPU-only
 	allocateGpuOnlyFbo(webcamFbo1, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(webcamFbo2, internalWidth, internalHeight);
-	
+
 	// Reallocate main framebuffers at internal resolution - GPU-only
 	allocateGpuOnlyFbo(framebuffer1, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(framebuffer2, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(framebuffer3, internalWidth, internalHeight);
-	
+
 	// Reallocate dummyTex at internal resolution
 	dummyTex.allocate(internalWidth, internalHeight, GL_RGBA);
-	
+
 	// Reallocate pastFrames at internal resolution - GPU-only for major RAM savings
 	for(int i=0; i<pastFramesSize; i++){
 		allocateGpuOnlyFbo(pastFrames1[i], internalWidth, internalHeight);
 		allocateGpuOnlyFbo(pastFrames2[i], internalWidth, internalHeight);
 	}
-	
+
 	// Reallocate NDI input FBOs at INTERNAL resolution - GPU-only
 	allocateGpuOnlyFbo(ndiFbo1, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(ndiFbo2, internalWidth, internalHeight);
-	
+
 	// Reallocate Spout input FBOs at INTERNAL resolution - GPU-only
 	allocateGpuOnlyFbo(spoutFbo1, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(spoutFbo2, internalWidth, internalHeight);
-	
+
 	// Reallocate Spout send FBOs at spout send resolution - GPU-only (Spout uses texture sharing)
 	allocateGpuOnlyFbo(spoutSendFbo1, spoutSendWidth, spoutSendHeight);
 	allocateGpuOnlyFbo(spoutSendFbo2, spoutSendWidth, spoutSendHeight);
 	allocateGpuOnlyFbo(spoutSendFbo3, spoutSendWidth, spoutSendHeight);
-	
+
 	// Reallocate NDI send FBOs at ndi send resolution
 	// NOTE: These NEED CPU backing because NDI reads pixels back to CPU for network transmission
 	ndiSendWidth = gui->ndiSendWidth;
@@ -2037,7 +2037,7 @@ void ofApp::reinitializeResolutions(){
 	ndiSendFbo3.begin();
 	ofClear(0,0,0,255);
 	ndiSendFbo3.end();
-	
+
 	// Update NDI senders with new resolution (only if active)
 	if(ndiSender1Active) {
 		ndiSenderBlock1.UpdateSender(ndiSendWidth, ndiSendHeight);
@@ -2048,27 +2048,27 @@ void ofApp::reinitializeResolutions(){
 	if(ndiSender3Active) {
 		ndiSenderBlock3.UpdateSender(ndiSendWidth, ndiSendHeight);
 	}
-	
+
 	ofLogNotice("Resolution") << "Resolution reinitialization complete";
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-	
+
 	// Keyboard shortcuts for output window control
 	// F11 - Toggle fullscreen
 	// F10 - Toggle window decorations (borders/title bar)
-	
+
 	if (key == OF_KEY_F11 && mainWindow) {
 		ofLogNotice("ofApp") << "Toggling fullscreen (F11)";
 		mainWindow->toggleFullscreen();
 	}
-	
+
 	if (key == OF_KEY_F10 && mainWindow) {
 		static bool decorated = true;
 		decorated = !decorated;
 		ofLogNotice("ofApp") << "Toggling window decorations (F10): " << (decorated ? "ON" : "OFF");
-		
+
 		// Get GLFW window handle
 		GLFWwindow* glfwWindow = static_cast<ofAppGLFWWindow*>(mainWindow.get())->getGLFWWindow();
 		if (glfwWindow) {
@@ -2076,17 +2076,17 @@ void ofApp::keyPressed(int key){
 			int xpos, ypos, width, height;
 			glfwGetWindowPos(glfwWindow, &xpos, &ypos);
 			glfwGetWindowSize(glfwWindow, &width, &height);
-			
+
 			// Set window hint and recreate window attributes
 			glfwSetWindowAttrib(glfwWindow, GLFW_DECORATED, decorated ? GLFW_TRUE : GLFW_FALSE);
-			
+
 			// Note: GLFW may require window recreation for decoration changes
 			// If the above doesn't work immediately, the window may need to be hidden/shown
 			glfwHideWindow(glfwWindow);
 			glfwShowWindow(glfwWindow);
 		}
 	}
-	
+
 	if (key == 'h' || key == 'H') {
 		ofLogNotice("ofApp") << "=== Gravity Waaaves Keyboard Shortcuts ===";
 		ofLogNotice("ofApp") << "F11 - Toggle fullscreen on output window";
@@ -2096,7 +2096,7 @@ void ofApp::keyPressed(int key){
 
 	if(key=='1'){testSwitch1=1;}
 	if(key=='2'){testSwitch1=2;}
-	
+
 	/*
 	if(key=='a'){ch1HdAspectXFix+=.001; cout<<"Xfix: "<< ch1HdAspectXFix<<endl;}
 	if(key=='z'){ch1HdAspectXFix-=.001; cout<<"Xfix: "<< ch1HdAspectXFix<<endl;}
@@ -2114,42 +2114,42 @@ void ofApp::keyReleased(int key){
 void ofApp::line_draw(){
 	ofVec3f linePosition1;
 	ofVec3f linePosition2;
-	
+
 	line_theta+=.01;
 	line_phi+=.013;
 	line_eta+=.0079;
-	
+
 	ofPushMatrix();
 	ofTranslate(outputWidth/2+outputHeight/8.0f*(cos(line_theta)),outputHeight/2+outputHeight/8.0f*(cos(line_eta)));
 	linePosition1.x=outputWidth/16.0f;
 	linePosition1.y=outputHeight/16.0f;
 	linePosition1.z=0;
-	
+
 	linePosition2.x=-outputWidth/16.0f;
 	linePosition2.y=-outputHeight/16.0f;
 	linePosition2.z=0;
-	
+
 	ofRotateZRad(line_theta);
 	ofRotateXRad(line_eta);
 	ofRotateYRad(line_phi);
-	
+
 	ofSetColor( 180.0f+63.0f*( sin(line_eta) ),127.0f+127.0f*( sin(line_theta) ),180.0f+63.0f*( sin(line_phi) ) );
-	
+
 	ofDrawLine(linePosition1,linePosition2);
 	ofPopMatrix();
 }
 
 //--------------------------
 void ofApp::hypercube_draw(){
-    
+
     int limit=3;
     for(int i=0;i<limit;i++){
         hypercube_theta+=.1*gui->hypercube_theta_rate;
-        
+
         hypercube_phi+=.1*gui->hypercube_phi_rate;
-        
+
         hypercube_r=outputWidth/32.0f*(gui->hypercube_size);
-        
+
         float xr=hypercube_r*(1);
         hypercube_x[0]=xr*(cos(hypercube_theta)-sin(hypercube_theta))*(1-.5*(cos(hypercube_phi)));
         hypercube_x[1]=xr*(cos(hypercube_theta)+sin(hypercube_theta))*(1-.5*(cos(PI/4+hypercube_phi)));
@@ -2159,7 +2159,7 @@ void ofApp::hypercube_draw(){
         hypercube_x[5]=xr*(cos(hypercube_theta)+sin(hypercube_theta))*(1-.5*(cos(5*PI/4+hypercube_phi)));
         hypercube_x[6]=xr*(-cos(hypercube_theta)+sin(hypercube_theta))*(1-.5*(cos(3*PI/2+hypercube_phi)));
         hypercube_x[7]=xr*(-cos(hypercube_theta)-sin(hypercube_theta))*(1-.5*(cos(7*PI/4+hypercube_phi)));
-        
+
         float yr=hypercube_r*(1);
         hypercube_y[0]=yr*(sin(hypercube_theta)+cos(hypercube_theta))*(1-.5*(cos(hypercube_phi)));
         hypercube_y[1]=yr*(sin(hypercube_theta)-cos(hypercube_theta))*(1-.5*(cos(PI/4+hypercube_phi)));
@@ -2169,7 +2169,7 @@ void ofApp::hypercube_draw(){
         hypercube_y[5]=yr*(sin(hypercube_theta)-cos(hypercube_theta))*(1-.5*(cos(5*PI/4+hypercube_phi)));
         hypercube_y[6]=yr*(-sin(hypercube_theta)-cos(hypercube_theta))*(1-.5*(cos(3*PI/2+hypercube_phi)));
         hypercube_y[7]=yr*(-sin(hypercube_theta)+cos(hypercube_theta))*(1-.5*(cos(7*PI/4+hypercube_phi)));
-        
+
         float zr=hypercube_r*(1);
         hypercube_z[0]=-zr/2*cos(hypercube_phi)+hypercube_r;
         hypercube_z[1]=-zr/2*cos(PI/4+hypercube_phi)+hypercube_r;
@@ -2179,8 +2179,8 @@ void ofApp::hypercube_draw(){
         hypercube_z[5]=-zr/2*cos(5*PI/4+hypercube_phi)+hypercube_r;
         hypercube_z[6]=-zr/2*cos(3*PI/2+hypercube_phi)+hypercube_r;
         hypercube_z[7]=-zr/2*cos(7*PI/8+hypercube_phi)+hypercube_r;
-        
-        
+
+
         hypercube_color_theta+=.01;
         ofSetColor(127+127*sin(hypercube_color_theta),0+192*abs(cos(hypercube_color_theta*.2)),127+127*cos(hypercube_color_theta/3.0f));
         ofNoFill();
@@ -2190,12 +2190,12 @@ void ofApp::hypercube_draw(){
         ofRotateZRad(hypercube_phi);
         ofRotateXRad(hypercube_theta/3);
         ofRotateXRad(hypercube_theta/5);
-        
+
         //list up the vertexes, give them some kind of grouping and
         //set up a set of 3 rotatios for each
         //i think just pick like an inner cube and an outer cube
         //if thats even possible
-        
+
         ofDrawLine(hypercube_x[0],hypercube_y[0],hypercube_z[0],hypercube_x[1],hypercube_y[1],hypercube_z[1]);
         ofDrawLine(hypercube_x[1],hypercube_y[1],hypercube_z[1],hypercube_x[2],hypercube_y[2],hypercube_z[2]);
         ofDrawLine(hypercube_x[2],hypercube_y[2],hypercube_z[2],hypercube_x[3],hypercube_y[3],hypercube_z[3]);
@@ -2204,7 +2204,7 @@ void ofApp::hypercube_draw(){
         ofDrawLine(hypercube_x[5],hypercube_y[5],hypercube_z[5],hypercube_x[6],hypercube_y[6],hypercube_z[6]);
         ofDrawLine(hypercube_x[6],hypercube_y[6],hypercube_z[6],hypercube_x[7],hypercube_y[7],hypercube_z[7]);
         ofDrawLine(hypercube_x[7],hypercube_y[7],hypercube_z[7],hypercube_x[0],hypercube_y[0],hypercube_z[0]);
-        
+
         ofDrawLine(hypercube_x[0],hypercube_y[0],-hypercube_z[0],hypercube_x[1],hypercube_y[1],-hypercube_z[1]);
         ofDrawLine(hypercube_x[1],hypercube_y[1],-hypercube_z[1],hypercube_x[2],hypercube_y[2],-hypercube_z[2]);
         ofDrawLine(hypercube_x[2],hypercube_y[2],-hypercube_z[2],hypercube_x[3],hypercube_y[3],-hypercube_z[3]);
@@ -2213,7 +2213,7 @@ void ofApp::hypercube_draw(){
         ofDrawLine(hypercube_x[5],hypercube_y[5],-hypercube_z[5],hypercube_x[6],hypercube_y[6],-hypercube_z[6]);
         ofDrawLine(hypercube_x[6],hypercube_y[6],-hypercube_z[6],hypercube_x[7],hypercube_y[7],-hypercube_z[7]);
         ofDrawLine(hypercube_x[7],hypercube_y[7],-hypercube_z[7],hypercube_x[0],hypercube_y[0],-hypercube_z[0]);
-        
+
         ofDrawLine(hypercube_x[0],hypercube_y[0],hypercube_z[0],hypercube_x[0],hypercube_y[0],-hypercube_z[0]);
         ofDrawLine(hypercube_x[1],hypercube_y[1],hypercube_z[1],hypercube_x[1],hypercube_y[1],-hypercube_z[1]);
         ofDrawLine(hypercube_x[2],hypercube_y[2],hypercube_z[2],hypercube_x[2],hypercube_y[2],-hypercube_z[2]);
@@ -2222,19 +2222,19 @@ void ofApp::hypercube_draw(){
         ofDrawLine(hypercube_x[5],hypercube_y[5],hypercube_z[5],hypercube_x[5],hypercube_y[5],-hypercube_z[5]);
         ofDrawLine(hypercube_x[6],hypercube_y[6],hypercube_z[6],hypercube_x[6],hypercube_y[6],-hypercube_z[6]);
         ofDrawLine(hypercube_x[7],hypercube_y[7],hypercube_z[7],hypercube_x[7],hypercube_y[7],-hypercube_z[7]);
-        
+
         ofDrawLine(hypercube_x[0],hypercube_y[0],-hypercube_z[0],hypercube_x[4],hypercube_y[4],-hypercube_z[4]);
         ofDrawLine(hypercube_x[1],hypercube_y[1],-hypercube_z[1],hypercube_x[5],hypercube_y[5],-hypercube_z[5]);
         ofDrawLine(hypercube_x[2],hypercube_y[2],-hypercube_z[2],hypercube_x[6],hypercube_y[6],-hypercube_z[6]);
         ofDrawLine(hypercube_x[3],hypercube_y[3],-hypercube_z[3],hypercube_x[7],hypercube_y[7],-hypercube_z[7]);
-        
+
         ofDrawLine(hypercube_x[0],hypercube_y[0],hypercube_z[0],hypercube_x[4],hypercube_y[4],hypercube_z[4]);
         ofDrawLine(hypercube_x[1],hypercube_y[1],hypercube_z[1],hypercube_x[5],hypercube_y[5],hypercube_z[5]);
         ofDrawLine(hypercube_x[2],hypercube_y[2],hypercube_z[2],hypercube_x[6],hypercube_y[6],hypercube_z[6]);
         ofDrawLine(hypercube_x[3],hypercube_y[3],hypercube_z[3],hypercube_x[7],hypercube_y[7],hypercube_z[7]);
-                
+
         ofPopMatrix();
-        
+
     }//endifor
     ofFill();
 }
@@ -2332,7 +2332,7 @@ void ofApp::drawSpiralEllipse() {
 
 	spiralTheta3 -= spiralTheta3Inc;
 	spiralRadius3 += radius3Inc;
-	
+
 
 	float x1 = spiralRadius1 * .5*(sin(spiralTheta1 - .001*sin(.01*spiralTheta2)) + cos(spiralTheta3) );
 	float y1 = spiralRadius1 * .5*(cos(spiralTheta1-.001*cos(.01*spiralTheta3) + sin(spiralTheta3)) );
@@ -2342,9 +2342,9 @@ void ofApp::drawSpiralEllipse() {
 
 	float x3 = spiralRadius3 * sin(spiralTheta3);
 	float y3 = spiralRadius3 * cos(spiralTheta3);
-	
+
 	float size = (outputHeight / 64)+22*abs((x1+y1)/((outputWidth/2+outputHeight/2)));
-	
+
 	ofPushMatrix();
 	ofTranslate(outputWidth / 2, outputHeight / 2);
 	/*
@@ -2402,7 +2402,7 @@ void ofApp::setupOsc() {
     oscReceiver.setup(gui->oscReceivePort);
     oscSender.setup(gui->oscSendIP, gui->oscSendPort);
     oscEnabled = gui->oscEnabled;
-    
+
     ofLogNotice("OSC") << "OSC initialized - Enabled: " << oscEnabled;
     ofLogNotice("OSC") << "Receiving on port: " << gui->oscReceivePort;
     ofLogNotice("OSC") << "Sending to: " << gui->oscSendIP << ":" << gui->oscSendPort;
@@ -2412,26 +2412,26 @@ void ofApp::setupOsc() {
 //--------------------------------------------------------------
 void ofApp::processOscMessages() {
     if (!oscEnabled || !gui->oscEnabled) return;
-    
+
     // Skip processing if paused (during sendAll)
     if (gui->oscReceivePaused) return;
-    
+
     while(oscReceiver.hasWaitingMessages()) {
         ofxOscMessage m;
         oscReceiver.getNextMessage(m);
-        
+
         string address = m.getAddress();
         float value = m.getArgAsFloat(0);
-        
+
         ofLogNotice("OSC") << "Received: " << address << " = " << value;
-        
+
         // Try registry lookup first (handles all registered parameters)
         auto it = gui->oscAddressMap.find(address);
         if (it != gui->oscAddressMap.end()) {
             it->second->setValueFromFloat(value);
             continue;  // Found in registry, skip the helper functions
         }
-        
+
         // Fallback to helper functions for any unregistered parameters
         if (processOscBlock1(address, value, m)) continue;
         if (processOscBlock2(address, value, m)) continue;
@@ -2465,7 +2465,7 @@ bool ofApp::processOscBlock1(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block1/ch1/sharpenAmount") gui->ch1Adjust[12] = value;
     else if (address == "/gravity/block1/ch1/sharpenRadius") gui->ch1Adjust[13] = value;
     else if (address == "/gravity/block1/ch1/filtersBoost") gui->ch1Adjust[14] = value;
-    
+
     // BLOCK 1 - Channel 1 Adjust LFO (16 parameters)
     else if (address == "/gravity/block1/ch1/lfo/xDisplaceAmp") gui->ch1AdjustLfo[0] = value;
     else if (address == "/gravity/block1/ch1/lfo/xDisplaceRate") gui->ch1AdjustLfo[1] = value;
@@ -2483,7 +2483,7 @@ bool ofApp::processOscBlock1(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block1/ch1/lfo/saturationOffsetRate") gui->ch1AdjustLfo[11] = value;
     else if (address == "/gravity/block1/ch1/lfo/brightOffsetAmp") gui->ch1AdjustLfo[12] = value;
     else if (address == "/gravity/block1/ch1/lfo/brightOffsetRate") gui->ch1AdjustLfo[13] = value;
-    
+
     // BLOCK 1 - Channel 2 Mix and Key (7 parameters)
     else if (address == "/gravity/block1/ch2/mixAmount") gui->ch2MixAndKey[0] = value;
     else if (address == "/gravity/block1/ch2/keyThreshold") gui->ch2MixAndKey[4] = value;
@@ -2491,7 +2491,7 @@ bool ofApp::processOscBlock1(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block1/ch2/keyBlue") gui->ch2MixAndKey[3] = value;
     else if (address == "/gravity/block1/ch2/keyRed") gui->ch2MixAndKey[1] = value;
     else if (address == "/gravity/block1/ch2/keyGreen") gui->ch2MixAndKey[2] = value;
-    
+
     // BLOCK 1 - Channel 2 Mix and Key LFO (6 parameters)
     else if (address == "/gravity/block1/ch2/lfo/mixAmountAmp") gui->ch2MixAndKeyLfo[0] = value;
     else if (address == "/gravity/block1/ch2/lfo/mixAmountRate") gui->ch2MixAndKeyLfo[1] = value;
@@ -2499,7 +2499,7 @@ bool ofApp::processOscBlock1(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block1/ch2/lfo/keyThresholdRate") gui->ch2MixAndKeyLfo[3] = value;
     else if (address == "/gravity/block1/ch2/lfo/keySoftAmp") gui->ch2MixAndKeyLfo[4] = value;
     else if (address == "/gravity/block1/ch2/lfo/keySoftRate") gui->ch2MixAndKeyLfo[5] = value;
-    
+
     // BLOCK 1 - Channel 2 Adjust (15 parameters)
     else if (address == "/gravity/block1/ch2/xDisplace") gui->ch2Adjust[0] = value;
     else if (address == "/gravity/block1/ch2/yDisplace") gui->ch2Adjust[1] = value;
@@ -2516,7 +2516,7 @@ bool ofApp::processOscBlock1(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block1/ch2/sharpenAmount") gui->ch2Adjust[12] = value;
     else if (address == "/gravity/block1/ch2/sharpenRadius") gui->ch2Adjust[13] = value;
     else if (address == "/gravity/block1/ch2/filtersBoost") gui->ch2Adjust[14] = value;
-    
+
     // BLOCK 1 - Channel 2 Adjust LFO (16 parameters)
     else if (address == "/gravity/block1/ch2/lfo/xDisplaceAmp") gui->ch2AdjustLfo[0] = value;
     else if (address == "/gravity/block1/ch2/lfo/xDisplaceRate") gui->ch2AdjustLfo[1] = value;
@@ -2534,7 +2534,7 @@ bool ofApp::processOscBlock1(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block1/ch2/lfo/saturationOffsetRate") gui->ch2AdjustLfo[11] = value;
     else if (address == "/gravity/block1/ch2/lfo/brightOffsetAmp") gui->ch2AdjustLfo[12] = value;
     else if (address == "/gravity/block1/ch2/lfo/brightOffsetRate") gui->ch2AdjustLfo[13] = value;
-    
+
     // BLOCK 1 - FB1 Mix and Key (6 parameters)
     else if (address == "/gravity/block1/fb1/mixAmount") gui->fb1MixAndKey[0] = value;
     else if (address == "/gravity/block1/fb1/keyThreshold") gui->fb1MixAndKey[4] = value;
@@ -2542,7 +2542,7 @@ bool ofApp::processOscBlock1(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block1/fb1/keyBlue") gui->fb1MixAndKey[3] = value;
     else if (address == "/gravity/block1/fb1/keyRed") gui->fb1MixAndKey[1] = value;
     else if (address == "/gravity/block1/fb1/keyGreen") gui->fb1MixAndKey[2] = value;
-    
+
     // BLOCK 1 - FB1 Geometry (10 parameters)
     else if (address == "/gravity/block1/fb1/xDisplace") gui->fb1Geo1[0] = value;
     else if (address == "/gravity/block1/fb1/yDisplace") gui->fb1Geo1[1] = value;
@@ -2554,7 +2554,7 @@ bool ofApp::processOscBlock1(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block1/fb1/yShear") gui->fb1Geo1[7] = value;
     else if (address == "/gravity/block1/fb1/kaleidoscopeAmount") gui->fb1Geo1[8] = value;
     else if (address == "/gravity/block1/fb1/kaleidoscopeSlice") gui->fb1Geo1[9] = value;
-    
+
     // BLOCK 1 - FB1 Color (11 parameters)
     else if (address == "/gravity/block1/fb1/hueOffset") gui->fb1Color1[0] = value;
     else if (address == "/gravity/block1/fb1/saturationOffset") gui->fb1Color1[1] = value;
@@ -2567,7 +2567,7 @@ bool ofApp::processOscBlock1(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block1/fb1/brightPowmap") gui->fb1Color1[8] = value;
     else if (address == "/gravity/block1/fb1/hueShaper") gui->fb1Color1[9] = value;
     else if (address == "/gravity/block1/fb1/posterize") gui->fb1Color1[10] = value;
-    
+
     // BLOCK 1 - FB1 Filters (9 parameters)
     else if (address == "/gravity/block1/fb1/blurAmount") gui->fb1Filters[0] = value;
     else if (address == "/gravity/block1/fb1/blurRadius") gui->fb1Filters[1] = value;
@@ -2578,7 +2578,7 @@ bool ofApp::processOscBlock1(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block1/fb1/temp2Amount") gui->fb1Filters[6] = value;
     else if (address == "/gravity/block1/fb1/temp2q") gui->fb1Filters[7] = value;
     else if (address == "/gravity/block1/fb1/filtersBoost") gui->fb1Filters[8] = value;
-    
+
     else return false;
     return true;
 }
@@ -2601,7 +2601,7 @@ bool ofApp::processOscBlock2(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block2/input/sharpenAmount") gui->block2InputAdjust[12] = value;
     else if (address == "/gravity/block2/input/sharpenRadius") gui->block2InputAdjust[13] = value;
     else if (address == "/gravity/block2/input/filtersBoost") gui->block2InputAdjust[14] = value;
-    
+
     // BLOCK 2 - FB2 Mix and Key (6 parameters)
     else if (address == "/gravity/block2/fb2/mixAmount") gui->fb2MixAndKey[0] = value;
     else if (address == "/gravity/block2/fb2/keyThreshold") gui->fb2MixAndKey[4] = value;
@@ -2609,7 +2609,7 @@ bool ofApp::processOscBlock2(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block2/fb2/keyBlue") gui->fb2MixAndKey[3] = value;
     else if (address == "/gravity/block2/fb2/keyRed") gui->fb2MixAndKey[1] = value;
     else if (address == "/gravity/block2/fb2/keyGreen") gui->fb2MixAndKey[2] = value;
-    
+
     // BLOCK 2 - FB2 Geometry (10 parameters)
     else if (address == "/gravity/block2/fb2/xDisplace") gui->fb2Geo1[0] = value;
     else if (address == "/gravity/block2/fb2/yDisplace") gui->fb2Geo1[1] = value;
@@ -2621,7 +2621,7 @@ bool ofApp::processOscBlock2(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block2/fb2/yShear") gui->fb2Geo1[7] = value;
     else if (address == "/gravity/block2/fb2/kaleidoscopeAmount") gui->fb2Geo1[8] = value;
     else if (address == "/gravity/block2/fb2/kaleidoscopeSlice") gui->fb2Geo1[9] = value;
-    
+
     // BLOCK 2 - FB2 Color (11 parameters)
     else if (address == "/gravity/block2/fb2/hueOffset") gui->fb2Color1[0] = value;
     else if (address == "/gravity/block2/fb2/saturationOffset") gui->fb2Color1[1] = value;
@@ -2634,7 +2634,7 @@ bool ofApp::processOscBlock2(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block2/fb2/brightPowmap") gui->fb2Color1[8] = value;
     else if (address == "/gravity/block2/fb2/hueShaper") gui->fb2Color1[9] = value;
     else if (address == "/gravity/block2/fb2/posterize") gui->fb2Color1[10] = value;
-    
+
     // BLOCK 2 - FB2 Filters (9 parameters)
     else if (address == "/gravity/block2/fb2/blurAmount") gui->fb2Filters[0] = value;
     else if (address == "/gravity/block2/fb2/blurRadius") gui->fb2Filters[1] = value;
@@ -2645,7 +2645,7 @@ bool ofApp::processOscBlock2(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block2/fb2/temp2Amount") gui->fb2Filters[6] = value;
     else if (address == "/gravity/block2/fb2/temp2q") gui->fb2Filters[7] = value;
     else if (address == "/gravity/block2/fb2/filtersBoost") gui->fb2Filters[8] = value;
-    
+
     else return false;
     return true;
 }
@@ -2663,7 +2663,7 @@ bool ofApp::processOscBlock3(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block3/b1/yShear") gui->block1Geo[7] = value;
     else if (address == "/gravity/block3/b1/kaleidoscopeAmount") gui->block1Geo[8] = value;
     else if (address == "/gravity/block3/b1/kaleidoscopeSlice") gui->block1Geo[9] = value;
-    
+
     // BLOCK 3 - Block 1 Colorize (15 parameters)
     else if (address == "/gravity/block3/b1/colorize/hueBand1") gui->block1Colorize[0] = value;
     else if (address == "/gravity/block3/b1/colorize/saturationBand1") gui->block1Colorize[1] = value;
@@ -2680,14 +2680,14 @@ bool ofApp::processOscBlock3(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block3/b1/colorize/hueBand5") gui->block1Colorize[12] = value;
     else if (address == "/gravity/block3/b1/colorize/saturationBand5") gui->block1Colorize[13] = value;
     else if (address == "/gravity/block3/b1/colorize/brightBand5") gui->block1Colorize[14] = value;
-    
+
     // BLOCK 3 - Block 1 Filters (5 parameters)
     else if (address == "/gravity/block3/b1/blurAmount") gui->block1Filters[0] = value;
     else if (address == "/gravity/block3/b1/blurRadius") gui->block1Filters[1] = value;
     else if (address == "/gravity/block3/b1/sharpenAmount") gui->block1Filters[2] = value;
     else if (address == "/gravity/block3/b1/sharpenRadius") gui->block1Filters[3] = value;
     else if (address == "/gravity/block3/b1/filtersBoost") gui->block1Filters[4] = value;
-    
+
     // BLOCK 3 - Block 2 Geometry (10 parameters)
     else if (address == "/gravity/block3/b2/xDisplace") gui->block2Geo[0] = value;
     else if (address == "/gravity/block3/b2/yDisplace") gui->block2Geo[1] = value;
@@ -2699,7 +2699,7 @@ bool ofApp::processOscBlock3(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block3/b2/yShear") gui->block2Geo[7] = value;
     else if (address == "/gravity/block3/b2/kaleidoscopeAmount") gui->block2Geo[8] = value;
     else if (address == "/gravity/block3/b2/kaleidoscopeSlice") gui->block2Geo[9] = value;
-    
+
     // BLOCK 3 - Block 2 Colorize (15 parameters)
     else if (address == "/gravity/block3/b2/colorize/hueBand1") gui->block2Colorize[0] = value;
     else if (address == "/gravity/block3/b2/colorize/saturationBand1") gui->block2Colorize[1] = value;
@@ -2716,14 +2716,14 @@ bool ofApp::processOscBlock3(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block3/b2/colorize/hueBand5") gui->block2Colorize[12] = value;
     else if (address == "/gravity/block3/b2/colorize/saturationBand5") gui->block2Colorize[13] = value;
     else if (address == "/gravity/block3/b2/colorize/brightBand5") gui->block2Colorize[14] = value;
-    
+
     // BLOCK 3 - Block 2 Filters (5 parameters)
     else if (address == "/gravity/block3/b2/blurAmount") gui->block2Filters[0] = value;
     else if (address == "/gravity/block3/b2/blurRadius") gui->block2Filters[1] = value;
     else if (address == "/gravity/block3/b2/sharpenAmount") gui->block2Filters[2] = value;
     else if (address == "/gravity/block3/b2/sharpenRadius") gui->block2Filters[3] = value;
     else if (address == "/gravity/block3/b2/filtersBoost") gui->block2Filters[4] = value;
-    
+
     // BLOCK 3 - Matrix Mix (9 parameters)
     else if (address == "/gravity/block3/matrixMix/b1RedToB2Red") gui->matrixMix[0] = value;
     else if (address == "/gravity/block3/matrixMix/b1RedToB2Green") gui->matrixMix[1] = value;
@@ -2734,7 +2734,7 @@ bool ofApp::processOscBlock3(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block3/matrixMix/b1BlueToB2Red") gui->matrixMix[6] = value;
     else if (address == "/gravity/block3/matrixMix/b1GreenToB2Blue") gui->matrixMix[7] = value;
     else if (address == "/gravity/block3/matrixMix/b1BlueToB2Blue") gui->matrixMix[8] = value;
-    
+
     // BLOCK 3 - Final Mix and Key (6 parameters)
     else if (address == "/gravity/block3/final/mixAmount") gui->finalMixAndKey[0] = value;
     else if (address == "/gravity/block3/final/keyThreshold") gui->finalMixAndKey[4] = value;
@@ -2742,7 +2742,7 @@ bool ofApp::processOscBlock3(const string& address, float value, const ofxOscMes
     else if (address == "/gravity/block3/final/keyInvert") gui->finalMixAndKey[3] = value;
     else if (address == "/gravity/block3/final/keyRed") gui->finalMixAndKey[1] = value;
     else if (address == "/gravity/block3/final/keyGreen") gui->finalMixAndKey[2] = value;
-    
+
     else return false;
     return true;
 }
@@ -2752,23 +2752,23 @@ bool ofApp::processOscDiscreteParams(const string& address, const ofxOscMessage&
     // BLOCK 1 - Ch1 Discrete Parameters
     if (address == "/gravity/block1/ch1/inputSelect") gui->ch1InputSelect = m.getArgAsInt(0);
     else if (address == "/gravity/block1/ch1/geoOverflow") gui->ch1GeoOverflow = m.getArgAsInt(0);
-    
+
     // BLOCK 1 - Ch2 Mix and Key Discrete Parameters
     else if (address == "/gravity/block1/ch2/inputSelect") gui->ch2InputSelect = m.getArgAsInt(0);
     else if (address == "/gravity/block1/ch2/keyOrder") gui->ch2KeyOrder = m.getArgAsInt(0);
     else if (address == "/gravity/block1/ch2/mixType") gui->ch2MixType = m.getArgAsInt(0);
     else if (address == "/gravity/block1/ch2/mixOverflow") gui->ch2MixOverflow = m.getArgAsInt(0);
     else if (address == "/gravity/block1/ch2/keyMode") gui->ch2KeyMode = m.getArgAsInt(0);
-    
+
     // BLOCK 1 - Ch2 Adjust Discrete Parameters
     else if (address == "/gravity/block1/ch2/geoOverflow") gui->ch2GeoOverflow = m.getArgAsInt(0);
-    
+
     // BLOCK 1 - FB1 Mix and Key Discrete Parameters
     else if (address == "/gravity/block1/fb1/keyOrder") gui->fb1KeyOrder = m.getArgAsInt(0);
     else if (address == "/gravity/block1/fb1/mixType") gui->fb1MixType = m.getArgAsInt(0);
     else if (address == "/gravity/block1/fb1/mixOverflow") gui->fb1MixOverflow = m.getArgAsInt(0);
     else if (address == "/gravity/block1/fb1/keyMode") gui->fb1KeyMode = m.getArgAsInt(0);
-    
+
     // BLOCK 1 - FB1 Geometry Discrete Parameters
     else if (address == "/gravity/block1/fb1/geoOverflow") gui->fb1GeoOverflow = m.getArgAsInt(0);
     else if (address == "/gravity/block1/fb1/delayTime") {
@@ -2777,17 +2777,17 @@ bool ofApp::processOscDiscreteParams(const string& address, const ofxOscMessage&
         float secDelay = (float)gui->fb1DelayTime / (float)gui->targetFPS;
         sendOscParameter("/gravity/block1/fb1/secDelay", roundf(secDelay * 100.0f) / 100.0f);
     }
-    
+
     // BLOCK 2 - Input Adjust Discrete Parameters
     else if (address == "/gravity/block2/input/inputSelect") gui->block2InputSelect = m.getArgAsInt(0);
     else if (address == "/gravity/block2/input/geoOverflow") gui->block2InputGeoOverflow = m.getArgAsInt(0);
-    
+
     // BLOCK 2 - FB2 Mix and Key Discrete Parameters
     else if (address == "/gravity/block2/fb2/keyOrder") gui->fb2KeyOrder = m.getArgAsInt(0);
     else if (address == "/gravity/block2/fb2/mixType") gui->fb2MixType = m.getArgAsInt(0);
     else if (address == "/gravity/block2/fb2/mixOverflow") gui->fb2MixOverflow = m.getArgAsInt(0);
     else if (address == "/gravity/block2/fb2/keyMode") gui->fb2KeyMode = m.getArgAsInt(0);
-    
+
     // BLOCK 2 - FB2 Geometry Discrete Parameters
     else if (address == "/gravity/block2/fb2/geoOverflow") gui->fb2GeoOverflow = m.getArgAsInt(0);
     else if (address == "/gravity/block2/fb2/delayTime") {
@@ -2796,27 +2796,27 @@ bool ofApp::processOscDiscreteParams(const string& address, const ofxOscMessage&
         float secDelay = (float)gui->fb2DelayTime / (float)gui->targetFPS;
         sendOscParameter("/gravity/block2/fb2/secDelay", roundf(secDelay * 100.0f) / 100.0f);
     }
-    
+
     // BLOCK 3 - Block 1 Geometry Discrete Parameters
     else if (address == "/gravity/block3/b1/geoOverflow") gui->block1GeoOverflow = m.getArgAsInt(0);
     else if (address == "/gravity/block3/b1/rotateMode") gui->block1RotateMode = m.getArgAsInt(0);
     else if (address == "/gravity/block3/b1/colorize/colorspace") gui->block1ColorizeHSB_RGB = m.getArgAsInt(0);
-    
+
     // BLOCK 3 - Block 2 Geometry Discrete Parameters
     else if (address == "/gravity/block3/b2/geoOverflow") gui->block2GeoOverflow = m.getArgAsInt(0);
     else if (address == "/gravity/block3/b2/rotateMode") gui->block2RotateMode = m.getArgAsInt(0);
     else if (address == "/gravity/block3/b2/colorize/colorspace") gui->block2ColorizeHSB_RGB = m.getArgAsInt(0);
-    
+
     // BLOCK 3 - Matrix Mix Discrete Parameters
     else if (address == "/gravity/block3/matrixMix/mixType") gui->matrixMixType = m.getArgAsInt(0);
     else if (address == "/gravity/block3/matrixMix/overflow") gui->matrixMixOverflow = m.getArgAsInt(0);
-    
+
     // BLOCK 3 - Final Mix and Key Discrete Parameters
     else if (address == "/gravity/block3/final/keyOrder") gui->finalKeyOrder = m.getArgAsInt(0);
     else if (address == "/gravity/block3/final/mixType") gui->finalMixType = m.getArgAsInt(0);
     else if (address == "/gravity/block3/final/overflow") gui->finalMixOverflow = m.getArgAsInt(0);
     else if (address == "/gravity/block3/final/keyMode") gui->finalKeyMode = m.getArgAsInt(0);
-    
+
     // SETTINGS - Performance
     else if (address == "/gravity/settings/fps") {
         int fps = m.getArgAsInt(0);
@@ -2825,7 +2825,7 @@ bool ofApp::processOscDiscreteParams(const string& address, const ofxOscMessage&
         gui->targetFPS = fps;
         gui->fpsChangeRequested = true;
     }
-    
+
     else return false;
     return true;
 }
@@ -2842,7 +2842,7 @@ bool ofApp::processOscBooleanParams(const string& address, const ofxOscMessage& 
     else if (address == "/gravity/block1/ch1/brightInvert") gui->ch1BrightInvert = m.getArgAsInt(0);
     else if (address == "/gravity/block1/ch1/rgbInvert") gui->ch1RGBInvert = m.getArgAsInt(0);
     else if (address == "/gravity/block1/ch1/solarize") gui->ch1Solarize = m.getArgAsInt(0);
-    
+
     // BLOCK 1 - Ch2 Adjust Boolean Parameters
     else if (address == "/gravity/block1/ch2/hMirror") gui->ch2HMirror = m.getArgAsInt(0);
     else if (address == "/gravity/block1/ch2/vMirror") gui->ch2VMirror = m.getArgAsInt(0);
@@ -2853,25 +2853,25 @@ bool ofApp::processOscBooleanParams(const string& address, const ofxOscMessage& 
     else if (address == "/gravity/block1/ch2/brightInvert") gui->ch2BrightInvert = m.getArgAsInt(0);
     else if (address == "/gravity/block1/ch2/rgbInvert") gui->ch2RGBInvert = m.getArgAsInt(0);
     else if (address == "/gravity/block1/ch2/solarize") gui->ch2Solarize = m.getArgAsInt(0);
-    
+
     // BLOCK 1 - FB1 Geometry Boolean Parameters
     else if (address == "/gravity/block1/fb1/hMirror") gui->fb1HMirror = m.getArgAsInt(0);
     else if (address == "/gravity/block1/fb1/vMirror") gui->fb1VMirror = m.getArgAsInt(0);
     else if (address == "/gravity/block1/fb1/hFlip") gui->fb1HFlip = m.getArgAsInt(0);
     else if (address == "/gravity/block1/fb1/vFlip") gui->fb1VFlip = m.getArgAsInt(0);
     else if (address == "/gravity/block1/fb1/rotateMode") gui->fb1RotateMode = m.getArgAsInt(0);
-    
+
     // BLOCK 1 - FB1 Geometrical Animations
     else if (address == "/gravity/block1/fb1/hypercube") gui->block1HypercubeSwitch = m.getArgAsInt(0);
     else if (address == "/gravity/block1/fb1/dancingLine") gui->block1LineSwitch = m.getArgAsInt(0);
     else if (address == "/gravity/block1/fb1/septagram") gui->block1SevenStarSwitch = m.getArgAsInt(0);
     else if (address == "/gravity/block1/fb1/lissajousBall") gui->block1LissaBallSwitch = m.getArgAsInt(0);
-    
+
     // BLOCK 1 - FB1 Color Boolean Parameters
     else if (address == "/gravity/block1/fb1/hueInvert") gui->fb1HueInvert = m.getArgAsInt(0);
     else if (address == "/gravity/block1/fb1/saturationInvert") gui->fb1SaturationInvert = m.getArgAsInt(0);
     else if (address == "/gravity/block1/fb1/brightInvert") gui->fb1BrightInvert = m.getArgAsInt(0);
-    
+
     // BLOCK 2 - Input Adjust Boolean Parameters
     else if (address == "/gravity/block2/input/hMirror") gui->block2InputHMirror = m.getArgAsInt(0);
     else if (address == "/gravity/block2/input/vMirror") gui->block2InputVMirror = m.getArgAsInt(0);
@@ -2882,41 +2882,41 @@ bool ofApp::processOscBooleanParams(const string& address, const ofxOscMessage& 
     else if (address == "/gravity/block2/input/brightInvert") gui->block2InputBrightInvert = m.getArgAsInt(0);
     else if (address == "/gravity/block2/input/rgbInvert") gui->block2InputRGBInvert = m.getArgAsInt(0);
     else if (address == "/gravity/block2/input/solarize") gui->block2InputSolarize = m.getArgAsInt(0);
-    
+
     // BLOCK 2 - FB2 Geometry Boolean Parameters
     else if (address == "/gravity/block2/fb2/hMirror") gui->fb2HMirror = m.getArgAsInt(0);
     else if (address == "/gravity/block2/fb2/vMirror") gui->fb2VMirror = m.getArgAsInt(0);
     else if (address == "/gravity/block2/fb2/hFlip") gui->fb2HFlip = m.getArgAsInt(0);
     else if (address == "/gravity/block2/fb2/vFlip") gui->fb2VFlip = m.getArgAsInt(0);
     else if (address == "/gravity/block2/fb2/rotateMode") gui->fb2RotateMode = m.getArgAsInt(0);
-    
+
     // BLOCK 2 - FB2 Geometrical Animations
     else if (address == "/gravity/block2/fb2/hypercube") gui->block2HypercubeSwitch = m.getArgAsInt(0);
     else if (address == "/gravity/block2/fb2/dancingLine") gui->block2LineSwitch = m.getArgAsInt(0);
     else if (address == "/gravity/block2/fb2/septagram") gui->block2SevenStarSwitch = m.getArgAsInt(0);
     else if (address == "/gravity/block2/fb2/lissajousBall") gui->block2LissaBallSwitch = m.getArgAsInt(0);
-    
+
     // BLOCK 2 - FB2 Color Boolean Parameters
     else if (address == "/gravity/block2/fb2/hueInvert") gui->fb2HueInvert = m.getArgAsInt(0);
     else if (address == "/gravity/block2/fb2/saturationInvert") gui->fb2SaturationInvert = m.getArgAsInt(0);
     else if (address == "/gravity/block2/fb2/brightInvert") gui->fb2BrightInvert = m.getArgAsInt(0);
-    
+
     // BLOCK 3 - Block 1 Geometry Boolean Parameters
     else if (address == "/gravity/block3/b1/hMirror") gui->block1HMirror = m.getArgAsInt(0);
     else if (address == "/gravity/block3/b1/vMirror") gui->block1VMirror = m.getArgAsInt(0);
     else if (address == "/gravity/block3/b1/hFlip") gui->block1HFlip = m.getArgAsInt(0);
     else if (address == "/gravity/block3/b1/vFlip") gui->block1VFlip = m.getArgAsInt(0);
-    
+
     // BLOCK 3 - Block 2 Geometry Boolean Parameters
     else if (address == "/gravity/block3/b2/hMirror") gui->block2HMirror = m.getArgAsInt(0);
     else if (address == "/gravity/block3/b2/vMirror") gui->block2VMirror = m.getArgAsInt(0);
     else if (address == "/gravity/block3/b2/hFlip") gui->block2HFlip = m.getArgAsInt(0);
     else if (address == "/gravity/block3/b2/vFlip") gui->block2VFlip = m.getArgAsInt(0);
-    
+
     // BLOCK 3 - Color EQ Boolean Parameters
     else if (address == "/gravity/block3/b1/colorize/active") gui->block1ColorizeSwitch = m.getArgAsInt(0);
     else if (address == "/gravity/block3/b2/colorize/active") gui->block2ColorizeSwitch = m.getArgAsInt(0);
-    
+
     else return false;
     return true;
 }
@@ -2930,7 +2930,7 @@ bool ofApp::processOscLfoParamsFb(const string& address, float value) {
     else if (address == "/gravity/block1/fb1/lfo/keyThresholdRate") gui->fb1MixAndKeyLfo[3] = value;
     else if (address == "/gravity/block1/fb1/lfo/keySoftAmp") gui->fb1MixAndKeyLfo[4] = value;
     else if (address == "/gravity/block1/fb1/lfo/keySoftRate") gui->fb1MixAndKeyLfo[5] = value;
-    
+
     // FB1 Geometry LFO 1 (8 parameters)
     else if (address == "/gravity/block1/fb1/lfo/xDisplaceAmp") gui->fb1Geo1Lfo1[0] = value;
     else if (address == "/gravity/block1/fb1/lfo/xDisplaceRate") gui->fb1Geo1Lfo1[1] = value;
@@ -2940,7 +2940,7 @@ bool ofApp::processOscLfoParamsFb(const string& address, float value) {
     else if (address == "/gravity/block1/fb1/lfo/zDisplaceRate") gui->fb1Geo1Lfo1[5] = value;
     else if (address == "/gravity/block1/fb1/lfo/rotateAmp") gui->fb1Geo1Lfo1[6] = value;
     else if (address == "/gravity/block1/fb1/lfo/rotateRate") gui->fb1Geo1Lfo1[7] = value;
-    
+
     // FB1 Geometry LFO 2 (10 parameters)
     else if (address == "/gravity/block1/fb1/lfo/xStretchAmp") gui->fb1Geo1Lfo2[0] = value;
     else if (address == "/gravity/block1/fb1/lfo/xStretchRate") gui->fb1Geo1Lfo2[1] = value;
@@ -2952,7 +2952,7 @@ bool ofApp::processOscLfoParamsFb(const string& address, float value) {
     else if (address == "/gravity/block1/fb1/lfo/yShearRate") gui->fb1Geo1Lfo2[7] = value;
     else if (address == "/gravity/block1/fb1/lfo/kaleidoscopeSliceAmp") gui->fb1Geo1Lfo2[8] = value;
     else if (address == "/gravity/block1/fb1/lfo/kaleidoscopeSliceRate") gui->fb1Geo1Lfo2[9] = value;
-    
+
     // FB1 Color LFO (6 parameters)
     else if (address == "/gravity/block1/fb1/lfo/huePowmapAmp") gui->fb1Color1Lfo1[0] = value;
     else if (address == "/gravity/block1/fb1/lfo/huePowmapRate") gui->fb1Color1Lfo1[1] = value;
@@ -2960,7 +2960,7 @@ bool ofApp::processOscLfoParamsFb(const string& address, float value) {
     else if (address == "/gravity/block1/fb1/lfo/saturationPowmapRate") gui->fb1Color1Lfo1[3] = value;
     else if (address == "/gravity/block1/fb1/lfo/brightPowmapAmp") gui->fb1Color1Lfo1[4] = value;
     else if (address == "/gravity/block1/fb1/lfo/brightPowmapRate") gui->fb1Color1Lfo1[5] = value;
-    
+
     // FB2 Mix and Key LFO (6 parameters)
     else if (address == "/gravity/block2/fb2/lfo/mixAmountAmp") gui->fb2MixAndKeyLfo[0] = value;
     else if (address == "/gravity/block2/fb2/lfo/mixAmountRate") gui->fb2MixAndKeyLfo[1] = value;
@@ -2968,7 +2968,7 @@ bool ofApp::processOscLfoParamsFb(const string& address, float value) {
     else if (address == "/gravity/block2/fb2/lfo/keyThresholdRate") gui->fb2MixAndKeyLfo[3] = value;
     else if (address == "/gravity/block2/fb2/lfo/keySoftAmp") gui->fb2MixAndKeyLfo[4] = value;
     else if (address == "/gravity/block2/fb2/lfo/keySoftRate") gui->fb2MixAndKeyLfo[5] = value;
-    
+
     // FB2 Geometry LFO 1 (8 parameters)
     else if (address == "/gravity/block2/fb2/lfo/xDisplaceAmp") gui->fb2Geo1Lfo1[0] = value;
     else if (address == "/gravity/block2/fb2/lfo/xDisplaceRate") gui->fb2Geo1Lfo1[1] = value;
@@ -2978,7 +2978,7 @@ bool ofApp::processOscLfoParamsFb(const string& address, float value) {
     else if (address == "/gravity/block2/fb2/lfo/zDisplaceRate") gui->fb2Geo1Lfo1[5] = value;
     else if (address == "/gravity/block2/fb2/lfo/rotateAmp") gui->fb2Geo1Lfo1[6] = value;
     else if (address == "/gravity/block2/fb2/lfo/rotateRate") gui->fb2Geo1Lfo1[7] = value;
-    
+
     // FB2 Geometry LFO 2 (10 parameters)
     else if (address == "/gravity/block2/fb2/lfo/xStretchAmp") gui->fb2Geo1Lfo2[0] = value;
     else if (address == "/gravity/block2/fb2/lfo/xStretchRate") gui->fb2Geo1Lfo2[1] = value;
@@ -2990,7 +2990,7 @@ bool ofApp::processOscLfoParamsFb(const string& address, float value) {
     else if (address == "/gravity/block2/fb2/lfo/yShearRate") gui->fb2Geo1Lfo2[7] = value;
     else if (address == "/gravity/block2/fb2/lfo/kaleidoscopeSliceAmp") gui->fb2Geo1Lfo2[8] = value;
     else if (address == "/gravity/block2/fb2/lfo/kaleidoscopeSliceRate") gui->fb2Geo1Lfo2[9] = value;
-    
+
     // FB2 Color LFO (6 parameters)
     else if (address == "/gravity/block2/fb2/lfo/huePowmapAmp") gui->fb2Color1Lfo1[0] = value;
     else if (address == "/gravity/block2/fb2/lfo/huePowmapRate") gui->fb2Color1Lfo1[1] = value;
@@ -3196,7 +3196,7 @@ bool ofApp::processOscResetCommands(const string& address) {
     else if (address == "/gravity/block1/fb1/resetColor") gui->fb1Color1Reset = 1;
     else if (address == "/gravity/block1/fb1/lfo/resetColor") gui->fb1Color1Lfo1Reset = 1;
     else if (address == "/gravity/block1/fb1/resetFilters") gui->fb1FiltersReset = 1;
-    
+
     // BLOCK 2 Resets
     else if (address == "/gravity/block2/input/resetAdjust") gui->block2InputAdjustReset = 1;
     else if (address == "/gravity/block2/input/lfo/resetAdjust") gui->block2InputAdjustLfoReset = 1;
@@ -3208,7 +3208,7 @@ bool ofApp::processOscResetCommands(const string& address) {
     else if (address == "/gravity/block2/fb2/resetColor") gui->fb2Color1Reset = 1;
     else if (address == "/gravity/block2/fb2/lfo/resetColor") gui->fb2Color1Lfo1Reset = 1;
     else if (address == "/gravity/block2/fb2/resetFilters") gui->fb2FiltersReset = 1;
-    
+
     // BLOCK 3 Resets
     else if (address == "/gravity/block3/b1/resetGeo") gui->block1GeoReset = 1;
     else if (address == "/gravity/block3/b1/resetColorize") gui->block1ColorizeReset = 1;
@@ -3231,18 +3231,18 @@ bool ofApp::processOscResetCommands(const string& address) {
     else if (address == "/gravity/block3/matrixMix/lfo/reset2") gui->matrixMixLfo2Reset = 1;
     else if (address == "/gravity/block3/final/resetMixAndKey") gui->finalMixAndKeyReset = 1;
     else if (address == "/gravity/block3/final/lfo/reset") gui->finalMixAndKeyLfoReset = 1;
-    
+
     // Macro data resets
     else if (address == "/gravity/macro/reset") gui->macroDataReset = 1;
     else if (address == "/gravity/macro/resetAssignments") gui->macroDataResetAssignments = 1;
-    
+
     // Framebuffer clears
     else if (address == "/gravity/block1/fb1/clear") gui->fb1FramebufferClearSwitch = 1;
     else if (address == "/gravity/block2/fb2/clear") gui->fb2FramebufferClearSwitch = 1;
-    
+
     // Send all OSC values
     else if (address == "/gravity/sendAll") gui->sendAllOscValues = 1;
-    
+
     // Block-level resets
     else if (address == "/gravity/resetAll") gui->resetAllSwitch = 1;
     else if (address == "/gravity/block1/resetAll") gui->block1ResetAllSwitch = 1;
@@ -3252,7 +3252,7 @@ bool ofApp::processOscResetCommands(const string& address) {
     else if (address == "/gravity/block2/resetInput") gui->block2InputResetAllSwitch = 1;
     else if (address == "/gravity/block2/fb2/resetAll") gui->fb2ResetAllSwitch = 1;
     else if (address == "/gravity/block3/resetAll") gui->block3ResetAllSwitch = 1;
-    
+
     else return false;
     return true;
 }
@@ -3333,19 +3333,19 @@ void ofApp::sendOscBlock3MatrixAndFinal() {
 //--------------------------------------------------------------
 void ofApp::sendAllOscParameters() {
     if (!oscEnabled || !gui->oscEnabled) return;
-    
+
     // Pause receiving while sending to avoid feedback loops
     gui->oscReceivePaused = true;
-    
+
     ofLogNotice("OSC") << "Sending all OSC parameters from registry (" << gui->oscRegistry.size() << " total)...";
-    
+
     // Send all parameters from the registry
     for (const auto& param : gui->oscRegistry) {
         sendOscParameter(param.address, param.getValueAsFloat());
     }
-    
+
     // Resume receiving
     gui->oscReceivePaused = false;
-    
+
     ofLogNotice("OSC") << "Finished sending all OSC parameters";
 }

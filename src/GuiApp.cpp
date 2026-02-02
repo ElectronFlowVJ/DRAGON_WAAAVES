@@ -62,46 +62,46 @@ string saveStateNames[saveStateLimit];
 const char* saveStateNamesChar[saveStateLimit];
 
 void GuiApp::setup(){
-	
+
 	ofBackground(0);
 
 	gui.setup();
-	
+
 	// Initialize OSC settings
 	updateLocalIP();
 	midiSetup();
 	allArrayClear();
-	
+
 	//lets do the buffering of a save state in the setup so we just have one on tap at all times
 	//but we might want to change this later to only happen as a one shot when called
 	//depends if it slows anything down, which is pretty unlikely
 	ofFile f1("gwJsonSaveStateTest1.json");
 	f1>>saveBuffer;
-	
+
 	//test that we read correctly
 	if(printSaveBuffer==1){
 		string s = saveBuffer.dump();
 		cout<<saveBuffer.dump(4)<<endl;
 	}
-	
-	
+
+
 	//initialize the saveStateRelated arrays
 	for(int i=0;i<saveStateLimit;i++){
 		saveStateNames[i]="you need more save states";
 		string dummy="where is your save state";
 		saveStateNamesChar[i]=dummy.c_str();
 	}
-	
+
 	//initialize the midi macro array
 	for(int i=0;i<arrayLength;i++){
 		macroData[i]=0;
 	}
-	
+
 	//turn this all into a procedure.  to start with we only run this on start up
 	// but update whenever someone saves a new savestate?
 	indexSaveStateNames();
 	initializeNames();
-	
+
 	// Initialize video device list
 	refreshVideoDevices();
 
@@ -131,22 +131,22 @@ void GuiApp::indexSaveStateNames(){
 	dir.allowExt("json");//only look for json files
 	dir.listDir();//this populates the ofDirectory object with all the filenames
 	dir.sort();
-	
+
 	//print them out to terminal & save to the array
 	for(int i=0;i<dir.size();i++){
 		ofLogNotice(dir.getPath(i));
 		if(i<saveStateLimit){
 			saveStateNames[i]=dir.getName(i);//no more directory by remove getPath(i)
-			
+
 			//add test flags to all the couts for future testing
 			cout<<"successfully loaded "<<dir.getName(i)<<" into buffer"<<endl;
-			
+
 			//remove extension
 			size_t lastIndex=saveStateNames[i].find_last_of(".");
 			saveStateNames[i]=saveStateNames[i].substr(0, lastIndex);
-			
+
 			cout<<"successfully removed directory name and .json from "<<saveStateNames[i]<<endl;
-			
+
 			saveStateNamesChar[i]=saveStateNames[i].c_str();
 			cout<<"successfully converted "<<dir.getPath(i)<<" into c_string"<<endl;
 		}
@@ -162,22 +162,22 @@ void GuiApp::refreshVideoDevices(){
 	// Use a temporary grabber to list devices
 	ofVideoGrabber tempGrabber;
 	videoDevices = tempGrabber.listDevices();
-	
+
 	// Build string list for combo box
 	videoDeviceNames.clear();
 	for(int i = 0; i < videoDevices.size(); i++){
 		string name = std::to_string(i) + ": " + videoDevices[i].deviceName;
 		videoDeviceNames.push_back(name);
 	}
-	
+
 	ofLogNotice("Video Input") << "Found " << videoDevices.size() << " video devices";
 }
 
 //--------------------------------------------------------------
 void GuiApp::update(){
 	midibiz();
-	
-	//make sure to reset these to normal if we've passed through the whole gui code without reenabling 
+
+	//make sure to reset these to normal if we've passed through the whole gui code without reenabling
 	//remember that none of the gui code executes UNLESS the specific window is open
 	//fb2FramebufferClearSwitch=0;
 	//saveloadshortcut
@@ -197,14 +197,14 @@ void GuiApp::update(){
 		//turn macros on!
 		macroDataMidiGui=1;
 	}
-	
+
 	if (sendAllOscValues == 1) {
 		if (mainApp) {
 			mainApp->sendAllOscParameters();
 		}
 		sendAllOscValues = 0;
 	}
-	
+
 	// Apply OSC settings (triggered on startup after loading settings)
 	if (oscSettingsReloadRequested == 1) {
 		if (mainApp) {
@@ -212,7 +212,7 @@ void GuiApp::update(){
 		}
 		oscSettingsReloadRequested = 0;
 	}
-	
+
 	// OSC-triggered reset handlers
 	if (resetAllSwitch == 1) {
 		resetAll();
@@ -268,13 +268,13 @@ void GuiApp::update(){
 		}
 		block3ResetAllSwitch = 0;
 	}
-	
+
 }
 
 //--------------------------------------------------------------
 void GuiApp::saveBLOCK_1(){
 
-	
+
 }
 
 //--------------------------------------------------------------
@@ -283,7 +283,7 @@ void GuiApp::loadBLOCK_1(){
 	//ofFile f1("saveTest1.json");
 
 	//ofLoadJson("saveTest1.json",loadBuffer);
-	
+
 	//add misc
 	//delay time
 
@@ -312,7 +312,7 @@ void GuiApp::midi2Gui(bool midiActive[], float params[], bool midiSwitch) {
 			if (midiActive[i] == 1) {
 				params[i] = midiCC[i];
 				if( abs(params[i])<.008 ){params[i]=0.0;}//zero shit out
-				//might want to 
+				//might want to
 			}
 		}
 
@@ -357,20 +357,20 @@ void GuiApp::jsonListToArray(ofJson jsonFile, string listName, float outArray[])
 void GuiApp::draw(){
 
 	int debugAdjust=0;
-	
+
 	if(debugOn==true){
 		debugAdjust=40;
 	}
-	float windowWidthThird=320.0;	
+	float windowWidthThird=320.0;
 	float windowWidthHalf=420;
-	
+
 
 	auto mainSettings = ofxImGui::Settings();
 	//change header colors
     ImGui::StyleColorsDark();
 
 	gui.begin();
-	
+
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
@@ -378,8 +378,8 @@ void GuiApp::draw(){
 	window_flags |= ImGuiWindowFlags_NoMove;
 	window_flags |= ImGuiWindowFlags_NoCollapse;
 	//window_flags |= ImGuiWindowFlags_NoResize;
-	
-	
+
+
 	//strangely enough, when i switched to ImGui::Begin from ImGui::BeginWindow, that seemed to really
 	//bonk up the fontGlobalScale thing...
 	io.FontGlobalScale=2.0f;
@@ -400,9 +400,9 @@ void GuiApp::draw(){
 	ImGui::SetNextWindowPos(ImVec2(0,0),ImGuiCond_Once);
 	//if (ofxImGui::BeginWindow("++--++--++--++--++--++--++--G*R*A*V*I*T*Y**W*A*A*A*V*E*S--++--++--++--++--++--++", mainSettings, false)) {
 	if( ImGui::Begin("*--++--++--++--++--++--++--++--G*R*A*V*I*T*Y**W*A*A*A*V*E*S v 1.50 --++--++--++--++--++--++--*", p_open ,window_flags)   ) {
-	
+
 		ImGui::PushItemWidth(windowWidthHalf);
-		
+
 		//trying to make the top line all fit
 		int windowWidthQuarter=720*.25f+50;
 		ImGui::PushItemWidth(windowWidthQuarter);
@@ -424,7 +424,7 @@ void GuiApp::draw(){
 		saveStateSelectSwitch=item_saveState;
 		ImGui::SameLine();
 		ImGui::Text(" ");
-		
+
 		ImGui::SameLine();
 		//add savestate select here
 		if (ImGui::Button("save")) {
@@ -438,7 +438,7 @@ void GuiApp::draw(){
 			ImGui::SetItemDefaultFocus();
 			ImGui::EndPopup();
 		}
-		
+
 		ImGui::SameLine();
 		ImGui::Text(" ");
 		ImGui::SameLine();
@@ -449,15 +449,15 @@ void GuiApp::draw(){
 		static int item_loadState = 0;
 		ImGui::Combo("##select a load state", &item_loadState, loadStateSelectItems, IM_ARRAYSIZE(loadStateSelectItems));
 		loadStateSelectSwitch=item_loadState;
-		
+
 		ImGui::SameLine();
 		ImGui::Text(" ");
 		ImGui::SameLine();
-		
+
 		if (ImGui::Button("load")) {
 			loadALL=1;
 			ImGui::OpenPopup("load successful");
-		}	
+		}
 		if(ImGui::BeginPopupModal("load successful")){
 			string success=saveStateNames[loadStateSelectSwitch]+ " loaded successfully";
 			ImGui::Text(success.c_str());
@@ -465,18 +465,18 @@ void GuiApp::draw(){
 			ImGui::SetItemDefaultFocus();
 			ImGui::EndPopup();
 		}
-		
+
 		ImGui::SameLine();
 		ImGui::Text("+++++");
-		
+
 		ImGui::SameLine();
 		if (ImGui::Button("reset all")) {
 			resetAll();
 		}
-		
+
 		ImGui::PopItemWidth();
-		
-		
+
+
 		//midi macros style color
 		float macroHue=.95;
 		ImGui::PushStyleColor(ImGuiCol_Header, (ImVec4)ImColor::HSV(macroHue, 0.9f, 0.8f));
@@ -490,7 +490,7 @@ void GuiApp::draw(){
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(macroHue, 0.9f, 0.9f));
 		ImGui::PushStyleColor(ImGuiCol_CheckMark, (ImVec4)ImColor::HSV(macroHue, 0.3f, 0.2f));
 		ImGui::PushStyleColor(ImGuiCol_Text,(ImVec4)ImColor::HSV(.4f,.35f,1.0f));
-		
+
 		bool testMacro1=1;
 		//adding midi macros here
 		if (ImGui::CollapsingHeader("midi macro")){
@@ -499,7 +499,7 @@ void GuiApp::draw(){
 			ImGui::Checkbox("reset ##midimacro", &macroDataReset);
 			ImGui::SameLine();
 			ImGui::Checkbox("reset assignments ##midimacro", &macroDataResetAssignments);
-			
+
 			if (macroDataReset == 1) {
 				for (int i = 0; i < PARAMETER_ARRAY_LENGTH; i++) {
 					macroData[i] = 0.0f;
@@ -517,18 +517,18 @@ void GuiApp::draw(){
 					macroDataMidiActive[i] = 0;
 					macroDataNames[i]="";
 				}
-				
+
 				macroDataResetEverything();
 				macroDataResetAssignments=0;
 			}
-			
-			
+
+
 			midi2Gui(macroDataMidiActive, macroData, macroDataMidiGui);
-			
+
 
 			ifSelectMacro0();
-			ifSelectMacro1();	
-			ifSelectMacro2();			
+			ifSelectMacro1();
+			ifSelectMacro2();
 			ifSelectMacro3();
 			ifSelectMacro4();
 			ifSelectMacro5();
@@ -542,8 +542,8 @@ void GuiApp::draw(){
 			ifSelectMacro13();
 			ifSelectMacro14();
 			ifSelectMacro15();
-			
-								
+
+
 			//GoToMenuBegins
 			const ImVec2 macroSliderSize(10.f,80.f);
 			ImGui::Columns(8,"macroColumns1");
@@ -553,7 +553,7 @@ void GuiApp::draw(){
 			if(ImGui::SmallButton("select ##macro0")){
 				ImGui::OpenPopup("select ##macro0");
 			}
-			if(ImGui::BeginPopup("select ##macro0")){	
+			if(ImGui::BeginPopup("select ##macro0")){
 				selectMacro0Menu();
 				ImGui::EndPopup();
 			}
@@ -724,17 +724,17 @@ void GuiApp::draw(){
 			ImGui::VSliderFloat("##15",macroSliderSize,&macroData[15],-1.0f,1.0f,"");
 			ImGui::SameLine();
 			ImGui::TextWrapped(macroDataNames[15].c_str());
-			
+
 			ImGui::Columns(1);//escape the columns!
-		
+
 		}//end collapsing header
-		
+
 		ImGui::PopStyleColor(11);
-		
-		
+
+
 		/*
 		ImGui::SameLine();
-		
+
 		if (ImGui::Button("randomize controls")) {
 			randomizeControls();
 		}
@@ -745,7 +745,7 @@ void GuiApp::draw(){
 		if (ImGui::IsItemHovered())
             ImGui::SetTooltip("I am a tooltip");
 		*/
-		
+
 		//ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
         //if (ImGui::BeginTabBar("GLOBALTAB", tab_bar_flags))
         if (ImGui::BeginTabBar("GLOBALTAB"))
@@ -760,12 +760,12 @@ void GuiApp::draw(){
 			ImGui::PushStyleColor(ImGuiCol_CheckMark, (ImVec4)ImColor::HSV(.8f, 0.3f, 0.2f));
 			ImGui::PushStyleColor(ImGuiCol_Text,(ImVec4)ImColor::HSV(.2f,.25f,1.0f));
 			//if (ImGui::CollapsingHeader("--++--<<--**--<<--++--!!--**--++--**--BLOCK_1--**--++--**--!!--++-->>--**-->>--++--")){
-			
+
 			ImGui::PushStyleColor(ImGuiCol_Tab, (ImVec4)ImColor::HSV(.8f,.5f,.5f));
 			ImGui::PushStyleColor(ImGuiCol_TabActive, (ImVec4)ImColor::HSV(.8f,.9f,.9f));
 			ImGui::PushStyleColor(ImGuiCol_TabHovered, (ImVec4)ImColor::HSV(.8f,.7f,.7f));
-				
-			
+
+
 			if (ImGui::BeginTabItem("BLOCK_1")){
 				blockSelectHsb=1;
 				if (ImGui::Button("reset BLOCK_1")) {
@@ -779,16 +779,16 @@ void GuiApp::draw(){
 				if (ImGui::Button("reset fb1")) {
 					fb1ResetAll();
 				}
-				
-				
-				
-				
-				
-				
-				
+
+
+
+
+
+
+
 				if (ImGui::BeginTabBar("BLOCK1_subfolders"))
 				{
-					
+
 					if (ImGui::BeginTabItem("ch1 adjust")){
 						const char* items0[] = { "input1","input2" };
 						//static int item_ch1InputSelect = 0;
@@ -796,7 +796,7 @@ void GuiApp::draw(){
 							if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch1/inputSelect", static_cast<float>(ch1InputSelect));
 						}
 						//ch1InputSelect=item_ch1InputSelect;
-						
+
 						ImGui::SameLine();
 						//might want to change default to hd and check for SD if that seems more relevant
 						ImGui::Checkbox("hd aspect ratio     ##ch1Adjust", &ch1AspectRatioSwitch);
@@ -845,7 +845,7 @@ void GuiApp::draw(){
 						ImGui::Separator();
 						ImGuiSliderFloatOSC("filters boost ##ch1 ", &ch1Adjust[14], -1.0f, 1.0f, "/gravity/block1/ch1/filtersBoost");
 						ImGui::Separator();
-						
+
 						static int item_current0 = 0;
 						const char* items1[] = { "geo overflow clamp","geo overflow toroid","geo overflow mirror" };
 						if (ImGui::Combo("##ch1 geo overflow", &ch1GeoOverflow, items1, IM_ARRAYSIZE(items1))) {
@@ -868,7 +868,7 @@ void GuiApp::draw(){
 						if (ImGui::Checkbox("v flip          ##ch1",&ch1VFlip)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch1/vFlip", ch1VFlip ? 1.0f : 0.0f);
 						}
-						
+
 						ImGui::Separator();
 						if (ImGui::Checkbox("hue invert      ##ch1",&ch1HueInvert)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch1/hueInvert", ch1HueInvert ? 1.0f : 0.0f);
@@ -888,18 +888,18 @@ void GuiApp::draw(){
 						ImGui::SameLine();
 						if (ImGui::Checkbox("solarize        ##ch1",&ch1Solarize)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch1/solarize", ch1Solarize ? 1.0f : 0.0f);
-						}				
-						
+						}
+
 						ImGui::EndTabItem();
 					}
-					
+
 					if (ImGui::BeginTabItem("ch2 mix and key")){
-						
+
 						static int item_current0 = 0;
 						static int item_current1 = 0;
 						static int item_current2 = 0;
 						static int item_current3 = 0;
-						
+
 						const char* items00[] = { "input1","input2" };
 						//static int item_ch2InputSelect = 1;
 						if (ImGui::Combo("input          ##ch2", &ch2InputSelect, items00, IM_ARRAYSIZE(items00))) {
@@ -909,7 +909,7 @@ void GuiApp::draw(){
 						ImGui::SameLine();
 						ImGui::Checkbox("hd aspect ratio ##ch2", &ch2AspectRatioSwitch);
 						ImGui::Separator();
-						  
+
 						ImGui::Checkbox("midi/gui                 ##ch2", &ch2MixAndKeyMidiGui);
 						ImGui::SameLine();
 						ImGui::Checkbox("reset          ##ch2",&ch2MixAndKeyReset);
@@ -922,7 +922,7 @@ void GuiApp::draw(){
 							ch2MixAndKeyReset = 0;
 							if (mainApp) mainApp->sendOscBlock1Ch2();
 						}
-						
+
 						midi2Gui(ch2MixAndKeyMidiActive, ch2MixAndKey, ch2MixAndKeyMidiGui);
 
 						const char* items0[] = { "key order ch1->ch2","key order ch2->ch1" };
@@ -930,7 +930,7 @@ void GuiApp::draw(){
 							if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/keyOrder", static_cast<float>(ch2KeyOrder));
 						}
 						//ch2KeyOrder = item_current0;
-						
+
 						ImGui::Separator();
 						const char* items1[] = { "linear fade", "additive","difference","multiplicitive","dodge" };
 						if (ImGui::Combo("mix type       ##ch2 ", &ch2MixType, items1, IM_ARRAYSIZE(items1))) {
@@ -940,7 +940,7 @@ void GuiApp::draw(){
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("mix ##ch2", &ch2MixAndKey[0],-1.0,1.0, "/gravity/block1/ch2/mixAmount");
 						ImGui::Separator();
-						
+
 						const char* items2[] = { "clamp", "wrap","foldover" };
 						if (ImGui::Combo("overflow       ##ch2Mix", &ch2MixOverflow, items2, IM_ARRAYSIZE(items2))) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/mixOverflow", static_cast<float>(ch2MixOverflow));
@@ -953,7 +953,7 @@ void GuiApp::draw(){
 						}
 						//ch2KeyMode = item_current3;
 						ImGui::Separator();
-					
+
 						if(ch2KeyMode==0){
 						ImGuiSliderFloatOSC("key red        ##ch2", &ch2MixAndKey[1],-1.0,1.0, "/gravity/block1/ch2/keyRed");
 						ImGui::SameLine();
@@ -963,7 +963,7 @@ void GuiApp::draw(){
 						ImGui::SameLine();
 						ch2MixAndKey[2]=ch2MixAndKey[3]=ch2MixAndKey[1];
 						}
-						
+
 						if(ch2KeyMode==1){
 						ImGuiSliderFloatOSC("key red        ##ch2", &ch2MixAndKey[1],-1.0,1.0, "/gravity/block1/ch2/keyRed");
 						ImGui::SameLine();
@@ -975,15 +975,15 @@ void GuiApp::draw(){
 						ImGui::ColorButton("testingColorButton 1", ImVec4(ch2MixAndKey[1], ch2MixAndKey[2], ch2MixAndKey[3], 1.0), 0, ImVec2(20, 20));
 						ImGui::SameLine();
 						ImGui::Text("key value color");
-						
+
 						ImGui::Separator();
 						ImGuiSliderFloatOSC("key threshold  ##ch2", &ch2MixAndKey[4],-1.0,1.0, "/gravity/block1/ch2/keyThreshold");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("key soft ##ch2", &ch2MixAndKey[5],-1.0,1.0, "/gravity/block1/ch2/keySoft");
-						
+
 						ImGui::EndTabItem();
 					}
-					
+
 					if (ImGui::BeginTabItem("ch2 adjust")){
 						ImGui::Checkbox("midi/gui                            ##ch2Adjust", &ch2AdjustMidiGui);
 						ImGui::SameLine();
@@ -997,7 +997,7 @@ void GuiApp::draw(){
 							if (mainApp) mainApp->sendOscBlock1Ch2();
 							ch2VMirror=ch2HMirror=ch2VFlip=ch2HFlip=ch2HueInvert=ch2SaturationInvert=ch2BrightInvert=ch2RGBInvert=ch2Solarize=0;
 						}
-						
+
 						midi2Gui(ch2AdjustMidiActive, ch2Adjust, ch2AdjustMidiGui);
 						ImGui::Separator();
 						ImGuiSliderFloatOSC("x <->   ##ch2", &ch2Adjust[0], -1.0f, 1.0f, "/gravity/block1/ch2/xDisplace");
@@ -1030,8 +1030,8 @@ void GuiApp::draw(){
 						ImGui::Separator();
 						ImGuiSliderFloatOSC("filters boost ##ch2 ", &ch2Adjust[14], -1.0f, 1.0f, "/gravity/block1/ch2/filtersBoost");
 						ImGui::Separator();
-						
-						
+
+
 						static int item_current0 = 0;
 						const char* items1[] = { "geo overflow clamp","geo overflow toroid","geo overflow mirror" };
 						if (ImGui::Combo("##ch2 geo overflow", &ch2GeoOverflow, items1, IM_ARRAYSIZE(items1))) {
@@ -1054,7 +1054,7 @@ void GuiApp::draw(){
 						if (ImGui::Checkbox("v flip          ##ch2",&ch2VFlip)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/vFlip", ch2VFlip ? 1.0f : 0.0f);
 						}
-						
+
 						ImGui::Separator();
 						if (ImGui::Checkbox("hue invert      ##ch2",&ch2HueInvert)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/hueInvert", ch2HueInvert ? 1.0f : 0.0f);
@@ -1074,16 +1074,16 @@ void GuiApp::draw(){
 						ImGui::SameLine();
 						if (ImGui::Checkbox("solarize        ##ch2",&ch2Solarize)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/solarize", ch2Solarize ? 1.0f : 0.0f);
-						}				
-						
+						}
+
 						ImGui::EndTabItem();
 					}
-					
-					if (ImGui::BeginTabItem("ch1 and ch2 lfo")){		
+
+					if (ImGui::BeginTabItem("ch1 and ch2 lfo")){
 						if(nodeToClose==0)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("ch1 adjust lfo"))
 						{
@@ -1102,49 +1102,49 @@ void GuiApp::draw(){
 									ch1AdjustLfoReset = 0;
 									if (mainApp) mainApp->sendOscBlock1Ch1();
 								}
-								
+
 								midi2Gui(ch1AdjustLfoMidiActive, ch1AdjustLfo, ch1AdjustLfoMidiGui);
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("x <-> a      ##ch1", &ch1AdjustLfo[0], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/xDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x <-> r      ##ch1", &ch1AdjustLfo[1], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/xDisplaceRate");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("y <-> a      ##ch1", &ch1AdjustLfo[2], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/yDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y <-> r      ##ch1", &ch1AdjustLfo[3], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/yDisplaceRate");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("z <-> a      ##ch1", &ch1AdjustLfo[4], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/zDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("z <-> r      ##ch1", &ch1AdjustLfo[5], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/zDisplaceRate");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("rotate <-> a ##ch1", &ch1AdjustLfo[6], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/rotateAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("rotate <-> r ##ch1", &ch1AdjustLfo[7], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/rotateRate");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("hue ^^ a     ##ch1", &ch1AdjustLfo[8], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/hueOffsetAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("hue ^^ r     ##ch1", &ch1AdjustLfo[9], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/hueOffsetRate");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("sat ^^ a     ##ch1", &ch1AdjustLfo[10], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/saturationOffsetAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("sat ^^ r     ##ch1", &ch1AdjustLfo[11], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/saturationOffsetRate");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("bri ^^ a     ##ch1", &ch1AdjustLfo[12], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/brightOffsetAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("bri ^^ r     ##ch1", &ch1AdjustLfo[13], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/brightOffsetRate");
-								
+
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("kaleid sli a ##ch1", &ch1AdjustLfo[14], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/kaleidoscopeSliceAmp");
 								ImGui::SameLine();
-								ImGuiSliderFloatOSC("kaleid sli r ##ch1", &ch1AdjustLfo[15], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/kaleidoscopeSliceRate");		
+								ImGuiSliderFloatOSC("kaleid sli r ##ch1", &ch1AdjustLfo[15], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/kaleidoscopeSliceRate");
 							}
 							else
 							{
@@ -1157,7 +1157,7 @@ void GuiApp::draw(){
 						if(nodeToClose==1)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("ch2 mix and key lfo"))
 						{
@@ -1176,9 +1176,9 @@ void GuiApp::draw(){
 									ch2MixAndKeyLfoReset = 0;
 									if (mainApp) mainApp->sendOscBlock1Ch2();
 								}
-								
+
 								midi2Gui(ch2MixAndKeyLfoMidiActive, ch2MixAndKeyLfo, ch2MixAndKeyLfoMidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("mix a       ##ch2", &ch2MixAndKeyLfo[0],-1.0,1.0, "/gravity/block1/ch2/lfo/mixAmountAmp");
 								ImGui::SameLine();
@@ -1191,7 +1191,7 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("ky soft a   ##ch2", &ch2MixAndKeyLfo[4],-1.0,1.0, "/gravity/block1/ch2/lfo/keySoftAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("ky soft r   ##ch2", &ch2MixAndKeyLfo[5],-1.0,1.0, "/gravity/block1/ch2/lfo/keySoftRate");
-								
+
 								//looks like we could just add AND wipe mode too here without too much issue, so we could simultaneously
 								//wipe and mix and key without having alternate modes
 							}
@@ -1206,7 +1206,7 @@ void GuiApp::draw(){
 						if(nodeToClose==2)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("ch2 adjust lfo"))
 						{
@@ -1225,25 +1225,25 @@ void GuiApp::draw(){
 									ch2AdjustLfoReset = 0;
 									if (mainApp) mainApp->sendOscBlock1Ch2();
 								}
-								
+
 								midi2Gui(ch2AdjustLfoMidiActive, ch2AdjustLfo, ch2AdjustLfoMidiGui);
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("x <-> a      ##ch2", &ch2AdjustLfo[0], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/xDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x <-> r      ##ch2", &ch2AdjustLfo[1], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/xDisplaceRate");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("y <-> a      ##ch2", &ch2AdjustLfo[2], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/yDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y <-> r      ##ch2", &ch2AdjustLfo[3], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/yDisplaceRate");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("z <-> a      ##ch2", &ch2AdjustLfo[4], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/zDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("z <-> r      ##ch2", &ch2AdjustLfo[5], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/zDisplaceRate");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("rotate <-> a ##ch2", &ch2AdjustLfo[6], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/rotateAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("rotate <-> r ##ch2", &ch2AdjustLfo[7], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/rotateRate");
@@ -1252,19 +1252,19 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("hue ^^ r     ##ch2", &ch2AdjustLfo[9], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/hueOffsetRate");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("sat ^^ a     ##ch2", &ch2AdjustLfo[10], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/saturationOffsetAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("sat ^^ r     ##ch2", &ch2AdjustLfo[11], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/saturationOffsetRate");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("bri ^^ a     ##ch2", &ch2AdjustLfo[12], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/brightOffsetAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("bri ^^ r     ##ch2", &ch2AdjustLfo[13], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/brightOffsetRate");
-								
-								
+
+
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("kaleid sli a ##ch2", &ch2AdjustLfo[14], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/kaleidoscopeSliceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("kaleid sli r ##ch2", &ch2AdjustLfo[15], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/kaleidoscopeSliceRate");
@@ -1275,12 +1275,12 @@ void GuiApp::draw(){
 								currentNode=2;
 							}
 							ImGui::TreePop();
-						}			
+						}
 						ImGui::EndTabItem();
 					}
 					if(ImGui::BeginTabItem("fb1 parameters")){
 						//reset all fb1 parameters
-						
+
 						if (ImGui::SliderInt("fb1 delay time         ",&fb1DelayTime,1,pastFramesSize)) {
 							if (mainApp) {
 								mainApp->sendOscParameter("/gravity/block1/fb1/delayTime", static_cast<float>(fb1DelayTime));
@@ -1298,10 +1298,10 @@ void GuiApp::draw(){
 						if(nodeToClose==3)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb1 mix and key"))
-						{	
+						{
 							if(currentNode==3)
 							{
 								//static int item_current0 = 0;
@@ -1321,7 +1321,7 @@ void GuiApp::draw(){
 									if (mainApp) mainApp->sendOscBlock1Fb1();
 									fb1KeyOrder=fb1MixType=fb1MixOverflow=fb1KeyMode=0;
 								}
-								
+
 								midi2Gui(fb1MixAndKeyMidiActive, fb1MixAndKey, fb1MixAndKeyMidiGui);
 
 								const char* items0[] = { "key order inputs->fb1","key order fb1->inputs" };
@@ -1329,7 +1329,7 @@ void GuiApp::draw(){
 							if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/keyOrder", static_cast<float>(fb1KeyOrder));
 						}
 								//fb1KeyOrder = item_current0;
-								
+
 								ImGui::Separator();
 								const char* items1[] = { "linear fade", "additive","difference","multiplicitive","dodge" };
 								if (ImGui::Combo("mix type       ##fb1 ", &fb1MixType, items1, IM_ARRAYSIZE(items1))) {
@@ -1339,7 +1339,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("mix ##fb1", &fb1MixAndKey[0],-1.0,1.0, "/gravity/block1/fb1/mixAmount");
 								ImGui::Separator();
-								
+
 								const char* items2[] = { "clamp", "wrap","foldover" };
 								if (ImGui::Combo("overflow       ##fb1Mix", &fb1MixOverflow, items2, IM_ARRAYSIZE(items2))) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/mixOverflow", static_cast<float>(fb1MixOverflow));
@@ -1352,7 +1352,7 @@ void GuiApp::draw(){
 						}
 								//fb1KeyMode = item_current3;
 								ImGui::Separator();
-							
+
 								if(fb1KeyMode==0){
 								ImGuiSliderFloatOSC("key red        ##fb1", &fb1MixAndKey[1],-1.0,1.0, "/gravity/block1/fb1/keyRed");
 								ImGui::SameLine();
@@ -1362,7 +1362,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								fb1MixAndKey[2]=fb1MixAndKey[3]=fb1MixAndKey[1];
 								}
-								
+
 								if(fb1KeyMode==1){
 								ImGuiSliderFloatOSC("key red        ##fb1", &fb1MixAndKey[1],-1.0,1.0, "/gravity/block1/fb1/keyRed");
 								ImGui::SameLine();
@@ -1374,7 +1374,7 @@ void GuiApp::draw(){
 								ImGui::ColorButton("testingColorButton 1", ImVec4(fb1MixAndKey[1], fb1MixAndKey[2], fb1MixAndKey[3], 1.0), 0, ImVec2(20, 20));
 								ImGui::SameLine();
 								ImGui::Text("key value color");
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("key threshold  ##fb1", &fb1MixAndKey[4],-1.0,1.0, "/gravity/block1/fb1/keyThreshold");
 								ImGui::SameLine();
@@ -1385,13 +1385,13 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=3;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==4)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb1 geo")){
 							if(currentNode==4)
@@ -1410,9 +1410,9 @@ void GuiApp::draw(){
 									fb1Geo1Reset = 0;
 									if (mainApp) mainApp->sendOscBlock1Fb1();
 								}
-								
+
 								midi2Gui(fb1Geo1MidiActive, fb1Geo1, fb1Geo1MidiGui);
-								
+
 								//x, y, z, rotate, matrix, kaleido
 								ImGuiSliderFloatOSC("x <->      ##fb1", &fb1Geo1[0],-1.0,1.0, "/gravity/block1/fb1/xDisplace");
 								ImGui::SameLine();
@@ -1466,14 +1466,14 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=4;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
-						
+
 						if(nodeToClose==5)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb1 color"))
 						{
@@ -1492,9 +1492,9 @@ void GuiApp::draw(){
 									fb1Color1Reset = 0;
 									if (mainApp) mainApp->sendOscBlock1Fb1();
 								}
-								
+
 								midi2Gui(fb1Color1MidiActive, fb1Color1, fb1Color1MidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("hue ++      ##fb1", &fb1Color1[0],-1.0,1.0, "/gravity/block1/fb1/hueOffset");
 								ImGui::SameLine();
@@ -1507,7 +1507,7 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("sat **      ##fb1", &fb1Color1[4],-1.0,1.0, "/gravity/block1/fb1/saturationMultiply");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("bri **      ##fb1", &fb1Color1[5],-1.0,1.0, "/gravity/block1/fb1/brightMultiply");
-								ImGui::Separator();			
+								ImGui::Separator();
 								ImGuiSliderFloatOSC("hue ^^      ##fb1", &fb1Color1[6],-1.0,1.0, "/gravity/block1/fb1/huePowmap");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("sat ^^      ##fb1", &fb1Color1[7],-1.0,1.0, "/gravity/block1/fb1/saturationPowmap");
@@ -1518,7 +1518,7 @@ void GuiApp::draw(){
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("posterize   ##fb1", &fb1Color1[10],0.0,1.0, "/gravity/block1/fb1/posterizeOffset");
 								ImGui::Separator();
-								
+
 								if (ImGui::Checkbox("fb1 hue invert  ", &fb1HueInvert)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/hueInvert", fb1HueInvert ? 1.0f : 0.0f);
 						}
@@ -1536,13 +1536,13 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=5;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==6)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb1 filters"))
 						{
@@ -1560,9 +1560,9 @@ void GuiApp::draw(){
 									fb1FiltersReset = 0;
 									if (mainApp) mainApp->sendOscBlock1Fb1();
 								}
-								
+
 								midi2Gui(fb1FiltersMidiActive, fb1Filters, fb1FiltersMidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("blur amt   ##fb1", &fb1Filters[0],-1.0,1.0, "/gravity/block1/fb1/blurAmount");
 								ImGui::SameLine();
@@ -1587,14 +1587,14 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=6;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(secretMenuSwitch==1){
 							if(nodeToClose==7)
 							{
 								ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-								nodeToClose=-1;	
+								nodeToClose=-1;
 							}
 							if (ImGui::TreeNode("fb1 geometrical animations"))
 							{
@@ -1632,13 +1632,13 @@ void GuiApp::draw(){
 						ImGui::EndTabItem();
 						//ImGui::TreePop();
 					}//end fb1 parameters
-					
+
 					if(ImGui::BeginTabItem("fb1 lfo"))
 					{
 						if(nodeToClose==8)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb1 mix and key lfo"))
 						{
@@ -1657,9 +1657,9 @@ void GuiApp::draw(){
 									fb1MixAndKeyLfoReset = 0;
 									if (mainApp) mainApp->sendOscBlock1Fb1();
 								}
-								
+
 								midi2Gui(fb1MixAndKeyLfoMidiActive, fb1MixAndKeyLfo, fb1MixAndKeyLfoMidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("mix a       ##fb1", &fb1MixAndKeyLfo[0],-1.0,1.0, "/gravity/block1/fb1/lfo/mixAmountAmp");
 								ImGui::SameLine();
@@ -1685,7 +1685,7 @@ void GuiApp::draw(){
 						if(nodeToClose==9)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb1 geo lfo 1"))
 						{
@@ -1705,9 +1705,9 @@ void GuiApp::draw(){
 									fb1Geo1Lfo1Reset = 0;
 									if (mainApp) mainApp->sendOscBlock1Fb1();
 								}
-								
+
 								midi2Gui(fb1Geo1Lfo1MidiActive, fb1Geo1Lfo1, fb1Geo1Lfo1MidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x <-> a      ##fb1Lfo", &fb1Geo1Lfo1[0],-1.0,1.0, "/gravity/block1/fb1/lfo/xDisplaceAmp");
 								ImGui::SameLine();
@@ -1730,18 +1730,18 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=9;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==10)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb1 geo lfo 2"))
 						{
 							if(currentNode==10)
-							{	
+							{
 								ImGui::Checkbox("midi/gui                 ##fb1Geo1Lfo2", &fb1Geo1Lfo2MidiGui);
 								ImGui::SameLine();
 								ImGui::Checkbox("reset        ##fb1Geo1Lfo2",&fb1Geo1Lfo2Reset);
@@ -1756,9 +1756,9 @@ void GuiApp::draw(){
 									fb1Geo1Lfo2Reset = 0;
 									if (mainApp) mainApp->sendOscBlock1Fb1();
 								}
-								
+
 								midi2Gui(fb1Geo1Lfo2MidiActive, fb1Geo1Lfo2, fb1Geo1Lfo2MidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x stretch a  ##fb1lfo", &fb1Geo1Lfo2[0],-1.0,1.0, "/gravity/block1/fb1/lfo/xStretchAmp");
 								ImGui::SameLine();
@@ -1775,7 +1775,7 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("y shear a    ##fb1lfo", &fb1Geo1Lfo2[6],-1.0,1.0, "/gravity/block1/fb1/lfo/yShearAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y shear r    ##fb1lfo", &fb1Geo1Lfo2[7],-1.0,1.0, "/gravity/block1/fb1/lfo/yShearRate");
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("kaleid sl a  ##fb1lfo", &fb1Geo1Lfo2[8],-1.0,1.0, "/gravity/block1/fb1/lfo/kaleidoscopeSliceAmp");
 								ImGui::SameLine();
@@ -1786,13 +1786,13 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=10;
 							}
-							ImGui::TreePop();		
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==11)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb1 color lfo"))
 						{
@@ -1811,9 +1811,9 @@ void GuiApp::draw(){
 									fb1Color1Lfo1Reset = 0;
 									if (mainApp) mainApp->sendOscBlock1Fb1();
 								}
-								
+
 								midi2Gui(fb1Color1Lfo1MidiActive, fb1Color1Lfo1, fb1Color1Lfo1MidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("hue ** a     ##fb1lfo", &fb1Color1Lfo1[0],-1.0,1.0, "/gravity/block1/fb1/lfo/huePowmapAmp");
 								ImGui::SameLine();
@@ -1832,22 +1832,22 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=11;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::EndTabItem();
 						//ImGui::TreePop();
 					}
-				
-						
+
+
 					ImGui::EndTabBar();
 				}
-				
+
 				ImGui::EndTabItem();
 			}//end block1tabItem
 		    ImGui::PopStyleColor(12);
-		
-        
-        
+
+
+
         	//BLOCK2 color style
 			ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::HSV(block2Hue, 0.6f, 0.5f));
             ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, (ImVec4)ImColor::HSV(block2Hue, 0.7f, 0.6f));
@@ -1857,18 +1857,18 @@ void GuiApp::draw(){
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(block2Hue, 0.6f, 0.7f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(block2Hue, 0.7f, 0.8f));
 			ImGui::PushStyleColor(ImGuiCol_CheckMark, (ImVec4)ImColor::HSV(block2Hue, 0.2f, 0.1f));
-			
+
 			ImGui::PushStyleColor(ImGuiCol_Text,(ImVec4)ImColor::HSV(.83f,.2f,1.0f));
-        
+
 			ImGui::PushStyleColor(ImGuiCol_Tab, (ImVec4)ImColor::HSV(block2Hue,.65f,.65f));
 			ImGui::PushStyleColor(ImGuiCol_TabActive, (ImVec4)ImColor::HSV(block2Hue,.7f,.7f));
 			ImGui::PushStyleColor(ImGuiCol_TabHovered, (ImVec4)ImColor::HSV(block2Hue,.8f,.8f));
-			        
-        
+
+
 		    if (ImGui::BeginTabItem("BLOCK_2"))
 		    {
 		    	blockSelectHsb=2;
-		    	//if (ImGui::CollapsingHeader("--**--**--**--**--**--**--**--**--**--BLOCK_2--**--**--**--**--**--**--**--**--**--")){	
+		    	//if (ImGui::CollapsingHeader("--**--**--**--**--**--**--**--**--**--BLOCK_2--**--**--**--**--**--**--**--**--**--")){
 				//add block2 input select & process
 				if (ImGui::Button("reset BLOCK_2")) {
 						block2ResetAll();
@@ -1881,12 +1881,12 @@ void GuiApp::draw(){
 				if (ImGui::Button("reset fb2")) {
 						fb2ResetAll();
 				}
-				
+
 				ImGui::Separator();
-				
-				
+
+
 				if(ImGui::BeginTabBar("BLOCK_2 subfolders")){
-					
+
 					if(ImGui::BeginTabItem("BLOCK_2 input adjust"))
 					{
 						const char* items0[] = { "BLOCK_1","input1","input2" };
@@ -1915,7 +1915,7 @@ void GuiApp::draw(){
 							block2InputVMirror=block2InputHMirror=block2InputVFlip=block2InputHFlip=block2InputHueInvert=0;
 							block2InputSaturationInvert=block2InputBrightInvert=block2InputRGBInvert=block2InputSolarize=0;
 						}
-						
+
 						midi2Gui(block2InputAdjustMidiActive, block2InputAdjust, block2InputAdjustMidiGui);
 						ImGui::Separator();
 						ImGuiSliderFloatOSC("x <->   ##block2Input", &block2InputAdjust[0], -1.0f, 1.0f, "/gravity/block2/input/xDisplace");
@@ -1937,7 +1937,7 @@ void GuiApp::draw(){
 						ImGuiSliderFloatOSC("kaleido ##block2Input ", &block2InputAdjust[8], -1.0f, 1.0f, "/gravity/block2/input/kaleidoscopeAmount");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("kaleido slice ##block2Input ", &block2InputAdjust[9], -1.0f, 1.0f, "/gravity/block2/input/kaleidoscopeSlice");
-						
+
 						ImGui::Separator();
 						ImGuiSliderFloatOSC("blur    ##block2Input ", &block2InputAdjust[10], -1.0f, 1.0f, "/gravity/block2/input/filterRadius");
 						ImGui::SameLine();
@@ -1949,10 +1949,10 @@ void GuiApp::draw(){
 						ImGui::Separator();
 						ImGuiSliderFloatOSC("filters boost ##block2Input ", &block2InputAdjust[14], -1.0f, 1.0f, "/gravity/block2/input/filtersBoost");
 						ImGui::Separator();
-						
-						
-						
-						
+
+
+
+
 						static int item_current0 = 0;
 						const char* items1[] = { "geo overflow clamp","geo overflow toroid","geo overflow mirror" };
 						if (ImGui::Combo("##block2Input geo overflow", &block2InputGeoOverflow, items1, IM_ARRAYSIZE(items1))) {
@@ -1995,12 +1995,12 @@ void GuiApp::draw(){
 						if (ImGui::Checkbox("solarize ##block2Input",&block2InputSolarize)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block2/input/solarize", block2InputSolarize ? 1.0f : 0.0f);
 						}
-					
+
 						ImGui::EndTabItem();
 					}
-				
+
 					if (ImGui::BeginTabItem("BLOCK_2 input adjust lfo")){
-						
+
 						ImGui::Checkbox("midi/gui                 ##block2InputAdjustLfo", &block2InputAdjustLfoMidiGui);
 						ImGui::SameLine();
 						ImGui::Checkbox("reset        ##block2InputAdjustLfo",&block2InputAdjustLfoReset);
@@ -2014,25 +2014,25 @@ void GuiApp::draw(){
 							block2InputAdjustLfoReset = 0;
 							if (mainApp) mainApp->sendOscBlock2Input();
 						}
-						
+
 						midi2Gui(block2InputAdjustLfoMidiActive, block2InputAdjustLfo, block2InputAdjustLfoMidiGui);
 						ImGui::Separator();
-						
+
 						ImGuiSliderFloatOSC("x <-> a      ##block2Input", &block2InputAdjustLfo[0], -1.0f, 1.0f, "/gravity/block2/input/lfo/xDisplaceAmp");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("x <-> r      ##block2Input", &block2InputAdjustLfo[1], -1.0f, 1.0f, "/gravity/block2/input/lfo/xDisplaceRate");
 						ImGui::Separator();
-						
+
 						ImGuiSliderFloatOSC("y <-> a      ##block2Input", &block2InputAdjustLfo[2], -1.0f, 1.0f, "/gravity/block2/input/lfo/yDisplaceAmp");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("y <-> r      ##block2Input", &block2InputAdjustLfo[3], -1.0f, 1.0f, "/gravity/block2/input/lfo/yDisplaceRate");
 						ImGui::Separator();
-						
+
 						ImGuiSliderFloatOSC("z <-> a      ##block2Input", &block2InputAdjustLfo[4], -1.0f, 1.0f, "/gravity/block2/input/lfo/zDisplaceAmp");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("z <-> r      ##block2Input", &block2InputAdjustLfo[5], -1.0f, 1.0f, "/gravity/block2/input/lfo/zDisplaceRate");
 						ImGui::Separator();
-						
+
 						ImGuiSliderFloatOSC("rotate <-> a ##block2Input", &block2InputAdjustLfo[6], -1.0f, 1.0f, "/gravity/block2/input/lfo/rotateAmp");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("rotate <-> r ##block2Input", &block2InputAdjustLfo[7], -1.0f, 1.0f, "/gravity/block2/input/lfo/rotateRate");
@@ -2041,28 +2041,28 @@ void GuiApp::draw(){
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("hue ^^ r     ##block2Input", &block2InputAdjustLfo[9], -1.0f, 1.0f, "/gravity/block2/input/lfo/hueOffsetRate");
 						ImGui::Separator();
-						
+
 						ImGuiSliderFloatOSC("sat ^^ a     ##block2Input", &block2InputAdjustLfo[10], -1.0f, 1.0f, "/gravity/block2/input/lfo/saturationOffsetAmp");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("sat ^^ r     ##block2Input", &block2InputAdjustLfo[11], -1.0f, 1.0f, "/gravity/block2/input/lfo/saturationOffsetRate");
 						ImGui::Separator();
-						
+
 						ImGuiSliderFloatOSC("bri ^^ a     ##block2Input", &block2InputAdjustLfo[12], -1.0f, 1.0f, "/gravity/block2/input/lfo/brightOffsetAmp");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("bri ^^ r     ##block2Input", &block2InputAdjustLfo[13], -1.0f, 1.0f, "/gravity/block2/input/lfo/brightOffsetRate");
-						
-						
+
+
 						ImGui::Separator();
-						
+
 						ImGuiSliderFloatOSC("kaleid sli a ##block2Input", &block2InputAdjustLfo[14], -1.0f, 1.0f, "/gravity/block2/input/lfo/kaleidoscopeSliceAmp");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("kaleid sli r ##block2Input", &block2InputAdjustLfo[15], -1.0f, 1.0f, "/gravity/block2/input/lfo/kaleidoscopeSliceRate");
-						
+
 						ImGui::EndTabItem();
 					}
-				
-				
-				
+
+
+
 					if(ImGui::BeginTabItem("fb2 parameters"))
 					{
 						//reset all fb2 parameters
@@ -2083,16 +2083,16 @@ void GuiApp::draw(){
 						if(nodeToClose==12)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb2 mix and key"))
 						{
 							if(currentNode==12)
-							{	
+							{
 								static int item_current0 = 0;
 								static int item_current1 = 0;
 								static int item_current2 = 0;
-								static int item_current3 = 0;  
+								static int item_current3 = 0;
 								ImGui::Checkbox("midi/gui                 ##fb2", &fb2MixAndKeyMidiGui);
 								ImGui::SameLine();
 								ImGui::Checkbox("reset          ##fb2",&fb2MixAndKeyReset);
@@ -2105,7 +2105,7 @@ void GuiApp::draw(){
 									fb2MixAndKeyReset = 0;
 									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
-								
+
 								midi2Gui(fb2MixAndKeyMidiActive, fb2MixAndKey, fb2MixAndKeyMidiGui);
 
 								const char* items0[] = { "key order inputs->fb2","key order fb2->inputs" };
@@ -2113,7 +2113,7 @@ void GuiApp::draw(){
 							if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/keyOrder", static_cast<float>(fb2KeyOrder));
 						}
 								//fb2KeyOrder = item_current0;
-								
+
 								ImGui::Separator();
 								const char* items1[] = { "linear fade", "additive","difference","multiplicitive","dodge" };
 								if (ImGui::Combo("mix type       ##fb2 ", &fb2MixType, items1, IM_ARRAYSIZE(items1))) {
@@ -2123,7 +2123,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("mix ##fb2", &fb2MixAndKey[0],-1.0,1.0, "/gravity/block2/fb2/mixAmount");
 								ImGui::Separator();
-								
+
 								const char* items2[] = { "clamp", "wrap","foldover" };
 								if (ImGui::Combo("overflow       ##fb2Mix", &fb2MixOverflow, items2, IM_ARRAYSIZE(items2))) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/mixOverflow", static_cast<float>(fb2MixOverflow));
@@ -2136,7 +2136,7 @@ void GuiApp::draw(){
 						}
 								//fb2KeyMode = item_current3;
 								ImGui::Separator();
-							
+
 								if(fb2KeyMode==0)
 								{
 									ImGuiSliderFloatOSC("key red        ##fb2", &fb2MixAndKey[1],-1.0,1.0, "/gravity/block2/fb2/keyRed");
@@ -2147,7 +2147,7 @@ void GuiApp::draw(){
 									ImGui::SameLine();
 									fb2MixAndKey[2]=fb2MixAndKey[3]=fb2MixAndKey[1];
 								}
-								
+
 								if(fb2KeyMode==1)
 								{
 									ImGuiSliderFloatOSC("key red        ##fb2", &fb2MixAndKey[1],-1.0,1.0, "/gravity/block2/fb2/keyRed");
@@ -2160,7 +2160,7 @@ void GuiApp::draw(){
 								ImGui::ColorButton("testingColorButton 1", ImVec4(fb2MixAndKey[1], fb2MixAndKey[2], fb2MixAndKey[3], 1.0), 0, ImVec2(20, 20));
 								ImGui::SameLine();
 								ImGui::Text("key value color");
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("key threshold  ##fb2", &fb2MixAndKey[4],-1.0,1.0, "/gravity/block2/fb2/keyThreshold");
 								ImGui::SameLine();
@@ -2171,13 +2171,13 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=12;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==13)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb2 geo")){
 							if(currentNode==13)
@@ -2195,9 +2195,9 @@ void GuiApp::draw(){
 									fb2Geo1Reset = 0;
 									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
-								
+
 								midi2Gui(fb2Geo1MidiActive, fb2Geo1, fb2Geo1MidiGui);
-								
+
 								//x, y, z, rotate, matrix, kaleido
 								ImGuiSliderFloatOSC("x <->      ##fb2", &fb2Geo1[0],-1.0,1.0, "/gravity/block2/fb2/xDisplace");
 								ImGui::SameLine();
@@ -2241,7 +2241,7 @@ void GuiApp::draw(){
 								if (ImGui::Checkbox("v flip        ##fb2",&fb2VFlip)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/vFlip", fb2VFlip ? 1.0f : 0.0f);
 						}
-								ImGui::SameLine();					
+								ImGui::SameLine();
 								ImGui::SameLine();
 								if (ImGui::Checkbox("rotate mode      ##fb2", &fb2RotateMode)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/rotateMode", fb2RotateMode ? 1.0f : 0.0f);
@@ -2258,7 +2258,7 @@ void GuiApp::draw(){
 						if(nodeToClose==14)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb2 color"))
 						{
@@ -2277,9 +2277,9 @@ void GuiApp::draw(){
 									fb2Color1Reset = 0;
 									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
-								
+
 								midi2Gui(fb2Color1MidiActive, fb2Color1, fb2Color1MidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("hue ++      ##fb2", &fb2Color1[0],-1.0,1.0, "/gravity/block2/fb2/hueOffset");
 								ImGui::SameLine();
@@ -2292,7 +2292,7 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("sat **      ##fb2", &fb2Color1[4],-1.0,1.0, "/gravity/block2/fb2/saturationMultiply");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("bri **      ##fb2", &fb2Color1[5],-1.0,1.0, "/gravity/block2/fb2/brightMultiply");
-								ImGui::Separator();			
+								ImGui::Separator();
 								ImGuiSliderFloatOSC("hue ^^      ##fb2", &fb2Color1[6],-1.0,1.0, "/gravity/block2/fb2/huePowmap");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("sat ^^      ##fb2", &fb2Color1[7],-1.0,1.0, "/gravity/block2/fb2/saturationPowmap");
@@ -2303,7 +2303,7 @@ void GuiApp::draw(){
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("posterize   ##fb2", &fb2Color1[10],0.0,1.0, "/gravity/block2/fb2/posterize");
 								ImGui::Separator();
-								
+
 								if (ImGui::Checkbox("fb2 hue invert  ", &fb2HueInvert)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/hueInvert", fb2HueInvert ? 1.0f : 0.0f);
 						}
@@ -2321,13 +2321,13 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=14;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==15)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb2 filters"))
 						{
@@ -2345,9 +2345,9 @@ void GuiApp::draw(){
 									fb2FiltersReset = 0;
 									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
-								
+
 								midi2Gui(fb2FiltersMidiActive, fb2Filters, fb2FiltersMidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("blur amt   ##fb2", &fb2Filters[0],-1.0,1.0, "/gravity/block2/fb2/blurAmount");
 								ImGui::SameLine();
@@ -2372,19 +2372,19 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=15;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(secretMenuSwitch==1){
 							if(nodeToClose==16)
 							{
 								ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-								nodeToClose=-1;	
+								nodeToClose=-1;
 							}
 							if (ImGui::TreeNode("fb2 geometrical animations ##fb2"))
 							{
 								if(currentNode==16)
-								{	
+								{
 									if (ImGui::Checkbox("hypercube ##fb2",&block2HypercubeSwitch)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/hypercube", block2HypercubeSwitch ? 1.0f : 0.0f);
 						}
@@ -2393,7 +2393,7 @@ void GuiApp::draw(){
 						}
 									if (ImGui::Checkbox("septagram ##fb2",&block2SevenStarSwitch)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/septagram", block2SevenStarSwitch ? 1.0f : 0.0f);
-						}	
+						}
 									if (ImGui::Checkbox("lissajous ball ##fb2",&block2LissaBallSwitch)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajousBall", block2LissaBallSwitch ? 1.0f : 0.0f);
 						}
@@ -2403,20 +2403,20 @@ void GuiApp::draw(){
 									nodeToClose=currentNode;
 									currentNode=16;
 								}
-								ImGui::TreePop();	
+								ImGui::TreePop();
 							}
 						}
 						ImGui::EndTabItem();
 						//ImGui::TreePop();
 					}//end fb2 parameters
-					
-					
-									
+
+
+
 					if(ImGui::BeginTabItem("fb2 lfo")){
 						if(nodeToClose==17)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb2 mix and key lfo"))
 						{
@@ -2435,9 +2435,9 @@ void GuiApp::draw(){
 									fb2MixAndKeyLfoReset = 0;
 									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
-								
+
 								midi2Gui(fb2MixAndKeyLfoMidiActive, fb2MixAndKeyLfo, fb2MixAndKeyLfoMidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("mix a       ##fb2", &fb2MixAndKeyLfo[0],-1.0,1.0, "/gravity/block2/fb2/lfo/mixAmountAmp");
 								ImGui::SameLine();
@@ -2449,20 +2449,20 @@ void GuiApp::draw(){
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("ky soft a   ##fb2", &fb2MixAndKeyLfo[4],-1.0,1.0, "/gravity/block2/fb2/lfo/keySoftAmp");
 								ImGui::SameLine();
-								ImGuiSliderFloatOSC("ky soft r   ##fb2", &fb2MixAndKeyLfo[5],-1.0,1.0, "/gravity/block2/fb2/lfo/keySoftRate");											
+								ImGuiSliderFloatOSC("ky soft r   ##fb2", &fb2MixAndKeyLfo[5],-1.0,1.0, "/gravity/block2/fb2/lfo/keySoftRate");
 							}
 							else
 							{
 								nodeToClose=currentNode;
 								currentNode=17;
 							}
-							ImGui::TreePop();							
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==18)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb2 geo lfo 1"))
 						{
@@ -2481,9 +2481,9 @@ void GuiApp::draw(){
 									fb2Geo1Lfo1Reset = 0;
 									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
-								
+
 								midi2Gui(fb2Geo1Lfo1MidiActive, fb2Geo1Lfo1, fb2Geo1Lfo1MidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x <-> a      ##fb2Lfo", &fb2Geo1Lfo1[0],-1.0,1.0, "/gravity/block2/fb2/lfo/xDisplaceAmp");
 								ImGui::SameLine();
@@ -2506,13 +2506,13 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=18;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==19)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb2 geo lfo 2"))
 						{
@@ -2532,9 +2532,9 @@ void GuiApp::draw(){
 									fb2Geo1Lfo2Reset = 0;
 									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
-								
+
 								midi2Gui(fb2Geo1Lfo2MidiActive, fb2Geo1Lfo2, fb2Geo1Lfo2MidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x stretch a  ##fb2lfo", &fb2Geo1Lfo2[0],-1.0,1.0, "/gravity/block2/fb2/lfo/xStretchAmp");
 								ImGui::SameLine();
@@ -2551,7 +2551,7 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("y shear a    ##fb2lfo", &fb2Geo1Lfo2[6],-1.0,1.0, "/gravity/block2/fb2/lfo/yShearAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y shear r    ##fb2lfo", &fb2Geo1Lfo2[7],-1.0,1.0, "/gravity/block2/fb2/lfo/yShearRate");
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("kaleid sl a  ##fb2lfo", &fb2Geo1Lfo2[8],-1.0,1.0, "/gravity/block2/fb2/lfo/kaleidoscopeSliceAmp");
 								ImGui::SameLine();
@@ -2562,13 +2562,13 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=19;
 							}
-							ImGui::TreePop();		
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==20)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("fb2 color lfo"))
 						{
@@ -2587,9 +2587,9 @@ void GuiApp::draw(){
 									fb2Color1Lfo1Reset = 0;
 									if (mainApp) mainApp->sendOscBlock2Fb2();
 								}
-								
+
 								midi2Gui(fb2Color1Lfo1MidiActive, fb2Color1Lfo1, fb2Color1Lfo1MidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("hue ** a     ##fb2lfo", &fb2Color1Lfo1[0],-1.0,1.0, "/gravity/block2/fb2/lfo/huePowmapAmp");
 								ImGui::SameLine();
@@ -2608,7 +2608,7 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=20;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::EndTabItem();
 						//ImGui::TreePop();
@@ -2617,13 +2617,13 @@ void GuiApp::draw(){
 				}//end block 2 tab bar
 				ImGui::EndTabItem();
 			}//end block2tab
-		
+
         	ImGui::PopStyleColor(12);
-        
-        	
-        	
-     		   	
-        	
+
+
+
+
+
         	ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::HSV(.65f, 0.5f, 0.5f));
             ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, (ImVec4)ImColor::HSV(.65f, 0.6f, 0.5f));
             ImGui::PushStyleColor(ImGuiCol_FrameBgActive, (ImVec4)ImColor::HSV(.65f, 0.7f, 0.5f));
@@ -2634,15 +2634,15 @@ void GuiApp::draw(){
 			ImGui::PushStyleColor(ImGuiCol_CheckMark, (ImVec4)ImColor::HSV(.65f, 0.3f, 0.2f));
 
 			ImGui::PushStyleColor(ImGuiCol_Text,(ImVec4)ImColor::HSV(.5f,.3f,1.0f));
-        	
+
         	ImGui::PushStyleColor(ImGuiCol_Tab, (ImVec4)ImColor::HSV(.65f,.5f,.5f));
 			ImGui::PushStyleColor(ImGuiCol_TabActive, (ImVec4)ImColor::HSV(.65f,.9f,.9f));
 			ImGui::PushStyleColor(ImGuiCol_TabHovered, (ImVec4)ImColor::HSV(.65f,.7f,.7f));
-			
-        
+
+
         	if(ImGui::BeginTabItem("BLOCK_3"))
        		{
- 				blockSelectHsb=3;       
+ 				blockSelectHsb=3;
         		//if (ImGui::CollapsingHeader("--**--**--**--**--**--**--**--**--**--BLOCK_3--**--**--**--**--**--**--**--**--**--")){
 				//static int item_current0 = 0;
 				const char* items0[] = { "BLOCK_1->BLOCK_2","BLOCK_2->BLOCK_1" };
@@ -2657,14 +2657,14 @@ void GuiApp::draw(){
 					block3ResetAll();
 					finalKeyOrder=0;
 				}
-				//add random fill 
-				
-				
-				
+				//add random fill
+
+
+
 				//**SO HERE IS WHERE WE TEST OUT TABBAR FLAGS
 				ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_FittingPolicyScroll;
 				//tab_bar_flags |=ImGuiTabBarFlags_AutoSelectNewTabs;
-				
+
 				//try out adding tab_bar_flags in here to the tab bar
 				if(ImGui::BeginTabBar("BLOCK_3 subfolders",tab_bar_flags))
 				{
@@ -2673,7 +2673,7 @@ void GuiApp::draw(){
 						if(nodeToClose==21)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if(ImGui::TreeNode("B_1 geometry"))
 						{
@@ -2691,8 +2691,8 @@ void GuiApp::draw(){
 									if (mainApp) mainApp->sendOscBlock3B1();
 									block1HMirror=block1VMirror=block1HFlip=block1VFlip=block1RotateMode=0;
 								}
-								
-								midi2Gui(block1GeoMidiActive, block1Geo, block1GeoMidiGui);	
+
+								midi2Gui(block1GeoMidiActive, block1Geo, block1GeoMidiGui);
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x <->      ##block1", &block1Geo[0],-1.0,1.0, "/gravity/block3/b1/xDisplace");
 								ImGui::SameLine();
@@ -2710,12 +2710,12 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y shear    ##block1", &block1Geo[7],-1.0,1.0, "/gravity/block3/b1/yShear");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("kaleid amt ##block1", &block1Geo[8],-1.0,1.0, "/gravity/block3/b1/kaleidoscopeAmount");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("kaleid slice ##block1", &block1Geo[9],-1.0,1.0, "/gravity/block3/b1/kaleidoscopeSlice");
 								ImGui::Separator();
-								
+
 								static int item_current0 = 0;
 								const char* items0[] = { "clamp","toroid","mirror" };
 								if (ImGui::Combo("block1 geo overflow", &block1GeoOverflow, items0, IM_ARRAYSIZE(items0))) {
@@ -2748,13 +2748,13 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=21;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==22)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("B_1 color eq"))
 						{
@@ -2771,7 +2771,7 @@ void GuiApp::draw(){
 								if (ImGui::Checkbox("hsb/rgb             ##block1Colorize",&block1ColorizeHSB_RGB)) {
 									if (mainApp) mainApp->sendOscParameter("/gravity/block3/b1/colorize/colorspace", block1ColorizeHSB_RGB ? 1.0f : 0.0f);
 								}
-								
+
 								if (block1ColorizeReset == 1) {
 									for (int i = 0; i < PARAMETER_ARRAY_LENGTH; i++) {
 										block1Colorize[i] = 0.0f;
@@ -2781,9 +2781,9 @@ void GuiApp::draw(){
 									if (mainApp) mainApp->sendOscBlock3B1();
 									block1ColorizeSwitch=block1ColorizeHSB_RGB=0;
 								}
-								
+
 								midi2Gui(block1ColorizeMidiActive, block1Colorize, block1ColorizeMidiGui);
-								
+
 								if(block1ColorizeHSB_RGB==0){
 									ImGui::Text("hue                    ");
 									ImGui::SameLine();
@@ -2791,18 +2791,18 @@ void GuiApp::draw(){
 									ImGui::SameLine();
 									ImGui::Text("bri                    ");
 								}
-								 
+
 								if(block1ColorizeHSB_RGB==1){
 									ImGui::Text("red                    ");
 									ImGui::SameLine();
 									ImGui::Text("green                  ");
 									ImGui::SameLine();
 									ImGui::Text("blue                   ");
-								} 
+								}
 								ImGui::Separator();
-								
+
 								ImGui::PushItemWidth(windowWidthThird);
-								
+
 								ImGuiSliderFloatOSC("##1", &block1Colorize[0],-1.0,1.0, "/gravity/block3/b1/colorize/hueBand1");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##2", &block1Colorize[1],-1.0,1.0, "/gravity/block3/b1/colorize/saturationBand1");
@@ -2811,7 +2811,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 1");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##4", &block1Colorize[3],-1.0,1.0, "/gravity/block3/b1/colorize/hueBand2");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##5", &block1Colorize[4],-1.0,1.0, "/gravity/block3/b1/colorize/saturationBand2");
@@ -2820,7 +2820,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 2");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##7", &block1Colorize[6],-1.0,1.0, "/gravity/block3/b1/colorize/hueBand3");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##8", &block1Colorize[7],-1.0,1.0, "/gravity/block3/b1/colorize/saturationBand3");
@@ -2829,7 +2829,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 3");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##10", &block1Colorize[9],-1.0,1.0, "/gravity/block3/b1/colorize/hueBand4");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##11", &block1Colorize[10],-1.0,1.0, "/gravity/block3/b1/colorize/saturationBand4");
@@ -2838,7 +2838,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 4");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##13", &block1Colorize[12],-1.0,1.0, "/gravity/block3/b1/colorize/hueBand5");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##14", &block1Colorize[13],-1.0,1.0, "/gravity/block3/b1/colorize/saturationBand5");
@@ -2847,7 +2847,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 5");
 								ImGui::Separator();
-								
+
 								ImGui::PopItemWidth();
 							}
 							else
@@ -2855,13 +2855,13 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=22;
 							}
-							ImGui::TreePop();	
-						}	
+							ImGui::TreePop();
+						}
 						ImGui::Separator();
 						if(nodeToClose==23)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("B_1 filters"))
 						{
@@ -2879,9 +2879,9 @@ void GuiApp::draw(){
 									block1FiltersReset = 0;
 									if (mainApp) mainApp->sendOscBlock3B1();
 								}
-								
+
 								midi2Gui(block1FiltersMidiActive, block1Filters, block1FiltersMidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("blur amt   ##block1", &block1Filters[0],-1.0,1.0, "/gravity/block3/b1/blurAmount");
 								ImGui::SameLine();
@@ -2898,16 +2898,16 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=23;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
-						//END BLOCK 1 TAB	
-						ImGui::EndTabItem();	
+						//END BLOCK 1 TAB
+						ImGui::EndTabItem();
 					}
 					if (ImGui::BeginTabItem("B_1 lfo")){
 						if(nodeToClose==24)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("B_1 geo lfo 1"))
 						{
@@ -2927,9 +2927,9 @@ void GuiApp::draw(){
 									block1Geo1Lfo1Reset = 0;
 									if (mainApp) mainApp->sendOscBlock3B1();
 								}
-								
+
 								midi2Gui(block1Geo1Lfo1MidiActive, block1Geo1Lfo1, block1Geo1Lfo1MidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x <-> a      ##block1Lfo", &block1Geo1Lfo1[0],-1.0,1.0, "/gravity/block3/lfo/b1/xDisplaceAmp");
 								ImGui::SameLine();
@@ -2952,13 +2952,13 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=24;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==25)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("B_1 geo lfo 2"))
 						{
@@ -2978,9 +2978,9 @@ void GuiApp::draw(){
 									block1Geo1Lfo2Reset = 0;
 									if (mainApp) mainApp->sendOscBlock3B1();
 								}
-								
+
 								midi2Gui(block1Geo1Lfo2MidiActive, block1Geo1Lfo2, block1Geo1Lfo2MidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x stretch a  ##block1lfo", &block1Geo1Lfo2[0],-1.0,1.0, "/gravity/block3/lfo/b1/xStretchAmp");
 								ImGui::SameLine();
@@ -2996,7 +2996,7 @@ void GuiApp::draw(){
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("y shear a    ##block1lfo", &block1Geo1Lfo2[6],-1.0,1.0, "/gravity/block3/lfo/b1/yShearAmp");
 								ImGui::SameLine();
-								ImGuiSliderFloatOSC("y shear r    ##block1lfo", &block1Geo1Lfo2[7],-1.0,1.0, "/gravity/block3/lfo/b1/yShearRate");	
+								ImGuiSliderFloatOSC("y shear r    ##block1lfo", &block1Geo1Lfo2[7],-1.0,1.0, "/gravity/block3/lfo/b1/yShearRate");
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("kaleid sl a  ##block1lfo", &block1Geo1Lfo2[8],-1.0,1.0, "/gravity/block3/lfo/b1/kaleidoscopeSliceAmp");
 								ImGui::SameLine();
@@ -3007,18 +3007,18 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=25;
 							}
-							ImGui::TreePop();		
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==26)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("B_1 color eq lfo 1"))
-						{	
+						{
 							if(currentNode==26)
-							{	
+							{
 								ImGui::Checkbox("midi/gui             ##block1ColorizeLfo1", &block1ColorizeLfo1MidiGui);
 								ImGui::SameLine();
 								ImGui::Checkbox("reset               ##block1ColorizeLfo1",&block1ColorizeLfo1Reset);
@@ -3032,9 +3032,9 @@ void GuiApp::draw(){
 									block1ColorizeLfo1Reset = 0;
 									if (mainApp) mainApp->sendOscBlock3B1();
 								}
-								
+
 								midi2Gui(block1ColorizeLfo1MidiActive, block1ColorizeLfo1, block1ColorizeLfo1MidiGui);
-								
+
 								if(block1ColorizeHSB_RGB==0){
 									ImGui::Text("hue                    ");
 									ImGui::SameLine();
@@ -3048,10 +3048,10 @@ void GuiApp::draw(){
 									ImGui::Text("green                  ");
 									ImGui::SameLine();
 									ImGui::Text("blue                   ");
-								} 
+								}
 								ImGui::Separator();
 								ImGui::PushItemWidth(windowWidthThird);
-								
+
 								ImGuiSliderFloatOSC("##1", &block1ColorizeLfo1[0],-1.0,1.0, "/gravity/block3/lfo/b1/hueBand1Amp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##2", &block1ColorizeLfo1[1],-1.0,1.0, "/gravity/block3/lfo/b1/saturationBand1Amp");
@@ -3060,7 +3060,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 1 a");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##4", &block1ColorizeLfo1[3],-1.0,1.0, "/gravity/block3/lfo/b1/hueBand1Rate");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##5", &block1ColorizeLfo1[4],-1.0,1.0, "/gravity/block3/lfo/b1/saturationBand1Rate");
@@ -3069,7 +3069,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 1 r");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##7",&block1ColorizeLfo1[6],-1.0,1.0, "/gravity/block3/lfo/b1/hueBand2Amp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##8",&block1ColorizeLfo1[7],-1.0,1.0, "/gravity/block3/lfo/b1/saturationBand2Amp");
@@ -3078,7 +3078,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 2 a");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##10",&block1ColorizeLfo1[9],-1.0,1.0, "/gravity/block3/lfo/b1/hueBand2Rate");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##11",&block1ColorizeLfo1[10],-1.0,1.0, "/gravity/block3/lfo/b1/saturationBand2Rate");
@@ -3092,18 +3092,18 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=26;
 							}
-							ImGui::TreePop();	
-						}	
-						ImGui::Separator();						
+							ImGui::TreePop();
+						}
+						ImGui::Separator();
 						if(nodeToClose==27)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
-						}				
+							nodeToClose=-1;
+						}
 						if (ImGui::TreeNode("B_1 color eq lfo 2"))
 						{
 							if(currentNode==27)
-							{	
+							{
 								ImGui::Checkbox("midi/gui             ##block1ColorizeLfo2", &block1ColorizeLfo2MidiGui);
 								ImGui::SameLine();
 								ImGui::Checkbox("reset               ##block1ColorizeLfo2",&block1ColorizeLfo2Reset);
@@ -3117,9 +3117,9 @@ void GuiApp::draw(){
 									block1ColorizeLfo2Reset = 0;
 									if (mainApp) mainApp->sendOscBlock3B1();
 								}
-								
+
 								midi2Gui(block1ColorizeLfo2MidiActive, block1ColorizeLfo2, block1ColorizeLfo2MidiGui);
-								
+
 								if(block1ColorizeHSB_RGB==0){
 									ImGui::Text("hue                    ");
 									ImGui::SameLine();
@@ -3127,17 +3127,17 @@ void GuiApp::draw(){
 									ImGui::SameLine();
 									ImGui::Text("bri                    ");
 								}
-								 
+
 								if(block1ColorizeHSB_RGB==1){
 									ImGui::Text("red                     ");
 									ImGui::SameLine();
 									ImGui::Text("green                   ");
 									ImGui::SameLine();
 									ImGui::Text("blue                    ");
-								} 
+								}
 								ImGui::Separator();
 								ImGui::PushItemWidth(windowWidthThird);
-								
+
 								ImGuiSliderFloatOSC("##1", &block1ColorizeLfo2[0],-1.0,1.0, "/gravity/block3/lfo/b1/hueBand3Amp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##2", &block1ColorizeLfo2[1],-1.0,1.0, "/gravity/block3/lfo/b1/saturationBand3Amp");
@@ -3146,7 +3146,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 3 a");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##4", &block1ColorizeLfo2[3],-1.0,1.0, "/gravity/block3/lfo/b1/hueBand3Rate");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##5", &block1ColorizeLfo2[4],-1.0,1.0, "/gravity/block3/lfo/b1/saturationBand3Rate");
@@ -3155,7 +3155,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 3 r");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##7",&block1ColorizeLfo2[6],-1.0,1.0, "/gravity/block3/lfo/b1/hueBand4Amp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##8",&block1ColorizeLfo2[7],-1.0,1.0, "/gravity/block3/lfo/b1/saturationBand4Amp");
@@ -3164,7 +3164,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 4 a");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##10",&block1ColorizeLfo2[9],-1.0,1.0, "/gravity/block3/lfo/b1/hueBand4Rate");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##11",&block1ColorizeLfo2[10],-1.0,1.0, "/gravity/block3/lfo/b1/saturationBand4Rate");
@@ -3179,17 +3179,17 @@ void GuiApp::draw(){
 								currentNode=27;
 							}
 							ImGui::TreePop();
-						}	
-						ImGui::Separator();	
+						}
+						ImGui::Separator();
 						if(nodeToClose==28)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
-						}	
+							nodeToClose=-1;
+						}
 						if (ImGui::TreeNode("B_1 color eq lfo 3"))
 						{
 							if(currentNode==28)
-							{	
+							{
 								ImGui::Checkbox("midi/gui             ##block1ColorizeLfo3", &block1ColorizeLfo3MidiGui);
 								ImGui::SameLine();
 								ImGui::Checkbox("reset               ##block1ColorizeLfo3",&block1ColorizeLfo3Reset);
@@ -3203,9 +3203,9 @@ void GuiApp::draw(){
 									block1ColorizeLfo3Reset = 0;
 									if (mainApp) mainApp->sendOscBlock3B1();
 								}
-								
+
 								midi2Gui(block1ColorizeLfo3MidiActive, block1ColorizeLfo3, block1ColorizeLfo3MidiGui);
-								
+
 								if(block1ColorizeHSB_RGB==0){
 									ImGui::Text("hue                    ");
 									ImGui::SameLine();
@@ -3213,17 +3213,17 @@ void GuiApp::draw(){
 									ImGui::SameLine();
 									ImGui::Text("bri                    ");
 								}
-								 
+
 								if(block1ColorizeHSB_RGB==1){
 									ImGui::Text("red                    ");
 									ImGui::SameLine();
 									ImGui::Text("green                  ");
 									ImGui::SameLine();
 									ImGui::Text("blue                   ");
-								} 
+								}
 								ImGui::Separator();
 								ImGui::PushItemWidth(windowWidthThird);
-								
+
 								ImGuiSliderFloatOSC("##1", &block1ColorizeLfo3[0],-1.0,1.0, "/gravity/block3/lfo/b1/hueBand5Amp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##2", &block1ColorizeLfo3[1],-1.0,1.0, "/gravity/block3/lfo/b1/saturationBand5Amp");
@@ -3232,7 +3232,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 5 a");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##4", &block1ColorizeLfo3[3],-1.0,1.0, "/gravity/block3/lfo/b1/hueBand5Rate");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##5", &block1ColorizeLfo3[4],-1.0,1.0, "/gravity/block3/lfo/b1/saturationBand5Rate");
@@ -3241,23 +3241,23 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 5 r");
 								ImGui::Separator();
-							
+
 							}
 							else
 							{
 								nodeToClose=currentNode;
 								currentNode=28;
 							}
-							ImGui::TreePop();						
-						}		
-						//endBlock1LfoTab			
+							ImGui::TreePop();
+						}
+						//endBlock1LfoTab
 						ImGui::EndTabItem();
 					}
 					if (ImGui::BeginTabItem("B_2 parameters")){
 						if(nodeToClose==29)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if(ImGui::TreeNode("B_2 geo"))
 						{
@@ -3276,8 +3276,8 @@ void GuiApp::draw(){
 									if (mainApp) mainApp->sendOscBlock3B2();
 									block2HMirror=block2VMirror=block2HFlip=block2VFlip=block2RotateMode=0;
 								}
-								
-								midi2Gui(block2GeoMidiActive, block2Geo, block2GeoMidiGui);	
+
+								midi2Gui(block2GeoMidiActive, block2Geo, block2GeoMidiGui);
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x <->      ##block2", &block2Geo[0],-1.0,1.0, "/gravity/block3/b2/xDisplace");
 								ImGui::SameLine();
@@ -3286,7 +3286,7 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("z <->      ##block2", &block2Geo[2],-1.0,1.0, "/gravity/block3/b2/zDisplace");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("rotate <-> ##block2", &block2Geo[3],-1.0,1.0, "/gravity/block3/b2/rotate");
-							
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x stretch  ##block2", &block2Geo[4],-1.0,1.0, "/gravity/block3/b2/xStretch");
 								ImGui::SameLine();
@@ -3296,12 +3296,12 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y shear    ##block2", &block2Geo[7],-1.0,1.0, "/gravity/block3/b2/yShear");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("kaleid amt ##block2", &block2Geo[8],-1.0,1.0, "/gravity/block3/b2/kaleidoscopeAmount");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("kaleid slice ##block2", &block2Geo[9],-1.0,1.0, "/gravity/block3/b2/kaleidoscopeSlice");
 								ImGui::Separator();
-								
+
 								static int item_current0 = 0;
 								const char* items0[] = { "clamp","toroid","mirror" };
 								if (ImGui::Combo("block2 geo overflow", &block2GeoOverflow, items0, IM_ARRAYSIZE(items0))) {
@@ -3334,13 +3334,13 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=29;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==30)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("B_2 color eq"))
 						{
@@ -3366,11 +3366,11 @@ void GuiApp::draw(){
 									if (mainApp) mainApp->sendOscBlock3B2();
 									block2ColorizeSwitch=block2ColorizeHSB_RGB=0;
 								}
-								
+
 								midi2Gui(block2ColorizeMidiActive, block2Colorize, block2ColorizeMidiGui);
-								
-									
-								
+
+
+
 								if(block2ColorizeHSB_RGB==0){
 									ImGui::Text("hue                    ");
 									ImGui::SameLine();
@@ -3378,18 +3378,18 @@ void GuiApp::draw(){
 									ImGui::SameLine();
 									ImGui::Text("bri                    ");
 								}
-								 
+
 								if(block2ColorizeHSB_RGB==1){
 									ImGui::Text("red                    ");
 									ImGui::SameLine();
 									ImGui::Text("green                  ");
 									ImGui::SameLine();
 									ImGui::Text("blue                   ");
-								} 
+								}
 								ImGui::Separator();
-								
+
 								ImGui::PushItemWidth(windowWidthThird);
-								
+
 								ImGuiSliderFloatOSC("##1", &block2Colorize[0],-1.0,1.0, "/gravity/block3/b2/colorize/hueBand1");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##2", &block2Colorize[1],-1.0,1.0, "/gravity/block3/b2/colorize/saturationBand1");
@@ -3398,7 +3398,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 1");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##4", &block2Colorize[3],-1.0,1.0, "/gravity/block3/b2/colorize/hueBand2");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##5", &block2Colorize[4],-1.0,1.0, "/gravity/block3/b2/colorize/saturationBand2");
@@ -3407,7 +3407,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 2");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##7", &block2Colorize[6],-1.0,1.0, "/gravity/block3/b2/colorize/hueBand3");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##8", &block2Colorize[7],-1.0,1.0, "/gravity/block3/b2/colorize/saturationBand3");
@@ -3416,7 +3416,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 3");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##10", &block2Colorize[9],-1.0,1.0, "/gravity/block3/b2/colorize/hueBand4");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##11", &block2Colorize[10],-1.0,1.0, "/gravity/block3/b2/colorize/saturationBand4");
@@ -3425,7 +3425,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 4");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##13", &block2Colorize[12],-1.0,1.0, "/gravity/block3/b2/colorize/hueBand5");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##14", &block2Colorize[13],-1.0,1.0, "/gravity/block3/b2/colorize/saturationBand5");
@@ -3434,7 +3434,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 5");
 								ImGui::Separator();
-								
+
 								ImGui::PopItemWidth();
 							}
 							else
@@ -3442,13 +3442,13 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=30;
 							}
-							ImGui::TreePop();	
-						}	
+							ImGui::TreePop();
+						}
 						ImGui::Separator();
 						if(nodeToClose==31)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("B_2 filters"))
 						{
@@ -3466,9 +3466,9 @@ void GuiApp::draw(){
 									block2FiltersReset = 0;
 									if (mainApp) mainApp->sendOscBlock3B2();
 								}
-								
+
 								midi2Gui(block2FiltersMidiActive, block2Filters, block2FiltersMidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("blur amt   ##block2", &block2Filters[0],-1.0,1.0, "/gravity/block3/b2/blurAmount");
 								ImGui::SameLine();
@@ -3486,15 +3486,15 @@ void GuiApp::draw(){
 								currentNode=31;
 							}
 							ImGui::TreePop();
-						}	
+						}
 						//endBLOCK2parameters
-						ImGui::EndTabItem();	
+						ImGui::EndTabItem();
 					}
 					if (ImGui::BeginTabItem("B_2 lfo")){
 						if(nodeToClose==32)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("B_2 geo lfo 1"))
 						{
@@ -3514,9 +3514,9 @@ void GuiApp::draw(){
 									block2Geo1Lfo1Reset = 0;
 									if (mainApp) mainApp->sendOscBlock3B2();
 								}
-								
+
 								midi2Gui(block2Geo1Lfo1MidiActive, block2Geo1Lfo1, block2Geo1Lfo1MidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x <-> a      ##block2Lfo", &block2Geo1Lfo1[0],-1.0,1.0, "/gravity/block3/lfo/b2/xDisplaceAmp");
 								ImGui::SameLine();
@@ -3539,13 +3539,13 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=32;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==33)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("B_2 geo lfo 2"))
 						{
@@ -3565,10 +3565,10 @@ void GuiApp::draw(){
 									block2Geo1Lfo2Reset = 0;
 									if (mainApp) mainApp->sendOscBlock3B2();
 								}
-								
+
 								midi2Gui(block2Geo1Lfo2MidiActive, block2Geo1Lfo2, block2Geo1Lfo2MidiGui);
-								
-								
+
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x stretch a  ##block2lfo", &block2Geo1Lfo2[0],-1.0,1.0, "/gravity/block3/lfo/b2/xStretchAmp");
 								ImGui::SameLine();
@@ -3595,13 +3595,13 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=33;
 							}
-							ImGui::TreePop();		
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==34)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("B_2 color eq lfo 1"))
 						{
@@ -3620,9 +3620,9 @@ void GuiApp::draw(){
 									block2ColorizeLfo1Reset = 0;
 									if (mainApp) mainApp->sendOscBlock3B2();
 								}
-								
+
 								midi2Gui(block2ColorizeLfo1MidiActive, block2ColorizeLfo1, block2ColorizeLfo1MidiGui);
-								
+
 								if(block2ColorizeHSB_RGB==0){
 									ImGui::Text("hue                    ");
 									ImGui::SameLine();
@@ -3630,17 +3630,17 @@ void GuiApp::draw(){
 									ImGui::SameLine();
 									ImGui::Text("bri                    ");
 								}
-								 
+
 								if(block2ColorizeHSB_RGB==1){
 									ImGui::Text("red                    ");
 									ImGui::SameLine();
 									ImGui::Text("green                  ");
 									ImGui::SameLine();
 									ImGui::Text("blue                   ");
-								} 
+								}
 								ImGui::Separator();
 								ImGui::PushItemWidth(windowWidthThird);
-								
+
 								ImGuiSliderFloatOSC("##1", &block2ColorizeLfo1[0],-1.0,1.0, "/gravity/block3/lfo/b2/hueBand1Amp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##2", &block2ColorizeLfo1[1],-1.0,1.0, "/gravity/block3/lfo/b2/saturationBand1Amp");
@@ -3649,7 +3649,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 1 a");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##4", &block2ColorizeLfo1[3],-1.0,1.0, "/gravity/block3/lfo/b2/hueBand1Rate");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##5", &block2ColorizeLfo1[4],-1.0,1.0, "/gravity/block3/lfo/b2/saturationBand1Rate");
@@ -3658,7 +3658,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 1 r");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##7",&block2ColorizeLfo1[6],-1.0,1.0, "/gravity/block3/lfo/b2/hueBand2Amp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##8",&block2ColorizeLfo1[7],-1.0,1.0, "/gravity/block3/lfo/b2/saturationBand2Amp");
@@ -3667,7 +3667,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 2 a");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##10",&block2ColorizeLfo1[9],-1.0,1.0, "/gravity/block3/lfo/b2/hueBand2Rate");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##11",&block2ColorizeLfo1[10],-1.0,1.0, "/gravity/block3/lfo/b2/saturationBand2Rate");
@@ -3681,18 +3681,18 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=34;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==35)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("B_2 color eq lfo 2"))
 						{
 							if(currentNode==35)
-							{	
+							{
 								ImGui::Checkbox("midi/gui             ##block2ColorizeLfo2", &block2ColorizeLfo2MidiGui);
 								ImGui::SameLine();
 								ImGui::Checkbox("reset               ##block2ColorizeLfo2",&block2ColorizeLfo2Reset);
@@ -3706,9 +3706,9 @@ void GuiApp::draw(){
 									block2ColorizeLfo2Reset = 0;
 									if (mainApp) mainApp->sendOscBlock3B2();
 								}
-								
+
 								midi2Gui(block2ColorizeLfo2MidiActive, block2ColorizeLfo2, block2ColorizeLfo2MidiGui);
-								
+
 								if(block2ColorizeHSB_RGB==0){
 									ImGui::Text("hue                    ");
 									ImGui::SameLine();
@@ -3716,17 +3716,17 @@ void GuiApp::draw(){
 									ImGui::SameLine();
 									ImGui::Text("bri                    ");
 								}
-								 
+
 								if(block2ColorizeHSB_RGB==1){
 									ImGui::Text("red                    ");
 									ImGui::SameLine();
 									ImGui::Text("green                  ");
 									ImGui::SameLine();
 									ImGui::Text("blue                   ");
-								} 
+								}
 								ImGui::Separator();
 								ImGui::PushItemWidth(windowWidthThird);
-								
+
 								ImGuiSliderFloatOSC("##1", &block2ColorizeLfo2[0],-1.0,1.0, "/gravity/block3/lfo/b2/hueBand3Amp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##2", &block2ColorizeLfo2[1],-1.0,1.0, "/gravity/block3/lfo/b2/saturationBand3Amp");
@@ -3735,7 +3735,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 3 a");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##4", &block2ColorizeLfo2[3],-1.0,1.0, "/gravity/block3/lfo/b2/hueBand3Rate");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##5", &block2ColorizeLfo2[4],-1.0,1.0, "/gravity/block3/lfo/b2/saturationBand3Rate");
@@ -3744,7 +3744,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 3 r");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##7",&block2ColorizeLfo2[6],-1.0,1.0, "/gravity/block3/lfo/b2/hueBand4Amp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##8",&block2ColorizeLfo2[7],-1.0,1.0, "/gravity/block3/lfo/b2/saturationBand4Amp");
@@ -3753,7 +3753,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 4 a");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##10",&block2ColorizeLfo2[9],-1.0,1.0, "/gravity/block3/lfo/b2/hueBand4Rate");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##11",&block2ColorizeLfo2[10],-1.0,1.0, "/gravity/block3/lfo/b2/saturationBand4Rate");
@@ -3767,18 +3767,18 @@ void GuiApp::draw(){
 								nodeToClose=currentNode;
 								currentNode=35;
 							}
-							ImGui::TreePop();	
+							ImGui::TreePop();
 						}
 						ImGui::Separator();
 						if(nodeToClose==36)
 						{
 							ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-							nodeToClose=-1;	
+							nodeToClose=-1;
 						}
 						if (ImGui::TreeNode("B_2 color eq lfo 3"))
 						{
 							if(currentNode==36)
-							{	
+							{
 								ImGui::Checkbox("midi/gui             ##block2ColorizeLfo3", &block2ColorizeLfo3MidiGui);
 								ImGui::SameLine();
 								ImGui::Checkbox("reset               ##block2ColorizeLfo3",&block2ColorizeLfo3Reset);
@@ -3792,9 +3792,9 @@ void GuiApp::draw(){
 									block2ColorizeLfo3Reset = 0;
 									if (mainApp) mainApp->sendOscBlock3B2();
 								}
-								
+
 								midi2Gui(block2ColorizeLfo3MidiActive, block2ColorizeLfo3, block2ColorizeLfo3MidiGui);
-								
+
 								if(block2ColorizeHSB_RGB==0){
 									ImGui::Text("hue                    ");
 									ImGui::SameLine();
@@ -3802,17 +3802,17 @@ void GuiApp::draw(){
 									ImGui::SameLine();
 									ImGui::Text("bri                    ");
 								}
-								 
+
 								if(block2ColorizeHSB_RGB==1){
 									ImGui::Text("red                    ");
 									ImGui::SameLine();
 									ImGui::Text("green                  ");
 									ImGui::SameLine();
 									ImGui::Text("blue                   ");
-								} 
+								}
 								ImGui::Separator();
 								ImGui::PushItemWidth(windowWidthThird);
-								
+
 								ImGuiSliderFloatOSC("##1", &block2ColorizeLfo3[0],-1.0,1.0, "/gravity/block3/lfo/b2/hueBand5Amp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##2", &block2ColorizeLfo3[1],-1.0,1.0, "/gravity/block3/lfo/b2/saturationBand5Amp");
@@ -3821,7 +3821,7 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGui::Text("band 5 a");
 								ImGui::Separator();
-								
+
 								ImGuiSliderFloatOSC("##4", &block2ColorizeLfo3[3],-1.0,1.0, "/gravity/block3/lfo/b2/hueBand5Rate");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("##5", &block2ColorizeLfo3[4],-1.0,1.0, "/gravity/block3/lfo/b2/saturationBand5Rate");
@@ -3838,17 +3838,17 @@ void GuiApp::draw(){
 							}
 							ImGui::TreePop();
 						}//end block1ColorizeLfo2
-						ImGui::EndTabItem();			
+						ImGui::EndTabItem();
 						//ImGui::TreePop();
-					}//end BLOCK2 lfos tab item	
-						
+					}//end BLOCK2 lfos tab item
+
 					if (ImGui::BeginTabItem("matrix mixer")){
 						//static int item_current0 = 0;
 						//static int item_current1 = 0;
 						//static int item_current2 = 0;
-						
+
 						ImGui::PushItemWidth(windowWidthThird);
-						
+
 						ImGui::Checkbox("midi/gui                              ##matrixMix", &matrixMixMidiGui);
 						ImGui::SameLine();
 						ImGui::Checkbox("reset        ##matrixMix",&matrixMixReset);
@@ -3861,7 +3861,7 @@ void GuiApp::draw(){
 						if (mainApp) mainApp->sendOscBlock3MatrixAndFinal();
 							matrixMixType=matrixMixOverflow=0;
 						}
-						
+
 						const char* items1[] = {  "linear fade", "additive","difference","multiplicitive","dodge" };
 						if (ImGui::Combo("type             ", &matrixMixType, items1, IM_ARRAYSIZE(items1))) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block3/matrixMix/mixType", static_cast<float>(matrixMixType));
@@ -3873,9 +3873,9 @@ void GuiApp::draw(){
 							if (mainApp) mainApp->sendOscParameter("/gravity/block3/matrixMix/overflow", static_cast<float>(matrixMixOverflow));
 						}
 						//matrixMixOverflow = item_current2;
-						
+
 						ImGui::Text(" ");
-						
+
 						midi2Gui(matrixMixMidiActive, matrixMix, matrixMixMidiGui);
 						if( finalKeyOrder==0){
 							ImGui::Text("B_2     ->   ");
@@ -3890,12 +3890,12 @@ void GuiApp::draw(){
 						ImGui::SameLine();
 						ImGui::Text("blue                  ");
 						ImGui::Separator();
-						
+
 						if( finalKeyOrder==0){
-							ImGui::Text("B_1       red");	
+							ImGui::Text("B_1       red");
 						}
 						if( finalKeyOrder==1){
-							ImGui::Text("B_2       red");	
+							ImGui::Text("B_2       red");
 						}
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("##1", &matrixMix[0],-1.0,1.0, "/gravity/block3/matrixMix/b1RedToB2Red");
@@ -3907,14 +3907,14 @@ void GuiApp::draw(){
 						ImGui::Text("   ");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("##3", &matrixMix[2],-1.0,1.0, "/gravity/block3/matrixMix/b1RedToB2Blue");
-						
+
 						ImGui::Separator();
-						
+
 						if( finalKeyOrder==0){
-							ImGui::Text("B_1     green");	
+							ImGui::Text("B_1     green");
 						}
 						if( finalKeyOrder==1){
-							ImGui::Text("B_2     green");	
+							ImGui::Text("B_2     green");
 						}
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("##4", &matrixMix[3],-1.0,1.0, "/gravity/block3/matrixMix/b1GreenToB2Red");
@@ -3926,14 +3926,14 @@ void GuiApp::draw(){
 						ImGui::Text("   ");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("##6", &matrixMix[5],-1.0,1.0, "/gravity/block3/matrixMix/b1GreenToB2Blue");
-						
+
 						ImGui::Separator();
-						
+
 						if( finalKeyOrder==0){
-							ImGui::Text("B_1      blue");	
+							ImGui::Text("B_1      blue");
 						}
 						if( finalKeyOrder==1){
-							ImGui::Text("B_2      blue");	
+							ImGui::Text("B_2      blue");
 						}
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("##7", &matrixMix[6],-1.0,1.0, "/gravity/block3/matrixMix/b1BlueToB2Red");
@@ -3945,20 +3945,20 @@ void GuiApp::draw(){
 						ImGui::Text("   ");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("##9", &matrixMix[8],-1.0,1.0, "/gravity/block3/matrixMix/b1BlueToB2Blue");
-						
+
 						ImGui::Separator();
 
 						ImGui::PopItemWidth();
 						ImGui::EndTabItem();
 					}
 					if (ImGui::BeginTabItem("final mix and key")){
-						
+
 						//static int item_current0 = 0;
 						//static int item_current1 = 0;
 						//static int item_current2 = 0;
 						//static int item_current3 = 0;
-						
-						  
+
+
 						ImGui::Checkbox("midi/gui                 ##final", &finalMixAndKeyMidiGui);
 						ImGui::SameLine();
 						ImGui::Checkbox("reset          ##final",&finalMixAndKeyReset);
@@ -3972,9 +3972,9 @@ void GuiApp::draw(){
 						if (mainApp) mainApp->sendOscBlock3MatrixAndFinal();
 							finalKeyMode=finalMixOverflow=finalMixType=0;
 						}
-						
+
 						midi2Gui(finalMixAndKeyMidiActive, finalMixAndKey, finalMixAndKeyMidiGui);
-		                
+
 						ImGui::Separator();
 						const char* items1[] = { "linear fade", "additive","difference","multiplicitive","dodge" };
 						if (ImGui::Combo("mix type       ##final ", &finalMixType, items1, IM_ARRAYSIZE(items1))) {
@@ -3984,7 +3984,7 @@ void GuiApp::draw(){
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("mix ##final", &finalMixAndKey[0],-1.0,1.0, "/gravity/block3/final/mixAmount");
 						ImGui::Separator();
-						
+
 						const char* items2[] = {"clamp", "wrap","foldover" };
 						if (ImGui::Combo("overflow       ##finalMix", &finalMixOverflow, items2, IM_ARRAYSIZE(items2))) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block3/final/overflow", static_cast<float>(finalMixOverflow));
@@ -3997,7 +3997,7 @@ void GuiApp::draw(){
 						}
 						//finalKeyMode = item_current3;
 						ImGui::Separator();
-					
+
 						if(finalKeyMode==0){
 							ImGuiSliderFloatOSC("key red        ##final", &finalMixAndKey[1],-1.0,1.0, "/gravity/block3/final/keyRed");
 							ImGui::SameLine();
@@ -4006,9 +4006,9 @@ void GuiApp::draw(){
 							ImGuiSliderFloatOSC("key blue       ##final", &finalMixAndKey[1],-1.0,1.0, "/gravity/block3/final/keyBluw");
 							ImGui::SameLine();
 							finalMixAndKey[2]=finalMixAndKey[3]=finalMixAndKey[1];
-							
+
 						}
-						
+
 						if(finalKeyMode==1){
 							ImGuiSliderFloatOSC("key red        ##final", &finalMixAndKey[1],-1.0,1.0, "/gravity/block3/final/keyRed");
 							ImGui::SameLine();
@@ -4017,25 +4017,25 @@ void GuiApp::draw(){
 							ImGuiSliderFloatOSC("key blue       ##final", &finalMixAndKey[3],-1.0,1.0, "/gravity/block3/final/keyBlue");
 							ImGui::SameLine();
 						}
-						
+
 						ImGui::ColorButton("testingColorButton 1", ImVec4(finalMixAndKey[1], finalMixAndKey[2], finalMixAndKey[3], 1.0), 0, ImVec2(20, 20));
 						ImGui::SameLine();
 						ImGui::Text("key value color");
-						
+
 						ImGui::Separator();
 						ImGuiSliderFloatOSC("key threshold  ##final", &finalMixAndKey[4],-1.0,1.0, "/gravity/block3/final/keyThreshold");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("key soft ##final", &finalMixAndKey[5],-1.0,1.0, "/gravity/block3/final/keySoft");
-						
-						ImGui::EndTabItem();	
+
+						ImGui::EndTabItem();
 					}
 					if (ImGui::BeginTabItem("mix lfo")){
-					
+
 						if(secretMenuSwitch==1){
 							if(nodeToClose==37)
 							{
 								ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-								nodeToClose=-1;	
+								nodeToClose=-1;
 							}
 							if (ImGui::TreeNode("matrix mixer lfo 1"))
 							{
@@ -4054,11 +4054,11 @@ void GuiApp::draw(){
 										matrixMixLfo1Reset = 0;
 										if (mainApp) mainApp->sendOscBlock3MatrixAndFinal();
 									}
-									
+
 									ImGui::Separator();
-									
+
 									midi2Gui(matrixMixLfo1MidiActive, matrixMixLfo1, matrixMixLfo1MidiGui);
-									
+
 									if( finalKeyOrder==0){
 										ImGui::Text("B_2   ->    ");
 									}
@@ -4072,14 +4072,14 @@ void GuiApp::draw(){
 									ImGui::SameLine();
 									ImGui::Text("blue                  ");
 									ImGui::Separator();
-									
+
 									ImGui::PushItemWidth(windowWidthThird);
-									
+
 									if( finalKeyOrder==0){
-										ImGui::Text("B_1  red   a");	
+										ImGui::Text("B_1  red   a");
 									}
 									if( finalKeyOrder==1){
-										ImGui::Text("B_2  red   a");	
+										ImGui::Text("B_2  red   a");
 									}
 									ImGui::SameLine();
 									ImGuiSliderFloatOSC("##1", &matrixMixLfo1[0],-1.0,1.0, "/gravity/block3/lfo/matrixMix/b1RedToB2RedAmp");
@@ -4091,14 +4091,14 @@ void GuiApp::draw(){
 									ImGui::Text("   ");
 									ImGui::SameLine();
 									ImGuiSliderFloatOSC("##3", &matrixMixLfo1[2],-1.0,1.0, "/gravity/block3/lfo/matrixMix/b1RedToB2BlueAmp");
-									
+
 									ImGui::Separator();
-									
+
 									if( finalKeyOrder==0){
-										ImGui::Text("B_1  red   r");	
+										ImGui::Text("B_1  red   r");
 									}
 									if( finalKeyOrder==1){
-										ImGui::Text("B_2  red   r");	
+										ImGui::Text("B_2  red   r");
 									}
 									ImGui::SameLine();
 									ImGuiSliderFloatOSC("##4", &matrixMixLfo1[3],-1.0,1.0, "/gravity/block3/lfo/matrixMix/b1RedToB2RedRate");
@@ -4110,14 +4110,14 @@ void GuiApp::draw(){
 									ImGui::Text("   ");
 									ImGui::SameLine();
 									ImGuiSliderFloatOSC("##6", &matrixMixLfo1[5],-1.0,1.0, "/gravity/block3/lfo/matrixMix/b1RedToB2BlueRate");
-									
+
 									ImGui::Separator();
-									
+
 									if( finalKeyOrder==0){
-										ImGui::Text("B_1 green  a");	
+										ImGui::Text("B_1 green  a");
 									}
 									if( finalKeyOrder==1){
-										ImGui::Text("B_2 green  a");	
+										ImGui::Text("B_2 green  a");
 									}
 									ImGui::SameLine();
 									ImGuiSliderFloatOSC("##7",&matrixMixLfo1[6],-1.0,1.0, "/gravity/block3/lfo/matrixMix/b1GreenToB2RedAmp");
@@ -4129,14 +4129,14 @@ void GuiApp::draw(){
 									ImGui::Text("   ");
 									ImGui::SameLine();
 									ImGuiSliderFloatOSC("##9",&matrixMixLfo1[8],-1.0,1.0, "/gravity/block3/lfo/matrixMix/b1GreenToB2BlueAmp");
-									
+
 									ImGui::Separator();
-									
+
 									if( finalKeyOrder==0){
-										ImGui::Text("B_1 green  r");	
+										ImGui::Text("B_1 green  r");
 									}
 									if( finalKeyOrder==1){
-										ImGui::Text("B_2 green  r");	
+										ImGui::Text("B_2 green  r");
 									}
 									ImGui::SameLine();
 									ImGuiSliderFloatOSC("##10",&matrixMixLfo1[9],-1.0,1.0, "/gravity/block3/lfo/matrixMix/b1GreenToB2RedRate");
@@ -4148,7 +4148,7 @@ void GuiApp::draw(){
 									ImGui::Text("   ");
 									ImGui::SameLine();
 									ImGuiSliderFloatOSC("##12",&matrixMixLfo1[11],-1.0,1.0, "/gravity/block3/lfo/matrixMix/b1GreenToB2BlueRate");
-									
+
 									ImGui::PopItemWidth();
 								}
 								else
@@ -4156,13 +4156,13 @@ void GuiApp::draw(){
 									nodeToClose=currentNode;
 									currentNode=37;
 								}
-								ImGui::TreePop();		
+								ImGui::TreePop();
 							}
 							ImGui::Separator();
 							if(nodeToClose==38)
 							{
 								ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-								nodeToClose=-1;	
+								nodeToClose=-1;
 							}
 							if (ImGui::TreeNode("matrix mixer lfo 2")){
 								if(currentNode==38)
@@ -4180,11 +4180,11 @@ void GuiApp::draw(){
 										matrixMixLfo2Reset = 0;
 										if (mainApp) mainApp->sendOscBlock3MatrixAndFinal();
 									}
-									
+
 									ImGui::Separator();
-									
+
 									midi2Gui(matrixMixLfo2MidiActive, matrixMixLfo2, matrixMixLfo2MidiGui);
-									
+
 									if( finalKeyOrder==0){
 										ImGui::Text("B_2   ->    ");
 									}
@@ -4198,14 +4198,14 @@ void GuiApp::draw(){
 									ImGui::SameLine();
 									ImGui::Text("blue                  ");
 									ImGui::Separator();
-									
+
 									ImGui::PushItemWidth(windowWidthThird);
-									
+
 									if( finalKeyOrder==0){
-										ImGui::Text("B_1  blue  a");	
+										ImGui::Text("B_1  blue  a");
 									}
 									if( finalKeyOrder==1){
-										ImGui::Text("B_2  blue  a");	
+										ImGui::Text("B_2  blue  a");
 									}
 									ImGui::SameLine();
 									ImGuiSliderFloatOSC("##1", &matrixMixLfo2[0],-1.0,1.0, "/gravity/block3/lfo/matrixMix/b1BlueToB2RedAmp");
@@ -4217,14 +4217,14 @@ void GuiApp::draw(){
 									ImGui::Text("   ");
 									ImGui::SameLine();
 									ImGuiSliderFloatOSC("##3",&matrixMixLfo2[2],-1.0,1.0, "/gravity/block3/lfo/matrixMix/b1BlueToB2BlueAmp");
-									
+
 									ImGui::Separator();
-									
+
 									if( finalKeyOrder==0){
-										ImGui::Text("B_1  blue  r");	
+										ImGui::Text("B_1  blue  r");
 									}
 									if( finalKeyOrder==1){
-										ImGui::Text("B_2  blue  r");	
+										ImGui::Text("B_2  blue  r");
 									}
 									ImGui::SameLine();
 									ImGuiSliderFloatOSC("##4",&matrixMixLfo2[3],-1.0,1.0, "/gravity/block3/lfo/matrixMix/b1BlueToB2RedRate");
@@ -4252,7 +4252,7 @@ void GuiApp::draw(){
 							if(nodeToClose==39)
 							{
 								ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-								nodeToClose=-1;	
+								nodeToClose=-1;
 							}
 						if (ImGui::TreeNode("final mix and key lfo"))
 						{
@@ -4271,9 +4271,9 @@ void GuiApp::draw(){
 									finalMixAndKeyLfoReset = 0;
 									if (mainApp) mainApp->sendOscBlock3MatrixAndFinal();
 								}
-								
+
 								midi2Gui(finalMixAndKeyLfoMidiActive, finalMixAndKeyLfo, finalMixAndKeyLfoMidiGui);
-								
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("mix a       ##final", &finalMixAndKeyLfo[0],-1.0,1.0, "/gravity/block3/lfo/final/mixAmountAmp");
 								ImGui::SameLine();
@@ -4293,23 +4293,23 @@ void GuiApp::draw(){
 								currentNode=39;
 							}
 							ImGui::TreePop();
-						}	
-						
-						ImGui::EndTabItem();	
+						}
+
+						ImGui::EndTabItem();
 					}//end finalmix lfo
 					ImGui::EndTabBar();
 				}
-				ImGui::EndTabItem();		
+				ImGui::EndTabItem();
 			}//end block3
-       		ImGui::PopStyleColor(12);	
+       		ImGui::PopStyleColor(12);
 
 			// VIDEO SETTINGS TAB
 			if (ImGui::BeginTabItem("VIDEO SETTINGS")) {
-				
+
 				ImGui::Text("Video Settings");
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// ========== FRAME RATE ==========
 				ImGui::Text("FRAME RATE");
 				ImGui::Spacing();
@@ -4328,12 +4328,12 @@ void GuiApp::draw(){
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// ========== VIDEO INPUT DEVICES ==========
 				ImGui::Text("Video Input Device Selection");
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// Refresh buttons
 				if (ImGui::Button("Refresh Webcams")) {
 					refreshVideoDevices();
@@ -4349,18 +4349,18 @@ void GuiApp::draw(){
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// Device counts
-				ImGui::Text("Found %d webcams, %d NDI sources, %d Spout senders", 
+				ImGui::Text("Found %d webcams, %d NDI sources, %d Spout senders",
 					(int)videoDevices.size(), (int)ndiSourceNames.size(), (int)spoutSourceNames.size());
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// ========== INPUT 1 ==========
 				ImGui::Text("INPUT 1");
 				ImGui::Spacing();
-				
+
 				// Source type selector
 				ImGui::Text("Source Type:");
 				ImGui::SameLine();
@@ -4375,12 +4375,12 @@ void GuiApp::draw(){
 				if (ImGui::RadioButton("Spout##1", input1SourceType == 2)) {
 					input1SourceType = 2;
 				}
-				
+
 				// Show appropriate dropdown based on source type
 				if (input1SourceType == 0) {
 					// Webcam dropdown
 					if (videoDeviceNames.size() > 0) {
-						if (ImGui::BeginCombo("##input1device", 
+						if (ImGui::BeginCombo("##input1device",
 							input1DeviceID < videoDeviceNames.size() ? videoDeviceNames[input1DeviceID].c_str() : "Select Device")) {
 							for (int i = 0; i < videoDeviceNames.size(); i++) {
 								bool isSelected = (input1DeviceID == i);
@@ -4399,7 +4399,7 @@ void GuiApp::draw(){
 				} else if (input1SourceType == 1) {
 					// NDI dropdown
 					if (ndiSourceNames.size() > 0) {
-						if (ImGui::BeginCombo("##input1ndi", 
+						if (ImGui::BeginCombo("##input1ndi",
 							input1NdiSourceIndex < ndiSourceNames.size() ? ndiSourceNames[input1NdiSourceIndex].c_str() : "Select NDI Source")) {
 							for (int i = 0; i < ndiSourceNames.size(); i++) {
 								bool isSelected = (input1NdiSourceIndex == i);
@@ -4418,7 +4418,7 @@ void GuiApp::draw(){
 				} else if (input1SourceType == 2) {
 					// Spout dropdown
 					if (spoutSourceNames.size() > 0) {
-						if (ImGui::BeginCombo("##input1spout", 
+						if (ImGui::BeginCombo("##input1spout",
 							input1SpoutSourceIndex < spoutSourceNames.size() ? spoutSourceNames[input1SpoutSourceIndex].c_str() : "Select Spout Sender")) {
 							for (int i = 0; i < spoutSourceNames.size(); i++) {
 								bool isSelected = (input1SpoutSourceIndex == i);
@@ -4439,11 +4439,11 @@ void GuiApp::draw(){
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// ========== INPUT 2 ==========
 				ImGui::Text("INPUT 2");
 				ImGui::Spacing();
-				
+
 				// Source type selector
 				ImGui::Text("Source Type:");
 				ImGui::SameLine();
@@ -4458,12 +4458,12 @@ void GuiApp::draw(){
 				if (ImGui::RadioButton("Spout##2", input2SourceType == 2)) {
 					input2SourceType = 2;
 				}
-				
+
 				// Show appropriate dropdown based on source type
 				if (input2SourceType == 0) {
 					// Webcam dropdown
 					if (videoDeviceNames.size() > 0) {
-						if (ImGui::BeginCombo("##input2device", 
+						if (ImGui::BeginCombo("##input2device",
 							input2DeviceID < videoDeviceNames.size() ? videoDeviceNames[input2DeviceID].c_str() : "Select Device")) {
 							for (int i = 0; i < videoDeviceNames.size(); i++) {
 								bool isSelected = (input2DeviceID == i);
@@ -4482,7 +4482,7 @@ void GuiApp::draw(){
 				} else if (input2SourceType == 1) {
 					// NDI dropdown
 					if (ndiSourceNames.size() > 0) {
-						if (ImGui::BeginCombo("##input2ndi", 
+						if (ImGui::BeginCombo("##input2ndi",
 							input2NdiSourceIndex < ndiSourceNames.size() ? ndiSourceNames[input2NdiSourceIndex].c_str() : "Select NDI Source")) {
 							for (int i = 0; i < ndiSourceNames.size(); i++) {
 								bool isSelected = (input2NdiSourceIndex == i);
@@ -4501,7 +4501,7 @@ void GuiApp::draw(){
 				} else if (input2SourceType == 2) {
 					// Spout dropdown
 					if (spoutSourceNames.size() > 0) {
-						if (ImGui::BeginCombo("##input2spout", 
+						if (ImGui::BeginCombo("##input2spout",
 							input2SpoutSourceIndex < spoutSourceNames.size() ? spoutSourceNames[input2SpoutSourceIndex].c_str() : "Select Spout Sender")) {
 							for (int i = 0; i < spoutSourceNames.size(); i++) {
 								bool isSelected = (input2SpoutSourceIndex == i);
@@ -4522,57 +4522,57 @@ void GuiApp::draw(){
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// Reinitialize button
 				ImGui::Text("Apply Changes");
 				if (ImGui::Button("REINITIALIZE INPUTS", ImVec2(220, 30))) {
 					reinitializeInputs = true;
 				}
 				ImGui::Spacing();
-				
+
 				// Help text
 				ImGui::Separator();
 				ImGui::Text("Select source type and device, then click");
 				ImGui::Text("'Reinitialize Inputs' to apply changes.");
-				
+
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// ========== SPOUT OUTPUT ==========
 				ImGui::Text("SPOUT OUTPUT");
 				ImGui::Spacing();
-				
+
 				ImGui::Checkbox("Send Block 1 (GwBlock1)", &spoutSendBlock1);
 				ImGui::Checkbox("Send Block 2 (GwBlock2)", &spoutSendBlock2);
 				ImGui::Checkbox("Send Block 3 - Final (GwBlock3)", &spoutSendBlock3);
-				
+
 				ImGui::Spacing();
 				ImGui::TextDisabled("Enable to share framebuffers via Spout");
-				
+
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// ========== NDI OUTPUT ==========
 				ImGui::Text("NDI OUTPUT");
 				ImGui::Spacing();
-				
+
 				ImGui::Checkbox("Send Block 1 (GwBlock1)##ndi", &ndiSendBlock1);
 				ImGui::Checkbox("Send Block 2 (GwBlock2)##ndi", &ndiSendBlock2);
 				ImGui::Checkbox("Send Block 3 - Final (GwBlock3)##ndi", &ndiSendBlock3);
-				
+
 				ImGui::Spacing();
 				ImGui::TextDisabled("Enable to share framebuffers via NDI");
-				
+
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// ========== RESOLUTION SETTINGS ==========
 				ImGui::Text("RESOLUTION SETTINGS");
 				ImGui::Spacing();
-				
+
 				// Input 1 Resolution
 				ImGui::Text("Input 1 Resolution:");
 				ImGui::SetNextItemWidth(80);
@@ -4582,7 +4582,7 @@ void GuiApp::draw(){
 				ImGui::SameLine();
 				ImGui::SetNextItemWidth(80);
 				ImGui::InputScalar("##in1Height", ImGuiDataType_S32, &input1Height);
-				
+
 				// Input 2 Resolution
 				ImGui::Text("Input 2 Resolution:");
 				ImGui::SetNextItemWidth(80);
@@ -4592,9 +4592,9 @@ void GuiApp::draw(){
 				ImGui::SameLine();
 				ImGui::SetNextItemWidth(80);
 				ImGui::InputScalar("##in2Height", ImGuiDataType_S32, &input2Height);
-				
+
 				ImGui::Spacing();
-				
+
 				// Internal Resolution
 				ImGui::Text("Internal Resolution (Feedback Buffers):");
 				ImGui::SetNextItemWidth(80);
@@ -4604,9 +4604,9 @@ void GuiApp::draw(){
 				ImGui::SameLine();
 				ImGui::SetNextItemWidth(80);
 				ImGui::InputScalar("##intHeight", ImGuiDataType_S32, &internalHeight);
-				
+
 				ImGui::Spacing();
-				
+
 				// Output Resolution
 				ImGui::Text("Output Resolution:");
 				ImGui::SetNextItemWidth(80);
@@ -4616,11 +4616,11 @@ void GuiApp::draw(){
 				ImGui::SameLine();
 				ImGui::SetNextItemWidth(80);
 				ImGui::InputScalar("##outHeight", ImGuiDataType_S32, &outputHeight);
-				
+
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// Spout Send Resolution
 				ImGui::Text("Spout Send Resolution:");
 				ImGui::SetNextItemWidth(80);
@@ -4630,7 +4630,7 @@ void GuiApp::draw(){
 				ImGui::SameLine();
 				ImGui::SetNextItemWidth(80);
 				ImGui::InputScalar("##spoutHeight", ImGuiDataType_S32, &spoutSendHeight);
-				
+
 				// NDI Send Resolution
 				ImGui::Text("NDI Send Resolution:");
 				ImGui::SetNextItemWidth(80);
@@ -4640,38 +4640,38 @@ void GuiApp::draw(){
 				ImGui::SameLine();
 				ImGui::SetNextItemWidth(80);
 				ImGui::InputScalar("##ndiHeight", ImGuiDataType_S32, &ndiSendHeight);
-				
+
 				// Clamp all values
 				if (input1Width < 160) input1Width = 160;
 				if (input1Width > 3840) input1Width = 3840;
 				if (input1Height < 120) input1Height = 120;
 				if (input1Height > 2160) input1Height = 2160;
-				
+
 				if (input2Width < 160) input2Width = 160;
 				if (input2Width > 3840) input2Width = 3840;
 				if (input2Height < 120) input2Height = 120;
 				if (input2Height > 2160) input2Height = 2160;
-				
+
 				if (internalWidth < 320) internalWidth = 320;
 				if (internalWidth > 3840) internalWidth = 3840;
 				if (internalHeight < 240) internalHeight = 240;
 				if (internalHeight > 2160) internalHeight = 2160;
-				
+
 				if (outputWidth < 320) outputWidth = 320;
 				if (outputWidth > 3840) outputWidth = 3840;
 				if (outputHeight < 240) outputHeight = 240;
 				if (outputHeight > 2160) outputHeight = 2160;
-				
+
 				if (spoutSendWidth < 320) spoutSendWidth = 320;
 				if (spoutSendWidth > 3840) spoutSendWidth = 3840;
 				if (spoutSendHeight < 240) spoutSendHeight = 240;
 				if (spoutSendHeight > 2160) spoutSendHeight = 2160;
-				
+
 				if (ndiSendWidth < 320) ndiSendWidth = 320;
 				if (ndiSendWidth > 3840) ndiSendWidth = 3840;
 				if (ndiSendHeight < 240) ndiSendHeight = 240;
 				if (ndiSendHeight > 2160) ndiSendHeight = 2160;
-				
+
 				ImGui::Spacing();
 				if (ImGui::Button("Apply Resolution Changes")) {
 					resolutionChangeRequested = true;
@@ -4679,11 +4679,11 @@ void GuiApp::draw(){
 				ImGui::Spacing();
 				ImGui::TextDisabled("Warning: Changing resolutions will clear all buffers.");
 				ImGui::TextDisabled("Higher resolutions require more GPU memory.");
-				
+
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// ========== SAVE SETTINGS ==========
 				ImGui::Text("SAVE/LOAD SETTINGS");
 				ImGui::Spacing();
@@ -4693,11 +4693,11 @@ void GuiApp::draw(){
 				ImGui::Spacing();
 				ImGui::TextDisabled("Saves to data/settings.json");
 				ImGui::TextDisabled("Settings auto-load on startup");
-				
+
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// ========== ATTRIBUTIONS ==========
 				ImGui::Text("ATTRIBUTIONS");
 				ImGui::Spacing();
@@ -4707,99 +4707,99 @@ void GuiApp::draw(){
 				ImGui::Spacing();
 				ImGui::TextDisabled("View licenses and credits for");
 				ImGui::TextDisabled("third-party libraries used in this app");
-				
+
 				// Attributions Popup Window
 				if (showAttributionsPopup) {
 					ImGui::OpenPopup("Attributions");
 				}
-				
+
 				// Calculate center of viewport (compatible with older ImGui versions)
 				ImGuiViewport* viewport = ImGui::GetMainViewport();
 				ImVec2 center(viewport->Pos.x + viewport->Size.x * 0.5f, viewport->Pos.y + viewport->Size.y * 0.5f);
 				ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 				ImGui::SetNextWindowSize(ImVec2(500, 450), ImGuiCond_Appearing);
-				
+
 				if (ImGui::BeginPopupModal("Attributions", &showAttributionsPopup, ImGuiWindowFlags_AlwaysAutoResize)) {
-					
+
 					// Original Author
 					ImGui::TextColored(ImVec4(1.0f, 0.9f, 0.4f, 1.0f), "GRAVITY_WAAAVES");
 					ImGui::TextWrapped("Original software by Andrei Jay");
 					ImGui::TextWrapped("https://andreijaycreativecoding.com");
 					ImGui::Spacing();
-					
+
 					ImGui::Separator();
 					ImGui::Spacing();
 					ImGui::Text("This application uses the following third-party libraries:");
 					ImGui::Separator();
 					ImGui::Spacing();
-					
+
 					// NDI
 					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "NDI SDK");
 					ImGui::TextWrapped("NDI(R) is a registered trademark of Vizrt NDI AB.");
 					ImGui::TextWrapped("For more information, visit: ndi.video");
 					ImGui::Spacing();
-					
+
 					// Spout2
 					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "Spout2");
 					ImGui::TextWrapped("Copyright (c) 2020-2024, Lynn Jarvis. All rights reserved.");
 					ImGui::TextWrapped("BSD 2-Clause License");
 					ImGui::TextWrapped("https://github.com/leadedge/Spout2");
 					ImGui::Spacing();
-					
+
 					// ofxNDI
 					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "ofxNDI");
 					ImGui::TextWrapped("Copyright (c) Lynn Jarvis. LGPL v3 License.");
 					ImGui::TextWrapped("https://github.com/leadedge/ofxNDI");
 					ImGui::Spacing();
-					
+
 					// ofxMidi
 					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "ofxMidi");
 					ImGui::TextWrapped("Copyright (c) Dan Wilcox. BSD Simplified License.");
 					ImGui::TextWrapped("https://github.com/danomatika/ofxMidi");
 					ImGui::Spacing();
-					
+
 					// ofxOsc
 					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "ofxOsc");
 					ImGui::TextWrapped("Part of openFrameworks. LGPL v3 License.");
 					ImGui::Spacing();
-					
+
 					// Dear ImGui
 					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "Dear ImGui");
 					ImGui::TextWrapped("Copyright (c) Omar Cornut. MIT License.");
 					ImGui::TextWrapped("https://github.com/ocornut/imgui");
 					ImGui::Spacing();
-					
+
 					// ofxImGui
 					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "ofxImGui");
 					ImGui::TextWrapped("https://github.com/jvcleave/ofxImGui");
 					ImGui::Spacing();
-					
+
 					// openFrameworks
 					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "openFrameworks");
 					ImGui::TextWrapped("MIT License. https://openframeworks.cc");
 					ImGui::Spacing();
-					
+
 					ImGui::Separator();
 					ImGui::Spacing();
-					
+
 					if (ImGui::Button("Close", ImVec2(120, 30))) {
 						showAttributionsPopup = false;
 						ImGui::CloseCurrentPopup();
 					}
-					
+
 					ImGui::EndPopup();
 				}
-				
+
 				ImGui::EndTabItem();
 			}
 
 			// OSC SETTINGS TAB
 			if (ImGui::BeginTabItem("OSC SETTINGS")) {
-				
+
 				ImGui::Text("OSC Communication Settings");
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// Display all local IPs
 				ImGui::Text("Local IP Addresses:");
 				if (localIPs.size() > 0) {
@@ -4812,7 +4812,7 @@ void GuiApp::draw(){
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// Enable/Disable OSC
 				if (ImGui::Checkbox("Enable OSC", &oscEnabled)) {
 					// Update connection status when toggled
@@ -4821,7 +4821,7 @@ void GuiApp::draw(){
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// Receive Settings
 				ImGui::Text("RECEIVE SETTINGS");
 				ImGui::PushItemWidth(150);
@@ -4834,13 +4834,13 @@ void GuiApp::draw(){
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// Send Settings
 				ImGui::Text("SEND SETTINGS");
 				ImGui::PushItemWidth(200);
 				ImGui::InputText("Send IP Address", oscSendIP, 64);
 				ImGui::PopItemWidth();
-				
+
 				ImGui::PushItemWidth(150);
 				if (ImGui::InputInt("Send Port", &oscSendPort)) {
 					// Validate port range
@@ -4851,7 +4851,7 @@ void GuiApp::draw(){
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// Connection Status
 				ImGui::Text("Connection Status:");
 				ImGui::SameLine();
@@ -4863,7 +4863,7 @@ void GuiApp::draw(){
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
-				
+
 				// Send All Values button
 				ImGui::Separator();
 				ImGui::Spacing();
@@ -4873,7 +4873,7 @@ void GuiApp::draw(){
 					sendAllOscValues = true;
 				}
 				ImGui::Spacing();
-				
+
 				// Apply/Restart button
 				if (ImGui::Button("APPLY SETTINGS", ImVec2(200, 30))) {
 					if (mainApp) {
@@ -4881,26 +4881,26 @@ void GuiApp::draw(){
 					}
 				}
 				ImGui::Spacing();
-				
+
 				// Help text
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Text("OSC Address Format: /gravity/block/parameter");
 				ImGui::Text("Example: /gravity/block1/ch1/xDisplace <float>");
-				
+
 				ImGui::EndTabItem();
 			}
         	ImGui::EndTabBar();
         }//end global tab
-		
+
 		ImGui::Text("  ");
 		ImGui::Text("  ");
 		ImGui::Checkbox("click to order from the secret menu",&secretMenuSwitch);
-		
+
 	}
 	ImGui::PopStyleColor(1);
 	ImGui::PopItemWidth();
-	
+
 	ImGui::End();
 	//ofxImGui::EndWindow(mainSettings);
 
@@ -4911,13 +4911,13 @@ void GuiApp::draw(){
 
 //--------------------------------------------------------------
 void GuiApp::saveEverything(){
-	
+
 	//save MACROS
 	//save macroData
 	for (int i=0;i<PARAMETER_ARRAY_LENGTH;i++){
 		saveBuffer["MACROS"]["macroData"][i]=macroData[i];
 	}
-	
+
 	//save all the stupid constants lolololol
 	//macro0
 	saveBuffer["MACRO0"]["BLOCK_1"]["selectMacro0Ch1Adjust"] = selectMacro0Ch1Adjust;
@@ -4935,7 +4935,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO0"]["BLOCK_1"]["selectMacro0Fb1Geo1Lfo2"] = selectMacro0Fb1Geo1Lfo2;
 	saveBuffer["MACRO0"]["BLOCK_1"]["selectMacro0Fb1Color1Lfo1"] = selectMacro0Fb1Color1Lfo1;
 	saveBuffer["MACRO0"]["BLOCK_1"]["selectMacro0Fb1DelayTime"] = selectMacro0Fb1DelayTime;
-	
+
 	saveBuffer["MACRO0"]["BLOCK_2"]["selectMacro0Block2InputAdjust"] = selectMacro0Block2InputAdjust;
 	saveBuffer["MACRO0"]["BLOCK_2"]["selectMacro0Block2InputAdjustLfo"] = selectMacro0Block2InputAdjustLfo;
 	saveBuffer["MACRO0"]["BLOCK_2"]["selectMacro0Fb2MixAndKey"] = selectMacro0Fb2MixAndKey;
@@ -4947,7 +4947,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO0"]["BLOCK_2"]["selectMacro0Fb2Geo1Lfo2"] = selectMacro0Fb2Geo1Lfo2;
 	saveBuffer["MACRO0"]["BLOCK_2"]["selectMacro0Fb2Color1Lfo1"] = selectMacro0Fb2Color1Lfo1;
 	saveBuffer["MACRO0"]["BLOCK_2"]["selectMacro0Fb2DelayTime"] = selectMacro0Fb2DelayTime;
-	
+
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block1Geo"] = selectMacro0Block1Geo;
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block1Colorize"] = selectMacro0Block1Colorize;
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block1Filters"] = selectMacro0Block1Filters;
@@ -4956,7 +4956,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block1ColorizeLfo1"] = selectMacro0Block1ColorizeLfo1;
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block1ColorizeLfo2"] = selectMacro0Block1ColorizeLfo2;
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block1ColorizeLfo3"] = selectMacro0Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2Geo"] = selectMacro0Block2Geo;
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2Colorize"] = selectMacro0Block2Colorize;
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2Filters"] = selectMacro0Block2Filters;
@@ -4964,14 +4964,14 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2Geo1Lfo2"] = selectMacro0Block2Geo1Lfo2;
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2ColorizeLfo1"] = selectMacro0Block2ColorizeLfo1;
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2ColorizeLfo2"] = selectMacro0Block2ColorizeLfo2;
-	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2ColorizeLfo3"] = selectMacro0Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2ColorizeLfo3"] = selectMacro0Block2ColorizeLfo3;
+
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0MatrixMix"] = selectMacro0MatrixMix;
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0FinalMixAndKey"] = selectMacro0FinalMixAndKey;
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0MatrixMixLfo1"] = selectMacro0MatrixMixLfo1;
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0MatrixMixLfo2"] = selectMacro0MatrixMixLfo2;
 	saveBuffer["MACRO0"]["BLOCK_3"]["selectMacro0FinalMixAndKeyLfo"] = selectMacro0FinalMixAndKeyLfo;
-	
+
 	//macro1
 	saveBuffer["MACRO1"]["BLOCK_1"]["selectMacro1Ch1Adjust"] = selectMacro1Ch1Adjust;
 	saveBuffer["MACRO1"]["BLOCK_1"]["selectMacro1Ch2MixAndKey"] = selectMacro1Ch2MixAndKey;
@@ -4988,7 +4988,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO1"]["BLOCK_1"]["selectMacro1Fb1Geo1Lfo2"] = selectMacro1Fb1Geo1Lfo2;
 	saveBuffer["MACRO1"]["BLOCK_1"]["selectMacro1Fb1Color1Lfo1"] = selectMacro1Fb1Color1Lfo1;
 	saveBuffer["MACRO1"]["BLOCK_1"]["selectMacro1Fb1DelayTime"] = selectMacro1Fb1DelayTime;
-	
+
 	saveBuffer["MACRO1"]["BLOCK_2"]["selectMacro1Block2InputAdjust"] = selectMacro1Block2InputAdjust;
 	saveBuffer["MACRO1"]["BLOCK_2"]["selectMacro1Block2InputAdjustLfo"] = selectMacro1Block2InputAdjustLfo;
 	saveBuffer["MACRO1"]["BLOCK_2"]["selectMacro1Fb2MixAndKey"] = selectMacro1Fb2MixAndKey;
@@ -5000,7 +5000,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO1"]["BLOCK_2"]["selectMacro1Fb2Geo1Lfo2"] = selectMacro1Fb2Geo1Lfo2;
 	saveBuffer["MACRO1"]["BLOCK_2"]["selectMacro1Fb2Color1Lfo1"] = selectMacro1Fb2Color1Lfo1;
 	saveBuffer["MACRO1"]["BLOCK_2"]["selectMacro1Fb2DelayTime"] = selectMacro1Fb2DelayTime;
-	
+
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block1Geo"] = selectMacro1Block1Geo;
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block1Colorize"] = selectMacro1Block1Colorize;
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block1Filters"] = selectMacro1Block1Filters;
@@ -5009,7 +5009,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block1ColorizeLfo1"] = selectMacro1Block1ColorizeLfo1;
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block1ColorizeLfo2"] = selectMacro1Block1ColorizeLfo2;
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block1ColorizeLfo3"] = selectMacro1Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2Geo"] = selectMacro1Block2Geo;
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2Colorize"] = selectMacro1Block2Colorize;
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2Filters"] = selectMacro1Block2Filters;
@@ -5017,14 +5017,14 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2Geo1Lfo2"] = selectMacro1Block2Geo1Lfo2;
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2ColorizeLfo1"] = selectMacro1Block2ColorizeLfo1;
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2ColorizeLfo2"] = selectMacro1Block2ColorizeLfo2;
-	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2ColorizeLfo3"] = selectMacro1Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2ColorizeLfo3"] = selectMacro1Block2ColorizeLfo3;
+
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1MatrixMix"] = selectMacro1MatrixMix;
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1FinalMixAndKey"] = selectMacro1FinalMixAndKey;
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1MatrixMixLfo1"] = selectMacro1MatrixMixLfo1;
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1MatrixMixLfo2"] = selectMacro1MatrixMixLfo2;
 	saveBuffer["MACRO1"]["BLOCK_3"]["selectMacro1FinalMixAndKeyLfo"] = selectMacro1FinalMixAndKeyLfo;
-	
+
 	//macro2
 	saveBuffer["MACRO2"]["BLOCK_1"]["selectMacro2Ch1Adjust"] = selectMacro2Ch1Adjust;
 	saveBuffer["MACRO2"]["BLOCK_1"]["selectMacro2Ch2MixAndKey"] = selectMacro2Ch2MixAndKey;
@@ -5041,7 +5041,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO2"]["BLOCK_1"]["selectMacro2Fb1Geo1Lfo2"] = selectMacro2Fb1Geo1Lfo2;
 	saveBuffer["MACRO2"]["BLOCK_1"]["selectMacro2Fb1Color1Lfo1"] = selectMacro2Fb1Color1Lfo1;
 	saveBuffer["MACRO2"]["BLOCK_1"]["selectMacro2Fb1DelayTime"] = selectMacro2Fb1DelayTime;
-	
+
 	saveBuffer["MACRO2"]["BLOCK_2"]["selectMacro2Block2InputAdjust"] = selectMacro2Block2InputAdjust;
 	saveBuffer["MACRO2"]["BLOCK_2"]["selectMacro2Block2InputAdjustLfo"] = selectMacro2Block2InputAdjustLfo;
 	saveBuffer["MACRO2"]["BLOCK_2"]["selectMacro2Fb2MixAndKey"] = selectMacro2Fb2MixAndKey;
@@ -5053,7 +5053,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO2"]["BLOCK_2"]["selectMacro2Fb2Geo1Lfo2"] = selectMacro2Fb2Geo1Lfo2;
 	saveBuffer["MACRO2"]["BLOCK_2"]["selectMacro2Fb2Color1Lfo1"] = selectMacro2Fb2Color1Lfo1;
 	saveBuffer["MACRO2"]["BLOCK_2"]["selectMacro2Fb2DelayTime"] = selectMacro2Fb2DelayTime;
-	
+
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block1Geo"] = selectMacro2Block1Geo;
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block1Colorize"] = selectMacro2Block1Colorize;
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block1Filters"] = selectMacro2Block1Filters;
@@ -5062,7 +5062,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block1ColorizeLfo1"] = selectMacro2Block1ColorizeLfo1;
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block1ColorizeLfo2"] = selectMacro2Block1ColorizeLfo2;
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block1ColorizeLfo3"] = selectMacro2Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2Geo"] = selectMacro2Block2Geo;
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2Colorize"] = selectMacro2Block2Colorize;
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2Filters"] = selectMacro2Block2Filters;
@@ -5070,14 +5070,14 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2Geo1Lfo2"] = selectMacro2Block2Geo1Lfo2;
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2ColorizeLfo1"] = selectMacro2Block2ColorizeLfo1;
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2ColorizeLfo2"] = selectMacro2Block2ColorizeLfo2;
-	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2ColorizeLfo3"] = selectMacro2Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2ColorizeLfo3"] = selectMacro2Block2ColorizeLfo3;
+
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2MatrixMix"] = selectMacro2MatrixMix;
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2FinalMixAndKey"] = selectMacro2FinalMixAndKey;
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2MatrixMixLfo1"] = selectMacro2MatrixMixLfo1;
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2MatrixMixLfo2"] = selectMacro2MatrixMixLfo2;
 	saveBuffer["MACRO2"]["BLOCK_3"]["selectMacro2FinalMixAndKeyLfo"] = selectMacro2FinalMixAndKeyLfo;
-	
+
 	//macro3
 	saveBuffer["MACRO3"]["BLOCK_1"]["selectMacro3Ch1Adjust"] = selectMacro3Ch1Adjust;
 	saveBuffer["MACRO3"]["BLOCK_1"]["selectMacro3Ch2MixAndKey"] = selectMacro3Ch2MixAndKey;
@@ -5094,7 +5094,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO3"]["BLOCK_1"]["selectMacro3Fb1Geo1Lfo2"] = selectMacro3Fb1Geo1Lfo2;
 	saveBuffer["MACRO3"]["BLOCK_1"]["selectMacro3Fb1Color1Lfo1"] = selectMacro3Fb1Color1Lfo1;
 	saveBuffer["MACRO3"]["BLOCK_1"]["selectMacro3Fb1DelayTime"] = selectMacro3Fb1DelayTime;
-	
+
 	saveBuffer["MACRO3"]["BLOCK_2"]["selectMacro3Block2InputAdjust"] = selectMacro3Block2InputAdjust;
 	saveBuffer["MACRO3"]["BLOCK_2"]["selectMacro3Block2InputAdjustLfo"] = selectMacro3Block2InputAdjustLfo;
 	saveBuffer["MACRO3"]["BLOCK_2"]["selectMacro3Fb2MixAndKey"] = selectMacro3Fb2MixAndKey;
@@ -5106,7 +5106,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO3"]["BLOCK_2"]["selectMacro3Fb2Geo1Lfo2"] = selectMacro3Fb2Geo1Lfo2;
 	saveBuffer["MACRO3"]["BLOCK_2"]["selectMacro3Fb2Color1Lfo1"] = selectMacro3Fb2Color1Lfo1;
 	saveBuffer["MACRO3"]["BLOCK_2"]["selectMacro3Fb2DelayTime"] = selectMacro3Fb2DelayTime;
-	
+
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block1Geo"] = selectMacro3Block1Geo;
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block1Colorize"] = selectMacro3Block1Colorize;
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block1Filters"] = selectMacro3Block1Filters;
@@ -5115,7 +5115,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block1ColorizeLfo1"] = selectMacro3Block1ColorizeLfo1;
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block1ColorizeLfo2"] = selectMacro3Block1ColorizeLfo2;
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block1ColorizeLfo3"] = selectMacro3Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2Geo"] = selectMacro3Block2Geo;
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2Colorize"] = selectMacro3Block2Colorize;
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2Filters"] = selectMacro3Block2Filters;
@@ -5123,14 +5123,14 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2Geo1Lfo2"] = selectMacro3Block2Geo1Lfo2;
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2ColorizeLfo1"] = selectMacro3Block2ColorizeLfo1;
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2ColorizeLfo2"] = selectMacro3Block2ColorizeLfo2;
-	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2ColorizeLfo3"] = selectMacro3Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2ColorizeLfo3"] = selectMacro3Block2ColorizeLfo3;
+
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3MatrixMix"] = selectMacro3MatrixMix;
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3FinalMixAndKey"] = selectMacro3FinalMixAndKey;
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3MatrixMixLfo1"] = selectMacro3MatrixMixLfo1;
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3MatrixMixLfo2"] = selectMacro3MatrixMixLfo2;
 	saveBuffer["MACRO3"]["BLOCK_3"]["selectMacro3FinalMixAndKeyLfo"] = selectMacro3FinalMixAndKeyLfo;
-	
+
 	//macro4
 	saveBuffer["MACRO4"]["BLOCK_1"]["selectMacro4Ch1Adjust"] = selectMacro4Ch1Adjust;
 	saveBuffer["MACRO4"]["BLOCK_1"]["selectMacro4Ch2MixAndKey"] = selectMacro4Ch2MixAndKey;
@@ -5147,7 +5147,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO4"]["BLOCK_1"]["selectMacro4Fb1Geo1Lfo2"] = selectMacro4Fb1Geo1Lfo2;
 	saveBuffer["MACRO4"]["BLOCK_1"]["selectMacro4Fb1Color1Lfo1"] = selectMacro4Fb1Color1Lfo1;
 	saveBuffer["MACRO4"]["BLOCK_1"]["selectMacro4Fb1DelayTime"] = selectMacro4Fb1DelayTime;
-	
+
 	saveBuffer["MACRO4"]["BLOCK_2"]["selectMacro4Block2InputAdjust"] = selectMacro4Block2InputAdjust;
 	saveBuffer["MACRO4"]["BLOCK_2"]["selectMacro4Block2InputAdjustLfo"] = selectMacro4Block2InputAdjustLfo;
 	saveBuffer["MACRO4"]["BLOCK_2"]["selectMacro4Fb2MixAndKey"] = selectMacro4Fb2MixAndKey;
@@ -5159,7 +5159,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO4"]["BLOCK_2"]["selectMacro4Fb2Geo1Lfo2"] = selectMacro4Fb2Geo1Lfo2;
 	saveBuffer["MACRO4"]["BLOCK_2"]["selectMacro4Fb2Color1Lfo1"] = selectMacro4Fb2Color1Lfo1;
 	saveBuffer["MACRO4"]["BLOCK_2"]["selectMacro4Fb2DelayTime"] = selectMacro4Fb2DelayTime;
-	
+
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block1Geo"] = selectMacro4Block1Geo;
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block1Colorize"] = selectMacro4Block1Colorize;
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block1Filters"] = selectMacro4Block1Filters;
@@ -5168,7 +5168,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block1ColorizeLfo1"] = selectMacro4Block1ColorizeLfo1;
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block1ColorizeLfo2"] = selectMacro4Block1ColorizeLfo2;
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block1ColorizeLfo3"] = selectMacro4Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2Geo"] = selectMacro4Block2Geo;
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2Colorize"] = selectMacro4Block2Colorize;
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2Filters"] = selectMacro4Block2Filters;
@@ -5176,14 +5176,14 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2Geo1Lfo2"] = selectMacro4Block2Geo1Lfo2;
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2ColorizeLfo1"] = selectMacro4Block2ColorizeLfo1;
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2ColorizeLfo2"] = selectMacro4Block2ColorizeLfo2;
-	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2ColorizeLfo3"] = selectMacro4Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2ColorizeLfo3"] = selectMacro4Block2ColorizeLfo3;
+
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4MatrixMix"] = selectMacro4MatrixMix;
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4FinalMixAndKey"] = selectMacro4FinalMixAndKey;
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4MatrixMixLfo1"] = selectMacro4MatrixMixLfo1;
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4MatrixMixLfo2"] = selectMacro4MatrixMixLfo2;
 	saveBuffer["MACRO4"]["BLOCK_3"]["selectMacro4FinalMixAndKeyLfo"] = selectMacro4FinalMixAndKeyLfo;
-	
+
 	//macro5
 	saveBuffer["MACRO5"]["BLOCK_1"]["selectMacro5Ch1Adjust"] = selectMacro5Ch1Adjust;
 	saveBuffer["MACRO5"]["BLOCK_1"]["selectMacro5Ch2MixAndKey"] = selectMacro5Ch2MixAndKey;
@@ -5200,7 +5200,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO5"]["BLOCK_1"]["selectMacro5Fb1Geo1Lfo2"] = selectMacro5Fb1Geo1Lfo2;
 	saveBuffer["MACRO5"]["BLOCK_1"]["selectMacro5Fb1Color1Lfo1"] = selectMacro5Fb1Color1Lfo1;
 	saveBuffer["MACRO5"]["BLOCK_1"]["selectMacro5Fb1DelayTime"] = selectMacro5Fb1DelayTime;
-	
+
 	saveBuffer["MACRO5"]["BLOCK_2"]["selectMacro5Block2InputAdjust"] = selectMacro5Block2InputAdjust;
 	saveBuffer["MACRO5"]["BLOCK_2"]["selectMacro5Block2InputAdjustLfo"] = selectMacro5Block2InputAdjustLfo;
 	saveBuffer["MACRO5"]["BLOCK_2"]["selectMacro5Fb2MixAndKey"] = selectMacro5Fb2MixAndKey;
@@ -5212,7 +5212,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO5"]["BLOCK_2"]["selectMacro5Fb2Geo1Lfo2"] = selectMacro5Fb2Geo1Lfo2;
 	saveBuffer["MACRO5"]["BLOCK_2"]["selectMacro5Fb2Color1Lfo1"] = selectMacro5Fb2Color1Lfo1;
 	saveBuffer["MACRO5"]["BLOCK_2"]["selectMacro5Fb2DelayTime"] = selectMacro5Fb2DelayTime;
-	
+
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block1Geo"] = selectMacro5Block1Geo;
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block1Colorize"] = selectMacro5Block1Colorize;
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block1Filters"] = selectMacro5Block1Filters;
@@ -5221,7 +5221,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block1ColorizeLfo1"] = selectMacro5Block1ColorizeLfo1;
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block1ColorizeLfo2"] = selectMacro5Block1ColorizeLfo2;
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block1ColorizeLfo3"] = selectMacro5Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2Geo"] = selectMacro5Block2Geo;
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2Colorize"] = selectMacro5Block2Colorize;
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2Filters"] = selectMacro5Block2Filters;
@@ -5229,14 +5229,14 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2Geo1Lfo2"] = selectMacro5Block2Geo1Lfo2;
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2ColorizeLfo1"] = selectMacro5Block2ColorizeLfo1;
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2ColorizeLfo2"] = selectMacro5Block2ColorizeLfo2;
-	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2ColorizeLfo3"] = selectMacro5Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2ColorizeLfo3"] = selectMacro5Block2ColorizeLfo3;
+
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5MatrixMix"] = selectMacro5MatrixMix;
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5FinalMixAndKey"] = selectMacro5FinalMixAndKey;
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5MatrixMixLfo1"] = selectMacro5MatrixMixLfo1;
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5MatrixMixLfo2"] = selectMacro5MatrixMixLfo2;
 	saveBuffer["MACRO5"]["BLOCK_3"]["selectMacro5FinalMixAndKeyLfo"] = selectMacro5FinalMixAndKeyLfo;
-	
+
 	//macro6
 	saveBuffer["MACRO6"]["BLOCK_1"]["selectMacro6Ch1Adjust"] = selectMacro6Ch1Adjust;
 	saveBuffer["MACRO6"]["BLOCK_1"]["selectMacro6Ch2MixAndKey"] = selectMacro6Ch2MixAndKey;
@@ -5253,7 +5253,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO6"]["BLOCK_1"]["selectMacro6Fb1Geo1Lfo2"] = selectMacro6Fb1Geo1Lfo2;
 	saveBuffer["MACRO6"]["BLOCK_1"]["selectMacro6Fb1Color1Lfo1"] = selectMacro6Fb1Color1Lfo1;
 	saveBuffer["MACRO6"]["BLOCK_1"]["selectMacro6Fb1DelayTime"] = selectMacro6Fb1DelayTime;
-	
+
 	saveBuffer["MACRO6"]["BLOCK_2"]["selectMacro6Block2InputAdjust"] = selectMacro6Block2InputAdjust;
 	saveBuffer["MACRO6"]["BLOCK_2"]["selectMacro6Block2InputAdjustLfo"] = selectMacro6Block2InputAdjustLfo;
 	saveBuffer["MACRO6"]["BLOCK_2"]["selectMacro6Fb2MixAndKey"] = selectMacro6Fb2MixAndKey;
@@ -5265,7 +5265,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO6"]["BLOCK_2"]["selectMacro6Fb2Geo1Lfo2"] = selectMacro6Fb2Geo1Lfo2;
 	saveBuffer["MACRO6"]["BLOCK_2"]["selectMacro6Fb2Color1Lfo1"] = selectMacro6Fb2Color1Lfo1;
 	saveBuffer["MACRO6"]["BLOCK_2"]["selectMacro6Fb2DelayTime"] = selectMacro6Fb2DelayTime;
-	
+
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block1Geo"] = selectMacro6Block1Geo;
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block1Colorize"] = selectMacro6Block1Colorize;
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block1Filters"] = selectMacro6Block1Filters;
@@ -5274,7 +5274,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block1ColorizeLfo1"] = selectMacro6Block1ColorizeLfo1;
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block1ColorizeLfo2"] = selectMacro6Block1ColorizeLfo2;
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block1ColorizeLfo3"] = selectMacro6Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2Geo"] = selectMacro6Block2Geo;
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2Colorize"] = selectMacro6Block2Colorize;
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2Filters"] = selectMacro6Block2Filters;
@@ -5282,15 +5282,15 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2Geo1Lfo2"] = selectMacro6Block2Geo1Lfo2;
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2ColorizeLfo1"] = selectMacro6Block2ColorizeLfo1;
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2ColorizeLfo2"] = selectMacro6Block2ColorizeLfo2;
-	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2ColorizeLfo3"] = selectMacro6Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2ColorizeLfo3"] = selectMacro6Block2ColorizeLfo3;
+
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6MatrixMix"] = selectMacro6MatrixMix;
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6FinalMixAndKey"] = selectMacro6FinalMixAndKey;
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6MatrixMixLfo1"] = selectMacro6MatrixMixLfo1;
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6MatrixMixLfo2"] = selectMacro6MatrixMixLfo2;
 	saveBuffer["MACRO6"]["BLOCK_3"]["selectMacro6FinalMixAndKeyLfo"] = selectMacro6FinalMixAndKeyLfo;
-	
-	
+
+
 	//macro7
 	saveBuffer["MACRO7"]["BLOCK_1"]["selectMacro7Ch1Adjust"] = selectMacro7Ch1Adjust;
 	saveBuffer["MACRO7"]["BLOCK_1"]["selectMacro7Ch2MixAndKey"] = selectMacro7Ch2MixAndKey;
@@ -5307,7 +5307,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO7"]["BLOCK_1"]["selectMacro7Fb1Geo1Lfo2"] = selectMacro7Fb1Geo1Lfo2;
 	saveBuffer["MACRO7"]["BLOCK_1"]["selectMacro7Fb1Color1Lfo1"] = selectMacro7Fb1Color1Lfo1;
 	saveBuffer["MACRO7"]["BLOCK_1"]["selectMacro7Fb1DelayTime"] = selectMacro7Fb1DelayTime;
-	
+
 	saveBuffer["MACRO7"]["BLOCK_2"]["selectMacro7Block2InputAdjust"] = selectMacro7Block2InputAdjust;
 	saveBuffer["MACRO7"]["BLOCK_2"]["selectMacro7Block2InputAdjustLfo"] = selectMacro7Block2InputAdjustLfo;
 	saveBuffer["MACRO7"]["BLOCK_2"]["selectMacro7Fb2MixAndKey"] = selectMacro7Fb2MixAndKey;
@@ -5319,7 +5319,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO7"]["BLOCK_2"]["selectMacro7Fb2Geo1Lfo2"] = selectMacro7Fb2Geo1Lfo2;
 	saveBuffer["MACRO7"]["BLOCK_2"]["selectMacro7Fb2Color1Lfo1"] = selectMacro7Fb2Color1Lfo1;
 	saveBuffer["MACRO7"]["BLOCK_2"]["selectMacro7Fb2DelayTime"] = selectMacro7Fb2DelayTime;
-	
+
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block1Geo"] = selectMacro7Block1Geo;
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block1Colorize"] = selectMacro7Block1Colorize;
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block1Filters"] = selectMacro7Block1Filters;
@@ -5328,7 +5328,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block1ColorizeLfo1"] = selectMacro7Block1ColorizeLfo1;
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block1ColorizeLfo2"] = selectMacro7Block1ColorizeLfo2;
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block1ColorizeLfo3"] = selectMacro7Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2Geo"] = selectMacro7Block2Geo;
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2Colorize"] = selectMacro7Block2Colorize;
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2Filters"] = selectMacro7Block2Filters;
@@ -5336,14 +5336,14 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2Geo1Lfo2"] = selectMacro7Block2Geo1Lfo2;
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2ColorizeLfo1"] = selectMacro7Block2ColorizeLfo1;
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2ColorizeLfo2"] = selectMacro7Block2ColorizeLfo2;
-	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2ColorizeLfo3"] = selectMacro7Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2ColorizeLfo3"] = selectMacro7Block2ColorizeLfo3;
+
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7MatrixMix"] = selectMacro7MatrixMix;
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7FinalMixAndKey"] = selectMacro7FinalMixAndKey;
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7MatrixMixLfo1"] = selectMacro7MatrixMixLfo1;
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7MatrixMixLfo2"] = selectMacro7MatrixMixLfo2;
 	saveBuffer["MACRO7"]["BLOCK_3"]["selectMacro7FinalMixAndKeyLfo"] = selectMacro7FinalMixAndKeyLfo;
-	
+
 	//macro8
 	saveBuffer["MACRO8"]["BLOCK_1"]["selectMacro8Ch1Adjust"] = selectMacro8Ch1Adjust;
 	saveBuffer["MACRO8"]["BLOCK_1"]["selectMacro8Ch2MixAndKey"] = selectMacro8Ch2MixAndKey;
@@ -5360,7 +5360,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO8"]["BLOCK_1"]["selectMacro8Fb1Geo1Lfo2"] = selectMacro8Fb1Geo1Lfo2;
 	saveBuffer["MACRO8"]["BLOCK_1"]["selectMacro8Fb1Color1Lfo1"] = selectMacro8Fb1Color1Lfo1;
 	saveBuffer["MACRO8"]["BLOCK_1"]["selectMacro8Fb1DelayTime"] = selectMacro8Fb1DelayTime;
-	
+
 	saveBuffer["MACRO8"]["BLOCK_2"]["selectMacro8Block2InputAdjust"] = selectMacro8Block2InputAdjust;
 	saveBuffer["MACRO8"]["BLOCK_2"]["selectMacro8Block2InputAdjustLfo"] = selectMacro8Block2InputAdjustLfo;
 	saveBuffer["MACRO8"]["BLOCK_2"]["selectMacro8Fb2MixAndKey"] = selectMacro8Fb2MixAndKey;
@@ -5372,7 +5372,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO8"]["BLOCK_2"]["selectMacro8Fb2Geo1Lfo2"] = selectMacro8Fb2Geo1Lfo2;
 	saveBuffer["MACRO8"]["BLOCK_2"]["selectMacro8Fb2Color1Lfo1"] = selectMacro8Fb2Color1Lfo1;
 	saveBuffer["MACRO8"]["BLOCK_2"]["selectMacro8Fb2DelayTime"] = selectMacro8Fb2DelayTime;
-	
+
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block1Geo"] = selectMacro8Block1Geo;
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block1Colorize"] = selectMacro8Block1Colorize;
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block1Filters"] = selectMacro8Block1Filters;
@@ -5381,7 +5381,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block1ColorizeLfo1"] = selectMacro8Block1ColorizeLfo1;
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block1ColorizeLfo2"] = selectMacro8Block1ColorizeLfo2;
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block1ColorizeLfo3"] = selectMacro8Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2Geo"] = selectMacro8Block2Geo;
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2Colorize"] = selectMacro8Block2Colorize;
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2Filters"] = selectMacro8Block2Filters;
@@ -5389,15 +5389,15 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2Geo1Lfo2"] = selectMacro8Block2Geo1Lfo2;
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2ColorizeLfo1"] = selectMacro8Block2ColorizeLfo1;
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2ColorizeLfo2"] = selectMacro8Block2ColorizeLfo2;
-	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2ColorizeLfo3"] = selectMacro8Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2ColorizeLfo3"] = selectMacro8Block2ColorizeLfo3;
+
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8MatrixMix"] = selectMacro8MatrixMix;
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8FinalMixAndKey"] = selectMacro8FinalMixAndKey;
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8MatrixMixLfo1"] = selectMacro8MatrixMixLfo1;
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8MatrixMixLfo2"] = selectMacro8MatrixMixLfo2;
 	saveBuffer["MACRO8"]["BLOCK_3"]["selectMacro8FinalMixAndKeyLfo"] = selectMacro8FinalMixAndKeyLfo;
-	
-	
+
+
 	//macro9
 	saveBuffer["MACRO9"]["BLOCK_1"]["selectMacro9Ch1Adjust"] = selectMacro9Ch1Adjust;
 	saveBuffer["MACRO9"]["BLOCK_1"]["selectMacro9Ch2MixAndKey"] = selectMacro9Ch2MixAndKey;
@@ -5414,7 +5414,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO9"]["BLOCK_1"]["selectMacro9Fb1Geo1Lfo2"] = selectMacro9Fb1Geo1Lfo2;
 	saveBuffer["MACRO9"]["BLOCK_1"]["selectMacro9Fb1Color1Lfo1"] = selectMacro9Fb1Color1Lfo1;
 	saveBuffer["MACRO9"]["BLOCK_1"]["selectMacro9Fb1DelayTime"] = selectMacro9Fb1DelayTime;
-	
+
 	saveBuffer["MACRO9"]["BLOCK_2"]["selectMacro9Block2InputAdjust"] = selectMacro9Block2InputAdjust;
 	saveBuffer["MACRO9"]["BLOCK_2"]["selectMacro9Block2InputAdjustLfo"] = selectMacro9Block2InputAdjustLfo;
 	saveBuffer["MACRO9"]["BLOCK_2"]["selectMacro9Fb2MixAndKey"] = selectMacro9Fb2MixAndKey;
@@ -5426,7 +5426,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO9"]["BLOCK_2"]["selectMacro9Fb2Geo1Lfo2"] = selectMacro9Fb2Geo1Lfo2;
 	saveBuffer["MACRO9"]["BLOCK_2"]["selectMacro9Fb2Color1Lfo1"] = selectMacro9Fb2Color1Lfo1;
 	saveBuffer["MACRO9"]["BLOCK_2"]["selectMacro9Fb2DelayTime"] = selectMacro9Fb2DelayTime;
-	
+
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block1Geo"] = selectMacro9Block1Geo;
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block1Colorize"] = selectMacro9Block1Colorize;
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block1Filters"] = selectMacro9Block1Filters;
@@ -5435,7 +5435,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block1ColorizeLfo1"] = selectMacro9Block1ColorizeLfo1;
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block1ColorizeLfo2"] = selectMacro9Block1ColorizeLfo2;
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block1ColorizeLfo3"] = selectMacro9Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2Geo"] = selectMacro9Block2Geo;
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2Colorize"] = selectMacro9Block2Colorize;
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2Filters"] = selectMacro9Block2Filters;
@@ -5443,14 +5443,14 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2Geo1Lfo2"] = selectMacro9Block2Geo1Lfo2;
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2ColorizeLfo1"] = selectMacro9Block2ColorizeLfo1;
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2ColorizeLfo2"] = selectMacro9Block2ColorizeLfo2;
-	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2ColorizeLfo3"] = selectMacro9Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2ColorizeLfo3"] = selectMacro9Block2ColorizeLfo3;
+
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9MatrixMix"] = selectMacro9MatrixMix;
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9FinalMixAndKey"] = selectMacro9FinalMixAndKey;
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9MatrixMixLfo1"] = selectMacro9MatrixMixLfo1;
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9MatrixMixLfo2"] = selectMacro9MatrixMixLfo2;
 	saveBuffer["MACRO9"]["BLOCK_3"]["selectMacro9FinalMixAndKeyLfo"] = selectMacro9FinalMixAndKeyLfo;
-	
+
 	//macro10
 	saveBuffer["MACRO10"]["BLOCK_1"]["selectMacro10Ch1Adjust"] = selectMacro10Ch1Adjust;
 	saveBuffer["MACRO10"]["BLOCK_1"]["selectMacro10Ch2MixAndKey"] = selectMacro10Ch2MixAndKey;
@@ -5467,7 +5467,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO10"]["BLOCK_1"]["selectMacro10Fb1Geo1Lfo2"] = selectMacro10Fb1Geo1Lfo2;
 	saveBuffer["MACRO10"]["BLOCK_1"]["selectMacro10Fb1Color1Lfo1"] = selectMacro10Fb1Color1Lfo1;
 	saveBuffer["MACRO10"]["BLOCK_1"]["selectMacro10Fb1DelayTime"] = selectMacro10Fb1DelayTime;
-	
+
 	saveBuffer["MACRO10"]["BLOCK_2"]["selectMacro10Block2InputAdjust"] = selectMacro10Block2InputAdjust;
 	saveBuffer["MACRO10"]["BLOCK_2"]["selectMacro10Block2InputAdjustLfo"] = selectMacro10Block2InputAdjustLfo;
 	saveBuffer["MACRO10"]["BLOCK_2"]["selectMacro10Fb2MixAndKey"] = selectMacro10Fb2MixAndKey;
@@ -5479,7 +5479,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO10"]["BLOCK_2"]["selectMacro10Fb2Geo1Lfo2"] = selectMacro10Fb2Geo1Lfo2;
 	saveBuffer["MACRO10"]["BLOCK_2"]["selectMacro10Fb2Color1Lfo1"] = selectMacro10Fb2Color1Lfo1;
 	saveBuffer["MACRO10"]["BLOCK_2"]["selectMacro10Fb2DelayTime"] = selectMacro10Fb2DelayTime;
-	
+
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block1Geo"] = selectMacro10Block1Geo;
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block1Colorize"] = selectMacro10Block1Colorize;
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block1Filters"] = selectMacro10Block1Filters;
@@ -5488,7 +5488,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block1ColorizeLfo1"] = selectMacro10Block1ColorizeLfo1;
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block1ColorizeLfo2"] = selectMacro10Block1ColorizeLfo2;
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block1ColorizeLfo3"] = selectMacro10Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2Geo"] = selectMacro10Block2Geo;
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2Colorize"] = selectMacro10Block2Colorize;
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2Filters"] = selectMacro10Block2Filters;
@@ -5496,14 +5496,14 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2Geo1Lfo2"] = selectMacro10Block2Geo1Lfo2;
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2ColorizeLfo1"] = selectMacro10Block2ColorizeLfo1;
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2ColorizeLfo2"] = selectMacro10Block2ColorizeLfo2;
-	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2ColorizeLfo3"] = selectMacro10Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2ColorizeLfo3"] = selectMacro10Block2ColorizeLfo3;
+
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10MatrixMix"] = selectMacro10MatrixMix;
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10FinalMixAndKey"] = selectMacro10FinalMixAndKey;
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10MatrixMixLfo1"] = selectMacro10MatrixMixLfo1;
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10MatrixMixLfo2"] = selectMacro10MatrixMixLfo2;
 	saveBuffer["MACRO10"]["BLOCK_3"]["selectMacro10FinalMixAndKeyLfo"] = selectMacro10FinalMixAndKeyLfo;
-	
+
 	//macro11
 	saveBuffer["MACRO11"]["BLOCK_1"]["selectMacro11Ch1Adjust"] = selectMacro11Ch1Adjust;
 	saveBuffer["MACRO11"]["BLOCK_1"]["selectMacro11Ch2MixAndKey"] = selectMacro11Ch2MixAndKey;
@@ -5520,7 +5520,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO11"]["BLOCK_1"]["selectMacro11Fb1Geo1Lfo2"] = selectMacro11Fb1Geo1Lfo2;
 	saveBuffer["MACRO11"]["BLOCK_1"]["selectMacro11Fb1Color1Lfo1"] = selectMacro11Fb1Color1Lfo1;
 	saveBuffer["MACRO11"]["BLOCK_1"]["selectMacro11Fb1DelayTime"] = selectMacro11Fb1DelayTime;
-	
+
 	saveBuffer["MACRO11"]["BLOCK_2"]["selectMacro11Block2InputAdjust"] = selectMacro11Block2InputAdjust;
 	saveBuffer["MACRO11"]["BLOCK_2"]["selectMacro11Block2InputAdjustLfo"] = selectMacro11Block2InputAdjustLfo;
 	saveBuffer["MACRO11"]["BLOCK_2"]["selectMacro11Fb2MixAndKey"] = selectMacro11Fb2MixAndKey;
@@ -5532,7 +5532,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO11"]["BLOCK_2"]["selectMacro11Fb2Geo1Lfo2"] = selectMacro11Fb2Geo1Lfo2;
 	saveBuffer["MACRO11"]["BLOCK_2"]["selectMacro11Fb2Color1Lfo1"] = selectMacro11Fb2Color1Lfo1;
 	saveBuffer["MACRO11"]["BLOCK_2"]["selectMacro11Fb2DelayTime"] = selectMacro11Fb2DelayTime;
-	
+
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block1Geo"] = selectMacro11Block1Geo;
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block1Colorize"] = selectMacro11Block1Colorize;
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block1Filters"] = selectMacro11Block1Filters;
@@ -5541,7 +5541,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block1ColorizeLfo1"] = selectMacro11Block1ColorizeLfo1;
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block1ColorizeLfo2"] = selectMacro11Block1ColorizeLfo2;
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block1ColorizeLfo3"] = selectMacro11Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2Geo"] = selectMacro11Block2Geo;
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2Colorize"] = selectMacro11Block2Colorize;
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2Filters"] = selectMacro11Block2Filters;
@@ -5549,14 +5549,14 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2Geo1Lfo2"] = selectMacro11Block2Geo1Lfo2;
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2ColorizeLfo1"] = selectMacro11Block2ColorizeLfo1;
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2ColorizeLfo2"] = selectMacro11Block2ColorizeLfo2;
-	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2ColorizeLfo3"] = selectMacro11Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2ColorizeLfo3"] = selectMacro11Block2ColorizeLfo3;
+
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11MatrixMix"] = selectMacro11MatrixMix;
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11FinalMixAndKey"] = selectMacro11FinalMixAndKey;
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11MatrixMixLfo1"] = selectMacro11MatrixMixLfo1;
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11MatrixMixLfo2"] = selectMacro11MatrixMixLfo2;
 	saveBuffer["MACRO11"]["BLOCK_3"]["selectMacro11FinalMixAndKeyLfo"] = selectMacro11FinalMixAndKeyLfo;
-	
+
 	//macro12
 	saveBuffer["MACRO12"]["BLOCK_1"]["selectMacro12Ch1Adjust"] = selectMacro12Ch1Adjust;
 	saveBuffer["MACRO12"]["BLOCK_1"]["selectMacro12Ch2MixAndKey"] = selectMacro12Ch2MixAndKey;
@@ -5573,7 +5573,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO12"]["BLOCK_1"]["selectMacro12Fb1Geo1Lfo2"] = selectMacro12Fb1Geo1Lfo2;
 	saveBuffer["MACRO12"]["BLOCK_1"]["selectMacro12Fb1Color1Lfo1"] = selectMacro12Fb1Color1Lfo1;
 	saveBuffer["MACRO12"]["BLOCK_1"]["selectMacro12Fb1DelayTime"] = selectMacro12Fb1DelayTime;
-	
+
 	saveBuffer["MACRO12"]["BLOCK_2"]["selectMacro12Block2InputAdjust"] = selectMacro12Block2InputAdjust;
 	saveBuffer["MACRO12"]["BLOCK_2"]["selectMacro12Block2InputAdjustLfo"] = selectMacro12Block2InputAdjustLfo;
 	saveBuffer["MACRO12"]["BLOCK_2"]["selectMacro12Fb2MixAndKey"] = selectMacro12Fb2MixAndKey;
@@ -5585,7 +5585,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO12"]["BLOCK_2"]["selectMacro12Fb2Geo1Lfo2"] = selectMacro12Fb2Geo1Lfo2;
 	saveBuffer["MACRO12"]["BLOCK_2"]["selectMacro12Fb2Color1Lfo1"] = selectMacro12Fb2Color1Lfo1;
 	saveBuffer["MACRO12"]["BLOCK_2"]["selectMacro12Fb2DelayTime"] = selectMacro12Fb2DelayTime;
-	
+
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block1Geo"] = selectMacro12Block1Geo;
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block1Colorize"] = selectMacro12Block1Colorize;
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block1Filters"] = selectMacro12Block1Filters;
@@ -5594,7 +5594,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block1ColorizeLfo1"] = selectMacro12Block1ColorizeLfo1;
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block1ColorizeLfo2"] = selectMacro12Block1ColorizeLfo2;
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block1ColorizeLfo3"] = selectMacro12Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2Geo"] = selectMacro12Block2Geo;
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2Colorize"] = selectMacro12Block2Colorize;
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2Filters"] = selectMacro12Block2Filters;
@@ -5602,14 +5602,14 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2Geo1Lfo2"] = selectMacro12Block2Geo1Lfo2;
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2ColorizeLfo1"] = selectMacro12Block2ColorizeLfo1;
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2ColorizeLfo2"] = selectMacro12Block2ColorizeLfo2;
-	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2ColorizeLfo3"] = selectMacro12Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2ColorizeLfo3"] = selectMacro12Block2ColorizeLfo3;
+
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12MatrixMix"] = selectMacro12MatrixMix;
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12FinalMixAndKey"] = selectMacro12FinalMixAndKey;
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12MatrixMixLfo1"] = selectMacro12MatrixMixLfo1;
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12MatrixMixLfo2"] = selectMacro12MatrixMixLfo2;
 	saveBuffer["MACRO12"]["BLOCK_3"]["selectMacro12FinalMixAndKeyLfo"] = selectMacro12FinalMixAndKeyLfo;
-	
+
 	//macro13
 	saveBuffer["MACRO13"]["BLOCK_1"]["selectMacro13Ch1Adjust"] = selectMacro13Ch1Adjust;
 	saveBuffer["MACRO13"]["BLOCK_1"]["selectMacro13Ch2MixAndKey"] = selectMacro13Ch2MixAndKey;
@@ -5626,7 +5626,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO13"]["BLOCK_1"]["selectMacro13Fb1Geo1Lfo2"] = selectMacro13Fb1Geo1Lfo2;
 	saveBuffer["MACRO13"]["BLOCK_1"]["selectMacro13Fb1Color1Lfo1"] = selectMacro13Fb1Color1Lfo1;
 	saveBuffer["MACRO13"]["BLOCK_1"]["selectMacro13Fb1DelayTime"] = selectMacro13Fb1DelayTime;
-	
+
 	saveBuffer["MACRO13"]["BLOCK_2"]["selectMacro13Block2InputAdjust"] = selectMacro13Block2InputAdjust;
 	saveBuffer["MACRO13"]["BLOCK_2"]["selectMacro13Block2InputAdjustLfo"] = selectMacro13Block2InputAdjustLfo;
 	saveBuffer["MACRO13"]["BLOCK_2"]["selectMacro13Fb2MixAndKey"] = selectMacro13Fb2MixAndKey;
@@ -5638,7 +5638,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO13"]["BLOCK_2"]["selectMacro13Fb2Geo1Lfo2"] = selectMacro13Fb2Geo1Lfo2;
 	saveBuffer["MACRO13"]["BLOCK_2"]["selectMacro13Fb2Color1Lfo1"] = selectMacro13Fb2Color1Lfo1;
 	saveBuffer["MACRO13"]["BLOCK_2"]["selectMacro13Fb2DelayTime"] = selectMacro13Fb2DelayTime;
-	
+
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block1Geo"] = selectMacro13Block1Geo;
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block1Colorize"] = selectMacro13Block1Colorize;
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block1Filters"] = selectMacro13Block1Filters;
@@ -5647,7 +5647,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block1ColorizeLfo1"] = selectMacro13Block1ColorizeLfo1;
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block1ColorizeLfo2"] = selectMacro13Block1ColorizeLfo2;
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block1ColorizeLfo3"] = selectMacro13Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2Geo"] = selectMacro13Block2Geo;
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2Colorize"] = selectMacro13Block2Colorize;
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2Filters"] = selectMacro13Block2Filters;
@@ -5655,14 +5655,14 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2Geo1Lfo2"] = selectMacro13Block2Geo1Lfo2;
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2ColorizeLfo1"] = selectMacro13Block2ColorizeLfo1;
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2ColorizeLfo2"] = selectMacro13Block2ColorizeLfo2;
-	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2ColorizeLfo3"] = selectMacro13Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2ColorizeLfo3"] = selectMacro13Block2ColorizeLfo3;
+
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13MatrixMix"] = selectMacro13MatrixMix;
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13FinalMixAndKey"] = selectMacro13FinalMixAndKey;
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13MatrixMixLfo1"] = selectMacro13MatrixMixLfo1;
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13MatrixMixLfo2"] = selectMacro13MatrixMixLfo2;
 	saveBuffer["MACRO13"]["BLOCK_3"]["selectMacro13FinalMixAndKeyLfo"] = selectMacro13FinalMixAndKeyLfo;
-	
+
 	//macro14
 	saveBuffer["MACRO14"]["BLOCK_1"]["selectMacro14Ch1Adjust"] = selectMacro14Ch1Adjust;
 	saveBuffer["MACRO14"]["BLOCK_1"]["selectMacro14Ch2MixAndKey"] = selectMacro14Ch2MixAndKey;
@@ -5679,7 +5679,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO14"]["BLOCK_1"]["selectMacro14Fb1Geo1Lfo2"] = selectMacro14Fb1Geo1Lfo2;
 	saveBuffer["MACRO14"]["BLOCK_1"]["selectMacro14Fb1Color1Lfo1"] = selectMacro14Fb1Color1Lfo1;
 	saveBuffer["MACRO14"]["BLOCK_1"]["selectMacro14Fb1DelayTime"] = selectMacro14Fb1DelayTime;
-	
+
 	saveBuffer["MACRO14"]["BLOCK_2"]["selectMacro14Block2InputAdjust"] = selectMacro14Block2InputAdjust;
 	saveBuffer["MACRO14"]["BLOCK_2"]["selectMacro14Block2InputAdjustLfo"] = selectMacro14Block2InputAdjustLfo;
 	saveBuffer["MACRO14"]["BLOCK_2"]["selectMacro14Fb2MixAndKey"] = selectMacro14Fb2MixAndKey;
@@ -5691,7 +5691,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO14"]["BLOCK_2"]["selectMacro14Fb2Geo1Lfo2"] = selectMacro14Fb2Geo1Lfo2;
 	saveBuffer["MACRO14"]["BLOCK_2"]["selectMacro14Fb2Color1Lfo1"] = selectMacro14Fb2Color1Lfo1;
 	saveBuffer["MACRO14"]["BLOCK_2"]["selectMacro14Fb2DelayTime"] = selectMacro14Fb2DelayTime;
-	
+
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block1Geo"] = selectMacro14Block1Geo;
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block1Colorize"] = selectMacro14Block1Colorize;
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block1Filters"] = selectMacro14Block1Filters;
@@ -5700,7 +5700,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block1ColorizeLfo1"] = selectMacro14Block1ColorizeLfo1;
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block1ColorizeLfo2"] = selectMacro14Block1ColorizeLfo2;
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block1ColorizeLfo3"] = selectMacro14Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2Geo"] = selectMacro14Block2Geo;
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2Colorize"] = selectMacro14Block2Colorize;
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2Filters"] = selectMacro14Block2Filters;
@@ -5708,14 +5708,14 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2Geo1Lfo2"] = selectMacro14Block2Geo1Lfo2;
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2ColorizeLfo1"] = selectMacro14Block2ColorizeLfo1;
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2ColorizeLfo2"] = selectMacro14Block2ColorizeLfo2;
-	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2ColorizeLfo3"] = selectMacro14Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2ColorizeLfo3"] = selectMacro14Block2ColorizeLfo3;
+
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14MatrixMix"] = selectMacro14MatrixMix;
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14FinalMixAndKey"] = selectMacro14FinalMixAndKey;
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14MatrixMixLfo1"] = selectMacro14MatrixMixLfo1;
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14MatrixMixLfo2"] = selectMacro14MatrixMixLfo2;
 	saveBuffer["MACRO14"]["BLOCK_3"]["selectMacro14FinalMixAndKeyLfo"] = selectMacro14FinalMixAndKeyLfo;
-	
+
 	//macro15
 	saveBuffer["MACRO15"]["BLOCK_1"]["selectMacro15Ch1Adjust"] = selectMacro15Ch1Adjust;
 	saveBuffer["MACRO15"]["BLOCK_1"]["selectMacro15Ch2MixAndKey"] = selectMacro15Ch2MixAndKey;
@@ -5732,7 +5732,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO15"]["BLOCK_1"]["selectMacro15Fb1Geo1Lfo2"] = selectMacro15Fb1Geo1Lfo2;
 	saveBuffer["MACRO15"]["BLOCK_1"]["selectMacro15Fb1Color1Lfo1"] = selectMacro15Fb1Color1Lfo1;
 	saveBuffer["MACRO15"]["BLOCK_1"]["selectMacro15Fb1DelayTime"] = selectMacro15Fb1DelayTime;
-	
+
 	saveBuffer["MACRO15"]["BLOCK_2"]["selectMacro15Block2InputAdjust"] = selectMacro15Block2InputAdjust;
 	saveBuffer["MACRO15"]["BLOCK_2"]["selectMacro15Block2InputAdjustLfo"] = selectMacro15Block2InputAdjustLfo;
 	saveBuffer["MACRO15"]["BLOCK_2"]["selectMacro15Fb2MixAndKey"] = selectMacro15Fb2MixAndKey;
@@ -5744,7 +5744,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO15"]["BLOCK_2"]["selectMacro15Fb2Geo1Lfo2"] = selectMacro15Fb2Geo1Lfo2;
 	saveBuffer["MACRO15"]["BLOCK_2"]["selectMacro15Fb2Color1Lfo1"] = selectMacro15Fb2Color1Lfo1;
 	saveBuffer["MACRO15"]["BLOCK_2"]["selectMacro15Fb2DelayTime"] = selectMacro15Fb2DelayTime;
-	
+
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block1Geo"] = selectMacro15Block1Geo;
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block1Colorize"] = selectMacro15Block1Colorize;
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block1Filters"] = selectMacro15Block1Filters;
@@ -5753,7 +5753,7 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block1ColorizeLfo1"] = selectMacro15Block1ColorizeLfo1;
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block1ColorizeLfo2"] = selectMacro15Block1ColorizeLfo2;
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block1ColorizeLfo3"] = selectMacro15Block1ColorizeLfo3;
-	
+
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2Geo"] = selectMacro15Block2Geo;
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2Colorize"] = selectMacro15Block2Colorize;
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2Filters"] = selectMacro15Block2Filters;
@@ -5761,29 +5761,29 @@ void GuiApp::saveEverything(){
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2Geo1Lfo2"] = selectMacro15Block2Geo1Lfo2;
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2ColorizeLfo1"] = selectMacro15Block2ColorizeLfo1;
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2ColorizeLfo2"] = selectMacro15Block2ColorizeLfo2;
-	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2ColorizeLfo3"] = selectMacro15Block2ColorizeLfo3;	
-	
+	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2ColorizeLfo3"] = selectMacro15Block2ColorizeLfo3;
+
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15MatrixMix"] = selectMacro15MatrixMix;
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15FinalMixAndKey"] = selectMacro15FinalMixAndKey;
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15MatrixMixLfo1"] = selectMacro15MatrixMixLfo1;
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15MatrixMixLfo2"] = selectMacro15MatrixMixLfo2;
 	saveBuffer["MACRO15"]["BLOCK_3"]["selectMacro15FinalMixAndKeyLfo"] = selectMacro15FinalMixAndKeyLfo;
-	
+
 	//SAVE BLOCK 1
 	for (int i=0;i<PARAMETER_ARRAY_LENGTH;i++){
 		saveBuffer["BLOCK_1"]["ch1Adjust"][i]=ch1Adjust[i];
 		saveBuffer["BLOCK_1"]["ch2MixAndKey"][i]=ch2MixAndKey[i];
 		saveBuffer["BLOCK_1"]["ch2Adjust"][i]=ch2Adjust[i];
-		
+
 		saveBuffer["BLOCK_1"]["ch1AdjustLfo"][i]=ch1AdjustLfo[i];
 		saveBuffer["BLOCK_1"]["ch2MixAndKeyLfo"][i]=ch2MixAndKeyLfo[i];
 		saveBuffer["BLOCK_1"]["ch2AdjustLfo"][i]=ch2AdjustLfo[i];
-		
+
 		saveBuffer["BLOCK_1"]["fb1MixAndKey"][i]=fb1MixAndKey[i];
 		saveBuffer["BLOCK_1"]["fb1Geo1"][i]=fb1Geo1[i];
 		saveBuffer["BLOCK_1"]["fb1Color1"][i]=fb1Color1[i];
 		saveBuffer["BLOCK_1"]["fb1Filters"][i]=fb1Filters[i];
-		
+
 		saveBuffer["BLOCK_1"]["fb1MixAndKeyLfo"][i]=fb1MixAndKeyLfo[i];
 		saveBuffer["BLOCK_1"]["fb1Geo1Lfo1"][i]=fb1Geo1Lfo1[i];
 		saveBuffer["BLOCK_1"]["fb1Geo1Lfo2"][i]=fb1Geo1Lfo2[i];
@@ -5838,33 +5838,33 @@ void GuiApp::saveEverything(){
 	saveBuffer["BLOCK_1"]["b1GeometricalAnimations"][1]=block1LineSwitch;
 	saveBuffer["BLOCK_1"]["b1GeometricalAnimations"][2]=block1SevenStarSwitch;
 	saveBuffer["BLOCK_1"]["b1GeometricalAnimations"][3]=block1LissaBallSwitch;
-	
+
 	//extra things to add
 
 	saveBuffer["BLOCK_1"]["b1_extraWhatever"][0]=fb1DelayTime;
 	saveBuffer["BLOCK_1"]["b1_extraWhatever"][1]=ch1InputSelect;
 	saveBuffer["BLOCK_1"]["b1_extraWhatever"][2]=ch2InputSelect;
 
-	
-	
+
+
 	//SAVE BLOCK 2
 	for (int i=0;i<PARAMETER_ARRAY_LENGTH;i++){
 		saveBuffer["BLOCK_2"]["block2InputAdjust"][i]=block2InputAdjust[i];
-		
+
 		saveBuffer["BLOCK_2"]["block2InputAdjustLfo"][i]=block2InputAdjustLfo[i];
-		
+
 		saveBuffer["BLOCK_2"]["fb2MixAndKey"][i]=fb2MixAndKey[i];
 		saveBuffer["BLOCK_2"]["fb2Geo1"][i]=fb2Geo1[i];
 		saveBuffer["BLOCK_2"]["fb2Color1"][i]=fb2Color1[i];
 		saveBuffer["BLOCK_2"]["fb2Filters"][i]=fb2Filters[i];
-		
+
 		saveBuffer["BLOCK_2"]["fb2MixAndKeyLfo"][i]=fb2MixAndKeyLfo[i];
 		saveBuffer["BLOCK_2"]["fb2Geo1Lfo1"][i]=fb2Geo1Lfo1[i];
 		saveBuffer["BLOCK_2"]["fb2Geo1Lfo2"][i]=fb2Geo1Lfo2[i];
 		saveBuffer["BLOCK_2"]["fb2Color1Lfo1"][i]=fb2Color1Lfo1[i];
 	}
-	
-	
+
+
 	//BLOCK 2 discretes
 	saveBuffer["BLOCK_2"]["block2InputAdjustDiscrete"][0]=block2InputGeoOverflow;
 	saveBuffer["BLOCK_2"]["block2InputAdjustDiscrete"][1]=block2InputHMirror;
@@ -5898,45 +5898,45 @@ void GuiApp::saveEverything(){
 	saveBuffer["BLOCK_2"]["b2GeometricalAnimations"][1]=block2LineSwitch;
 	saveBuffer["BLOCK_2"]["b2GeometricalAnimations"][2]=block2SevenStarSwitch;
 	saveBuffer["BLOCK_2"]["b2GeometricalAnimations"][3]=block2LissaBallSwitch;
-	
+
 	//extra things to add
 
 	saveBuffer["BLOCK_2"]["b2_extraWhatever"][0]=fb2DelayTime;
 	saveBuffer["BLOCK_2"]["b2_extraWhatever"][1]=block2InputSelect;
-	
-	
-	
-	//BLOCK_3 
+
+
+
+	//BLOCK_3
 	for (int i=0;i<PARAMETER_ARRAY_LENGTH;i++){
 		saveBuffer["BLOCK_3"]["block1Geo"][i]=block1Geo[i];
 		saveBuffer["BLOCK_3"]["block1Colorize"][i]=block1Colorize[i];
 		saveBuffer["BLOCK_3"]["block1Filters"][i]=block1Filters[i];
-		
+
 		saveBuffer["BLOCK_3"]["block1Geo1Lfo1"][i]=block1Geo1Lfo1[i];
 		saveBuffer["BLOCK_3"]["block1Geo1Lfo2"][i]=block1Geo1Lfo2[i];
 		saveBuffer["BLOCK_3"]["block1ColorizeLfo1"][i]=block1ColorizeLfo1[i];
 		saveBuffer["BLOCK_3"]["block1ColorizeLfo2"][i]=block1ColorizeLfo2[i];
 		saveBuffer["BLOCK_3"]["block1ColorizeLfo3"][i]=block1ColorizeLfo3[i];
-		
+
 		saveBuffer["BLOCK_3"]["block2Geo"][i]=block2Geo[i];
 		saveBuffer["BLOCK_3"]["block2Colorize"][i]=block2Colorize[i];
 		saveBuffer["BLOCK_3"]["block2Filters"][i]=block2Filters[i];
-		
+
 		saveBuffer["BLOCK_3"]["block2Geo1Lfo1"][i]=block2Geo1Lfo1[i];
 		saveBuffer["BLOCK_3"]["block2Geo1Lfo2"][i]=block2Geo1Lfo2[i];
 		saveBuffer["BLOCK_3"]["block2ColorizeLfo1"][i]=block2ColorizeLfo1[i];
 		saveBuffer["BLOCK_3"]["block2ColorizeLfo2"][i]=block2ColorizeLfo2[i];
 		saveBuffer["BLOCK_3"]["block2ColorizeLfo3"][i]=block2ColorizeLfo3[i];
-		
+
 		saveBuffer["BLOCK_3"]["matrixMix"][i]=matrixMix[i];
 		saveBuffer["BLOCK_3"]["finalMixAndKey"][i]=finalMixAndKey[i];
-		
+
 		saveBuffer["BLOCK_3"]["matrixMixLfo1"][i]=matrixMixLfo1[i];
 		saveBuffer["BLOCK_3"]["matrixMixLfo2"][i]=matrixMixLfo2[i];
 		saveBuffer["BLOCK_3"]["finalMixAndKeyLfo"][i]=finalMixAndKeyLfo[i];
-	
+
 	}
-	
+
 	//BLOCK 3 DISCRETES
 	saveBuffer["BLOCK_3"]["block1Geo1Discrete"][0]=block1GeoOverflow;
 	saveBuffer["BLOCK_3"]["block1Geo1Discrete"][1]=block1HMirror;
@@ -5944,32 +5944,32 @@ void GuiApp::saveEverything(){
 	saveBuffer["BLOCK_3"]["block1Geo1Discrete"][3]=block1HFlip;
 	saveBuffer["BLOCK_3"]["block1Geo1Discrete"][4]=block1VFlip;
 	saveBuffer["BLOCK_3"]["block1Geo1Discrete"][5]=block1RotateMode;
-	
+
 	saveBuffer["BLOCK_3"]["block1ColorizeDiscrete"][0]=block1ColorizeSwitch;
 	saveBuffer["BLOCK_3"]["block1ColorizeDiscrete"][1]=block1ColorizeHSB_RGB;
-	
+
 	saveBuffer["BLOCK_3"]["block2Geo1Discrete"][0]=block2GeoOverflow;
 	saveBuffer["BLOCK_3"]["block2Geo1Discrete"][1]=block2HMirror;
 	saveBuffer["BLOCK_3"]["block2Geo1Discrete"][2]=block2VMirror;
 	saveBuffer["BLOCK_3"]["block2Geo1Discrete"][3]=block2HFlip;
 	saveBuffer["BLOCK_3"]["block2Geo1Discrete"][4]=block2VFlip;
 	saveBuffer["BLOCK_3"]["block2Geo1Discrete"][5]=block2RotateMode;
-	
+
 	saveBuffer["BLOCK_3"]["block2ColorizeDiscrete"][0]=block2ColorizeSwitch;
 	saveBuffer["BLOCK_3"]["block2ColorizeDiscrete"][1]=block2ColorizeHSB_RGB;
-	
+
 	saveBuffer["BLOCK_3"]["matrixMixDiscrete"][0]=matrixMixType;
 	saveBuffer["BLOCK_3"]["matrixMixDiscrete"][1]=matrixMixOverflow;
-	
+
 	saveBuffer["BLOCK_3"]["finalMixAndKeyDiscrete"][0]=finalKeyOrder;
 	saveBuffer["BLOCK_3"]["finalMixAndKeyDiscrete"][1]=finalMixType;
 	saveBuffer["BLOCK_3"]["finalMixAndKeyDiscrete"][2]=finalMixOverflow;
 	saveBuffer["BLOCK_3"]["finalMixAndKeyDiscrete"][3]=finalKeyMode;
-	
+
 	//extra block 3 things to add: final mix order
 	//saveBuffer["BLOCK_3"]["b3_extraWhatever"][0]=finalKeyOrder;
-	
-	
+
+
 	ofSaveJson("saveStates/"+saveStateNames[saveStateSelectSwitch]+".json",saveBuffer);
 }
 
@@ -5986,12 +5986,12 @@ void GuiApp::loadEverything(){
 	//didn't feel like fucking around with extra procedures
 	//can allways bool this section if we really really want seperate block saves
 	//but heckin a not now
-	
+
 	//macros
 	for (int i=0;i<PARAMETER_ARRAY_LENGTH;i++){
 		macroData[i]=loadBuffer["MACROS"]["macroData"][i];
 	}
-	
+
 	//load all the stupid constants lolololol
 	//macro0
 	selectMacro0Ch1Adjust=loadBuffer["MACRO0"]["BLOCK_1"]["selectMacro0Ch1Adjust"];
@@ -6009,7 +6009,7 @@ void GuiApp::loadEverything(){
 	selectMacro0Fb1Geo1Lfo2=loadBuffer["MACRO0"]["BLOCK_1"]["selectMacro0Fb1Geo1Lfo2"];
 	selectMacro0Fb1Color1Lfo1=loadBuffer["MACRO0"]["BLOCK_1"]["selectMacro0Fb1Color1Lfo1"];
 	selectMacro0Fb1DelayTime=loadBuffer["MACRO0"]["BLOCK_1"]["selectMacro0Fb1DelayTime"];
-	
+
 	selectMacro0Block2InputAdjust=loadBuffer["MACRO0"]["BLOCK_2"]["selectMacro0Block2InputAdjust"];
 	selectMacro0Block2InputAdjustLfo=loadBuffer["MACRO0"]["BLOCK_2"]["selectMacro0Block2InputAdjustLfo"];
 	selectMacro0Fb2MixAndKey=loadBuffer["MACRO0"]["BLOCK_2"]["selectMacro0Fb2MixAndKey"];
@@ -6021,7 +6021,7 @@ void GuiApp::loadEverything(){
 	selectMacro0Fb2Geo1Lfo2=loadBuffer["MACRO0"]["BLOCK_2"]["selectMacro0Fb2Geo1Lfo2"];
 	selectMacro0Fb2Color1Lfo1=loadBuffer["MACRO0"]["BLOCK_2"]["selectMacro0Fb2Color1Lfo1"];
 	selectMacro0Fb2DelayTime=loadBuffer["MACRO0"]["BLOCK_2"]["selectMacro0Fb2DelayTime"];
-	
+
 	selectMacro0Block1Geo=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block1Geo"];
 	selectMacro0Block1Colorize=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block1Colorize"];
 	selectMacro0Block1Filters=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block1Filters"];
@@ -6030,7 +6030,7 @@ void GuiApp::loadEverything(){
 	selectMacro0Block1ColorizeLfo1=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block1ColorizeLfo1"];
 	selectMacro0Block1ColorizeLfo2=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block1ColorizeLfo2"];
 	selectMacro0Block1ColorizeLfo3=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block1ColorizeLfo3"];
-	
+
 	selectMacro0Block2Geo=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2Geo"];
 	selectMacro0Block2Colorize=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2Colorize"];
 	selectMacro0Block2Filters=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2Filters"];
@@ -6038,14 +6038,14 @@ void GuiApp::loadEverything(){
 	selectMacro0Block2Geo1Lfo2=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2Geo1Lfo2"];
 	selectMacro0Block2ColorizeLfo1=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2ColorizeLfo1"];
 	selectMacro0Block2ColorizeLfo2=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2ColorizeLfo2"];
-	selectMacro0Block2ColorizeLfo3=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2ColorizeLfo3"];	
-	
+	selectMacro0Block2ColorizeLfo3=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0Block2ColorizeLfo3"];
+
 	selectMacro0MatrixMix=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0MatrixMix"];
 	selectMacro0FinalMixAndKey=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0FinalMixAndKey"];
 	selectMacro0MatrixMixLfo1=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0MatrixMixLfo1"];
 	selectMacro0MatrixMixLfo2=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0MatrixMixLfo2"];
 	selectMacro0FinalMixAndKeyLfo=loadBuffer["MACRO0"]["BLOCK_3"]["selectMacro0FinalMixAndKeyLfo"];
-	
+
 	//macro1
 	selectMacro1Ch1Adjust=loadBuffer["MACRO1"]["BLOCK_1"]["selectMacro1Ch1Adjust"];
 	selectMacro1Ch2MixAndKey=loadBuffer["MACRO1"]["BLOCK_1"]["selectMacro1Ch2MixAndKey"];
@@ -6062,7 +6062,7 @@ void GuiApp::loadEverything(){
 	selectMacro1Fb1Geo1Lfo2=loadBuffer["MACRO1"]["BLOCK_1"]["selectMacro1Fb1Geo1Lfo2"];
 	selectMacro1Fb1Color1Lfo1=loadBuffer["MACRO1"]["BLOCK_1"]["selectMacro1Fb1Color1Lfo1"];
 	selectMacro1Fb1DelayTime=loadBuffer["MACRO1"]["BLOCK_1"]["selectMacro1Fb1DelayTime"];
-	
+
 	selectMacro1Block2InputAdjust=loadBuffer["MACRO1"]["BLOCK_2"]["selectMacro1Block2InputAdjust"];
 	selectMacro1Block2InputAdjustLfo=loadBuffer["MACRO1"]["BLOCK_2"]["selectMacro1Block2InputAdjustLfo"];
 	selectMacro1Fb2MixAndKey=loadBuffer["MACRO1"]["BLOCK_2"]["selectMacro1Fb2MixAndKey"];
@@ -6074,7 +6074,7 @@ void GuiApp::loadEverything(){
 	selectMacro1Fb2Geo1Lfo2=loadBuffer["MACRO1"]["BLOCK_2"]["selectMacro1Fb2Geo1Lfo2"];
 	selectMacro1Fb2Color1Lfo1=loadBuffer["MACRO1"]["BLOCK_2"]["selectMacro1Fb2Color1Lfo1"];
 	selectMacro1Fb2DelayTime=loadBuffer["MACRO1"]["BLOCK_2"]["selectMacro1Fb2DelayTime"];
-	
+
 	selectMacro1Block1Geo=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block1Geo"];
 	selectMacro1Block1Colorize=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block1Colorize"];
 	selectMacro1Block1Filters=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block1Filters"];
@@ -6083,7 +6083,7 @@ void GuiApp::loadEverything(){
 	selectMacro1Block1ColorizeLfo1=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block1ColorizeLfo1"];
 	selectMacro1Block1ColorizeLfo2=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block1ColorizeLfo2"];
 	selectMacro1Block1ColorizeLfo3=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block1ColorizeLfo3"];
-	
+
 	selectMacro1Block2Geo=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2Geo"];
 	selectMacro1Block2Colorize=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2Colorize"];
 	selectMacro1Block2Filters=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2Filters"];
@@ -6091,14 +6091,14 @@ void GuiApp::loadEverything(){
 	selectMacro1Block2Geo1Lfo2=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2Geo1Lfo2"];
 	selectMacro1Block2ColorizeLfo1=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2ColorizeLfo1"];
 	selectMacro1Block2ColorizeLfo2=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2ColorizeLfo2"];
-	selectMacro1Block2ColorizeLfo3=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2ColorizeLfo3"];	
-	
+	selectMacro1Block2ColorizeLfo3=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1Block2ColorizeLfo3"];
+
 	selectMacro1MatrixMix=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1MatrixMix"];
 	selectMacro1FinalMixAndKey=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1FinalMixAndKey"];
 	selectMacro1MatrixMixLfo1=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1MatrixMixLfo1"];
 	selectMacro1MatrixMixLfo2=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1MatrixMixLfo2"];
 	selectMacro1FinalMixAndKeyLfo=loadBuffer["MACRO1"]["BLOCK_3"]["selectMacro1FinalMixAndKeyLfo"];
-	
+
 	//macro2
 	selectMacro2Ch1Adjust=loadBuffer["MACRO2"]["BLOCK_1"]["selectMacro2Ch1Adjust"];
 	selectMacro2Ch2MixAndKey=loadBuffer["MACRO2"]["BLOCK_1"]["selectMacro2Ch2MixAndKey"];
@@ -6115,7 +6115,7 @@ void GuiApp::loadEverything(){
 	selectMacro2Fb1Geo1Lfo2=loadBuffer["MACRO2"]["BLOCK_1"]["selectMacro2Fb1Geo1Lfo2"];
 	selectMacro2Fb1Color1Lfo1=loadBuffer["MACRO2"]["BLOCK_1"]["selectMacro2Fb1Color1Lfo1"];
 	selectMacro2Fb1DelayTime=loadBuffer["MACRO2"]["BLOCK_1"]["selectMacro2Fb1DelayTime"];
-	
+
 	selectMacro2Block2InputAdjust=loadBuffer["MACRO2"]["BLOCK_2"]["selectMacro2Block2InputAdjust"];
 	selectMacro2Block2InputAdjustLfo=loadBuffer["MACRO2"]["BLOCK_2"]["selectMacro2Block2InputAdjustLfo"];
 	selectMacro2Fb2MixAndKey=loadBuffer["MACRO2"]["BLOCK_2"]["selectMacro2Fb2MixAndKey"];
@@ -6127,7 +6127,7 @@ void GuiApp::loadEverything(){
 	selectMacro2Fb2Geo1Lfo2=loadBuffer["MACRO2"]["BLOCK_2"]["selectMacro2Fb2Geo1Lfo2"];
 	selectMacro2Fb2Color1Lfo1=loadBuffer["MACRO2"]["BLOCK_2"]["selectMacro2Fb2Color1Lfo1"];
 	selectMacro2Fb2DelayTime=loadBuffer["MACRO2"]["BLOCK_2"]["selectMacro2Fb2DelayTime"];
-	
+
 	selectMacro2Block1Geo=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block1Geo"];
 	selectMacro2Block1Colorize=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block1Colorize"];
 	selectMacro2Block1Filters=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block1Filters"];
@@ -6136,7 +6136,7 @@ void GuiApp::loadEverything(){
 	selectMacro2Block1ColorizeLfo1=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block1ColorizeLfo1"];
 	selectMacro2Block1ColorizeLfo2=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block1ColorizeLfo2"];
 	selectMacro2Block1ColorizeLfo3=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block1ColorizeLfo3"];
-	
+
 	selectMacro2Block2Geo=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2Geo"];
 	selectMacro2Block2Colorize=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2Colorize"];
 	selectMacro2Block2Filters=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2Filters"];
@@ -6144,14 +6144,14 @@ void GuiApp::loadEverything(){
 	selectMacro2Block2Geo1Lfo2=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2Geo1Lfo2"];
 	selectMacro2Block2ColorizeLfo1=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2ColorizeLfo1"];
 	selectMacro2Block2ColorizeLfo2=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2ColorizeLfo2"];
-	selectMacro2Block2ColorizeLfo3=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2ColorizeLfo3"];	
-	
+	selectMacro2Block2ColorizeLfo3=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2Block2ColorizeLfo3"];
+
 	selectMacro2MatrixMix=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2MatrixMix"];
 	selectMacro2FinalMixAndKey=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2FinalMixAndKey"];
 	selectMacro2MatrixMixLfo1=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2MatrixMixLfo1"];
 	selectMacro2MatrixMixLfo2=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2MatrixMixLfo2"];
 	selectMacro2FinalMixAndKeyLfo=loadBuffer["MACRO2"]["BLOCK_3"]["selectMacro2FinalMixAndKeyLfo"];
-	
+
 	//macro3
 	selectMacro3Ch1Adjust=loadBuffer["MACRO3"]["BLOCK_1"]["selectMacro3Ch1Adjust"];
 	selectMacro3Ch2MixAndKey=loadBuffer["MACRO3"]["BLOCK_1"]["selectMacro3Ch2MixAndKey"];
@@ -6168,7 +6168,7 @@ void GuiApp::loadEverything(){
 	selectMacro3Fb1Geo1Lfo2=loadBuffer["MACRO3"]["BLOCK_1"]["selectMacro3Fb1Geo1Lfo2"];
 	selectMacro3Fb1Color1Lfo1=loadBuffer["MACRO3"]["BLOCK_1"]["selectMacro3Fb1Color1Lfo1"];
 	selectMacro3Fb1DelayTime=loadBuffer["MACRO3"]["BLOCK_1"]["selectMacro3Fb1DelayTime"];
-	
+
 	selectMacro3Block2InputAdjust=loadBuffer["MACRO3"]["BLOCK_2"]["selectMacro3Block2InputAdjust"];
 	selectMacro3Block2InputAdjustLfo=loadBuffer["MACRO3"]["BLOCK_2"]["selectMacro3Block2InputAdjustLfo"];
 	selectMacro3Fb2MixAndKey=loadBuffer["MACRO3"]["BLOCK_2"]["selectMacro3Fb2MixAndKey"];
@@ -6180,7 +6180,7 @@ void GuiApp::loadEverything(){
 	selectMacro3Fb2Geo1Lfo2=loadBuffer["MACRO3"]["BLOCK_2"]["selectMacro3Fb2Geo1Lfo2"];
 	selectMacro3Fb2Color1Lfo1=loadBuffer["MACRO3"]["BLOCK_2"]["selectMacro3Fb2Color1Lfo1"];
 	selectMacro3Fb2DelayTime=loadBuffer["MACRO3"]["BLOCK_2"]["selectMacro3Fb2DelayTime"];
-	
+
 	selectMacro3Block1Geo=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block1Geo"];
 	selectMacro3Block1Colorize=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block1Colorize"];
 	selectMacro3Block1Filters=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block1Filters"];
@@ -6189,7 +6189,7 @@ void GuiApp::loadEverything(){
 	selectMacro3Block1ColorizeLfo1=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block1ColorizeLfo1"];
 	selectMacro3Block1ColorizeLfo2=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block1ColorizeLfo2"];
 	selectMacro3Block1ColorizeLfo3=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block1ColorizeLfo3"];
-	
+
 	selectMacro3Block2Geo=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2Geo"];
 	selectMacro3Block2Colorize=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2Colorize"];
 	selectMacro3Block2Filters=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2Filters"];
@@ -6197,14 +6197,14 @@ void GuiApp::loadEverything(){
 	selectMacro3Block2Geo1Lfo2=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2Geo1Lfo2"];
 	selectMacro3Block2ColorizeLfo1=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2ColorizeLfo1"];
 	selectMacro3Block2ColorizeLfo2=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2ColorizeLfo2"];
-	selectMacro3Block2ColorizeLfo3=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2ColorizeLfo3"];	
-	
+	selectMacro3Block2ColorizeLfo3=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3Block2ColorizeLfo3"];
+
 	selectMacro3MatrixMix=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3MatrixMix"];
 	selectMacro3FinalMixAndKey=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3FinalMixAndKey"];
 	selectMacro3MatrixMixLfo1=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3MatrixMixLfo1"];
 	selectMacro3MatrixMixLfo2=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3MatrixMixLfo2"];
 	selectMacro3FinalMixAndKeyLfo=loadBuffer["MACRO3"]["BLOCK_3"]["selectMacro3FinalMixAndKeyLfo"];
-	
+
 	//macro4
 	selectMacro4Ch1Adjust=loadBuffer["MACRO4"]["BLOCK_1"]["selectMacro4Ch1Adjust"];
 	selectMacro4Ch2MixAndKey=loadBuffer["MACRO4"]["BLOCK_1"]["selectMacro4Ch2MixAndKey"];
@@ -6221,7 +6221,7 @@ void GuiApp::loadEverything(){
 	selectMacro4Fb1Geo1Lfo2=loadBuffer["MACRO4"]["BLOCK_1"]["selectMacro4Fb1Geo1Lfo2"];
 	selectMacro4Fb1Color1Lfo1=loadBuffer["MACRO4"]["BLOCK_1"]["selectMacro4Fb1Color1Lfo1"];
 	selectMacro4Fb1DelayTime=loadBuffer["MACRO4"]["BLOCK_1"]["selectMacro4Fb1DelayTime"];
-	
+
 	selectMacro4Block2InputAdjust=loadBuffer["MACRO4"]["BLOCK_2"]["selectMacro4Block2InputAdjust"];
 	selectMacro4Block2InputAdjustLfo=loadBuffer["MACRO4"]["BLOCK_2"]["selectMacro4Block2InputAdjustLfo"];
 	selectMacro4Fb2MixAndKey=loadBuffer["MACRO4"]["BLOCK_2"]["selectMacro4Fb2MixAndKey"];
@@ -6233,7 +6233,7 @@ void GuiApp::loadEverything(){
 	selectMacro4Fb2Geo1Lfo2=loadBuffer["MACRO4"]["BLOCK_2"]["selectMacro4Fb2Geo1Lfo2"];
 	selectMacro4Fb2Color1Lfo1=loadBuffer["MACRO4"]["BLOCK_2"]["selectMacro4Fb2Color1Lfo1"];
 	selectMacro4Fb2DelayTime=loadBuffer["MACRO4"]["BLOCK_2"]["selectMacro4Fb2DelayTime"];
-	
+
 	selectMacro4Block1Geo=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block1Geo"];
 	selectMacro4Block1Colorize=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block1Colorize"];
 	selectMacro4Block1Filters=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block1Filters"];
@@ -6242,7 +6242,7 @@ void GuiApp::loadEverything(){
 	selectMacro4Block1ColorizeLfo1=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block1ColorizeLfo1"];
 	selectMacro4Block1ColorizeLfo2=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block1ColorizeLfo2"];
 	selectMacro4Block1ColorizeLfo3=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block1ColorizeLfo3"];
-	
+
 	selectMacro4Block2Geo=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2Geo"];
 	selectMacro4Block2Colorize=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2Colorize"];
 	selectMacro4Block2Filters=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2Filters"];
@@ -6250,14 +6250,14 @@ void GuiApp::loadEverything(){
 	selectMacro4Block2Geo1Lfo2=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2Geo1Lfo2"];
 	selectMacro4Block2ColorizeLfo1=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2ColorizeLfo1"];
 	selectMacro4Block2ColorizeLfo2=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2ColorizeLfo2"];
-	selectMacro4Block2ColorizeLfo3=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2ColorizeLfo3"];	
-	
+	selectMacro4Block2ColorizeLfo3=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4Block2ColorizeLfo3"];
+
 	selectMacro4MatrixMix=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4MatrixMix"];
 	selectMacro4FinalMixAndKey=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4FinalMixAndKey"];
 	selectMacro4MatrixMixLfo1=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4MatrixMixLfo1"];
 	selectMacro4MatrixMixLfo2=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4MatrixMixLfo2"];
 	selectMacro4FinalMixAndKeyLfo=loadBuffer["MACRO4"]["BLOCK_3"]["selectMacro4FinalMixAndKeyLfo"];
-	
+
 	//macro5
 	selectMacro5Ch1Adjust=loadBuffer["MACRO5"]["BLOCK_1"]["selectMacro5Ch1Adjust"];
 	selectMacro5Ch2MixAndKey=loadBuffer["MACRO5"]["BLOCK_1"]["selectMacro5Ch2MixAndKey"];
@@ -6274,7 +6274,7 @@ void GuiApp::loadEverything(){
 	selectMacro5Fb1Geo1Lfo2=loadBuffer["MACRO5"]["BLOCK_1"]["selectMacro5Fb1Geo1Lfo2"];
 	selectMacro5Fb1Color1Lfo1=loadBuffer["MACRO5"]["BLOCK_1"]["selectMacro5Fb1Color1Lfo1"];
 	selectMacro5Fb1DelayTime=loadBuffer["MACRO5"]["BLOCK_1"]["selectMacro5Fb1DelayTime"];
-	
+
 	selectMacro5Block2InputAdjust=loadBuffer["MACRO5"]["BLOCK_2"]["selectMacro5Block2InputAdjust"];
 	selectMacro5Block2InputAdjustLfo=loadBuffer["MACRO5"]["BLOCK_2"]["selectMacro5Block2InputAdjustLfo"];
 	selectMacro5Fb2MixAndKey=loadBuffer["MACRO5"]["BLOCK_2"]["selectMacro5Fb2MixAndKey"];
@@ -6286,7 +6286,7 @@ void GuiApp::loadEverything(){
 	selectMacro5Fb2Geo1Lfo2=loadBuffer["MACRO5"]["BLOCK_2"]["selectMacro5Fb2Geo1Lfo2"];
 	selectMacro5Fb2Color1Lfo1=loadBuffer["MACRO5"]["BLOCK_2"]["selectMacro5Fb2Color1Lfo1"];
 	selectMacro5Fb2DelayTime=loadBuffer["MACRO5"]["BLOCK_2"]["selectMacro5Fb2DelayTime"];
-	
+
 	selectMacro5Block1Geo=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block1Geo"];
 	selectMacro5Block1Colorize=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block1Colorize"];
 	selectMacro5Block1Filters=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block1Filters"];
@@ -6295,7 +6295,7 @@ void GuiApp::loadEverything(){
 	selectMacro5Block1ColorizeLfo1=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block1ColorizeLfo1"];
 	selectMacro5Block1ColorizeLfo2=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block1ColorizeLfo2"];
 	selectMacro5Block1ColorizeLfo3=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block1ColorizeLfo3"];
-	
+
 	selectMacro5Block2Geo=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2Geo"];
 	selectMacro5Block2Colorize=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2Colorize"];
 	selectMacro5Block2Filters=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2Filters"];
@@ -6303,14 +6303,14 @@ void GuiApp::loadEverything(){
 	selectMacro5Block2Geo1Lfo2=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2Geo1Lfo2"];
 	selectMacro5Block2ColorizeLfo1=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2ColorizeLfo1"];
 	selectMacro5Block2ColorizeLfo2=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2ColorizeLfo2"];
-	selectMacro5Block2ColorizeLfo3=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2ColorizeLfo3"];	
-	
+	selectMacro5Block2ColorizeLfo3=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5Block2ColorizeLfo3"];
+
 	selectMacro5MatrixMix=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5MatrixMix"];
 	selectMacro5FinalMixAndKey=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5FinalMixAndKey"];
 	selectMacro5MatrixMixLfo1=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5MatrixMixLfo1"];
 	selectMacro5MatrixMixLfo2=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5MatrixMixLfo2"];
 	selectMacro5FinalMixAndKeyLfo=loadBuffer["MACRO5"]["BLOCK_3"]["selectMacro5FinalMixAndKeyLfo"];
-	
+
 	//macro6
 	selectMacro6Ch1Adjust=loadBuffer["MACRO6"]["BLOCK_1"]["selectMacro6Ch1Adjust"];
 	selectMacro6Ch2MixAndKey=loadBuffer["MACRO6"]["BLOCK_1"]["selectMacro6Ch2MixAndKey"];
@@ -6327,7 +6327,7 @@ void GuiApp::loadEverything(){
 	selectMacro6Fb1Geo1Lfo2=loadBuffer["MACRO6"]["BLOCK_1"]["selectMacro6Fb1Geo1Lfo2"];
 	selectMacro6Fb1Color1Lfo1=loadBuffer["MACRO6"]["BLOCK_1"]["selectMacro6Fb1Color1Lfo1"];
 	selectMacro6Fb1DelayTime=loadBuffer["MACRO6"]["BLOCK_1"]["selectMacro6Fb1DelayTime"];
-	
+
 	selectMacro6Block2InputAdjust=loadBuffer["MACRO6"]["BLOCK_2"]["selectMacro6Block2InputAdjust"];
 	selectMacro6Block2InputAdjustLfo=loadBuffer["MACRO6"]["BLOCK_2"]["selectMacro6Block2InputAdjustLfo"];
 	selectMacro6Fb2MixAndKey=loadBuffer["MACRO6"]["BLOCK_2"]["selectMacro6Fb2MixAndKey"];
@@ -6339,7 +6339,7 @@ void GuiApp::loadEverything(){
 	selectMacro6Fb2Geo1Lfo2=loadBuffer["MACRO6"]["BLOCK_2"]["selectMacro6Fb2Geo1Lfo2"];
 	selectMacro6Fb2Color1Lfo1=loadBuffer["MACRO6"]["BLOCK_2"]["selectMacro6Fb2Color1Lfo1"];
 	selectMacro6Fb2DelayTime=loadBuffer["MACRO6"]["BLOCK_2"]["selectMacro6Fb2DelayTime"];
-	
+
 	selectMacro6Block1Geo=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block1Geo"];
 	selectMacro6Block1Colorize=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block1Colorize"];
 	selectMacro6Block1Filters=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block1Filters"];
@@ -6348,7 +6348,7 @@ void GuiApp::loadEverything(){
 	selectMacro6Block1ColorizeLfo1=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block1ColorizeLfo1"];
 	selectMacro6Block1ColorizeLfo2=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block1ColorizeLfo2"];
 	selectMacro6Block1ColorizeLfo3=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block1ColorizeLfo3"];
-	
+
 	selectMacro6Block2Geo=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2Geo"];
 	selectMacro6Block2Colorize=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2Colorize"];
 	selectMacro6Block2Filters=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2Filters"];
@@ -6356,14 +6356,14 @@ void GuiApp::loadEverything(){
 	selectMacro6Block2Geo1Lfo2=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2Geo1Lfo2"];
 	selectMacro6Block2ColorizeLfo1=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2ColorizeLfo1"];
 	selectMacro6Block2ColorizeLfo2=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2ColorizeLfo2"];
-	selectMacro6Block2ColorizeLfo3=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2ColorizeLfo3"];	
-	
+	selectMacro6Block2ColorizeLfo3=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6Block2ColorizeLfo3"];
+
 	selectMacro6MatrixMix=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6MatrixMix"];
 	selectMacro6FinalMixAndKey=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6FinalMixAndKey"];
 	selectMacro6MatrixMixLfo1=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6MatrixMixLfo1"];
 	selectMacro6MatrixMixLfo2=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6MatrixMixLfo2"];
 	selectMacro6FinalMixAndKeyLfo=loadBuffer["MACRO6"]["BLOCK_3"]["selectMacro6FinalMixAndKeyLfo"];
-	
+
 	//macro7
 	selectMacro7Ch1Adjust=loadBuffer["MACRO7"]["BLOCK_1"]["selectMacro7Ch1Adjust"];
 	selectMacro7Ch2MixAndKey=loadBuffer["MACRO7"]["BLOCK_1"]["selectMacro7Ch2MixAndKey"];
@@ -6380,7 +6380,7 @@ void GuiApp::loadEverything(){
 	selectMacro7Fb1Geo1Lfo2=loadBuffer["MACRO7"]["BLOCK_1"]["selectMacro7Fb1Geo1Lfo2"];
 	selectMacro7Fb1Color1Lfo1=loadBuffer["MACRO7"]["BLOCK_1"]["selectMacro7Fb1Color1Lfo1"];
 	selectMacro7Fb1DelayTime=loadBuffer["MACRO7"]["BLOCK_1"]["selectMacro7Fb1DelayTime"];
-	
+
 	selectMacro7Block2InputAdjust=loadBuffer["MACRO7"]["BLOCK_2"]["selectMacro7Block2InputAdjust"];
 	selectMacro7Block2InputAdjustLfo=loadBuffer["MACRO7"]["BLOCK_2"]["selectMacro7Block2InputAdjustLfo"];
 	selectMacro7Fb2MixAndKey=loadBuffer["MACRO7"]["BLOCK_2"]["selectMacro7Fb2MixAndKey"];
@@ -6392,7 +6392,7 @@ void GuiApp::loadEverything(){
 	selectMacro7Fb2Geo1Lfo2=loadBuffer["MACRO7"]["BLOCK_2"]["selectMacro7Fb2Geo1Lfo2"];
 	selectMacro7Fb2Color1Lfo1=loadBuffer["MACRO7"]["BLOCK_2"]["selectMacro7Fb2Color1Lfo1"];
 	selectMacro7Fb2DelayTime=loadBuffer["MACRO7"]["BLOCK_2"]["selectMacro7Fb2DelayTime"];
-	
+
 	selectMacro7Block1Geo=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block1Geo"];
 	selectMacro7Block1Colorize=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block1Colorize"];
 	selectMacro7Block1Filters=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block1Filters"];
@@ -6401,7 +6401,7 @@ void GuiApp::loadEverything(){
 	selectMacro7Block1ColorizeLfo1=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block1ColorizeLfo1"];
 	selectMacro7Block1ColorizeLfo2=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block1ColorizeLfo2"];
 	selectMacro7Block1ColorizeLfo3=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block1ColorizeLfo3"];
-	
+
 	selectMacro7Block2Geo=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2Geo"];
 	selectMacro7Block2Colorize=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2Colorize"];
 	selectMacro7Block2Filters=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2Filters"];
@@ -6409,14 +6409,14 @@ void GuiApp::loadEverything(){
 	selectMacro7Block2Geo1Lfo2=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2Geo1Lfo2"];
 	selectMacro7Block2ColorizeLfo1=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2ColorizeLfo1"];
 	selectMacro7Block2ColorizeLfo2=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2ColorizeLfo2"];
-	selectMacro7Block2ColorizeLfo3=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2ColorizeLfo3"];	
-	
+	selectMacro7Block2ColorizeLfo3=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7Block2ColorizeLfo3"];
+
 	selectMacro7MatrixMix=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7MatrixMix"];
 	selectMacro7FinalMixAndKey=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7FinalMixAndKey"];
 	selectMacro7MatrixMixLfo1=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7MatrixMixLfo1"];
 	selectMacro7MatrixMixLfo2=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7MatrixMixLfo2"];
 	selectMacro7FinalMixAndKeyLfo=loadBuffer["MACRO7"]["BLOCK_3"]["selectMacro7FinalMixAndKeyLfo"];
-	
+
 	//macro8
 	selectMacro8Ch1Adjust=loadBuffer["MACRO8"]["BLOCK_1"]["selectMacro8Ch1Adjust"];
 	selectMacro8Ch2MixAndKey=loadBuffer["MACRO8"]["BLOCK_1"]["selectMacro8Ch2MixAndKey"];
@@ -6433,7 +6433,7 @@ void GuiApp::loadEverything(){
 	selectMacro8Fb1Geo1Lfo2=loadBuffer["MACRO8"]["BLOCK_1"]["selectMacro8Fb1Geo1Lfo2"];
 	selectMacro8Fb1Color1Lfo1=loadBuffer["MACRO8"]["BLOCK_1"]["selectMacro8Fb1Color1Lfo1"];
 	selectMacro8Fb1DelayTime=loadBuffer["MACRO8"]["BLOCK_1"]["selectMacro8Fb1DelayTime"];
-	
+
 	selectMacro8Block2InputAdjust=loadBuffer["MACRO8"]["BLOCK_2"]["selectMacro8Block2InputAdjust"];
 	selectMacro8Block2InputAdjustLfo=loadBuffer["MACRO8"]["BLOCK_2"]["selectMacro8Block2InputAdjustLfo"];
 	selectMacro8Fb2MixAndKey=loadBuffer["MACRO8"]["BLOCK_2"]["selectMacro8Fb2MixAndKey"];
@@ -6445,7 +6445,7 @@ void GuiApp::loadEverything(){
 	selectMacro8Fb2Geo1Lfo2=loadBuffer["MACRO8"]["BLOCK_2"]["selectMacro8Fb2Geo1Lfo2"];
 	selectMacro8Fb2Color1Lfo1=loadBuffer["MACRO8"]["BLOCK_2"]["selectMacro8Fb2Color1Lfo1"];
 	selectMacro8Fb2DelayTime=loadBuffer["MACRO8"]["BLOCK_2"]["selectMacro8Fb2DelayTime"];
-	
+
 	selectMacro8Block1Geo=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block1Geo"];
 	selectMacro8Block1Colorize=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block1Colorize"];
 	selectMacro8Block1Filters=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block1Filters"];
@@ -6454,7 +6454,7 @@ void GuiApp::loadEverything(){
 	selectMacro8Block1ColorizeLfo1=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block1ColorizeLfo1"];
 	selectMacro8Block1ColorizeLfo2=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block1ColorizeLfo2"];
 	selectMacro8Block1ColorizeLfo3=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block1ColorizeLfo3"];
-	
+
 	selectMacro8Block2Geo=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2Geo"];
 	selectMacro8Block2Colorize=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2Colorize"];
 	selectMacro8Block2Filters=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2Filters"];
@@ -6462,14 +6462,14 @@ void GuiApp::loadEverything(){
 	selectMacro8Block2Geo1Lfo2=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2Geo1Lfo2"];
 	selectMacro8Block2ColorizeLfo1=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2ColorizeLfo1"];
 	selectMacro8Block2ColorizeLfo2=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2ColorizeLfo2"];
-	selectMacro8Block2ColorizeLfo3=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2ColorizeLfo3"];	
-	
+	selectMacro8Block2ColorizeLfo3=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8Block2ColorizeLfo3"];
+
 	selectMacro8MatrixMix=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8MatrixMix"];
 	selectMacro8FinalMixAndKey=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8FinalMixAndKey"];
 	selectMacro8MatrixMixLfo1=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8MatrixMixLfo1"];
 	selectMacro8MatrixMixLfo2=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8MatrixMixLfo2"];
 	selectMacro8FinalMixAndKeyLfo=loadBuffer["MACRO8"]["BLOCK_3"]["selectMacro8FinalMixAndKeyLfo"];
-	
+
 	//macro9
 	selectMacro9Ch1Adjust=loadBuffer["MACRO9"]["BLOCK_1"]["selectMacro9Ch1Adjust"];
 	selectMacro9Ch2MixAndKey=loadBuffer["MACRO9"]["BLOCK_1"]["selectMacro9Ch2MixAndKey"];
@@ -6486,7 +6486,7 @@ void GuiApp::loadEverything(){
 	selectMacro9Fb1Geo1Lfo2=loadBuffer["MACRO9"]["BLOCK_1"]["selectMacro9Fb1Geo1Lfo2"];
 	selectMacro9Fb1Color1Lfo1=loadBuffer["MACRO9"]["BLOCK_1"]["selectMacro9Fb1Color1Lfo1"];
 	selectMacro9Fb1DelayTime=loadBuffer["MACRO9"]["BLOCK_1"]["selectMacro9Fb1DelayTime"];
-	
+
 	selectMacro9Block2InputAdjust=loadBuffer["MACRO9"]["BLOCK_2"]["selectMacro9Block2InputAdjust"];
 	selectMacro9Block2InputAdjustLfo=loadBuffer["MACRO9"]["BLOCK_2"]["selectMacro9Block2InputAdjustLfo"];
 	selectMacro9Fb2MixAndKey=loadBuffer["MACRO9"]["BLOCK_2"]["selectMacro9Fb2MixAndKey"];
@@ -6498,7 +6498,7 @@ void GuiApp::loadEverything(){
 	selectMacro9Fb2Geo1Lfo2=loadBuffer["MACRO9"]["BLOCK_2"]["selectMacro9Fb2Geo1Lfo2"];
 	selectMacro9Fb2Color1Lfo1=loadBuffer["MACRO9"]["BLOCK_2"]["selectMacro9Fb2Color1Lfo1"];
 	selectMacro9Fb2DelayTime=loadBuffer["MACRO9"]["BLOCK_2"]["selectMacro9Fb2DelayTime"];
-	
+
 	selectMacro9Block1Geo=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block1Geo"];
 	selectMacro9Block1Colorize=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block1Colorize"];
 	selectMacro9Block1Filters=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block1Filters"];
@@ -6507,7 +6507,7 @@ void GuiApp::loadEverything(){
 	selectMacro9Block1ColorizeLfo1=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block1ColorizeLfo1"];
 	selectMacro9Block1ColorizeLfo2=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block1ColorizeLfo2"];
 	selectMacro9Block1ColorizeLfo3=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block1ColorizeLfo3"];
-	
+
 	selectMacro9Block2Geo=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2Geo"];
 	selectMacro9Block2Colorize=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2Colorize"];
 	selectMacro9Block2Filters=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2Filters"];
@@ -6515,14 +6515,14 @@ void GuiApp::loadEverything(){
 	selectMacro9Block2Geo1Lfo2=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2Geo1Lfo2"];
 	selectMacro9Block2ColorizeLfo1=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2ColorizeLfo1"];
 	selectMacro9Block2ColorizeLfo2=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2ColorizeLfo2"];
-	selectMacro9Block2ColorizeLfo3=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2ColorizeLfo3"];	
-	
+	selectMacro9Block2ColorizeLfo3=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9Block2ColorizeLfo3"];
+
 	selectMacro9MatrixMix=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9MatrixMix"];
 	selectMacro9FinalMixAndKey=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9FinalMixAndKey"];
 	selectMacro9MatrixMixLfo1=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9MatrixMixLfo1"];
 	selectMacro9MatrixMixLfo2=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9MatrixMixLfo2"];
 	selectMacro9FinalMixAndKeyLfo=loadBuffer["MACRO9"]["BLOCK_3"]["selectMacro9FinalMixAndKeyLfo"];
-	
+
 	//macro10
 	selectMacro10Ch1Adjust=loadBuffer["MACRO10"]["BLOCK_1"]["selectMacro10Ch1Adjust"];
 	selectMacro10Ch2MixAndKey=loadBuffer["MACRO10"]["BLOCK_1"]["selectMacro10Ch2MixAndKey"];
@@ -6539,7 +6539,7 @@ void GuiApp::loadEverything(){
 	selectMacro10Fb1Geo1Lfo2=loadBuffer["MACRO10"]["BLOCK_1"]["selectMacro10Fb1Geo1Lfo2"];
 	selectMacro10Fb1Color1Lfo1=loadBuffer["MACRO10"]["BLOCK_1"]["selectMacro10Fb1Color1Lfo1"];
 	selectMacro10Fb1DelayTime=loadBuffer["MACRO10"]["BLOCK_1"]["selectMacro10Fb1DelayTime"];
-	
+
 	selectMacro10Block2InputAdjust=loadBuffer["MACRO10"]["BLOCK_2"]["selectMacro10Block2InputAdjust"];
 	selectMacro10Block2InputAdjustLfo=loadBuffer["MACRO10"]["BLOCK_2"]["selectMacro10Block2InputAdjustLfo"];
 	selectMacro10Fb2MixAndKey=loadBuffer["MACRO10"]["BLOCK_2"]["selectMacro10Fb2MixAndKey"];
@@ -6551,7 +6551,7 @@ void GuiApp::loadEverything(){
 	selectMacro10Fb2Geo1Lfo2=loadBuffer["MACRO10"]["BLOCK_2"]["selectMacro10Fb2Geo1Lfo2"];
 	selectMacro10Fb2Color1Lfo1=loadBuffer["MACRO10"]["BLOCK_2"]["selectMacro10Fb2Color1Lfo1"];
 	selectMacro10Fb2DelayTime=loadBuffer["MACRO10"]["BLOCK_2"]["selectMacro10Fb2DelayTime"];
-	
+
 	selectMacro10Block1Geo=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block1Geo"];
 	selectMacro10Block1Colorize=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block1Colorize"];
 	selectMacro10Block1Filters=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block1Filters"];
@@ -6560,7 +6560,7 @@ void GuiApp::loadEverything(){
 	selectMacro10Block1ColorizeLfo1=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block1ColorizeLfo1"];
 	selectMacro10Block1ColorizeLfo2=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block1ColorizeLfo2"];
 	selectMacro10Block1ColorizeLfo3=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block1ColorizeLfo3"];
-	
+
 	selectMacro10Block2Geo=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2Geo"];
 	selectMacro10Block2Colorize=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2Colorize"];
 	selectMacro10Block2Filters=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2Filters"];
@@ -6568,14 +6568,14 @@ void GuiApp::loadEverything(){
 	selectMacro10Block2Geo1Lfo2=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2Geo1Lfo2"];
 	selectMacro10Block2ColorizeLfo1=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2ColorizeLfo1"];
 	selectMacro10Block2ColorizeLfo2=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2ColorizeLfo2"];
-	selectMacro10Block2ColorizeLfo3=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2ColorizeLfo3"];	
-	
+	selectMacro10Block2ColorizeLfo3=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10Block2ColorizeLfo3"];
+
 	selectMacro10MatrixMix=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10MatrixMix"];
 	selectMacro10FinalMixAndKey=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10FinalMixAndKey"];
 	selectMacro10MatrixMixLfo1=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10MatrixMixLfo1"];
 	selectMacro10MatrixMixLfo2=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10MatrixMixLfo2"];
 	selectMacro10FinalMixAndKeyLfo=loadBuffer["MACRO10"]["BLOCK_3"]["selectMacro10FinalMixAndKeyLfo"];
-	
+
 	//macro11
 	selectMacro11Ch1Adjust=loadBuffer["MACRO11"]["BLOCK_1"]["selectMacro11Ch1Adjust"];
 	selectMacro11Ch2MixAndKey=loadBuffer["MACRO11"]["BLOCK_1"]["selectMacro11Ch2MixAndKey"];
@@ -6592,7 +6592,7 @@ void GuiApp::loadEverything(){
 	selectMacro11Fb1Geo1Lfo2=loadBuffer["MACRO11"]["BLOCK_1"]["selectMacro11Fb1Geo1Lfo2"];
 	selectMacro11Fb1Color1Lfo1=loadBuffer["MACRO11"]["BLOCK_1"]["selectMacro11Fb1Color1Lfo1"];
 	selectMacro11Fb1DelayTime=loadBuffer["MACRO11"]["BLOCK_1"]["selectMacro11Fb1DelayTime"];
-	
+
 	selectMacro11Block2InputAdjust=loadBuffer["MACRO11"]["BLOCK_2"]["selectMacro11Block2InputAdjust"];
 	selectMacro11Block2InputAdjustLfo=loadBuffer["MACRO11"]["BLOCK_2"]["selectMacro11Block2InputAdjustLfo"];
 	selectMacro11Fb2MixAndKey=loadBuffer["MACRO11"]["BLOCK_2"]["selectMacro11Fb2MixAndKey"];
@@ -6604,7 +6604,7 @@ void GuiApp::loadEverything(){
 	selectMacro11Fb2Geo1Lfo2=loadBuffer["MACRO11"]["BLOCK_2"]["selectMacro11Fb2Geo1Lfo2"];
 	selectMacro11Fb2Color1Lfo1=loadBuffer["MACRO11"]["BLOCK_2"]["selectMacro11Fb2Color1Lfo1"];
 	selectMacro11Fb2DelayTime=loadBuffer["MACRO11"]["BLOCK_2"]["selectMacro11Fb2DelayTime"];
-	
+
 	selectMacro11Block1Geo=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block1Geo"];
 	selectMacro11Block1Colorize=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block1Colorize"];
 	selectMacro11Block1Filters=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block1Filters"];
@@ -6613,7 +6613,7 @@ void GuiApp::loadEverything(){
 	selectMacro11Block1ColorizeLfo1=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block1ColorizeLfo1"];
 	selectMacro11Block1ColorizeLfo2=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block1ColorizeLfo2"];
 	selectMacro11Block1ColorizeLfo3=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block1ColorizeLfo3"];
-	
+
 	selectMacro11Block2Geo=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2Geo"];
 	selectMacro11Block2Colorize=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2Colorize"];
 	selectMacro11Block2Filters=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2Filters"];
@@ -6621,14 +6621,14 @@ void GuiApp::loadEverything(){
 	selectMacro11Block2Geo1Lfo2=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2Geo1Lfo2"];
 	selectMacro11Block2ColorizeLfo1=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2ColorizeLfo1"];
 	selectMacro11Block2ColorizeLfo2=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2ColorizeLfo2"];
-	selectMacro11Block2ColorizeLfo3=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2ColorizeLfo3"];	
-	
+	selectMacro11Block2ColorizeLfo3=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11Block2ColorizeLfo3"];
+
 	selectMacro11MatrixMix=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11MatrixMix"];
 	selectMacro11FinalMixAndKey=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11FinalMixAndKey"];
 	selectMacro11MatrixMixLfo1=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11MatrixMixLfo1"];
 	selectMacro11MatrixMixLfo2=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11MatrixMixLfo2"];
 	selectMacro11FinalMixAndKeyLfo=loadBuffer["MACRO11"]["BLOCK_3"]["selectMacro11FinalMixAndKeyLfo"];
-	
+
 	//macro12
 	selectMacro12Ch1Adjust=loadBuffer["MACRO12"]["BLOCK_1"]["selectMacro12Ch1Adjust"];
 	selectMacro12Ch2MixAndKey=loadBuffer["MACRO12"]["BLOCK_1"]["selectMacro12Ch2MixAndKey"];
@@ -6645,7 +6645,7 @@ void GuiApp::loadEverything(){
 	selectMacro12Fb1Geo1Lfo2=loadBuffer["MACRO12"]["BLOCK_1"]["selectMacro12Fb1Geo1Lfo2"];
 	selectMacro12Fb1Color1Lfo1=loadBuffer["MACRO12"]["BLOCK_1"]["selectMacro12Fb1Color1Lfo1"];
 	selectMacro12Fb1DelayTime=loadBuffer["MACRO12"]["BLOCK_1"]["selectMacro12Fb1DelayTime"];
-	
+
 	selectMacro12Block2InputAdjust=loadBuffer["MACRO12"]["BLOCK_2"]["selectMacro12Block2InputAdjust"];
 	selectMacro12Block2InputAdjustLfo=loadBuffer["MACRO12"]["BLOCK_2"]["selectMacro12Block2InputAdjustLfo"];
 	selectMacro12Fb2MixAndKey=loadBuffer["MACRO12"]["BLOCK_2"]["selectMacro12Fb2MixAndKey"];
@@ -6657,7 +6657,7 @@ void GuiApp::loadEverything(){
 	selectMacro12Fb2Geo1Lfo2=loadBuffer["MACRO12"]["BLOCK_2"]["selectMacro12Fb2Geo1Lfo2"];
 	selectMacro12Fb2Color1Lfo1=loadBuffer["MACRO12"]["BLOCK_2"]["selectMacro12Fb2Color1Lfo1"];
 	selectMacro12Fb2DelayTime=loadBuffer["MACRO12"]["BLOCK_2"]["selectMacro12Fb2DelayTime"];
-	
+
 	selectMacro12Block1Geo=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block1Geo"];
 	selectMacro12Block1Colorize=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block1Colorize"];
 	selectMacro12Block1Filters=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block1Filters"];
@@ -6666,7 +6666,7 @@ void GuiApp::loadEverything(){
 	selectMacro12Block1ColorizeLfo1=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block1ColorizeLfo1"];
 	selectMacro12Block1ColorizeLfo2=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block1ColorizeLfo2"];
 	selectMacro12Block1ColorizeLfo3=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block1ColorizeLfo3"];
-	
+
 	selectMacro12Block2Geo=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2Geo"];
 	selectMacro12Block2Colorize=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2Colorize"];
 	selectMacro12Block2Filters=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2Filters"];
@@ -6674,15 +6674,15 @@ void GuiApp::loadEverything(){
 	selectMacro12Block2Geo1Lfo2=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2Geo1Lfo2"];
 	selectMacro12Block2ColorizeLfo1=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2ColorizeLfo1"];
 	selectMacro12Block2ColorizeLfo2=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2ColorizeLfo2"];
-	selectMacro12Block2ColorizeLfo3=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2ColorizeLfo3"];	
-	
+	selectMacro12Block2ColorizeLfo3=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12Block2ColorizeLfo3"];
+
 	selectMacro12MatrixMix=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12MatrixMix"];
 	selectMacro12FinalMixAndKey=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12FinalMixAndKey"];
 	selectMacro12MatrixMixLfo1=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12MatrixMixLfo1"];
 	selectMacro12MatrixMixLfo2=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12MatrixMixLfo2"];
 	selectMacro12FinalMixAndKeyLfo=loadBuffer["MACRO12"]["BLOCK_3"]["selectMacro12FinalMixAndKeyLfo"];
-	
-	
+
+
 	//macro13
 	selectMacro13Ch1Adjust=loadBuffer["MACRO13"]["BLOCK_1"]["selectMacro13Ch1Adjust"];
 	selectMacro13Ch2MixAndKey=loadBuffer["MACRO13"]["BLOCK_1"]["selectMacro13Ch2MixAndKey"];
@@ -6699,7 +6699,7 @@ void GuiApp::loadEverything(){
 	selectMacro13Fb1Geo1Lfo2=loadBuffer["MACRO13"]["BLOCK_1"]["selectMacro13Fb1Geo1Lfo2"];
 	selectMacro13Fb1Color1Lfo1=loadBuffer["MACRO13"]["BLOCK_1"]["selectMacro13Fb1Color1Lfo1"];
 	selectMacro13Fb1DelayTime=loadBuffer["MACRO13"]["BLOCK_1"]["selectMacro13Fb1DelayTime"];
-	
+
 	selectMacro13Block2InputAdjust=loadBuffer["MACRO13"]["BLOCK_2"]["selectMacro13Block2InputAdjust"];
 	selectMacro13Block2InputAdjustLfo=loadBuffer["MACRO13"]["BLOCK_2"]["selectMacro13Block2InputAdjustLfo"];
 	selectMacro13Fb2MixAndKey=loadBuffer["MACRO13"]["BLOCK_2"]["selectMacro13Fb2MixAndKey"];
@@ -6711,7 +6711,7 @@ void GuiApp::loadEverything(){
 	selectMacro13Fb2Geo1Lfo2=loadBuffer["MACRO13"]["BLOCK_2"]["selectMacro13Fb2Geo1Lfo2"];
 	selectMacro13Fb2Color1Lfo1=loadBuffer["MACRO13"]["BLOCK_2"]["selectMacro13Fb2Color1Lfo1"];
 	selectMacro13Fb2DelayTime=loadBuffer["MACRO13"]["BLOCK_2"]["selectMacro13Fb2DelayTime"];
-	
+
 	selectMacro13Block1Geo=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block1Geo"];
 	selectMacro13Block1Colorize=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block1Colorize"];
 	selectMacro13Block1Filters=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block1Filters"];
@@ -6720,7 +6720,7 @@ void GuiApp::loadEverything(){
 	selectMacro13Block1ColorizeLfo1=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block1ColorizeLfo1"];
 	selectMacro13Block1ColorizeLfo2=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block1ColorizeLfo2"];
 	selectMacro13Block1ColorizeLfo3=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block1ColorizeLfo3"];
-	
+
 	selectMacro13Block2Geo=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2Geo"];
 	selectMacro13Block2Colorize=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2Colorize"];
 	selectMacro13Block2Filters=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2Filters"];
@@ -6728,14 +6728,14 @@ void GuiApp::loadEverything(){
 	selectMacro13Block2Geo1Lfo2=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2Geo1Lfo2"];
 	selectMacro13Block2ColorizeLfo1=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2ColorizeLfo1"];
 	selectMacro13Block2ColorizeLfo2=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2ColorizeLfo2"];
-	selectMacro13Block2ColorizeLfo3=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2ColorizeLfo3"];	
-	
+	selectMacro13Block2ColorizeLfo3=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13Block2ColorizeLfo3"];
+
 	selectMacro13MatrixMix=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13MatrixMix"];
 	selectMacro13FinalMixAndKey=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13FinalMixAndKey"];
 	selectMacro13MatrixMixLfo1=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13MatrixMixLfo1"];
 	selectMacro13MatrixMixLfo2=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13MatrixMixLfo2"];
 	selectMacro13FinalMixAndKeyLfo=loadBuffer["MACRO13"]["BLOCK_3"]["selectMacro13FinalMixAndKeyLfo"];
-	
+
 	//macro14
 	selectMacro14Ch1Adjust=loadBuffer["MACRO14"]["BLOCK_1"]["selectMacro14Ch1Adjust"];
 	selectMacro14Ch2MixAndKey=loadBuffer["MACRO14"]["BLOCK_1"]["selectMacro14Ch2MixAndKey"];
@@ -6752,7 +6752,7 @@ void GuiApp::loadEverything(){
 	selectMacro14Fb1Geo1Lfo2=loadBuffer["MACRO14"]["BLOCK_1"]["selectMacro14Fb1Geo1Lfo2"];
 	selectMacro14Fb1Color1Lfo1=loadBuffer["MACRO14"]["BLOCK_1"]["selectMacro14Fb1Color1Lfo1"];
 	selectMacro14Fb1DelayTime=loadBuffer["MACRO14"]["BLOCK_1"]["selectMacro14Fb1DelayTime"];
-	
+
 	selectMacro14Block2InputAdjust=loadBuffer["MACRO14"]["BLOCK_2"]["selectMacro14Block2InputAdjust"];
 	selectMacro14Block2InputAdjustLfo=loadBuffer["MACRO14"]["BLOCK_2"]["selectMacro14Block2InputAdjustLfo"];
 	selectMacro14Fb2MixAndKey=loadBuffer["MACRO14"]["BLOCK_2"]["selectMacro14Fb2MixAndKey"];
@@ -6764,7 +6764,7 @@ void GuiApp::loadEverything(){
 	selectMacro14Fb2Geo1Lfo2=loadBuffer["MACRO14"]["BLOCK_2"]["selectMacro14Fb2Geo1Lfo2"];
 	selectMacro14Fb2Color1Lfo1=loadBuffer["MACRO14"]["BLOCK_2"]["selectMacro14Fb2Color1Lfo1"];
 	selectMacro14Fb2DelayTime=loadBuffer["MACRO14"]["BLOCK_2"]["selectMacro14Fb2DelayTime"];
-	
+
 	selectMacro14Block1Geo=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block1Geo"];
 	selectMacro14Block1Colorize=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block1Colorize"];
 	selectMacro14Block1Filters=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block1Filters"];
@@ -6773,7 +6773,7 @@ void GuiApp::loadEverything(){
 	selectMacro14Block1ColorizeLfo1=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block1ColorizeLfo1"];
 	selectMacro14Block1ColorizeLfo2=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block1ColorizeLfo2"];
 	selectMacro14Block1ColorizeLfo3=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block1ColorizeLfo3"];
-	
+
 	selectMacro14Block2Geo=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2Geo"];
 	selectMacro14Block2Colorize=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2Colorize"];
 	selectMacro14Block2Filters=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2Filters"];
@@ -6781,14 +6781,14 @@ void GuiApp::loadEverything(){
 	selectMacro14Block2Geo1Lfo2=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2Geo1Lfo2"];
 	selectMacro14Block2ColorizeLfo1=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2ColorizeLfo1"];
 	selectMacro14Block2ColorizeLfo2=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2ColorizeLfo2"];
-	selectMacro14Block2ColorizeLfo3=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2ColorizeLfo3"];	
-	
+	selectMacro14Block2ColorizeLfo3=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14Block2ColorizeLfo3"];
+
 	selectMacro14MatrixMix=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14MatrixMix"];
 	selectMacro14FinalMixAndKey=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14FinalMixAndKey"];
 	selectMacro14MatrixMixLfo1=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14MatrixMixLfo1"];
 	selectMacro14MatrixMixLfo2=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14MatrixMixLfo2"];
 	selectMacro14FinalMixAndKeyLfo=loadBuffer["MACRO14"]["BLOCK_3"]["selectMacro14FinalMixAndKeyLfo"];
-	
+
 	//macro15
 	selectMacro15Ch1Adjust=loadBuffer["MACRO15"]["BLOCK_1"]["selectMacro15Ch1Adjust"];
 	selectMacro15Ch2MixAndKey=loadBuffer["MACRO15"]["BLOCK_1"]["selectMacro15Ch2MixAndKey"];
@@ -6805,7 +6805,7 @@ void GuiApp::loadEverything(){
 	selectMacro15Fb1Geo1Lfo2=loadBuffer["MACRO15"]["BLOCK_1"]["selectMacro15Fb1Geo1Lfo2"];
 	selectMacro15Fb1Color1Lfo1=loadBuffer["MACRO15"]["BLOCK_1"]["selectMacro15Fb1Color1Lfo1"];
 	selectMacro15Fb1DelayTime=loadBuffer["MACRO15"]["BLOCK_1"]["selectMacro15Fb1DelayTime"];
-	
+
 	selectMacro15Block2InputAdjust=loadBuffer["MACRO15"]["BLOCK_2"]["selectMacro15Block2InputAdjust"];
 	selectMacro15Block2InputAdjustLfo=loadBuffer["MACRO15"]["BLOCK_2"]["selectMacro15Block2InputAdjustLfo"];
 	selectMacro15Fb2MixAndKey=loadBuffer["MACRO15"]["BLOCK_2"]["selectMacro15Fb2MixAndKey"];
@@ -6817,7 +6817,7 @@ void GuiApp::loadEverything(){
 	selectMacro15Fb2Geo1Lfo2=loadBuffer["MACRO15"]["BLOCK_2"]["selectMacro15Fb2Geo1Lfo2"];
 	selectMacro15Fb2Color1Lfo1=loadBuffer["MACRO15"]["BLOCK_2"]["selectMacro15Fb2Color1Lfo1"];
 	selectMacro15Fb2DelayTime=loadBuffer["MACRO15"]["BLOCK_2"]["selectMacro15Fb2DelayTime"];
-	
+
 	selectMacro15Block1Geo=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block1Geo"];
 	selectMacro15Block1Colorize=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block1Colorize"];
 	selectMacro15Block1Filters=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block1Filters"];
@@ -6826,7 +6826,7 @@ void GuiApp::loadEverything(){
 	selectMacro15Block1ColorizeLfo1=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block1ColorizeLfo1"];
 	selectMacro15Block1ColorizeLfo2=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block1ColorizeLfo2"];
 	selectMacro15Block1ColorizeLfo3=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block1ColorizeLfo3"];
-	
+
 	selectMacro15Block2Geo=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2Geo"];
 	selectMacro15Block2Colorize=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2Colorize"];
 	selectMacro15Block2Filters=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2Filters"];
@@ -6834,29 +6834,29 @@ void GuiApp::loadEverything(){
 	selectMacro15Block2Geo1Lfo2=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2Geo1Lfo2"];
 	selectMacro15Block2ColorizeLfo1=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2ColorizeLfo1"];
 	selectMacro15Block2ColorizeLfo2=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2ColorizeLfo2"];
-	selectMacro15Block2ColorizeLfo3=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2ColorizeLfo3"];	
-	
+	selectMacro15Block2ColorizeLfo3=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15Block2ColorizeLfo3"];
+
 	selectMacro15MatrixMix=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15MatrixMix"];
 	selectMacro15FinalMixAndKey=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15FinalMixAndKey"];
 	selectMacro15MatrixMixLfo1=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15MatrixMixLfo1"];
 	selectMacro15MatrixMixLfo2=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15MatrixMixLfo2"];
 	selectMacro15FinalMixAndKeyLfo=loadBuffer["MACRO15"]["BLOCK_3"]["selectMacro15FinalMixAndKeyLfo"];
-	
+
 	//LOAD BLOCK 1
 	for (int i=0;i<PARAMETER_ARRAY_LENGTH;i++){
 		ch1Adjust[i]=loadBuffer["BLOCK_1"]["ch1Adjust"][i];
 		ch2MixAndKey[i]=loadBuffer["BLOCK_1"]["ch2MixAndKey"][i];
 		ch2Adjust[i]=loadBuffer["BLOCK_1"]["ch2Adjust"][i];
-		
+
 		ch1AdjustLfo[i]=loadBuffer["BLOCK_1"]["ch1AdjustLfo"][i];
 		ch2MixAndKeyLfo[i]=loadBuffer["BLOCK_1"]["ch2MixAndKeyLfo"][i];
 		ch2AdjustLfo[i]=loadBuffer["BLOCK_1"]["ch2AdjustLfo"][i];
-		
+
 		fb1MixAndKey[i]=loadBuffer["BLOCK_1"]["fb1MixAndKey"][i];
 		fb1Geo1[i]=loadBuffer["BLOCK_1"]["fb1Geo1"][i];
 		fb1Color1[i]=loadBuffer["BLOCK_1"]["fb1Color1"][i];
 		fb1Filters[i]=loadBuffer["BLOCK_1"]["fb1Filters"][i];
-		
+
 		fb1MixAndKeyLfo[i]=loadBuffer["BLOCK_1"]["fb1MixAndKeyLfo"][i];
 		fb1Geo1Lfo1[i]=loadBuffer["BLOCK_1"]["fb1Geo1Lfo1"][i];
 		fb1Geo1Lfo2[i]=loadBuffer["BLOCK_1"]["fb1Geo1Lfo2"][i];
@@ -6916,19 +6916,19 @@ void GuiApp::loadEverything(){
 	fb1DelayTime=loadBuffer["BLOCK_1"]["b1_extraWhatever"][0];
 	ch1InputSelect=loadBuffer["BLOCK_1"]["b1_extraWhatever"][1];
 	ch2InputSelect=loadBuffer["BLOCK_1"]["b1_extraWhatever"][2];
-	
-	
+
+
 	//LOAD BLOCK 2
 	for (int i=0;i<PARAMETER_ARRAY_LENGTH;i++){
 		block2InputAdjust[i]=loadBuffer["BLOCK_2"]["block2InputAdjust"][i];
-		
+
 		block2InputAdjustLfo[i]=loadBuffer["BLOCK_2"]["block2InputAdjustLfo"][i];
-			
+
 		fb2MixAndKey[i]=loadBuffer["BLOCK_2"]["fb2MixAndKey"][i];
 		fb2Geo1[i]=loadBuffer["BLOCK_2"]["fb2Geo1"][i];
 		fb2Color1[i]=loadBuffer["BLOCK_2"]["fb2Color1"][i];
 		fb2Filters[i]=loadBuffer["BLOCK_2"]["fb2Filters"][i];
-		
+
 		fb2MixAndKeyLfo[i]=loadBuffer["BLOCK_2"]["fb2MixAndKeyLfo"][i];
 		fb2Geo1Lfo1[i]=loadBuffer["BLOCK_2"]["fb2Geo1Lfo1"][i];
 		fb2Geo1Lfo2[i]=loadBuffer["BLOCK_2"]["fb2Geo1Lfo2"][i];
@@ -6972,39 +6972,39 @@ void GuiApp::loadEverything(){
 
 	fb2DelayTime=loadBuffer["BLOCK_2"]["b2_extraWhatever"][0];
 	block2InputSelect=loadBuffer["BLOCK_2"]["b2_extraWhatever"][1];
-	
-	
-	//BLOCK_3 
+
+
+	//BLOCK_3
 	for (int i=0;i<PARAMETER_ARRAY_LENGTH;i++){
 		block1Geo[i]= loadBuffer["BLOCK_3"]["block1Geo"][i];
 		block1Colorize[i]=loadBuffer["BLOCK_3"]["block1Colorize"][i];
 		block1Filters[i]=loadBuffer["BLOCK_3"]["block1Filters"][i];
-		
+
 		block1Geo1Lfo1[i]=loadBuffer["BLOCK_3"]["block1Geo1Lfo1"][i];
 		block1Geo1Lfo2[i]=loadBuffer["BLOCK_3"]["block1Geo1Lfo2"][i];
 		block1ColorizeLfo1[i]=loadBuffer["BLOCK_3"]["block1ColorizeLfo1"][i];
 		block1ColorizeLfo2[i]=loadBuffer["BLOCK_3"]["block1ColorizeLfo2"][i];
 		block1ColorizeLfo3[i]=loadBuffer["BLOCK_3"]["block1ColorizeLfo3"][i];
-		
+
 		block2Geo[i]=loadBuffer["BLOCK_3"]["block2Geo"][i];
 		block2Colorize[i]=loadBuffer["BLOCK_3"]["block2Colorize"][i];
 		block2Filters[i]=loadBuffer["BLOCK_3"]["block2Filters"][i];
-		
+
 		block2Geo1Lfo1[i]=loadBuffer["BLOCK_3"]["block2Geo1Lfo1"][i];
 		block2Geo1Lfo2[i]=loadBuffer["BLOCK_3"]["block2Geo1Lfo2"][i];
 		block2ColorizeLfo1[i]=loadBuffer["BLOCK_3"]["block2ColorizeLfo1"][i];
 		block2ColorizeLfo2[i]=loadBuffer["BLOCK_3"]["block2ColorizeLfo2"][i];
 		block2ColorizeLfo3[i]=loadBuffer["BLOCK_3"]["block2ColorizeLfo3"][i];
-		
+
 		matrixMix[i]=loadBuffer["BLOCK_3"]["matrixMix"][i];
 		finalMixAndKey[i]=loadBuffer["BLOCK_3"]["finalMixAndKey"][i];
-		
+
 		matrixMixLfo1[i]=loadBuffer["BLOCK_3"]["matrixMixLfo1"][i];
 		matrixMixLfo2[i]=loadBuffer["BLOCK_3"]["matrixMixLfo2"][i];
 		finalMixAndKeyLfo[i]=loadBuffer["BLOCK_3"]["finalMixAndKeyLfo"][i];
-	
+
 	}
-	
+
 	//BLOCK 3 DISCRETES
 	block1GeoOverflow=loadBuffer["BLOCK_3"]["block1Geo1Discrete"][0];
 	block1HMirror=loadBuffer["BLOCK_3"]["block1Geo1Discrete"][1];
@@ -7012,28 +7012,28 @@ void GuiApp::loadEverything(){
 	block1HFlip=loadBuffer["BLOCK_3"]["block1Geo1Discrete"][3];
 	block1VFlip=loadBuffer["BLOCK_3"]["block1Geo1Discrete"][4];
 	block1RotateMode=loadBuffer["BLOCK_3"]["block1Geo1Discrete"][5];
-	
+
 	block1ColorizeSwitch=loadBuffer["BLOCK_3"]["block1ColorizeDiscrete"][0];
 	block1ColorizeHSB_RGB=loadBuffer["BLOCK_3"]["block1ColorizeDiscrete"][1];
-	
+
 	block2GeoOverflow=loadBuffer["BLOCK_3"]["block2Geo1Discrete"][0];
 	block2HMirror=loadBuffer["BLOCK_3"]["block2Geo1Discrete"][1];
 	block2VMirror=loadBuffer["BLOCK_3"]["block2Geo1Discrete"][2];
 	block2HFlip=loadBuffer["BLOCK_3"]["block2Geo1Discrete"][3];
 	block2VFlip=loadBuffer["BLOCK_3"]["block2Geo1Discrete"][4];
 	block2RotateMode=loadBuffer["BLOCK_3"]["block2Geo1Discrete"][5];
-	
+
 	block2ColorizeSwitch=loadBuffer["BLOCK_3"]["block2ColorizeDiscrete"][0];
 	block2ColorizeHSB_RGB=loadBuffer["BLOCK_3"]["block2ColorizeDiscrete"][1];
-	
+
 	matrixMixType=loadBuffer["BLOCK_3"]["matrixMixDiscrete"][0];
 	matrixMixOverflow=loadBuffer["BLOCK_3"]["matrixMixDiscrete"][1];
-	
+
 	finalKeyOrder=loadBuffer["BLOCK_3"]["finalMixAndKeyDiscrete"][0];
 	finalMixType=loadBuffer["BLOCK_3"]["finalMixAndKeyDiscrete"][1];
 	finalMixOverflow=loadBuffer["BLOCK_3"]["finalMixAndKeyDiscrete"][2];
 	finalKeyMode=loadBuffer["BLOCK_3"]["finalMixAndKeyDiscrete"][3];
-	
+
 	//extra block 3 things to add: final mix order
 	//finalKeyOrder=loadBuffer["BLOCK_3"]["b3_extraWhatever"][0];
 
@@ -7043,7 +7043,7 @@ void GuiApp::loadEverything(){
 
 //--------------------------------------------------------------
 void GuiApp::exit() {
-	
+
 	// clean up
 	if (midiIn) {
 		midiIn->closePort();
@@ -7070,21 +7070,21 @@ void GuiApp::keyPressed(int key) {
 	/*
     if (key == 'a') {tweakHue += .01; cout<<"hue = "<<tweakHue<<endl;}
     if (key == 'z') {tweakHue -= .01; cout<<"hue = "<<tweakHue<<endl;}
-    
+
     if (key == 's') {tweakSat += .01; cout<<"sat = "<<tweakSat<<endl;}
     if (key == 'x') {tweakSat -= .01; cout<<"sat = "<<tweakSat<<endl;}
-    
+
     if (key == 'a') {sliderWidth += .1; cout<<"xpos = "<<sliderWidth<<endl;}
     if (key == 'z') {sliderWidth -= .1; cout<<"xpos = "<<sliderWidth<<endl;}
-    
+
     if (key == 's') {tweakSat += .01; cout<<"tweakSat = "<<tweakSat<<endl;}
     if (key == 'x') {tweakSat -= .01; cout<<"tweakSat = "<<tweakSat<<endl;}
-    
+
     if (key == 'd') {tweakBri += .01; cout<<"bri = "<<tweakBri<<endl;}
     if (key == 'c') {tweakBri -= .01; cout<<"bri = "<<tweakBri<<endl;}
     */
     //if(key=='0'){coutMidiSwitch=!coutMidiSwitch;}
-    
+
 }
 
 //--------------------------------------------------------------
@@ -7099,30 +7099,30 @@ void GuiApp::midiSetup(){
 		// Force UNIX_JACK API (value 3) since ALSA sequencer is unavailable
 		midiIn = new ofxMidiIn("GravityWaaaves", (ofxMidiApi)3);  // RtMidi::UNIX_JACK
 		ofLogNotice("MIDI") << "Created MIDI input using JACK API";
-		
+
 		// print input ports to console
 		midiIn->listInPorts();
-		
+
 		int numPorts = midiIn->getNumInPorts();
-		
+
 		if (numPorts > 0) {
 			ofLogNotice("MIDI") << "Found " << numPorts << " MIDI input port(s)";
-			
+
 			// open port by number (you may need to change this)
 			midiIn->openPort(0);
 			//midiIn->openPort("IAC Pure Data In");	// by name
 			//midiIn->openVirtualPort("ofxMidiIn Input"); // open a virtual port
-			
+
 			// don't ignore sysex, timing, & active sense messages,
 			// these are ignored by default
 			midiIn->ignoreTypes(false, false, false);
-			
+
 			// add ofApp as a listener
 			midiIn->addListener(this);
-			
+
 			// print received messages to the console
 			midiIn->setVerbose(true);
-			
+
 			ofLogNotice("MIDI") << "MIDI initialized successfully on port 0";
 		} else {
 			ofLogWarning("MIDI") << "No MIDI input ports detected";
@@ -7135,18 +7135,18 @@ void GuiApp::midiSetup(){
 		ofLogNotice("MIDI") << "This is normal on systems without ALSA sequencer support";
 		ofLogNotice("MIDI") << "The application will continue to run normally";
 	}
-	
+
 }
 //--------------------------------------------------------------
 void GuiApp::midibiz(){
 	for(unsigned int i = 0; i < midiMessages.size(); ++i) {
 
 		ofxMidiMessage &message = midiMessages[i];
-	
+
 		if(message.status < MIDI_SYSEX) {
 			//text << "chan: " << message.channel;
             if(message.status == MIDI_CONTROL_CHANGE) {
-                
+
                 //How to Midi Map
                 //uncomment the line that says cout<<message control etc
                 //run the code and look down in the console
@@ -7155,12 +7155,12 @@ void GuiApp::midibiz(){
                 //then go down to the part labled 'MIDIMAPZONE'
                 //and change the numbers for each if message.control== statement to the values
                 //on yr controller
-                
+
                 if(coutMidiSwitch==1){
                		//cout << "message.control"<< message.control<< endl;
                 	//cout << "message.value"<< message.value<< endl;
                 }
-				
+
 				if(message.control>15 && message.control<24){
                     midiCC[message.control-16]=(message.value-MIDI_MAGIC)/MIDI_MAGIC;
                     if(coutMidiSwitch==1){
@@ -7168,7 +7168,7 @@ void GuiApp::midibiz(){
                     cout << "message.value"<< message.value<< endl;
                     }
                 }
-                
+
                 if(message.control>119 && message.control<128){
                     midiCC[message.control-120+8]=(message.value-MIDI_MAGIC)/MIDI_MAGIC;
                     if(coutMidiSwitch==1){
@@ -7176,50 +7176,50 @@ void GuiApp::midibiz(){
                     cout << "message.value"<< message.value<< endl;
                     }
                 }
-				
+
                 /* the nanostudio kontrols
                 //c1 maps to fb0 hue attenuation
                 if(message.control==20){
                     c1=(message.value-63.0)/63.0;
                    //  c1=(message.value)/127.00;
-                    
+
                 }
-                
+
    				}
                 */
-             
+
 			}//endifmessagestatus==
 		}//endifmessagestatus<
-	}//endfori	
+	}//endfori
 }//endmidibiz
 //-----------------------------------------------------------------------------------
 void GuiApp::resetAll(){
 	allArrayClear();
 	allButtonsClear();
-	
+
 	fb1DelayTime=1;
 	fb2DelayTime=1;
-	
+
 	fb1DelayTimeMacroBuffer=0;
 	fb2DelayTimeMacroBuffer=0;
-	
-	
+
+
 	ch2KeyOrder=ch2MixType=ch2KeyMode=ch2MixOverflow=0;
 	fb1KeyOrder=fb1MixType=fb1KeyMode=fb1MixOverflow=0;
 	fb2KeyOrder=fb2MixType=fb2KeyMode=fb2MixOverflow=0;
-	matrixMixType=matrixMixOverflow=0;	
+	matrixMixType=matrixMixOverflow=0;
 	finalKeyOrder=finalKeyMode=finalMixOverflow=finalMixType=0;
-	
+
 	for (int i = 0; i < PARAMETER_ARRAY_LENGTH; i++) {
 		macroData[i] = 0.0f;
 		macroDataMidiActive[i] = 0;
 		macroDataNames[i]="";
 	}
-	
-	
+
+
 	macroDataResetEverything();
 	macroDataResetAssignments=0;
-	
+
 	//fb1Geo1[0]=0.0;
 	//fb1Geo1[1]=0.0;
 }
@@ -7228,25 +7228,25 @@ void GuiApp::resetAll(){
 void GuiApp::allButtonsClear(){
 	ch1VMirror=ch1HMirror=ch1VFlip=ch1HFlip=ch1HueInvert=ch1SaturationInvert=ch1BrightInvert=ch1RGBInvert=ch1Solarize=0;
 	ch2VMirror=ch2HMirror=ch2VFlip=ch2HFlip=ch2HueInvert=ch2SaturationInvert=ch2BrightInvert=ch2RGBInvert=ch2Solarize=0;
-	
+
 	fb1HueInvert=fb1SaturationInvert=fb1BrightInvert=0;
 	fb1HMirror=fb1VMirror=fb1RotateMode=fb1HFlip=fb1VFlip=0;
-	
+
 	block1HypercubeSwitch=block1LineSwitch=block1SevenStarSwitch=block1LissaBallSwitch=0;
-	
+
 	block2InputVMirror=block2InputHMirror=block2InputVFlip=block2InputHFlip=block2InputHueInvert=0;
 	block2InputSaturationInvert=block2InputBrightInvert=block2InputRGBInvert=block2InputSolarize=0;
-	
+
 	block2HypercubeSwitch=block2LineSwitch=block2SevenStarSwitch=block2LissaBallSwitch=0;
-	
+
 	fb2HueInvert=fb2SaturationInvert=fb2BrightInvert=0;
 	fb2HMirror=fb2VMirror=fb2RotateMode=fb2HFlip=fb2VFlip=0;
-	
+
 	block1HMirror=block1VMirror=block1HFlip=block1VFlip=block1RotateMode=0;
 	block2HMirror=block2VMirror=block2HFlip=block2VFlip=block2RotateMode=0;
 	block1ColorizeSwitch=block1ColorizeHSB_RGB=0;
 	block2ColorizeSwitch=block2ColorizeHSB_RGB=0;
-	
+
 	matrixMixType=matrixMixOverflow=0;
 	finalKeyOrder=finalKeyMode=finalMixOverflow=finalMixType=0;
 }
@@ -7264,30 +7264,30 @@ void GuiApp::block1InputResetAll(){
 	for (int i = 0; i < PARAMETER_ARRAY_LENGTH; i++) {
 		ch1Adjust[i]=0.0f;
 		ch1AdjustMidiActive[i]=0;
-		
+
 		ch2MixAndKey[i]=0.0f;
 		ch2MixAndKeyMidiActive[i]=0;
-		
+
 		ch2MixAndKeyLfo[i]=0.0f;
 		ch2MixAndKeyLfoMidiActive[i]=0;
-		
+
 		ch2Adjust[i]=0.0f;
 		ch2AdjustMidiActive[i]=0;
-		
+
 		//input lfo
 		ch1AdjustLfo[i]=0.0f;
 		ch1AdjustLfoMidiActive[i]=0;
-		
+
 		ch2AdjustLfo[i]=0.0f;
 		ch2AdjustLfoMidiActive[i]=0;
-	}	
-	
+	}
+
 	ch1VMirror=ch1HMirror=ch1VFlip=ch1HFlip=ch1HueInvert=ch1SaturationInvert=ch1BrightInvert=ch1RGBInvert=ch1Solarize=0;
-	
+
 	ch2VMirror=ch2HMirror=ch2VFlip=ch2HFlip=ch2HueInvert=ch2SaturationInvert=ch2BrightInvert=ch2RGBInvert=ch2Solarize=0;
-	
+
 	ch2KeyOrder=ch2MixType=ch2KeyMode=ch2MixOverflow=0;
-	
+
 }
 
 //-----------------------------------------------------------------------------------
@@ -7295,25 +7295,25 @@ void GuiApp::fb1ResetAll(){
 	for (int i = 0; i < PARAMETER_ARRAY_LENGTH; i++) {
 		fb1MixAndKey[i]=0.0f;
 		fb1MixAndKeyMidiActive[i]=0;
-		
+
 		fb1Geo1[i]=0.0f;
 		fb1Geo1MidiActive[i]=0;
-		
+
 		fb1Color1[i]=0.0f;
 		fb1Color1MidiActive[i]=0;
-		
+
 		fb1Filters[i]=0.0f;
 		fb1FiltersMidiActive[i]=0;
-		
+
 		fb1MixAndKeyLfo[i]=0.0f;
 		fb1MixAndKeyLfoMidiActive[i]=0;
-		
+
 		fb1Geo1Lfo1[i]=0.0f;
 		fb1Geo1Lfo1MidiActive[i]=0;
-		
+
 		fb1Geo1Lfo2[i]=0.0f;
 		fb1Geo1Lfo2MidiActive[i]=0;
-		
+
 		fb1Color1Lfo1[i]=0.0f;
 		fb1Color1Lfo1MidiActive[i]=0;
 	}
@@ -7321,7 +7321,7 @@ void GuiApp::fb1ResetAll(){
 	fb1HueInvert=fb1SaturationInvert=fb1BrightInvert=0;
 
 	fb1HMirror=fb1VMirror=fb1RotateMode=fb1HFlip=fb1VFlip=0;
-	
+
 	fb1KeyOrder=fb1MixType=fb1KeyMode=fb1MixOverflow=0;
 }
 
@@ -7337,16 +7337,16 @@ void GuiApp::block2InputResetAll(){
 	for (int i = 0; i < PARAMETER_ARRAY_LENGTH; i++) {
 		block2InputAdjust[i]=0.0f;
 		block2InputAdjustMidiActive[i]=0;
-		
+
 		//input lfo
 		block2InputAdjustLfo[i]=0.0f;
 		block2InputAdjustLfoMidiActive[i]=0;
-		
-		}	
-	
+
+		}
+
 	block2InputVMirror=block2InputHMirror=block2InputVFlip=block2InputHFlip=block2InputHueInvert=0;
 	block2InputSaturationInvert=block2InputBrightInvert=block2InputRGBInvert=block2InputSolarize=0;
-		
+
 }
 
 
@@ -7355,25 +7355,25 @@ void GuiApp::fb2ResetAll(){
 	for (int i = 0; i < PARAMETER_ARRAY_LENGTH; i++) {
 		fb2MixAndKey[i]=0.0f;
 		fb2MixAndKeyMidiActive[i]=0;
-		
+
 		fb2Geo1[i]=0.0f;
 		fb2Geo1MidiActive[i]=0;
-		
+
 		fb2Color1[i]=0.0f;
 		fb2Color1MidiActive[i]=0;
-		
+
 		fb2Filters[i]=0.0f;
 		fb2FiltersMidiActive[i]=0;
-		
+
 		fb2MixAndKeyLfo[i]=0.0f;
 		fb2MixAndKeyLfoMidiActive[i]=0;
-		
+
 		fb2Geo1Lfo1[i]=0.0f;
 		fb2Geo1Lfo1MidiActive[i]=0;
-		
+
 		fb2Geo1Lfo2[i]=0.0f;
 		fb2Geo1Lfo2MidiActive[i]=0;
-		
+
 		fb2Color1Lfo1[i]=0.0f;
 		fb2Color1Lfo1MidiActive[i]=0;
 	}
@@ -7381,7 +7381,7 @@ void GuiApp::fb2ResetAll(){
 	fb2HueInvert=fb2SaturationInvert=fb2BrightInvert=0;
 
 	fb2HMirror=fb2VMirror=fb2RotateMode=fb2HFlip=fb2VFlip=0;
-	
+
 	fb2KeyOrder=fb2MixType=fb2KeyMode=fb2MixOverflow=0;
 }
 //---------------------------------------------------------------------------------------
@@ -7390,81 +7390,81 @@ void GuiApp::block3ResetAll(){
 		//block1 param
 		block1Geo[i]=0.0f;
 		block1GeoMidiActive[i]=0;
-		
+
 		block1Colorize[i]=0.0f;
 		block1ColorizeMidiActive[i]=0;
-		
+
 		block1Filters[i]=0.0f;
 		block1FiltersMidiActive[i]=0;
-		
+
 		//block1 lfo
 		block1Geo1Lfo1[i]=0.0f;
 		block1Geo1Lfo1MidiActive[i]=0;
-		
+
 		block1Geo1Lfo2[i]=0.0f;
 		block1Geo1Lfo2MidiActive[i]=0;
-		
+
 		block1ColorizeLfo1[i]=0.0f;
 		block1ColorizeLfo1MidiActive[i]=0;
-		
+
 		block1ColorizeLfo2[i]=0.0f;
 		block1ColorizeLfo2MidiActive[i]=0;
-		
+
 		block1ColorizeLfo3[i]=0.0f;
 		block1ColorizeLfo3MidiActive[i]=0;
-		
+
 		//block2 params
 		block2Geo[i]=0.0f;
 		block2GeoMidiActive[i]=0;
-		
+
 		block2Colorize[i]=0.0f;
 		block2ColorizeMidiActive[i]=0;
-		
+
 		block2Filters[i]=0.0f;
 		block2FiltersMidiActive[i]=0;
-		
+
 		//block2 lfo
 		block2Geo1Lfo1[i]=0.0f;
 		block2Geo1Lfo1MidiActive[i]=0;
-		
+
 		block2Geo1Lfo2[i]=0.0f;
 		block2Geo1Lfo2MidiActive[i]=0;
-		
+
 		block2ColorizeLfo1[i]=0.0f;
 		block2ColorizeLfo1MidiActive[i]=0;
-		
+
 		block2ColorizeLfo2[i]=0.0f;
 		block2ColorizeLfo2MidiActive[i]=0;
-		
+
 		block2ColorizeLfo3[i]=0.0f;
 		block2ColorizeLfo3MidiActive[i]=0;
-		
-		
-		//final mix params	
+
+
+		//final mix params
 		matrixMix[i]=0.0f;
 		matrixMixMidiActive[i]=0;
-		
+
 		finalMixAndKey[i]=0.0f;
 		finalMixAndKeyMidiActive[i]=0;
-		
+
 		//final mix lfo
 		matrixMixLfo1[i]=0.0f;
 		matrixMixLfo1MidiActive[i]=0;
-		
+
 		matrixMixLfo2[i]=0.0f;
 		matrixMixLfo2MidiActive[i]=0;
-		
+
 		finalMixAndKeyLfo[i]=0.0f;
 		finalMixAndKeyLfoMidiActive[i]=0;
-			
-	
+
+
 	}
 	block1HMirror=block1VMirror=block1HFlip=block1VFlip=block1RotateMode=0;
 	block2HMirror=block2VMirror=block2HFlip=block2VFlip=block2RotateMode=0;
 	block1ColorizeSwitch=block1ColorizeHSB_RGB=0;
 	block2ColorizeSwitch=block2ColorizeHSB_RGB=0;
-	
-	matrixMixType=matrixMixOverflow=0;	
+
+	matrixMixType=matrixMixOverflow=0;
 	finalKeyOrder=finalKeyMode=finalMixOverflow=finalMixType=0;
 
 }
@@ -7475,53 +7475,53 @@ void GuiApp::randomizeControls(){
 	for (int i = 0; i < PARAMETER_ARRAY_LENGTH; i++) {
 		//block1 param
 		block1Geo[i]+=.5*ofRandomf()*ofRandomf();
-		
+
 		block1Colorize[i]+=.5*ofRandomf()*ofRandomf();
-				
+
 		block1Filters[i]+=.5*ofRandomf()*ofRandomf();
-				
+
 		//block1 lfo
 		block1Geo1Lfo1[i]+=.5*ofRandomf()*ofRandomf();
-				
+
 		block1Geo1Lfo2[i]+=.5*ofRandomf()*ofRandomf();
-				
+
 		block1ColorizeLfo1[i]+=.5*ofRandomf()*ofRandomf();
-				
+
 		block1ColorizeLfo2[i]+=.5*ofRandomf()*ofRandomf();
-			
+
 		block1ColorizeLfo3[i]+=.5*ofRandomf()*ofRandomf();
-				
+
 		//block2 params
 		block2Geo[i]+=.5*ofRandomf()*ofRandomf();
-				
+
 		block2Colorize[i]+=.5*ofRandomf()*ofRandomf();
-		
+
 		block2Filters[i]+=.5*ofRandomf()*ofRandomf();
-			
+
 		//block2 lfo
 		block2Geo1Lfo1[i]+=.5*ofRandomf()*ofRandomf();
-				
+
 		block2Geo1Lfo2[i]+=.5*ofRandomf()*ofRandomf();
-				
+
 		block2ColorizeLfo1[i]+=.5*ofRandomf()*ofRandomf();
-			
+
 		block2ColorizeLfo2[i]+=.5*ofRandomf()*ofRandomf();
-			
+
 		block2ColorizeLfo3[i]+=.5*ofRandomf()*ofRandomf();
-		
-		//final mix params	
+
+		//final mix params
 		matrixMix[i]+=.5*ofRandomf()*ofRandomf();
-			
+
 		finalMixAndKey[i]+=.5*ofRandomf()*ofRandomf();
-		
+
 		//final mix lfo
 		matrixMixLfo1[i]+=.5*ofRandomf()*ofRandomf();
-				
+
 		matrixMixLfo2[i]+=.5*ofRandomf()*ofRandomf();
-				
+
 		finalMixAndKeyLfo[i]+=.5*ofRandomf()*ofRandomf();
-		
-		
+
+
 	}
 
 
@@ -7533,59 +7533,59 @@ void GuiApp::allArrayClear(){
 //should we clear all the midiGui switches here too?/ probably...
 	for(int i=0;i<PARAMETER_ARRAY_LENGTH;i++){
 		//BLOCK1
-		
+
 		//input adjust and mix
 		ch1Adjust[i]=0.0f;
 		ch1AdjustMidiActive[i]=0;
-		
+
 		ch2MixAndKey[i]=0.0f;
 		ch2MixAndKeyMidiActive[i]=0;
-		
+
 		ch2MixAndKeyLfo[i]=0.0f;
 		ch2MixAndKeyLfoMidiActive[i]=0;
-		
+
 		ch2Adjust[i]=0.0f;
 		ch2AdjustMidiActive[i]=0;
-		
+
 		//input lfo
 		ch1AdjustLfo[i]=0.0f;
 		ch1AdjustLfoMidiActive[i]=0;
-		
+
 		ch2AdjustLfo[i]=0.0f;
 		ch2AdjustLfoMidiActive[i]=0;
-		
+
 		//fb1 param
 		fb1MixAndKey[i]=0.0f;
 		fb1MixAndKeyMidiActive[i]=0;
-		
+
 		fb1Geo1[i]=0.0f;
 		fb1Geo1MidiActive[i]=0;
-		
+
 		fb1Color1[i]=0.0f;
 		fb1Color1MidiActive[i]=0;
-		
+
 		fb1Filters[i]=0.0f;
 		fb1FiltersMidiActive[i]=0;
-		
+
 		//fb1 lfo
 		fb1MixAndKeyLfo[i]=0.0f;
 		fb1MixAndKeyLfoMidiActive[i]=0;
-		
+
 		fb1Geo1Lfo1[i]=0.0f;
 		fb1Geo1Lfo1MidiActive[i]=0;
-		
+
 		fb1Geo1Lfo2[i]=0.0f;
 		fb1Geo1Lfo2MidiActive[i]=0;
-		
+
 		fb1Color1Lfo1[i]=0.0f;
 		fb1Color1Lfo1MidiActive[i]=0;
-		
+
 		//BLOCK2
-		
+
 		//input adjust
 		block2InputAdjust[i]=0.0f;
 		block2InputAdjustMidiActive[i]=0;
-		
+
 		//input lfo
 		block2InputAdjustLfo[i]=0.0f;
 		block2InputAdjustLfoMidiActive[i]=0;
@@ -7593,102 +7593,102 @@ void GuiApp::allArrayClear(){
 		//fb2 param
 		fb2MixAndKey[i]=0.0f;
 		fb2MixAndKeyMidiActive[i]=0;
-		
+
 		fb2Geo1[i]=0.0f;
 		fb2Geo1MidiActive[i]=0;
-		
+
 		fb2Color1[i]=0.0f;
 		fb2Color1MidiActive[i]=0;
-		
+
 		fb2Filters[i]=0.0f;
 		fb2FiltersMidiActive[i]=0;
-		
+
 		//fb2 lfo
 		fb2MixAndKeyLfo[i]=0.0f;
 		fb2MixAndKeyLfoMidiActive[i]=0;
-		
+
 		fb2Geo1Lfo1[i]=0.0f;
 		fb2Geo1Lfo1MidiActive[i]=0;
-		
+
 		fb2Geo1Lfo2[i]=0.0f;
 		fb2Geo1Lfo2MidiActive[i]=0;
-		
+
 		fb2Color1Lfo1[i]=0.0f;
 		fb2Color1Lfo1MidiActive[i]=0;
-		
-		//BLOCK3 
-		
+
+		//BLOCK3
+
 		//block1 param
 		block1Geo[i]=0.0f;
 		block1GeoMidiActive[i]=0;
-		
+
 		block1Colorize[i]=0.0f;
 		block1ColorizeMidiActive[i]=0;
-		
+
 		block1Filters[i]=0.0f;
 		block1FiltersMidiActive[i]=0;
-		
+
 		//block1 lfo
 		block1Geo1Lfo1[i]=0.0f;
 		block1Geo1Lfo1MidiActive[i]=0;
-		
+
 		block1Geo1Lfo2[i]=0.0f;
 		block1Geo1Lfo2MidiActive[i]=0;
-		
+
 		block1ColorizeLfo1[i]=0.0f;
 		block1ColorizeLfo1MidiActive[i]=0;
-		
+
 		block1ColorizeLfo2[i]=0.0f;
 		block1ColorizeLfo2MidiActive[i]=0;
-		
+
 		block1ColorizeLfo3[i]=0.0f;
 		block1ColorizeLfo3MidiActive[i]=0;
-		
+
 		//block2 params
 		block2Geo[i]=0.0f;
 		block2GeoMidiActive[i]=0;
-		
+
 		block2Colorize[i]=0.0f;
 		block2ColorizeMidiActive[i]=0;
-		
+
 		block2Filters[i]=0.0f;
 		block2FiltersMidiActive[i]=0;
-		
+
 		//block2 lfo
 		block2Geo1Lfo1[i]=0.0f;
 		block2Geo1Lfo1MidiActive[i]=0;
-		
+
 		block2Geo1Lfo2[i]=0.0f;
 		block2Geo1Lfo2MidiActive[i]=0;
-		
+
 		block2ColorizeLfo1[i]=0.0f;
 		block2ColorizeLfo1MidiActive[i]=0;
-		
+
 		block2ColorizeLfo2[i]=0.0f;
 		block2ColorizeLfo2MidiActive[i]=0;
-		
+
 		block2ColorizeLfo3[i]=0.0f;
 		block2ColorizeLfo3MidiActive[i]=0;
-		
-		
-		//final mix params	
+
+
+		//final mix params
 		matrixMix[i]=0.0f;
 		matrixMixMidiActive[i]=0;
-		
+
 		finalMixAndKey[i]=0.0f;
 		finalMixAndKeyMidiActive[i]=0;
-		
+
 		//final mix lfo
 		matrixMixLfo1[i]=0.0f;
 		matrixMixLfo1MidiActive[i]=0;
-		
+
 		matrixMixLfo2[i]=0.0f;
 		matrixMixLfo2MidiActive[i]=0;
-		
+
 		finalMixAndKeyLfo[i]=0.0f;
 		finalMixAndKeyLfoMidiActive[i]=0;
-		
-		
+
+
 	}
 
 }
@@ -7985,7 +7985,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -8093,7 +8093,7 @@ void GuiApp::selectMacro0Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro0Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
@@ -8142,7 +8142,7 @@ void GuiApp::selectMacro0Menu(){
 				selectMacro0MatrixMixLfo2=0;
 				selectMacro0FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro0Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro0Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -8265,7 +8265,7 @@ void GuiApp::selectMacro0Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro0Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
@@ -8384,7 +8384,7 @@ void GuiApp::selectMacro0Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro0Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
@@ -8441,7 +8441,7 @@ void GuiApp::selectMacro0Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro0Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
@@ -8498,7 +8498,7 @@ void GuiApp::selectMacro0Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro0Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
@@ -8555,7 +8555,7 @@ void GuiApp::selectMacro0Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro0Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
@@ -8612,7 +8612,7 @@ void GuiApp::selectMacro0Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro0Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
@@ -8669,7 +8669,7 @@ void GuiApp::selectMacro0Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro0Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
@@ -8726,7 +8726,7 @@ void GuiApp::selectMacro0Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro0Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
@@ -8783,7 +8783,7 @@ void GuiApp::selectMacro0Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro0Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -8791,14 +8791,14 @@ void GuiApp::selectMacro0Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro0")){
 		if(ImGui::BeginMenu("b2 input ##macro0")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -8854,7 +8854,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -8915,7 +8915,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -8971,7 +8971,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9027,7 +9027,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9083,7 +9083,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9136,11 +9136,11 @@ void GuiApp::selectMacro0Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9196,7 +9196,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9252,7 +9252,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9308,7 +9308,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9373,7 +9373,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9429,7 +9429,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9485,7 +9485,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9541,7 +9541,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9597,7 +9597,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9653,7 +9653,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9709,7 +9709,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9765,7 +9765,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9818,13 +9818,13 @@ void GuiApp::selectMacro0Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro0")){
 			if(ImGui::BeginMenu("block2 geo ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9880,7 +9880,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9936,7 +9936,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -9992,7 +9992,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -10048,7 +10048,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -10104,7 +10104,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -10160,7 +10160,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -10216,7 +10216,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -10269,13 +10269,13 @@ void GuiApp::selectMacro0Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro0")){
 			if(ImGui::BeginMenu("matrix mix ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -10331,7 +10331,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -10387,7 +10387,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -10443,7 +10443,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -10499,7 +10499,7 @@ void GuiApp::selectMacro0Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro0")){
 				selectMacro0Fb1DelayTime=0; selectMacro0Fb2DelayTime=0;
 				selectMacro0Ch2MixAndKey=0;
-				selectMacro0Ch2Adjust=0;			
+				selectMacro0Ch2Adjust=0;
 				selectMacro0Ch1AdjustLfo=0;
 				selectMacro0Ch2MixAndKeyLfo=0;
 				selectMacro0Fb1MixAndKey=0;
@@ -10705,11 +10705,11 @@ void GuiApp::ifSelectMacro0(){
 	if(selectMacro0FinalMixAndKeyLfo>0){
 		macroBLOCK_3FinalMixAndKeyLfo(selectMacro0FinalMixAndKeyLfo-1,0);
 	}
-	
+
 	if(selectMacro0Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(0);
 	}
-	
+
 	if(selectMacro0Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(0);
 	}
@@ -10722,7 +10722,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -10830,7 +10830,7 @@ void GuiApp::selectMacro1Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro1Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
@@ -10879,7 +10879,7 @@ void GuiApp::selectMacro1Menu(){
 				selectMacro1MatrixMixLfo2=0;
 				selectMacro1FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro1Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro1Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -11002,7 +11002,7 @@ void GuiApp::selectMacro1Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro1Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
@@ -11121,7 +11121,7 @@ void GuiApp::selectMacro1Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro1Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
@@ -11178,7 +11178,7 @@ void GuiApp::selectMacro1Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro1Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
@@ -11235,7 +11235,7 @@ void GuiApp::selectMacro1Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro1Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
@@ -11292,7 +11292,7 @@ void GuiApp::selectMacro1Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro1Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
@@ -11349,7 +11349,7 @@ void GuiApp::selectMacro1Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro1Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
@@ -11406,7 +11406,7 @@ void GuiApp::selectMacro1Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro1Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
@@ -11463,7 +11463,7 @@ void GuiApp::selectMacro1Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro1Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
@@ -11520,7 +11520,7 @@ void GuiApp::selectMacro1Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro1Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -11528,14 +11528,14 @@ void GuiApp::selectMacro1Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro1")){
 		if(ImGui::BeginMenu("b2 input ##macro1")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -11591,7 +11591,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -11652,7 +11652,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -11708,7 +11708,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -11764,7 +11764,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -11820,7 +11820,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -11873,11 +11873,11 @@ void GuiApp::selectMacro1Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -11933,7 +11933,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -11989,7 +11989,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12045,7 +12045,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12110,7 +12110,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12166,7 +12166,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12222,7 +12222,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12278,7 +12278,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12334,7 +12334,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12390,7 +12390,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12446,7 +12446,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12502,7 +12502,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12555,13 +12555,13 @@ void GuiApp::selectMacro1Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro1")){
 			if(ImGui::BeginMenu("block2 geo ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12617,7 +12617,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12673,7 +12673,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12729,7 +12729,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12785,7 +12785,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12841,7 +12841,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12897,7 +12897,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -12953,7 +12953,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -13006,13 +13006,13 @@ void GuiApp::selectMacro1Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro1")){
 			if(ImGui::BeginMenu("matrix mix ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -13068,7 +13068,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -13124,7 +13124,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -13180,7 +13180,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -13236,7 +13236,7 @@ void GuiApp::selectMacro1Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro1")){
 				selectMacro1Fb1DelayTime=0; selectMacro1Fb2DelayTime=0;
 				selectMacro1Ch2MixAndKey=0;
-				selectMacro1Ch2Adjust=0;			
+				selectMacro1Ch2Adjust=0;
 				selectMacro1Ch1AdjustLfo=0;
 				selectMacro1Ch2MixAndKeyLfo=0;
 				selectMacro1Fb1MixAndKey=0;
@@ -13445,7 +13445,7 @@ void GuiApp::ifSelectMacro1(){
 	if(selectMacro1Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(1);
 	}
-	
+
 	if(selectMacro1Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(1);
 	}
@@ -13457,7 +13457,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -13565,7 +13565,7 @@ void GuiApp::selectMacro2Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro2Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
@@ -13614,7 +13614,7 @@ void GuiApp::selectMacro2Menu(){
 				selectMacro2MatrixMixLfo2=0;
 				selectMacro2FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro2Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro2Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -13737,7 +13737,7 @@ void GuiApp::selectMacro2Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro2Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
@@ -13856,7 +13856,7 @@ void GuiApp::selectMacro2Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro2Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
@@ -13913,7 +13913,7 @@ void GuiApp::selectMacro2Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro2Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
@@ -13970,7 +13970,7 @@ void GuiApp::selectMacro2Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro2Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
@@ -14027,7 +14027,7 @@ void GuiApp::selectMacro2Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro2Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
@@ -14084,7 +14084,7 @@ void GuiApp::selectMacro2Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro2Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
@@ -14141,7 +14141,7 @@ void GuiApp::selectMacro2Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro2Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
@@ -14198,7 +14198,7 @@ void GuiApp::selectMacro2Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro2Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
@@ -14255,7 +14255,7 @@ void GuiApp::selectMacro2Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro2Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -14263,14 +14263,14 @@ void GuiApp::selectMacro2Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro2")){
 		if(ImGui::BeginMenu("b2 input ##macro2")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -14326,7 +14326,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -14387,7 +14387,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -14443,7 +14443,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -14499,7 +14499,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -14555,7 +14555,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -14608,11 +14608,11 @@ void GuiApp::selectMacro2Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -14668,7 +14668,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -14724,7 +14724,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -14780,7 +14780,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -14845,7 +14845,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -14901,7 +14901,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -14957,7 +14957,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15013,7 +15013,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15069,7 +15069,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15125,7 +15125,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15181,7 +15181,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15237,7 +15237,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15290,13 +15290,13 @@ void GuiApp::selectMacro2Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro2")){
 			if(ImGui::BeginMenu("block2 geo ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15352,7 +15352,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15408,7 +15408,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15464,7 +15464,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15520,7 +15520,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15576,7 +15576,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15632,7 +15632,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15688,7 +15688,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15741,13 +15741,13 @@ void GuiApp::selectMacro2Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro2")){
 			if(ImGui::BeginMenu("matrix mix ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15803,7 +15803,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15859,7 +15859,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15915,7 +15915,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -15971,7 +15971,7 @@ void GuiApp::selectMacro2Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro2")){
 				selectMacro2Fb1DelayTime=0; selectMacro2Fb2DelayTime=0;
 				selectMacro2Ch2MixAndKey=0;
-				selectMacro2Ch2Adjust=0;			
+				selectMacro2Ch2Adjust=0;
 				selectMacro2Ch1AdjustLfo=0;
 				selectMacro2Ch2MixAndKeyLfo=0;
 				selectMacro2Fb1MixAndKey=0;
@@ -16179,7 +16179,7 @@ void GuiApp::ifSelectMacro2(){
 	if(selectMacro2Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(2);
 	}
-	
+
 	if(selectMacro2Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(2);
 	}
@@ -16192,7 +16192,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -16300,7 +16300,7 @@ void GuiApp::selectMacro3Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro3Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
@@ -16349,7 +16349,7 @@ void GuiApp::selectMacro3Menu(){
 				selectMacro3MatrixMixLfo2=0;
 				selectMacro3FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro3Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro3Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -16472,7 +16472,7 @@ void GuiApp::selectMacro3Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro3Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
@@ -16591,7 +16591,7 @@ void GuiApp::selectMacro3Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro3Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
@@ -16648,7 +16648,7 @@ void GuiApp::selectMacro3Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro3Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
@@ -16705,7 +16705,7 @@ void GuiApp::selectMacro3Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro3Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
@@ -16762,7 +16762,7 @@ void GuiApp::selectMacro3Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro3Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
@@ -16819,7 +16819,7 @@ void GuiApp::selectMacro3Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro3Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
@@ -16876,7 +16876,7 @@ void GuiApp::selectMacro3Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro3Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
@@ -16933,7 +16933,7 @@ void GuiApp::selectMacro3Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro3Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
@@ -16990,7 +16990,7 @@ void GuiApp::selectMacro3Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro3Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -16998,14 +16998,14 @@ void GuiApp::selectMacro3Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro3")){
 		if(ImGui::BeginMenu("b2 input ##macro3")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17061,7 +17061,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17122,7 +17122,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17178,7 +17178,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17234,7 +17234,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17290,7 +17290,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17343,11 +17343,11 @@ void GuiApp::selectMacro3Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17403,7 +17403,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17459,7 +17459,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17515,7 +17515,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17580,7 +17580,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17636,7 +17636,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17692,7 +17692,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17748,7 +17748,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17804,7 +17804,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17860,7 +17860,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17916,7 +17916,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -17972,7 +17972,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -18025,13 +18025,13 @@ void GuiApp::selectMacro3Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro3")){
 			if(ImGui::BeginMenu("block2 geo ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -18087,7 +18087,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -18143,7 +18143,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -18199,7 +18199,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -18255,7 +18255,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -18311,7 +18311,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -18367,7 +18367,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -18423,7 +18423,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -18476,13 +18476,13 @@ void GuiApp::selectMacro3Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro3")){
 			if(ImGui::BeginMenu("matrix mix ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -18538,7 +18538,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -18594,7 +18594,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -18650,7 +18650,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -18706,7 +18706,7 @@ void GuiApp::selectMacro3Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro3")){
 				selectMacro3Fb1DelayTime=0; selectMacro3Fb2DelayTime=0;
 				selectMacro3Ch2MixAndKey=0;
-				selectMacro3Ch2Adjust=0;			
+				selectMacro3Ch2Adjust=0;
 				selectMacro3Ch1AdjustLfo=0;
 				selectMacro3Ch2MixAndKeyLfo=0;
 				selectMacro3Fb1MixAndKey=0;
@@ -18914,7 +18914,7 @@ void GuiApp::ifSelectMacro3(){
 	if(selectMacro3Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(3);
 	}
-	
+
 	if(selectMacro3Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(3);
 	}
@@ -18927,7 +18927,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -19035,7 +19035,7 @@ void GuiApp::selectMacro4Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro4Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
@@ -19084,7 +19084,7 @@ void GuiApp::selectMacro4Menu(){
 				selectMacro4MatrixMixLfo2=0;
 				selectMacro4FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro4Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro4Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -19207,7 +19207,7 @@ void GuiApp::selectMacro4Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro4Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
@@ -19326,7 +19326,7 @@ void GuiApp::selectMacro4Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro4Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
@@ -19383,7 +19383,7 @@ void GuiApp::selectMacro4Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro4Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
@@ -19440,7 +19440,7 @@ void GuiApp::selectMacro4Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro4Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
@@ -19497,7 +19497,7 @@ void GuiApp::selectMacro4Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro4Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
@@ -19554,7 +19554,7 @@ void GuiApp::selectMacro4Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro4Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
@@ -19611,7 +19611,7 @@ void GuiApp::selectMacro4Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro4Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
@@ -19668,7 +19668,7 @@ void GuiApp::selectMacro4Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro4Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
@@ -19725,7 +19725,7 @@ void GuiApp::selectMacro4Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro4Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -19733,14 +19733,14 @@ void GuiApp::selectMacro4Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro4")){
 		if(ImGui::BeginMenu("b2 input ##macro4")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -19796,7 +19796,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -19857,7 +19857,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -19913,7 +19913,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -19969,7 +19969,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20025,7 +20025,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20078,11 +20078,11 @@ void GuiApp::selectMacro4Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20138,7 +20138,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20194,7 +20194,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20250,7 +20250,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20315,7 +20315,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20371,7 +20371,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20427,7 +20427,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20483,7 +20483,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20539,7 +20539,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20595,7 +20595,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20651,7 +20651,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20707,7 +20707,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20760,13 +20760,13 @@ void GuiApp::selectMacro4Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro4")){
 			if(ImGui::BeginMenu("block2 geo ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20822,7 +20822,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20878,7 +20878,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20934,7 +20934,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -20990,7 +20990,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -21046,7 +21046,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -21102,7 +21102,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -21158,7 +21158,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -21211,13 +21211,13 @@ void GuiApp::selectMacro4Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro4")){
 			if(ImGui::BeginMenu("matrix mix ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -21273,7 +21273,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -21329,7 +21329,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -21385,7 +21385,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -21441,7 +21441,7 @@ void GuiApp::selectMacro4Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro4")){
 				selectMacro4Fb1DelayTime=0; selectMacro4Fb2DelayTime=0;
 				selectMacro4Ch2MixAndKey=0;
-				selectMacro4Ch2Adjust=0;			
+				selectMacro4Ch2Adjust=0;
 				selectMacro4Ch1AdjustLfo=0;
 				selectMacro4Ch2MixAndKeyLfo=0;
 				selectMacro4Fb1MixAndKey=0;
@@ -21648,7 +21648,7 @@ void GuiApp::ifSelectMacro4(){
 	if(selectMacro4Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(4);
 	}
-	
+
 	if(selectMacro4Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(4);
 	}
@@ -21661,7 +21661,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -21769,7 +21769,7 @@ void GuiApp::selectMacro5Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro5Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
@@ -21818,7 +21818,7 @@ void GuiApp::selectMacro5Menu(){
 				selectMacro5MatrixMixLfo2=0;
 				selectMacro5FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro5Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro5Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -21941,7 +21941,7 @@ void GuiApp::selectMacro5Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro5Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
@@ -22060,7 +22060,7 @@ void GuiApp::selectMacro5Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro5Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
@@ -22117,7 +22117,7 @@ void GuiApp::selectMacro5Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro5Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
@@ -22174,7 +22174,7 @@ void GuiApp::selectMacro5Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro5Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
@@ -22231,7 +22231,7 @@ void GuiApp::selectMacro5Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro5Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
@@ -22288,7 +22288,7 @@ void GuiApp::selectMacro5Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro5Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
@@ -22345,7 +22345,7 @@ void GuiApp::selectMacro5Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro5Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
@@ -22402,7 +22402,7 @@ void GuiApp::selectMacro5Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro5Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
@@ -22459,7 +22459,7 @@ void GuiApp::selectMacro5Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro5Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -22467,14 +22467,14 @@ void GuiApp::selectMacro5Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro5")){
 		if(ImGui::BeginMenu("b2 input ##macro5")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -22530,7 +22530,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -22591,7 +22591,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -22647,7 +22647,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -22703,7 +22703,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -22759,7 +22759,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -22812,11 +22812,11 @@ void GuiApp::selectMacro5Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -22872,7 +22872,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -22928,7 +22928,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -22984,7 +22984,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23049,7 +23049,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23105,7 +23105,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23161,7 +23161,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23217,7 +23217,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23273,7 +23273,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23329,7 +23329,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23385,7 +23385,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23441,7 +23441,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23494,13 +23494,13 @@ void GuiApp::selectMacro5Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro5")){
 			if(ImGui::BeginMenu("block2 geo ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23556,7 +23556,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23612,7 +23612,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23668,7 +23668,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23724,7 +23724,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23780,7 +23780,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23836,7 +23836,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23892,7 +23892,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -23945,13 +23945,13 @@ void GuiApp::selectMacro5Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro5")){
 			if(ImGui::BeginMenu("matrix mix ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -24007,7 +24007,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -24063,7 +24063,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -24119,7 +24119,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -24175,7 +24175,7 @@ void GuiApp::selectMacro5Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro5")){
 				selectMacro5Fb1DelayTime=0; selectMacro5Fb2DelayTime=0;
 				selectMacro5Ch2MixAndKey=0;
-				selectMacro5Ch2Adjust=0;			
+				selectMacro5Ch2Adjust=0;
 				selectMacro5Ch1AdjustLfo=0;
 				selectMacro5Ch2MixAndKeyLfo=0;
 				selectMacro5Fb1MixAndKey=0;
@@ -24382,7 +24382,7 @@ void GuiApp::ifSelectMacro5(){
 	if(selectMacro5Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(5);
 	}
-	
+
 	if(selectMacro5Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(5);
 	}
@@ -24395,7 +24395,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -24503,7 +24503,7 @@ void GuiApp::selectMacro6Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro6Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
@@ -24552,7 +24552,7 @@ void GuiApp::selectMacro6Menu(){
 				selectMacro6MatrixMixLfo2=0;
 				selectMacro6FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro6Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro6Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -24675,7 +24675,7 @@ void GuiApp::selectMacro6Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro6Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
@@ -24794,7 +24794,7 @@ void GuiApp::selectMacro6Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro6Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
@@ -24851,7 +24851,7 @@ void GuiApp::selectMacro6Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro6Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
@@ -24908,7 +24908,7 @@ void GuiApp::selectMacro6Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro6Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
@@ -24965,7 +24965,7 @@ void GuiApp::selectMacro6Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro6Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
@@ -25022,7 +25022,7 @@ void GuiApp::selectMacro6Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro6Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
@@ -25079,7 +25079,7 @@ void GuiApp::selectMacro6Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro6Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
@@ -25136,7 +25136,7 @@ void GuiApp::selectMacro6Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro6Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
@@ -25193,7 +25193,7 @@ void GuiApp::selectMacro6Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro6Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -25201,14 +25201,14 @@ void GuiApp::selectMacro6Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro6")){
 		if(ImGui::BeginMenu("b2 input ##macro6")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -25264,7 +25264,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -25325,7 +25325,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -25381,7 +25381,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -25437,7 +25437,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -25493,7 +25493,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -25546,11 +25546,11 @@ void GuiApp::selectMacro6Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -25606,7 +25606,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -25662,7 +25662,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -25718,7 +25718,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -25783,7 +25783,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -25839,7 +25839,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -25895,7 +25895,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -25951,7 +25951,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26007,7 +26007,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26063,7 +26063,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26119,7 +26119,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26175,7 +26175,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26228,13 +26228,13 @@ void GuiApp::selectMacro6Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro6")){
 			if(ImGui::BeginMenu("block2 geo ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26290,7 +26290,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26346,7 +26346,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26402,7 +26402,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26458,7 +26458,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26514,7 +26514,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26570,7 +26570,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26626,7 +26626,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26679,13 +26679,13 @@ void GuiApp::selectMacro6Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro6")){
 			if(ImGui::BeginMenu("matrix mix ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26741,7 +26741,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26797,7 +26797,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26853,7 +26853,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -26909,7 +26909,7 @@ void GuiApp::selectMacro6Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro6")){
 				selectMacro6Fb1DelayTime=0; selectMacro6Fb2DelayTime=0;
 				selectMacro6Ch2MixAndKey=0;
-				selectMacro6Ch2Adjust=0;			
+				selectMacro6Ch2Adjust=0;
 				selectMacro6Ch1AdjustLfo=0;
 				selectMacro6Ch2MixAndKeyLfo=0;
 				selectMacro6Fb1MixAndKey=0;
@@ -27116,7 +27116,7 @@ void GuiApp::ifSelectMacro6(){
 	if(selectMacro6Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(6);
 	}
-	
+
 	if(selectMacro6Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(6);
 	}
@@ -27128,7 +27128,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -27236,7 +27236,7 @@ void GuiApp::selectMacro7Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro7Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
@@ -27285,7 +27285,7 @@ void GuiApp::selectMacro7Menu(){
 				selectMacro7MatrixMixLfo2=0;
 				selectMacro7FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro7Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro7Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -27408,7 +27408,7 @@ void GuiApp::selectMacro7Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro7Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
@@ -27527,7 +27527,7 @@ void GuiApp::selectMacro7Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro7Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
@@ -27584,7 +27584,7 @@ void GuiApp::selectMacro7Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro7Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
@@ -27641,7 +27641,7 @@ void GuiApp::selectMacro7Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro7Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
@@ -27698,7 +27698,7 @@ void GuiApp::selectMacro7Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro7Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
@@ -27755,7 +27755,7 @@ void GuiApp::selectMacro7Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro7Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
@@ -27812,7 +27812,7 @@ void GuiApp::selectMacro7Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro7Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
@@ -27869,7 +27869,7 @@ void GuiApp::selectMacro7Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro7Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
@@ -27926,7 +27926,7 @@ void GuiApp::selectMacro7Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro7Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -27934,14 +27934,14 @@ void GuiApp::selectMacro7Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro7")){
 		if(ImGui::BeginMenu("b2 input ##macro7")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -27997,7 +27997,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28058,7 +28058,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28114,7 +28114,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28170,7 +28170,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28226,7 +28226,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28279,11 +28279,11 @@ void GuiApp::selectMacro7Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28339,7 +28339,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28395,7 +28395,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28451,7 +28451,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28516,7 +28516,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28572,7 +28572,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28628,7 +28628,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28684,7 +28684,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28740,7 +28740,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28796,7 +28796,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28852,7 +28852,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28908,7 +28908,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -28961,13 +28961,13 @@ void GuiApp::selectMacro7Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro7")){
 			if(ImGui::BeginMenu("block2 geo ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -29023,7 +29023,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -29079,7 +29079,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -29135,7 +29135,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -29191,7 +29191,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -29247,7 +29247,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -29303,7 +29303,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -29359,7 +29359,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -29412,13 +29412,13 @@ void GuiApp::selectMacro7Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro7")){
 			if(ImGui::BeginMenu("matrix mix ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -29474,7 +29474,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -29530,7 +29530,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -29586,7 +29586,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -29642,7 +29642,7 @@ void GuiApp::selectMacro7Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro7")){
 				selectMacro7Fb1DelayTime=0; selectMacro7Fb2DelayTime=0;
 				selectMacro7Ch2MixAndKey=0;
-				selectMacro7Ch2Adjust=0;			
+				selectMacro7Ch2Adjust=0;
 				selectMacro7Ch1AdjustLfo=0;
 				selectMacro7Ch2MixAndKeyLfo=0;
 				selectMacro7Fb1MixAndKey=0;
@@ -29849,7 +29849,7 @@ void GuiApp::ifSelectMacro7(){
 	if(selectMacro7Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(7);
 	}
-	
+
 	if(selectMacro7Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(7);
 	}
@@ -29862,7 +29862,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -29970,7 +29970,7 @@ void GuiApp::selectMacro8Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro8Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
@@ -30019,7 +30019,7 @@ void GuiApp::selectMacro8Menu(){
 				selectMacro8MatrixMixLfo2=0;
 				selectMacro8FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro8Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro8Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -30142,7 +30142,7 @@ void GuiApp::selectMacro8Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro8Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
@@ -30261,7 +30261,7 @@ void GuiApp::selectMacro8Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro8Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
@@ -30318,7 +30318,7 @@ void GuiApp::selectMacro8Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro8Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
@@ -30375,7 +30375,7 @@ void GuiApp::selectMacro8Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro8Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
@@ -30432,7 +30432,7 @@ void GuiApp::selectMacro8Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro8Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
@@ -30489,7 +30489,7 @@ void GuiApp::selectMacro8Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro8Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
@@ -30546,7 +30546,7 @@ void GuiApp::selectMacro8Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro8Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
@@ -30603,7 +30603,7 @@ void GuiApp::selectMacro8Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro8Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
@@ -30660,7 +30660,7 @@ void GuiApp::selectMacro8Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro8Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -30668,14 +30668,14 @@ void GuiApp::selectMacro8Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro8")){
 		if(ImGui::BeginMenu("b2 input ##macro8")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -30731,7 +30731,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -30792,7 +30792,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -30848,7 +30848,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -30904,7 +30904,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -30960,7 +30960,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31013,11 +31013,11 @@ void GuiApp::selectMacro8Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31073,7 +31073,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31129,7 +31129,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31185,7 +31185,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31250,7 +31250,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31306,7 +31306,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31362,7 +31362,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31418,7 +31418,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31474,7 +31474,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31530,7 +31530,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31586,7 +31586,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31642,7 +31642,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31695,13 +31695,13 @@ void GuiApp::selectMacro8Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro8")){
 			if(ImGui::BeginMenu("block2 geo ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31757,7 +31757,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31813,7 +31813,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31869,7 +31869,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31925,7 +31925,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -31981,7 +31981,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -32037,7 +32037,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -32093,7 +32093,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -32146,13 +32146,13 @@ void GuiApp::selectMacro8Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro8")){
 			if(ImGui::BeginMenu("matrix mix ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -32208,7 +32208,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -32264,7 +32264,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -32320,7 +32320,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -32376,7 +32376,7 @@ void GuiApp::selectMacro8Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro8")){
 				selectMacro8Fb1DelayTime=0; selectMacro8Fb2DelayTime=0;
 				selectMacro8Ch2MixAndKey=0;
-				selectMacro8Ch2Adjust=0;			
+				selectMacro8Ch2Adjust=0;
 				selectMacro8Ch1AdjustLfo=0;
 				selectMacro8Ch2MixAndKeyLfo=0;
 				selectMacro8Fb1MixAndKey=0;
@@ -32583,7 +32583,7 @@ void GuiApp::ifSelectMacro8(){
 	if(selectMacro8Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(8);
 	}
-	
+
 	if(selectMacro8Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(8);
 	}
@@ -32596,7 +32596,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -32704,7 +32704,7 @@ void GuiApp::selectMacro9Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro9Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
@@ -32753,7 +32753,7 @@ void GuiApp::selectMacro9Menu(){
 				selectMacro9MatrixMixLfo2=0;
 				selectMacro9FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro9Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro9Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -32876,7 +32876,7 @@ void GuiApp::selectMacro9Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro9Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
@@ -32995,7 +32995,7 @@ void GuiApp::selectMacro9Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro9Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
@@ -33052,7 +33052,7 @@ void GuiApp::selectMacro9Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro9Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
@@ -33109,7 +33109,7 @@ void GuiApp::selectMacro9Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro9Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
@@ -33166,7 +33166,7 @@ void GuiApp::selectMacro9Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro9Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
@@ -33223,7 +33223,7 @@ void GuiApp::selectMacro9Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro9Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
@@ -33280,7 +33280,7 @@ void GuiApp::selectMacro9Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro9Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
@@ -33337,7 +33337,7 @@ void GuiApp::selectMacro9Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro9Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
@@ -33394,7 +33394,7 @@ void GuiApp::selectMacro9Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro9Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -33402,14 +33402,14 @@ void GuiApp::selectMacro9Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro9")){
 		if(ImGui::BeginMenu("b2 input ##macro9")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -33465,7 +33465,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -33526,7 +33526,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -33582,7 +33582,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -33638,7 +33638,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -33694,7 +33694,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -33747,11 +33747,11 @@ void GuiApp::selectMacro9Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -33807,7 +33807,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -33863,7 +33863,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -33919,7 +33919,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -33984,7 +33984,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34040,7 +34040,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34096,7 +34096,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34152,7 +34152,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34208,7 +34208,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34264,7 +34264,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34320,7 +34320,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34376,7 +34376,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34429,13 +34429,13 @@ void GuiApp::selectMacro9Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro9")){
 			if(ImGui::BeginMenu("block2 geo ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34491,7 +34491,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34547,7 +34547,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34603,7 +34603,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34659,7 +34659,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34715,7 +34715,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34771,7 +34771,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34827,7 +34827,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34880,13 +34880,13 @@ void GuiApp::selectMacro9Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro9")){
 			if(ImGui::BeginMenu("matrix mix ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34942,7 +34942,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -34998,7 +34998,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -35054,7 +35054,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -35110,7 +35110,7 @@ void GuiApp::selectMacro9Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro9")){
 				selectMacro9Fb1DelayTime=0; selectMacro9Fb2DelayTime=0;
 				selectMacro9Ch2MixAndKey=0;
-				selectMacro9Ch2Adjust=0;			
+				selectMacro9Ch2Adjust=0;
 				selectMacro9Ch1AdjustLfo=0;
 				selectMacro9Ch2MixAndKeyLfo=0;
 				selectMacro9Fb1MixAndKey=0;
@@ -35317,7 +35317,7 @@ void GuiApp::ifSelectMacro9(){
 	if(selectMacro9Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(9);
 	}
-	
+
 	if(selectMacro9Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(9);
 	}
@@ -35329,7 +35329,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -35437,7 +35437,7 @@ void GuiApp::selectMacro10Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro10Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
@@ -35486,7 +35486,7 @@ void GuiApp::selectMacro10Menu(){
 				selectMacro10MatrixMixLfo2=0;
 				selectMacro10FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro10Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro10Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -35609,7 +35609,7 @@ void GuiApp::selectMacro10Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro10Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
@@ -35728,7 +35728,7 @@ void GuiApp::selectMacro10Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro10Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
@@ -35785,7 +35785,7 @@ void GuiApp::selectMacro10Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro10Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
@@ -35842,7 +35842,7 @@ void GuiApp::selectMacro10Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro10Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
@@ -35899,7 +35899,7 @@ void GuiApp::selectMacro10Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro10Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
@@ -35956,7 +35956,7 @@ void GuiApp::selectMacro10Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro10Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
@@ -36013,7 +36013,7 @@ void GuiApp::selectMacro10Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro10Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
@@ -36070,7 +36070,7 @@ void GuiApp::selectMacro10Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro10Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
@@ -36127,7 +36127,7 @@ void GuiApp::selectMacro10Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro10Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -36135,14 +36135,14 @@ void GuiApp::selectMacro10Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro10")){
 		if(ImGui::BeginMenu("b2 input ##macro10")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -36198,7 +36198,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -36259,7 +36259,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -36315,7 +36315,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -36371,7 +36371,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -36427,7 +36427,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -36480,11 +36480,11 @@ void GuiApp::selectMacro10Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -36540,7 +36540,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -36596,7 +36596,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -36652,7 +36652,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -36717,7 +36717,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -36773,7 +36773,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -36829,7 +36829,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -36885,7 +36885,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -36941,7 +36941,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -36997,7 +36997,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -37053,7 +37053,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -37109,7 +37109,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -37162,13 +37162,13 @@ void GuiApp::selectMacro10Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro10")){
 			if(ImGui::BeginMenu("block2 geo ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -37224,7 +37224,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -37280,7 +37280,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -37336,7 +37336,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -37392,7 +37392,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -37448,7 +37448,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -37504,7 +37504,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -37560,7 +37560,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -37613,13 +37613,13 @@ void GuiApp::selectMacro10Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro10")){
 			if(ImGui::BeginMenu("matrix mix ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -37675,7 +37675,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -37731,7 +37731,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -37787,7 +37787,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -37843,7 +37843,7 @@ void GuiApp::selectMacro10Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro10")){
 				selectMacro10Fb1DelayTime=0; selectMacro10Fb2DelayTime=0;
 				selectMacro10Ch2MixAndKey=0;
-				selectMacro10Ch2Adjust=0;			
+				selectMacro10Ch2Adjust=0;
 				selectMacro10Ch1AdjustLfo=0;
 				selectMacro10Ch2MixAndKeyLfo=0;
 				selectMacro10Fb1MixAndKey=0;
@@ -38050,7 +38050,7 @@ void GuiApp::ifSelectMacro10(){
 	if(selectMacro10Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(10);
 	}
-	
+
 	if(selectMacro10Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(10);
 	}
@@ -38063,7 +38063,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -38171,7 +38171,7 @@ void GuiApp::selectMacro11Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro11Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
@@ -38220,7 +38220,7 @@ void GuiApp::selectMacro11Menu(){
 				selectMacro11MatrixMixLfo2=0;
 				selectMacro11FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro11Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro11Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -38343,7 +38343,7 @@ void GuiApp::selectMacro11Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro11Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
@@ -38462,7 +38462,7 @@ void GuiApp::selectMacro11Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro11Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
@@ -38519,7 +38519,7 @@ void GuiApp::selectMacro11Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro11Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
@@ -38576,7 +38576,7 @@ void GuiApp::selectMacro11Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro11Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
@@ -38633,7 +38633,7 @@ void GuiApp::selectMacro11Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro11Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
@@ -38690,7 +38690,7 @@ void GuiApp::selectMacro11Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro11Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
@@ -38747,7 +38747,7 @@ void GuiApp::selectMacro11Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro11Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
@@ -38804,7 +38804,7 @@ void GuiApp::selectMacro11Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro11Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
@@ -38861,7 +38861,7 @@ void GuiApp::selectMacro11Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro11Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -38869,14 +38869,14 @@ void GuiApp::selectMacro11Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro11")){
 		if(ImGui::BeginMenu("b2 input ##macro11")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -38932,7 +38932,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -38993,7 +38993,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39049,7 +39049,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39105,7 +39105,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39161,7 +39161,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39214,11 +39214,11 @@ void GuiApp::selectMacro11Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39274,7 +39274,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39330,7 +39330,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39386,7 +39386,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39451,7 +39451,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39507,7 +39507,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39563,7 +39563,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39619,7 +39619,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39675,7 +39675,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39731,7 +39731,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39787,7 +39787,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39843,7 +39843,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39896,13 +39896,13 @@ void GuiApp::selectMacro11Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro11")){
 			if(ImGui::BeginMenu("block2 geo ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -39958,7 +39958,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -40014,7 +40014,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -40070,7 +40070,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -40126,7 +40126,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -40182,7 +40182,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -40238,7 +40238,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -40294,7 +40294,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -40347,13 +40347,13 @@ void GuiApp::selectMacro11Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro11")){
 			if(ImGui::BeginMenu("matrix mix ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -40409,7 +40409,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -40465,7 +40465,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -40521,7 +40521,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -40577,7 +40577,7 @@ void GuiApp::selectMacro11Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro11")){
 				selectMacro11Fb1DelayTime=0; selectMacro11Fb2DelayTime=0;
 				selectMacro11Ch2MixAndKey=0;
-				selectMacro11Ch2Adjust=0;			
+				selectMacro11Ch2Adjust=0;
 				selectMacro11Ch1AdjustLfo=0;
 				selectMacro11Ch2MixAndKeyLfo=0;
 				selectMacro11Fb1MixAndKey=0;
@@ -40785,7 +40785,7 @@ void GuiApp::ifSelectMacro11(){
 	if(selectMacro11Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(11);
 	}
-	
+
 	if(selectMacro11Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(11);
 	}
@@ -40798,7 +40798,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -40906,7 +40906,7 @@ void GuiApp::selectMacro12Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro12Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
@@ -40955,7 +40955,7 @@ void GuiApp::selectMacro12Menu(){
 				selectMacro12MatrixMixLfo2=0;
 				selectMacro12FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro12Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro12Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -41078,7 +41078,7 @@ void GuiApp::selectMacro12Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro12Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
@@ -41197,7 +41197,7 @@ void GuiApp::selectMacro12Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro12Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
@@ -41254,7 +41254,7 @@ void GuiApp::selectMacro12Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro12Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
@@ -41311,7 +41311,7 @@ void GuiApp::selectMacro12Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro12Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
@@ -41368,7 +41368,7 @@ void GuiApp::selectMacro12Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro12Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
@@ -41425,7 +41425,7 @@ void GuiApp::selectMacro12Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro12Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
@@ -41482,7 +41482,7 @@ void GuiApp::selectMacro12Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro12Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
@@ -41539,7 +41539,7 @@ void GuiApp::selectMacro12Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro12Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
@@ -41596,7 +41596,7 @@ void GuiApp::selectMacro12Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro12Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -41604,14 +41604,14 @@ void GuiApp::selectMacro12Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro12")){
 		if(ImGui::BeginMenu("b2 input ##macro12")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -41667,7 +41667,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -41728,7 +41728,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -41784,7 +41784,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -41840,7 +41840,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -41896,7 +41896,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -41949,11 +41949,11 @@ void GuiApp::selectMacro12Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42009,7 +42009,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42065,7 +42065,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42121,7 +42121,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42186,7 +42186,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42242,7 +42242,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42298,7 +42298,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42354,7 +42354,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42410,7 +42410,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42466,7 +42466,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42522,7 +42522,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42578,7 +42578,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42631,13 +42631,13 @@ void GuiApp::selectMacro12Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro12")){
 			if(ImGui::BeginMenu("block2 geo ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42693,7 +42693,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42749,7 +42749,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42805,7 +42805,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42861,7 +42861,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42917,7 +42917,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -42973,7 +42973,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -43029,7 +43029,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -43082,13 +43082,13 @@ void GuiApp::selectMacro12Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro12")){
 			if(ImGui::BeginMenu("matrix mix ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -43144,7 +43144,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -43200,7 +43200,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -43256,7 +43256,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -43312,7 +43312,7 @@ void GuiApp::selectMacro12Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro12")){
 				selectMacro12Fb1DelayTime=0; selectMacro12Fb2DelayTime=0;
 				selectMacro12Ch2MixAndKey=0;
-				selectMacro12Ch2Adjust=0;			
+				selectMacro12Ch2Adjust=0;
 				selectMacro12Ch1AdjustLfo=0;
 				selectMacro12Ch2MixAndKeyLfo=0;
 				selectMacro12Fb1MixAndKey=0;
@@ -43519,7 +43519,7 @@ void GuiApp::ifSelectMacro12(){
 	if(selectMacro12Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(12);
 	}
-	
+
 	if(selectMacro12Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(12);
 	}
@@ -43531,7 +43531,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -43639,7 +43639,7 @@ void GuiApp::selectMacro13Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro13Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
@@ -43688,7 +43688,7 @@ void GuiApp::selectMacro13Menu(){
 				selectMacro13MatrixMixLfo2=0;
 				selectMacro13FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro13Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro13Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -43811,7 +43811,7 @@ void GuiApp::selectMacro13Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro13Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
@@ -43930,7 +43930,7 @@ void GuiApp::selectMacro13Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro13Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
@@ -43987,7 +43987,7 @@ void GuiApp::selectMacro13Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro13Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
@@ -44044,7 +44044,7 @@ void GuiApp::selectMacro13Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro13Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
@@ -44101,7 +44101,7 @@ void GuiApp::selectMacro13Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro13Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
@@ -44158,7 +44158,7 @@ void GuiApp::selectMacro13Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro13Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
@@ -44215,7 +44215,7 @@ void GuiApp::selectMacro13Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro13Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
@@ -44272,7 +44272,7 @@ void GuiApp::selectMacro13Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro13Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
@@ -44329,7 +44329,7 @@ void GuiApp::selectMacro13Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro13Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -44337,14 +44337,14 @@ void GuiApp::selectMacro13Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro13")){
 		if(ImGui::BeginMenu("b2 input ##macro13")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -44400,7 +44400,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -44461,7 +44461,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -44517,7 +44517,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -44573,7 +44573,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -44629,7 +44629,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -44682,11 +44682,11 @@ void GuiApp::selectMacro13Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -44742,7 +44742,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -44798,7 +44798,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -44854,7 +44854,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -44919,7 +44919,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -44975,7 +44975,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45031,7 +45031,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45087,7 +45087,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45143,7 +45143,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45199,7 +45199,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45255,7 +45255,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45311,7 +45311,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45364,13 +45364,13 @@ void GuiApp::selectMacro13Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro13")){
 			if(ImGui::BeginMenu("block2 geo ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45426,7 +45426,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45482,7 +45482,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45538,7 +45538,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45594,7 +45594,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45650,7 +45650,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45706,7 +45706,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45762,7 +45762,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45815,13 +45815,13 @@ void GuiApp::selectMacro13Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro13")){
 			if(ImGui::BeginMenu("matrix mix ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45877,7 +45877,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45933,7 +45933,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -45989,7 +45989,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -46045,7 +46045,7 @@ void GuiApp::selectMacro13Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro13")){
 				selectMacro13Fb1DelayTime=0; selectMacro13Fb2DelayTime=0;
 				selectMacro13Ch2MixAndKey=0;
-				selectMacro13Ch2Adjust=0;			
+				selectMacro13Ch2Adjust=0;
 				selectMacro13Ch1AdjustLfo=0;
 				selectMacro13Ch2MixAndKeyLfo=0;
 				selectMacro13Fb1MixAndKey=0;
@@ -46252,7 +46252,7 @@ void GuiApp::ifSelectMacro13(){
 	if(selectMacro13Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(13);
 	}
-	
+
 	if(selectMacro13Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(13);
 	}
@@ -46264,7 +46264,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -46372,7 +46372,7 @@ void GuiApp::selectMacro14Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro14Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
@@ -46421,7 +46421,7 @@ void GuiApp::selectMacro14Menu(){
 				selectMacro14MatrixMixLfo2=0;
 				selectMacro14FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro14Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro14Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -46544,7 +46544,7 @@ void GuiApp::selectMacro14Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro14Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
@@ -46663,7 +46663,7 @@ void GuiApp::selectMacro14Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro14Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
@@ -46720,7 +46720,7 @@ void GuiApp::selectMacro14Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro14Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
@@ -46777,7 +46777,7 @@ void GuiApp::selectMacro14Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro14Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
@@ -46834,7 +46834,7 @@ void GuiApp::selectMacro14Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro14Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
@@ -46891,7 +46891,7 @@ void GuiApp::selectMacro14Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro14Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
@@ -46948,7 +46948,7 @@ void GuiApp::selectMacro14Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro14Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
@@ -47005,7 +47005,7 @@ void GuiApp::selectMacro14Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro14Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
@@ -47062,7 +47062,7 @@ void GuiApp::selectMacro14Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro14Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -47070,14 +47070,14 @@ void GuiApp::selectMacro14Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro14")){
 		if(ImGui::BeginMenu("b2 input ##macro14")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47133,7 +47133,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47194,7 +47194,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47250,7 +47250,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47306,7 +47306,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47362,7 +47362,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47415,11 +47415,11 @@ void GuiApp::selectMacro14Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47475,7 +47475,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47531,7 +47531,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47587,7 +47587,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47652,7 +47652,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47708,7 +47708,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47764,7 +47764,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47820,7 +47820,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47876,7 +47876,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47932,7 +47932,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -47988,7 +47988,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -48044,7 +48044,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -48097,13 +48097,13 @@ void GuiApp::selectMacro14Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro14")){
 			if(ImGui::BeginMenu("block2 geo ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -48159,7 +48159,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -48215,7 +48215,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -48271,7 +48271,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -48327,7 +48327,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -48383,7 +48383,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -48439,7 +48439,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -48495,7 +48495,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -48548,13 +48548,13 @@ void GuiApp::selectMacro14Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro14")){
 			if(ImGui::BeginMenu("matrix mix ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -48610,7 +48610,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -48666,7 +48666,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -48722,7 +48722,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -48778,7 +48778,7 @@ void GuiApp::selectMacro14Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro14")){
 				selectMacro14Fb1DelayTime=0; selectMacro14Fb2DelayTime=0;
 				selectMacro14Ch2MixAndKey=0;
-				selectMacro14Ch2Adjust=0;			
+				selectMacro14Ch2Adjust=0;
 				selectMacro14Ch1AdjustLfo=0;
 				selectMacro14Ch2MixAndKeyLfo=0;
 				selectMacro14Fb1MixAndKey=0;
@@ -48985,7 +48985,7 @@ void GuiApp::ifSelectMacro14(){
 	if(selectMacro14Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(14);
 	}
-	
+
 	if(selectMacro14Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(14);
 	}
@@ -48997,7 +48997,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("ch1 adjust ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -49105,7 +49105,7 @@ void GuiApp::selectMacro15Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyNames[k-1].c_str(),&selectMacro15Ch2MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
@@ -49154,7 +49154,7 @@ void GuiApp::selectMacro15Menu(){
 				selectMacro15MatrixMixLfo2=0;
 				selectMacro15FinalMixAndKeyLfo=0;
 				//0 has to be none selected yet
-				ImGui::RadioButton("none",&selectMacro15Ch2Adjust,0);	
+				ImGui::RadioButton("none",&selectMacro15Ch2Adjust,0);
 				//ImGui::PushItemWidth(10); this seems to do nothing
 				for(int k=1;k<ch2AdjustLength+1;k++){
 					//same line every other button
@@ -49277,7 +49277,7 @@ void GuiApp::selectMacro15Menu(){
 					}
 					ImGui::RadioButton(ch2MixAndKeyLfoNames[k-1].c_str(),&selectMacro15Ch2MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("ch2 adjust lfo ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
@@ -49396,7 +49396,7 @@ void GuiApp::selectMacro15Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyNames[k-1].c_str(),&selectMacro15Fb1MixAndKey,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
@@ -49453,7 +49453,7 @@ void GuiApp::selectMacro15Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Names[k-1].c_str(),&selectMacro15Fb1Geo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
@@ -49510,7 +49510,7 @@ void GuiApp::selectMacro15Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Names[k-1].c_str(),&selectMacro15Fb1Color1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 filters ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
@@ -49567,7 +49567,7 @@ void GuiApp::selectMacro15Menu(){
 					}
 					ImGui::RadioButton(fb1FiltersNames[k-1].c_str(),&selectMacro15Fb1Filters,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 mix and key lfo ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
@@ -49624,7 +49624,7 @@ void GuiApp::selectMacro15Menu(){
 					}
 					ImGui::RadioButton(fb1MixAndKeyLfoNames[k-1].c_str(),&selectMacro15Fb1MixAndKeyLfo,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo1 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
@@ -49681,7 +49681,7 @@ void GuiApp::selectMacro15Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo1Names[k-1].c_str(),&selectMacro15Fb1Geo1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 geo lfo2 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
@@ -49738,7 +49738,7 @@ void GuiApp::selectMacro15Menu(){
 					}
 					ImGui::RadioButton(fb1Geo1Lfo2Names[k-1].c_str(),&selectMacro15Fb1Geo1Lfo2,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("fb1 color lfo ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
@@ -49795,7 +49795,7 @@ void GuiApp::selectMacro15Menu(){
 					}
 					ImGui::RadioButton(fb1Color1Lfo1Names[k-1].c_str(),&selectMacro15Fb1Color1Lfo1,k);
 				}
-				ImGui::EndMenu();		
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}//end fb1 menu
@@ -49803,14 +49803,14 @@ void GuiApp::selectMacro15Menu(){
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndMenu();
-	}//end b1 menu	
+	}//end b1 menu
 	if(ImGui::BeginMenu("b2 ##macro15")){
 		if(ImGui::BeginMenu("b2 input ##macro15")){
 			//add params here
 			if(ImGui::BeginMenu("block2 input adjust ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -49866,7 +49866,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block2 input adjust lfo ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -49927,7 +49927,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("fb2 mix and key ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -49983,7 +49983,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("fb2 geo ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50039,7 +50039,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("fb2 color ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50095,7 +50095,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("fb2 filters ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50148,11 +50148,11 @@ void GuiApp::selectMacro15Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			if(ImGui::BeginMenu("fb2 mix and key lfo ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50208,7 +50208,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo1 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50264,7 +50264,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("fb2 geo lfo2 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50320,7 +50320,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("fb2 color lfo ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50385,7 +50385,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block1 geo ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50441,7 +50441,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block1 colorize ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50497,7 +50497,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block1 Filters ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50553,7 +50553,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 1 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50609,7 +50609,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block1 geo lfo 2 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50665,7 +50665,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 1 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50721,7 +50721,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 2 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50777,7 +50777,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block1 colorize lfo 3 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50830,13 +50830,13 @@ void GuiApp::selectMacro15Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("block2 ##macro15")){
 			if(ImGui::BeginMenu("block2 geo ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50892,7 +50892,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block2 colorize ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -50948,7 +50948,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block2 Filters ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -51004,7 +51004,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 1 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -51060,7 +51060,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block2 geo lfo 2 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -51116,7 +51116,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 1 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -51172,7 +51172,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 2 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -51228,7 +51228,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("block2 colorize lfo 3 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -51281,13 +51281,13 @@ void GuiApp::selectMacro15Menu(){
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();						
+			ImGui::EndMenu();
 		}//end b3 block 1
 		if(ImGui::BeginMenu("final mixes ##macro15")){
 			if(ImGui::BeginMenu("matrix mix ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -51343,7 +51343,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("final mix and key ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -51399,7 +51399,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 1 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -51455,7 +51455,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("matrix mix lfo 2 ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -51511,7 +51511,7 @@ void GuiApp::selectMacro15Menu(){
 			if(ImGui::BeginMenu("final mix and key lfo ##macro15")){
 				selectMacro15Fb1DelayTime=0; selectMacro15Fb2DelayTime=0;
 				selectMacro15Ch2MixAndKey=0;
-				selectMacro15Ch2Adjust=0;			
+				selectMacro15Ch2Adjust=0;
 				selectMacro15Ch1AdjustLfo=0;
 				selectMacro15Ch2MixAndKeyLfo=0;
 				selectMacro15Fb1MixAndKey=0;
@@ -51718,7 +51718,7 @@ void GuiApp::ifSelectMacro15(){
 	if(selectMacro15Fb1DelayTime>0){
 		macroBLOCK_1Fb1DelayTime(15);
 	}
-	
+
 	if(selectMacro15Fb2DelayTime>0){
 		macroBLOCK_1Fb2DelayTime(15);
 	}
@@ -51751,7 +51751,7 @@ void GuiApp::initializeNames(){
 	ch2MixAndKeyNames[3]="ch2 key blue";
 	ch2MixAndKeyNames[4]="ch2 key threshold";
 	ch2MixAndKeyNames[5]="ch2 key soft";
-	
+
 	ch2AdjustNames[0]="ch2 x <->";
 	ch2AdjustNames[1]="ch2 y <->";
 	ch2AdjustNames[2]="ch2 z <->";
@@ -51768,7 +51768,7 @@ void GuiApp::initializeNames(){
 	ch2AdjustNames[13]="ch2 sharp rad";
 	ch2AdjustNames[14]="ch2 filters boost";
 	ch2AdjustNames[15]="null";
-	
+
 	ch1AdjustLfoNames[0]="ch1 x <-> a";
 	ch1AdjustLfoNames[1]="ch1 x <-> r";
 	ch1AdjustLfoNames[2]="ch1 y <-> a";
@@ -51785,14 +51785,14 @@ void GuiApp::initializeNames(){
 	ch1AdjustLfoNames[13]="ch1 bri ^^ r";
 	ch1AdjustLfoNames[14]="ch1 kaleid sli a";
 	ch1AdjustLfoNames[15]="ch1 kaleid sli r";
-	
+
 	ch2MixAndKeyLfoNames[0]="ch2 mix a";
 	ch2MixAndKeyLfoNames[1]="ch2 mix r";
 	ch2MixAndKeyLfoNames[2]="ch2 key thresh a";
 	ch2MixAndKeyLfoNames[3]="ch2 key thresh r";
 	ch2MixAndKeyLfoNames[4]="ch2 key soft a";
 	ch2MixAndKeyLfoNames[5]="ch2 key soft r";
-	
+
 	ch2AdjustLfoNames[0]="ch2 x <-> a";
 	ch2AdjustLfoNames[1]="ch2 x <-> r";
 	ch2AdjustLfoNames[2]="ch2 y <-> a";
@@ -51809,14 +51809,14 @@ void GuiApp::initializeNames(){
 	ch2AdjustLfoNames[13]="ch2 bri ^^ r";
 	ch2AdjustLfoNames[14]="ch2 kaleid sli a";
 	ch2AdjustLfoNames[15]="ch2 kaleid sli r";
-	
+
 	fb1MixAndKeyNames[0]="fb1 mix";
 	fb1MixAndKeyNames[1]="fb1 key red";
 	fb1MixAndKeyNames[2]="fb1 key green";
 	fb1MixAndKeyNames[3]="fb1 key blue";
 	fb1MixAndKeyNames[4]="fb1 key threshold";
 	fb1MixAndKeyNames[5]="fb1 key soft";
-	
+
 	fb1Geo1Names[0]="fb1 x <->";
 	fb1Geo1Names[1]="fb1 y <->";
 	fb1Geo1Names[2]="fb1 z <->";
@@ -51827,7 +51827,7 @@ void GuiApp::initializeNames(){
 	fb1Geo1Names[7]="fb1 y shear";
 	fb1Geo1Names[8]="fb1 kaleid amt";
 	fb1Geo1Names[9]="fb1 kaleid slice";
-	
+
 	fb1Color1Names[0]="fb1 hue ++";
 	fb1Color1Names[1]="fb1 sat ++";
 	fb1Color1Names[2]="fb1 bri ++";
@@ -51838,9 +51838,9 @@ void GuiApp::initializeNames(){
 	fb1Color1Names[7]="fb1 sat ^^";
 	fb1Color1Names[8]="fb1 bri ^^";
 	fb1Color1Names[9]="fb1 hue shaper";
-	fb1Color1Names[10]="fb1 posterize"; 
-	
-	
+	fb1Color1Names[10]="fb1 posterize";
+
+
 	fb1FiltersNames[0]="fb1 blur amt";
 	fb1FiltersNames[1]="fb1 blur rad";
 	fb1FiltersNames[2]="fb1 sharp amt";
@@ -51850,14 +51850,14 @@ void GuiApp::initializeNames(){
 	fb1FiltersNames[6]="fb1 temp 2 amt";
 	fb1FiltersNames[7]="fb1 temp 2 q";
 	fb1FiltersNames[8]="fb1 filters boost";
-	
+
 	fb1MixAndKeyLfoNames[0]="fb1 mix a";
 	fb1MixAndKeyLfoNames[1]="fb1 mix r";
 	fb1MixAndKeyLfoNames[2]="fb1 ky thresh a";
 	fb1MixAndKeyLfoNames[3]="fb1 ky thresh r";
 	fb1MixAndKeyLfoNames[4]="fb1 ky soft a";
 	fb1MixAndKeyLfoNames[5]="fb1 ky soft r";
-	
+
 	fb1Geo1Lfo1Names[0]="fb1 x <-> a";
 	fb1Geo1Lfo1Names[1]="fb1 x <-> r";
 	fb1Geo1Lfo1Names[2]="fb1 y <-> a";
@@ -51866,7 +51866,7 @@ void GuiApp::initializeNames(){
 	fb1Geo1Lfo1Names[5]="fb1 z <-> r";
 	fb1Geo1Lfo1Names[6]="fb1 rotate <-> a";
 	fb1Geo1Lfo1Names[7]="fb1 rotate <-> r";
-	
+
 	fb1Geo1Lfo2Names[0]="fb1 x stretch a";
 	fb1Geo1Lfo2Names[1]="fb1 x stretch r";
 	fb1Geo1Lfo2Names[2]="fb1 y stretch a";
@@ -51877,14 +51877,14 @@ void GuiApp::initializeNames(){
 	fb1Geo1Lfo2Names[7]="fb1 y shear r";
 	fb1Geo1Lfo2Names[8]="fb1 kaleid sl a";
 	fb1Geo1Lfo2Names[9]="fb1 kaleid sl r";
-	
+
 	fb1Color1Lfo1Names[0]="fb1 hue ** a";
 	fb1Color1Lfo1Names[1]="fb1 hue ** r";
 	fb1Color1Lfo1Names[2]="fb1 sat ** a";
 	fb1Color1Lfo1Names[3]="fb1 sat ** r";
 	fb1Color1Lfo1Names[4]="fb1 bri ** a";
 	fb1Color1Lfo1Names[5]="fb1 bri ** r";
-	
+
 	//BLOCK2
 	block2InputAdjustNames[0]="b2 input x <->";
 	block2InputAdjustNames[1]="b2 input y <->";
@@ -51902,7 +51902,7 @@ void GuiApp::initializeNames(){
 	block2InputAdjustNames[13]="b2 input sharp rad";
 	block2InputAdjustNames[14]="b2 input filters boost";
 	block2InputAdjustNames[15]="null";
-	
+
 	block2InputAdjustLfoNames[0]="b2 input x <-> a";
 	block2InputAdjustLfoNames[1]="b2 input x <-> r";
 	block2InputAdjustLfoNames[2]="b2 input y <-> a";
@@ -51919,14 +51919,14 @@ void GuiApp::initializeNames(){
 	block2InputAdjustLfoNames[13]="b2 input bri ^^ r";
 	block2InputAdjustLfoNames[14]="b2 input kaleid sli a";
 	block2InputAdjustLfoNames[15]="b2 input kaleid sli r";
-	
+
 	fb2MixAndKeyNames[0]="fb2 mix";
 	fb2MixAndKeyNames[1]="fb2 key red";
 	fb2MixAndKeyNames[2]="fb2 key green";
 	fb2MixAndKeyNames[3]="fb2 key blue";
 	fb2MixAndKeyNames[4]="fb2 key threshold";
 	fb2MixAndKeyNames[5]="fb2 key soft";
-	
+
 	fb2Geo1Names[0]="fb2 x <->";
 	fb2Geo1Names[1]="fb2 y <->";
 	fb2Geo1Names[2]="fb2 z <->";
@@ -51937,8 +51937,8 @@ void GuiApp::initializeNames(){
 	fb2Geo1Names[7]="fb2 y shear";
 	fb2Geo1Names[8]="fb2 kaleid amt";
 	fb2Geo1Names[9]="fb2 kaleid slice";
-	
-	
+
+
 	fb2Color1Names[0]="fb2 hue ++";
 	fb2Color1Names[1]="fb2 sat ++";
 	fb2Color1Names[2]="fb2 bri ++";
@@ -51950,8 +51950,8 @@ void GuiApp::initializeNames(){
 	fb2Color1Names[8]="fb2 bri ^^";
 	fb2Color1Names[9]="fb2 hue shaper";
 	fb2Color1Names[10]="fb2 posterize";
-	
-	
+
+
 	fb2FiltersNames[0]="fb2 blur amt";
 	fb2FiltersNames[1]="fb2 blur rad";
 	fb2FiltersNames[2]="fb2 sharp amt";
@@ -51961,14 +51961,14 @@ void GuiApp::initializeNames(){
 	fb2FiltersNames[6]="fb2 temp 2 amt";
 	fb2FiltersNames[7]="fb2 temp 2 q";
 	fb2FiltersNames[8]="fb2 filters boost";
-	
+
 	fb2MixAndKeyLfoNames[0]="fb2 mix a";
 	fb2MixAndKeyLfoNames[1]="fb2 mix r";
 	fb2MixAndKeyLfoNames[2]="fb2 ky thresh a";
 	fb2MixAndKeyLfoNames[3]="fb2 ky thresh r";
 	fb2MixAndKeyLfoNames[4]="fb2 ky soft a";
 	fb2MixAndKeyLfoNames[5]="fb2 ky soft r";
-	
+
 	fb2Geo1Lfo1Names[0]="fb2 x <-> a";
 	fb2Geo1Lfo1Names[1]="fb2 x <-> r";
 	fb2Geo1Lfo1Names[2]="fb2 y <-> a";
@@ -51977,7 +51977,7 @@ void GuiApp::initializeNames(){
 	fb2Geo1Lfo1Names[5]="fb2 z <-> r";
 	fb2Geo1Lfo1Names[6]="fb2 rotate <-> a";
 	fb2Geo1Lfo1Names[7]="fb2 rotate <-> r";
-	
+
 	fb2Geo1Lfo2Names[0]="fb2 x stretch a";
 	fb2Geo1Lfo2Names[1]="fb2 x stretch r";
 	fb2Geo1Lfo2Names[2]="fb2 y stretch a";
@@ -51988,18 +51988,18 @@ void GuiApp::initializeNames(){
 	fb2Geo1Lfo2Names[7]="fb2 y shear r";
 	fb2Geo1Lfo2Names[8]="fb2 kaleid sl a";
 	fb2Geo1Lfo2Names[9]="fb2 kaleid sl r";
-	
+
 	fb2Color1Lfo1Names[0]="fb2 hue ** a";
 	fb2Color1Lfo1Names[1]="fb2 hue ** r";
 	fb2Color1Lfo1Names[2]="fb2 sat ** a";
 	fb2Color1Lfo1Names[3]="fb2 sat ** r";
 	fb2Color1Lfo1Names[4]="fb2 bri ** a";
 	fb2Color1Lfo1Names[5]="fb2 bri ** r";
-	
+
 	//BLOCK 3
-	block1GeoNames[0]="b1 x <->"; 
+	block1GeoNames[0]="b1 x <->";
 	block1GeoNames[1]="b1 y <->";
-	block1GeoNames[2]="b1 z <->"; 
+	block1GeoNames[2]="b1 z <->";
 	block1GeoNames[3]="b1 rotate <->";
 	block1GeoNames[4]="b1 x stretch";
 	block1GeoNames[5]="b1 y stretch";
@@ -52007,7 +52007,7 @@ void GuiApp::initializeNames(){
 	block1GeoNames[7]="b1 y shear";
 	block1GeoNames[8]="b1 kaleid amt";
 	block1GeoNames[9]="b1 kaleid sli";
-	
+
 	block1ColorizeNames[0]="b1 band 1 hue/red";
 	block1ColorizeNames[1]="b1 band 1 sat/green";
 	block1ColorizeNames[2]="b1 band 1 bri/blue";
@@ -52023,14 +52023,14 @@ void GuiApp::initializeNames(){
 	block1ColorizeNames[12]="b1 band 5 hue/red";
 	block1ColorizeNames[13]="b1 band 5 sat/green";
 	block1ColorizeNames[14]="b1 band 5 bri/blue";
-	
+
 	block1FiltersNames[0]="b1 blur amt";
 	block1FiltersNames[1]="b1 blur rad";
 	block1FiltersNames[2]="b1 sharp amt";
 	block1FiltersNames[3]="b1 sharp rad";
 	block1FiltersNames[4]="b1 filt boost";
-	
-	block1Geo1Lfo1Names[0]="b1 x <-> a"; 
+
+	block1Geo1Lfo1Names[0]="b1 x <-> a";
 	block1Geo1Lfo1Names[1]="b1 x <-> r";
 	block1Geo1Lfo1Names[2]="b1 y <-> a";
 	block1Geo1Lfo1Names[3]="b1 y <-> r";
@@ -52038,7 +52038,7 @@ void GuiApp::initializeNames(){
 	block1Geo1Lfo1Names[5]="b1 z <-> r";
 	block1Geo1Lfo1Names[6]="b1 rotate <-> a";
 	block1Geo1Lfo1Names[7]="b1 rotate <-> r";
-	
+
 	block1Geo1Lfo2Names[0]="b1 x stretch a";
 	block1Geo1Lfo2Names[1]="b1 x stretch r";
 	block1Geo1Lfo2Names[2]="b1 y stretch a";
@@ -52049,8 +52049,8 @@ void GuiApp::initializeNames(){
 	block1Geo1Lfo2Names[7]="b1 y shear r";
 	block1Geo1Lfo2Names[8]="b1 kaleid sl a";
 	block1Geo1Lfo2Names[9]="b1 kaleid sl r";
-	
-	
+
+
 	block1ColorizeLfo1Names[0]="b1 band 1 hue/red a";
 	block1ColorizeLfo1Names[1]="b1 band 1 sat/green a";
 	block1ColorizeLfo1Names[2]="b1 band 1 bri/blue a";
@@ -52063,7 +52063,7 @@ void GuiApp::initializeNames(){
 	block1ColorizeLfo1Names[9]="b1 band 2 hue/red r";
 	block1ColorizeLfo1Names[10]="b1 band 2 sat/green r";
 	block1ColorizeLfo1Names[11]="b1 band 2 bri/blue r";
-	
+
 	block1ColorizeLfo2Names[0]="b1 band 3 hue/red a";
 	block1ColorizeLfo2Names[1]="b1 band 3 sat/green a";
 	block1ColorizeLfo2Names[2]="b1 band 3 bri/blue a";
@@ -52076,7 +52076,7 @@ void GuiApp::initializeNames(){
 	block1ColorizeLfo2Names[9]="b1 band 4 hue/red r";
 	block1ColorizeLfo2Names[10]="b1 band 4 sat/green r";
 	block1ColorizeLfo2Names[11]="b1 band 4 bri/blue r";
-	
+
 	block1ColorizeLfo3Names[0]="b1 band 5 hue/red a";
 	block1ColorizeLfo3Names[1]="b1 band 5 sat/green a";
 	block1ColorizeLfo3Names[2]="b1 band 5 bri/blue a";
@@ -52085,9 +52085,9 @@ void GuiApp::initializeNames(){
 	block1ColorizeLfo3Names[5]="b1 band 5 bri/blue r";
 
 
-	block2GeoNames[0]="b2 x <->"; 
+	block2GeoNames[0]="b2 x <->";
 	block2GeoNames[1]="b2 y <->";
-	block2GeoNames[2]="b2 z <->"; 
+	block2GeoNames[2]="b2 z <->";
 	block2GeoNames[3]="b2 rotate <->";
 	block2GeoNames[4]="b2 x stretch";
 	block2GeoNames[5]="b2 y stretch";
@@ -52095,7 +52095,7 @@ void GuiApp::initializeNames(){
 	block2GeoNames[7]="b2 y shear";
 	block2GeoNames[8]="b2 kaleid amt";
 	block2GeoNames[9]="b2 kaleid sli";
-	
+
 	block2ColorizeNames[0]="b2 band 1 hue/red";
 	block2ColorizeNames[1]="b2 band 1 sat/green";
 	block2ColorizeNames[2]="b2 band 1 bri/blue";
@@ -52111,14 +52111,14 @@ void GuiApp::initializeNames(){
 	block2ColorizeNames[12]="b2 band 5 hue/red";
 	block2ColorizeNames[13]="b2 band 5 sat/green";
 	block2ColorizeNames[14]="b2 band 5 bri/blue";
-	
+
 	block2FiltersNames[0]="b2 blur amt";
 	block2FiltersNames[1]="b2 blur rad";
 	block2FiltersNames[2]="b2 sharp amt";
 	block2FiltersNames[3]="b2 sharp rad";
 	block2FiltersNames[4]="b2 filt boost";
-	
-	block2Geo1Lfo1Names[0]="b2 x <-> a"; 
+
+	block2Geo1Lfo1Names[0]="b2 x <-> a";
 	block2Geo1Lfo1Names[1]="b2 x <-> r";
 	block2Geo1Lfo1Names[2]="b2 y <-> a";
 	block2Geo1Lfo1Names[3]="b2 y <-> r";
@@ -52126,7 +52126,7 @@ void GuiApp::initializeNames(){
 	block2Geo1Lfo1Names[5]="b2 z <-> r";
 	block2Geo1Lfo1Names[6]="b2 rotate <-> a";
 	block2Geo1Lfo1Names[7]="b2 rotate <-> r";
-	
+
 	block2Geo1Lfo2Names[0]="b2 x stretch a";
 	block2Geo1Lfo2Names[1]="b2 x stretch r";
 	block2Geo1Lfo2Names[2]="b2 y stretch a";
@@ -52137,8 +52137,8 @@ void GuiApp::initializeNames(){
 	block2Geo1Lfo2Names[7]="b2 y shear r";
 	block2Geo1Lfo2Names[8]="b2 kaleid sl a";
 	block2Geo1Lfo2Names[9]="b2 kaleid sl r";
-	
-	
+
+
 	block2ColorizeLfo1Names[0]="b2 band 1 hue/red a";
 	block2ColorizeLfo1Names[1]="b2 band 1 sat/green a";
 	block2ColorizeLfo1Names[2]="b2 band 1 bri/blue a";
@@ -52151,7 +52151,7 @@ void GuiApp::initializeNames(){
 	block2ColorizeLfo1Names[9]="b2 band 2 hue/red r";
 	block2ColorizeLfo1Names[10]="b2 band 2 sat/green r";
 	block2ColorizeLfo1Names[11]="b2 band 2 bri/blue r";
-	
+
 	block2ColorizeLfo2Names[0]="b2 band 3 hue/red a";
 	block2ColorizeLfo2Names[1]="b2 band 3 sat/green a";
 	block2ColorizeLfo2Names[2]="b2 band 3 bri/blue a";
@@ -52164,14 +52164,14 @@ void GuiApp::initializeNames(){
 	block2ColorizeLfo2Names[9]="b2 band 4 hue/red r";
 	block2ColorizeLfo2Names[10]="b2 band 4 sat/green r";
 	block2ColorizeLfo2Names[11]="b2 band 4 bri/blue r";
-	
+
 	block2ColorizeLfo3Names[0]="b2 band 5 hue/red a";
 	block2ColorizeLfo3Names[1]="b2 band 5 sat/green a";
 	block2ColorizeLfo3Names[2]="b2 band 5 bri/blue a";
 	block2ColorizeLfo3Names[3]="b2 band 5 hue/red r";
 	block2ColorizeLfo3Names[4]="b2 band 5 sat/green r";
 	block2ColorizeLfo3Names[5]="b2 band 5 bri/blue r";
-	
+
 	matrixMixNames[0]="matrix b1 r -> b2 r";
 	matrixMixNames[1]="matrix b1 r -> b2 g";
 	matrixMixNames[2]="matrix b1 r -> b2 b";
@@ -52181,14 +52181,14 @@ void GuiApp::initializeNames(){
 	matrixMixNames[6]="matrix b1 b -> b2 r";
 	matrixMixNames[7]="matrix b1 b -> b2 g";
 	matrixMixNames[8]="matrix b1 b -> b2 b";
-	
+
 	finalMixAndKeyNames[0]="final mix";
 	finalMixAndKeyNames[1]="final key red";
 	finalMixAndKeyNames[2]="final key green";
 	finalMixAndKeyNames[3]="final key blue";
 	finalMixAndKeyNames[4]="final key threshold";
 	finalMixAndKeyNames[5]="final key soft";
-	
+
 	matrixMixLfo1Names[0]="matrix b1 r -> b2 r a";
 	matrixMixLfo1Names[1]="matrix b1 r -> b2 g a";
 	matrixMixLfo1Names[2]="matrix b1 r -> b2 b a";
@@ -52201,14 +52201,14 @@ void GuiApp::initializeNames(){
 	matrixMixLfo1Names[9]="matrix b1 g -> b2 r r";
 	matrixMixLfo1Names[10]="matrix b1 g -> b2 g r";
 	matrixMixLfo1Names[11]="matrix b1 g -> b2 b r";
-	
+
 	matrixMixLfo2Names[0]="matrix b1 b -> b2 r a";
 	matrixMixLfo2Names[1]="matrix b1 b -> b2 g a";
 	matrixMixLfo2Names[2]="matrix b1 b -> b2 b a";
 	matrixMixLfo2Names[3]="matrix b1 b -> b2 r r";
 	matrixMixLfo2Names[4]="matrix b1 b -> b2 g r";
 	matrixMixLfo2Names[5]="matrix b1 b -> b2 b r";
-	
+
 	finalMixAndKeyLfoNames[0]="final mix a";
 	finalMixAndKeyLfoNames[1]="final mix r";
 	finalMixAndKeyLfoNames[2]="final ky thresh a";
@@ -52234,7 +52234,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro0Fb1Geo1Lfo1=0;
 	selectMacro0Fb1Geo1Lfo2=0;
 	selectMacro0Fb1Color1Lfo1=0;
-	
+
 	selectMacro0Fb1DelayTime=0;
 	//b2
 	selectMacro0Block2InputAdjust=0;
@@ -52247,7 +52247,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro0Fb2Geo1Lfo1=0;
 	selectMacro0Fb2Geo1Lfo2=0;
 	selectMacro0Fb2Color1Lfo1=0;
-	
+
 	selectMacro0Fb2DelayTime=0;
 	//b3
 	selectMacro0Block1Geo=0;
@@ -52271,8 +52271,8 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro0MatrixMixLfo1=0;
 	selectMacro0MatrixMixLfo2=0;
 	selectMacro0FinalMixAndKeyLfo=0;
-	
-	
+
+
 	//macro1
 	selectMacro1Ch1Adjust=0;
 	selectMacro1Ch2MixAndKey=0;
@@ -52288,7 +52288,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro1Fb1Geo1Lfo1=0;
 	selectMacro1Fb1Geo1Lfo2=0;
 	selectMacro1Fb1Color1Lfo1=0;
-	
+
 	selectMacro1Fb1DelayTime=0;
 	//b2
 	selectMacro1Block2InputAdjust=0;
@@ -52301,7 +52301,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro1Fb2Geo1Lfo1=0;
 	selectMacro1Fb2Geo1Lfo2=0;
 	selectMacro1Fb2Color1Lfo1=0;
-	
+
 	selectMacro1Fb2DelayTime=0;
 	//b3
 	selectMacro1Block1Geo=0;
@@ -52325,8 +52325,8 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro1MatrixMixLfo1=0;
 	selectMacro1MatrixMixLfo2=0;
 	selectMacro1FinalMixAndKeyLfo=0;
-	
-	
+
+
 	//macro2
 	selectMacro2Ch1Adjust=0;
 	selectMacro2Ch2MixAndKey=0;
@@ -52342,7 +52342,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro2Fb1Geo1Lfo1=0;
 	selectMacro2Fb1Geo1Lfo2=0;
 	selectMacro2Fb1Color1Lfo1=0;
-	
+
 	selectMacro2Fb1DelayTime=0;
 	//b2
 	selectMacro2Block2InputAdjust=0;
@@ -52355,7 +52355,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro2Fb2Geo1Lfo1=0;
 	selectMacro2Fb2Geo1Lfo2=0;
 	selectMacro2Fb2Color1Lfo1=0;
-	
+
 	selectMacro2Fb2DelayTime=0;
 	//b3
 	selectMacro2Block1Geo=0;
@@ -52379,8 +52379,8 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro2MatrixMixLfo1=0;
 	selectMacro2MatrixMixLfo2=0;
 	selectMacro2FinalMixAndKeyLfo=0;
-	
-	
+
+
 	//macro3
 	selectMacro3Ch1Adjust=0;
 	selectMacro3Ch2MixAndKey=0;
@@ -52396,7 +52396,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro3Fb1Geo1Lfo1=0;
 	selectMacro3Fb1Geo1Lfo2=0;
 	selectMacro3Fb1Color1Lfo1=0;
-	
+
 	selectMacro3Fb1DelayTime=0;
 	//b2
 	selectMacro3Block2InputAdjust=0;
@@ -52409,7 +52409,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro3Fb2Geo1Lfo1=0;
 	selectMacro3Fb2Geo1Lfo2=0;
 	selectMacro3Fb2Color1Lfo1=0;
-	
+
 	selectMacro3Fb2DelayTime=0;
 	//b3
 	selectMacro3Block1Geo=0;
@@ -52433,8 +52433,8 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro3MatrixMixLfo1=0;
 	selectMacro3MatrixMixLfo2=0;
 	selectMacro3FinalMixAndKeyLfo=0;
-	
-	
+
+
 	//macro4
 	selectMacro4Ch1Adjust=0;
 	selectMacro4Ch2MixAndKey=0;
@@ -52450,7 +52450,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro4Fb1Geo1Lfo1=0;
 	selectMacro4Fb1Geo1Lfo2=0;
 	selectMacro4Fb1Color1Lfo1=0;
-	
+
 	selectMacro4Fb1DelayTime=0;
 	//b2
 	selectMacro4Block2InputAdjust=0;
@@ -52463,7 +52463,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro4Fb2Geo1Lfo1=0;
 	selectMacro4Fb2Geo1Lfo2=0;
 	selectMacro4Fb2Color1Lfo1=0;
-	
+
 	selectMacro4Fb2DelayTime=0;
 	//b3
 	selectMacro4Block1Geo=0;
@@ -52487,8 +52487,8 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro4MatrixMixLfo1=0;
 	selectMacro4MatrixMixLfo2=0;
 	selectMacro4FinalMixAndKeyLfo=0;
-	
-	
+
+
 	//macro5
 	selectMacro5Ch1Adjust=0;
 	selectMacro5Ch2MixAndKey=0;
@@ -52504,7 +52504,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro5Fb1Geo1Lfo1=0;
 	selectMacro5Fb1Geo1Lfo2=0;
 	selectMacro5Fb1Color1Lfo1=0;
-	
+
 	selectMacro5Fb1DelayTime=0;
 	//b2
 	selectMacro5Block2InputAdjust=0;
@@ -52517,7 +52517,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro5Fb2Geo1Lfo1=0;
 	selectMacro5Fb2Geo1Lfo2=0;
 	selectMacro5Fb2Color1Lfo1=0;
-	
+
 	selectMacro5Fb2DelayTime=0;
 	//b3
 	selectMacro5Block1Geo=0;
@@ -52541,8 +52541,8 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro5MatrixMixLfo1=0;
 	selectMacro5MatrixMixLfo2=0;
 	selectMacro5FinalMixAndKeyLfo=0;
-	
-	
+
+
 	//macro6
 	selectMacro6Ch1Adjust=0;
 	selectMacro6Ch2MixAndKey=0;
@@ -52558,7 +52558,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro6Fb1Geo1Lfo1=0;
 	selectMacro6Fb1Geo1Lfo2=0;
 	selectMacro6Fb1Color1Lfo1=0;
-	
+
 	selectMacro6Fb1DelayTime=0;
 	//b2
 	selectMacro6Block2InputAdjust=0;
@@ -52571,7 +52571,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro6Fb2Geo1Lfo1=0;
 	selectMacro6Fb2Geo1Lfo2=0;
 	selectMacro6Fb2Color1Lfo1=0;
-	
+
 	selectMacro6Fb2DelayTime=0;
 	//b3
 	selectMacro6Block1Geo=0;
@@ -52595,8 +52595,8 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro6MatrixMixLfo1=0;
 	selectMacro6MatrixMixLfo2=0;
 	selectMacro6FinalMixAndKeyLfo=0;
-	
-	
+
+
 	//macro7
 	selectMacro7Ch1Adjust=0;
 	selectMacro7Ch2MixAndKey=0;
@@ -52612,7 +52612,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro7Fb1Geo1Lfo1=0;
 	selectMacro7Fb1Geo1Lfo2=0;
 	selectMacro7Fb1Color1Lfo1=0;
-	
+
 	selectMacro7Fb1DelayTime=0;
 	//b2
 	selectMacro7Block2InputAdjust=0;
@@ -52625,7 +52625,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro7Fb2Geo1Lfo1=0;
 	selectMacro7Fb2Geo1Lfo2=0;
 	selectMacro7Fb2Color1Lfo1=0;
-	
+
 	selectMacro7Fb2DelayTime=0;
 	//b3
 	selectMacro7Block1Geo=0;
@@ -52649,8 +52649,8 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro7MatrixMixLfo1=0;
 	selectMacro7MatrixMixLfo2=0;
 	selectMacro7FinalMixAndKeyLfo=0;
-	
-	
+
+
 	//macro8
 	selectMacro8Ch1Adjust=0;
 	selectMacro8Ch2MixAndKey=0;
@@ -52666,7 +52666,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro8Fb1Geo1Lfo1=0;
 	selectMacro8Fb1Geo1Lfo2=0;
 	selectMacro8Fb1Color1Lfo1=0;
-	
+
 	selectMacro8Fb1DelayTime=0;
 	//b2
 	selectMacro8Block2InputAdjust=0;
@@ -52679,7 +52679,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro8Fb2Geo1Lfo1=0;
 	selectMacro8Fb2Geo1Lfo2=0;
 	selectMacro8Fb2Color1Lfo1=0;
-	
+
 	selectMacro8Fb2DelayTime=0;
 	//b3
 	selectMacro8Block1Geo=0;
@@ -52703,8 +52703,8 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro8MatrixMixLfo1=0;
 	selectMacro8MatrixMixLfo2=0;
 	selectMacro8FinalMixAndKeyLfo=0;
-	
-	
+
+
 	//macro9
 	selectMacro9Ch1Adjust=0;
 	selectMacro9Ch2MixAndKey=0;
@@ -52720,7 +52720,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro9Fb1Geo1Lfo1=0;
 	selectMacro9Fb1Geo1Lfo2=0;
 	selectMacro9Fb1Color1Lfo1=0;
-	
+
 	selectMacro9Fb1DelayTime=0;
 	//b2
 	selectMacro9Block2InputAdjust=0;
@@ -52733,7 +52733,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro9Fb2Geo1Lfo1=0;
 	selectMacro9Fb2Geo1Lfo2=0;
 	selectMacro9Fb2Color1Lfo1=0;
-	
+
 	selectMacro9Fb2DelayTime=0;
 	//b3
 	selectMacro9Block1Geo=0;
@@ -52757,8 +52757,8 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro9MatrixMixLfo1=0;
 	selectMacro9MatrixMixLfo2=0;
 	selectMacro9FinalMixAndKeyLfo=0;
-	
-	
+
+
 	//macro10
 	selectMacro10Ch1Adjust=0;
 	selectMacro10Ch2MixAndKey=0;
@@ -52774,7 +52774,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro10Fb1Geo1Lfo1=0;
 	selectMacro10Fb1Geo1Lfo2=0;
 	selectMacro10Fb1Color1Lfo1=0;
-	
+
 	selectMacro10Fb1DelayTime=0;
 	//b2
 	selectMacro10Block2InputAdjust=0;
@@ -52787,7 +52787,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro10Fb2Geo1Lfo1=0;
 	selectMacro10Fb2Geo1Lfo2=0;
 	selectMacro10Fb2Color1Lfo1=0;
-	
+
 	selectMacro10Fb2DelayTime=0;
 	//b3
 	selectMacro10Block1Geo=0;
@@ -52811,8 +52811,8 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro10MatrixMixLfo1=0;
 	selectMacro10MatrixMixLfo2=0;
 	selectMacro10FinalMixAndKeyLfo=0;
-	
-	
+
+
 	//macro11
 	selectMacro11Ch1Adjust=0;
 	selectMacro11Ch2MixAndKey=0;
@@ -52828,7 +52828,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro11Fb1Geo1Lfo1=0;
 	selectMacro11Fb1Geo1Lfo2=0;
 	selectMacro11Fb1Color1Lfo1=0;
-	
+
 	selectMacro11Fb1DelayTime=0;
 	//b2
 	selectMacro11Block2InputAdjust=0;
@@ -52841,7 +52841,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro11Fb2Geo1Lfo1=0;
 	selectMacro11Fb2Geo1Lfo2=0;
 	selectMacro11Fb2Color1Lfo1=0;
-	
+
 	selectMacro11Fb2DelayTime=0;
 	//b3
 	selectMacro11Block1Geo=0;
@@ -52865,8 +52865,8 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro11MatrixMixLfo1=0;
 	selectMacro11MatrixMixLfo2=0;
 	selectMacro11FinalMixAndKeyLfo=0;
-	
-	
+
+
 	//macro12
 	selectMacro12Ch1Adjust=0;
 	selectMacro12Ch2MixAndKey=0;
@@ -52882,7 +52882,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro12Fb1Geo1Lfo1=0;
 	selectMacro12Fb1Geo1Lfo2=0;
 	selectMacro12Fb1Color1Lfo1=0;
-	
+
 	selectMacro12Fb1DelayTime=0;
 	//b2
 	selectMacro12Block2InputAdjust=0;
@@ -52895,7 +52895,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro12Fb2Geo1Lfo1=0;
 	selectMacro12Fb2Geo1Lfo2=0;
 	selectMacro12Fb2Color1Lfo1=0;
-	
+
 	selectMacro12Fb2DelayTime=0;
 	//b3
 	selectMacro12Block1Geo=0;
@@ -52919,8 +52919,8 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro12MatrixMixLfo1=0;
 	selectMacro12MatrixMixLfo2=0;
 	selectMacro12FinalMixAndKeyLfo=0;
-	
-	
+
+
 	//macro13
 	selectMacro13Ch1Adjust=0;
 	selectMacro13Ch2MixAndKey=0;
@@ -52936,7 +52936,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro13Fb1Geo1Lfo1=0;
 	selectMacro13Fb1Geo1Lfo2=0;
 	selectMacro13Fb1Color1Lfo1=0;
-	
+
 	selectMacro13Fb1DelayTime=0;
 	//b2
 	selectMacro13Block2InputAdjust=0;
@@ -52949,7 +52949,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro13Fb2Geo1Lfo1=0;
 	selectMacro13Fb2Geo1Lfo2=0;
 	selectMacro13Fb2Color1Lfo1=0;
-	
+
 	selectMacro13Fb2DelayTime=0;
 	//b3
 	selectMacro13Block1Geo=0;
@@ -52973,8 +52973,8 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro13MatrixMixLfo1=0;
 	selectMacro13MatrixMixLfo2=0;
 	selectMacro13FinalMixAndKeyLfo=0;
-	
-	
+
+
 	//macro14
 	selectMacro14Ch1Adjust=0;
 	selectMacro14Ch2MixAndKey=0;
@@ -52990,7 +52990,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro14Fb1Geo1Lfo1=0;
 	selectMacro14Fb1Geo1Lfo2=0;
 	selectMacro14Fb1Color1Lfo1=0;
-	
+
 	selectMacro14Fb1DelayTime=0;
 	//b2
 	selectMacro14Block2InputAdjust=0;
@@ -53003,7 +53003,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro14Fb2Geo1Lfo1=0;
 	selectMacro14Fb2Geo1Lfo2=0;
 	selectMacro14Fb2Color1Lfo1=0;
-	
+
 	selectMacro14Fb2DelayTime=0;
 	//b3
 	selectMacro14Block1Geo=0;
@@ -53027,8 +53027,8 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro14MatrixMixLfo1=0;
 	selectMacro14MatrixMixLfo2=0;
 	selectMacro14FinalMixAndKeyLfo=0;
-	
-	
+
+
 	//macro15
 	selectMacro15Ch1Adjust=0;
 	selectMacro15Ch2MixAndKey=0;
@@ -53044,7 +53044,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro15Fb1Geo1Lfo1=0;
 	selectMacro15Fb1Geo1Lfo2=0;
 	selectMacro15Fb1Color1Lfo1=0;
-	
+
 	selectMacro15Fb1DelayTime=0;
 	//b2
 	selectMacro15Block2InputAdjust=0;
@@ -53057,7 +53057,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro15Fb2Geo1Lfo1=0;
 	selectMacro15Fb2Geo1Lfo2=0;
 	selectMacro15Fb2Color1Lfo1=0;
-	
+
 	selectMacro15Fb2DelayTime=0;
 	//b3
 	selectMacro15Block1Geo=0;
@@ -53081,7 +53081,7 @@ void GuiApp::macroDataResetEverything(){
 	selectMacro15MatrixMixLfo1=0;
 	selectMacro15MatrixMixLfo2=0;
 	selectMacro15FinalMixAndKeyLfo=0;
-	
+
 }
 
 
@@ -53090,7 +53090,7 @@ void GuiApp::macroDataResetEverything(){
 // Update local IP address for OSC display
 void GuiApp::updateLocalIP() {
     localIPs.clear();
-    
+
 #ifdef _WIN32
     // Windows implementation - get all network interfaces
     char hostname[256];
@@ -53099,7 +53099,7 @@ void GuiApp::updateLocalIP() {
         struct addrinfo* result = nullptr;
         hints.ai_family = AF_INET;
         hints.ai_socktype = SOCK_STREAM;
-        
+
         if (getaddrinfo(hostname, nullptr, &hints, &result) == 0) {
             for (struct addrinfo* ptr = result; ptr != nullptr; ptr = ptr->ai_next) {
                 struct sockaddr_in* addr = (struct sockaddr_in*)ptr->ai_addr;
@@ -53169,10 +53169,10 @@ void GuiApp::registerOscParam(const std::string& address, int* ptr) {
 
 void GuiApp::registerBlock1OscParameters() {
     ofLogNotice("OSC") << "Registering Block 1 OSC parameters...";
-    
+
     // Reserve space for all blocks (approximately 600 parameters total)
     oscRegistry.reserve(700);
-    
+
     // ============== CH1 ADJUST (15 sliders) ==============
     registerOscParam("/gravity/block1/ch1/xDisplace", &ch1Adjust[0]);
     registerOscParam("/gravity/block1/ch1/yDisplace", &ch1Adjust[1]);
@@ -53189,7 +53189,7 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/ch1/sharpenAmount", &ch1Adjust[12]);
     registerOscParam("/gravity/block1/ch1/sharpenRadius", &ch1Adjust[13]);
     registerOscParam("/gravity/block1/ch1/filtersBoost", &ch1Adjust[14]);
-    
+
     // CH1 booleans/ints
     registerOscParam("/gravity/block1/ch1/inputSelect", &ch1InputSelect);
     registerOscParam("/gravity/block1/ch1/aspectRatio", &ch1AspectRatioSwitch);
@@ -53204,7 +53204,7 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/ch1/rgbInvert", &ch1RGBInvert);
     registerOscParam("/gravity/block1/ch1/solarize", &ch1Solarize);
     registerOscParam("/gravity/block1/ch1/reset", &ch1AdjustReset);
-    
+
     // ============== CH1 ADJUST LFO (16 params) ==============
     registerOscParam("/gravity/block1/ch1/lfo/xDisplaceAmp", &ch1AdjustLfo[0]);
     registerOscParam("/gravity/block1/ch1/lfo/xDisplaceRate", &ch1AdjustLfo[1]);
@@ -53223,7 +53223,7 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/ch1/lfo/kaleidoscopeSliceAmp", &ch1AdjustLfo[14]);
     registerOscParam("/gravity/block1/ch1/lfo/kaleidoscopeSliceRate", &ch1AdjustLfo[15]);
     registerOscParam("/gravity/block1/ch1/lfo/reset", &ch1AdjustLfoReset);
-    
+
     // ============== CH2 MIX AND KEY (6 params) ==============
     registerOscParam("/gravity/block1/ch2/mixAmount", &ch2MixAndKey[0]);
     registerOscParam("/gravity/block1/ch2/keyRed", &ch2MixAndKey[1]);
@@ -53231,14 +53231,14 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/ch2/keyBlue", &ch2MixAndKey[3]);
     registerOscParam("/gravity/block1/ch2/keyThreshold", &ch2MixAndKey[4]);
     registerOscParam("/gravity/block1/ch2/keySoft", &ch2MixAndKey[5]);
-    
+
     // CH2 mix booleans/ints
     registerOscParam("/gravity/block1/ch2/keyOrder", &ch2KeyOrder);
     registerOscParam("/gravity/block1/ch2/mixType", &ch2MixType);
     registerOscParam("/gravity/block1/ch2/keyMode", &ch2KeyMode);
     registerOscParam("/gravity/block1/ch2/mixOverflow", &ch2MixOverflow);
     registerOscParam("/gravity/block1/ch2/resetMixAndKey", &ch2MixAndKeyReset);
-    
+
     // ============== CH2 MIX AND KEY LFO (6 params) ==============
     registerOscParam("/gravity/block1/ch2/lfo/mixAmountAmp", &ch2MixAndKeyLfo[0]);
     registerOscParam("/gravity/block1/ch2/lfo/mixAmountRate", &ch2MixAndKeyLfo[1]);
@@ -53247,7 +53247,7 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/ch2/lfo/keySoftAmp", &ch2MixAndKeyLfo[4]);
     registerOscParam("/gravity/block1/ch2/lfo/keySoftRate", &ch2MixAndKeyLfo[5]);
     registerOscParam("/gravity/block1/ch2/lfo/resetMixAndKey", &ch2MixAndKeyLfoReset);
-    
+
     // ============== CH2 ADJUST (15 sliders) ==============
     registerOscParam("/gravity/block1/ch2/xDisplace", &ch2Adjust[0]);
     registerOscParam("/gravity/block1/ch2/yDisplace", &ch2Adjust[1]);
@@ -53264,7 +53264,7 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/ch2/sharpenAmount", &ch2Adjust[12]);
     registerOscParam("/gravity/block1/ch2/sharpenRadius", &ch2Adjust[13]);
     registerOscParam("/gravity/block1/ch2/filtersBoost", &ch2Adjust[14]);
-    
+
     // CH2 booleans/ints
     registerOscParam("/gravity/block1/ch2/inputSelect", &ch2InputSelect);
     registerOscParam("/gravity/block1/ch2/aspectRatio", &ch2AspectRatioSwitch);
@@ -53279,7 +53279,7 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/ch2/rgbInvert", &ch2RGBInvert);
     registerOscParam("/gravity/block1/ch2/solarize", &ch2Solarize);
     registerOscParam("/gravity/block1/ch2/reset", &ch2AdjustReset);
-    
+
     // ============== CH2 ADJUST LFO (16 params) ==============
     registerOscParam("/gravity/block1/ch2/lfo/xDisplaceAmp", &ch2AdjustLfo[0]);
     registerOscParam("/gravity/block1/ch2/lfo/xDisplaceRate", &ch2AdjustLfo[1]);
@@ -53298,7 +53298,7 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/ch2/lfo/kaleidoscopeSliceAmp", &ch2AdjustLfo[14]);
     registerOscParam("/gravity/block1/ch2/lfo/kaleidoscopeSliceRate", &ch2AdjustLfo[15]);
     registerOscParam("/gravity/block1/ch2/lfo/reset", &ch2AdjustLfoReset);
-    
+
     // ============== FB1 MIX AND KEY (6 params) ==============
     registerOscParam("/gravity/block1/fb1/mixAmount", &fb1MixAndKey[0]);
     registerOscParam("/gravity/block1/fb1/keyRed", &fb1MixAndKey[1]);
@@ -53306,14 +53306,14 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/fb1/keyBlue", &fb1MixAndKey[3]);
     registerOscParam("/gravity/block1/fb1/keyThreshold", &fb1MixAndKey[4]);
     registerOscParam("/gravity/block1/fb1/keySoft", &fb1MixAndKey[5]);
-    
+
     // FB1 mix booleans/ints
     registerOscParam("/gravity/block1/fb1/keyOrder", &fb1KeyOrder);
     registerOscParam("/gravity/block1/fb1/mixType", &fb1MixType);
     registerOscParam("/gravity/block1/fb1/keyMode", &fb1KeyMode);
     registerOscParam("/gravity/block1/fb1/mixOverflow", &fb1MixOverflow);
     registerOscParam("/gravity/block1/fb1/resetMixAndKey", &fb1MixAndKeyReset);
-    
+
     // ============== FB1 MIX AND KEY LFO (6 params) ==============
     registerOscParam("/gravity/block1/fb1/lfo/mixAmountAmp", &fb1MixAndKeyLfo[0]);
     registerOscParam("/gravity/block1/fb1/lfo/mixAmountRate", &fb1MixAndKeyLfo[1]);
@@ -53322,7 +53322,7 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/fb1/lfo/keySoftAmp", &fb1MixAndKeyLfo[4]);
     registerOscParam("/gravity/block1/fb1/lfo/keySoftRate", &fb1MixAndKeyLfo[5]);
     registerOscParam("/gravity/block1/fb1/lfo/resetMixAndKey", &fb1MixAndKeyLfoReset);
-    
+
     // ============== FB1 GEO1 (10 params) ==============
     registerOscParam("/gravity/block1/fb1/xDisplace", &fb1Geo1[0]);
     registerOscParam("/gravity/block1/fb1/yDisplace", &fb1Geo1[1]);
@@ -53334,7 +53334,7 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/fb1/yShear", &fb1Geo1[7]);
     registerOscParam("/gravity/block1/fb1/kaleidoscopeAmount", &fb1Geo1[8]);
     registerOscParam("/gravity/block1/fb1/kaleidoscopeSlice", &fb1Geo1[9]);
-    
+
     // FB1 geo booleans/ints
     registerOscParam("/gravity/block1/fb1/hMirror", &fb1HMirror);
     registerOscParam("/gravity/block1/fb1/vMirror", &fb1VMirror);
@@ -53343,7 +53343,7 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/fb1/geoOverflow", &fb1GeoOverflow);
     registerOscParam("/gravity/block1/fb1/rotateMode", &fb1RotateMode);
     registerOscParam("/gravity/block1/fb1/resetGeo", &fb1Geo1Reset);
-    
+
     // ============== FB1 GEO1 LFO1 (8 params) ==============
     registerOscParam("/gravity/block1/fb1/lfo/xDisplaceAmp", &fb1Geo1Lfo1[0]);
     registerOscParam("/gravity/block1/fb1/lfo/xDisplaceRate", &fb1Geo1Lfo1[1]);
@@ -53354,7 +53354,7 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/fb1/lfo/rotateAmp", &fb1Geo1Lfo1[6]);
     registerOscParam("/gravity/block1/fb1/lfo/rotateRate", &fb1Geo1Lfo1[7]);
     registerOscParam("/gravity/block1/fb1/lfo/resetGeo1", &fb1Geo1Lfo1Reset);
-    
+
     // ============== FB1 GEO1 LFO2 (10 params) ==============
     registerOscParam("/gravity/block1/fb1/lfo/xStretchAmp", &fb1Geo1Lfo2[0]);
     registerOscParam("/gravity/block1/fb1/lfo/xStretchRate", &fb1Geo1Lfo2[1]);
@@ -53367,7 +53367,7 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/fb1/lfo/kaleidoscopeSliceAmp", &fb1Geo1Lfo2[8]);
     registerOscParam("/gravity/block1/fb1/lfo/kaleidoscopeSliceRate", &fb1Geo1Lfo2[9]);
     registerOscParam("/gravity/block1/fb1/lfo/resetGeo2", &fb1Geo1Lfo2Reset);
-    
+
     // ============== FB1 COLOR1 (11 params) ==============
     registerOscParam("/gravity/block1/fb1/hueOffset", &fb1Color1[0]);
     registerOscParam("/gravity/block1/fb1/saturationOffset", &fb1Color1[1]);
@@ -53380,13 +53380,13 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/fb1/brightPowmap", &fb1Color1[8]);
     registerOscParam("/gravity/block1/fb1/hueShaper", &fb1Color1[9]);
     registerOscParam("/gravity/block1/fb1/posterize", &fb1Color1[10]);
-    
+
     // FB1 color booleans
     registerOscParam("/gravity/block1/fb1/hueInvert", &fb1HueInvert);
     registerOscParam("/gravity/block1/fb1/saturationInvert", &fb1SaturationInvert);
     registerOscParam("/gravity/block1/fb1/brightInvert", &fb1BrightInvert);
     registerOscParam("/gravity/block1/fb1/resetColor", &fb1Color1Reset);
-    
+
     // ============== FB1 COLOR1 LFO1 (6 params) ==============
     registerOscParam("/gravity/block1/fb1/lfo/huePowmapAmp", &fb1Color1Lfo1[0]);
     registerOscParam("/gravity/block1/fb1/lfo/huePowmapRate", &fb1Color1Lfo1[1]);
@@ -53395,7 +53395,7 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/fb1/lfo/brightPowmapAmp", &fb1Color1Lfo1[4]);
     registerOscParam("/gravity/block1/fb1/lfo/brightPowmapRate", &fb1Color1Lfo1[5]);
     registerOscParam("/gravity/block1/fb1/lfo/resetColor", &fb1Color1Lfo1Reset);
-    
+
     // ============== FB1 FILTERS (9 params) ==============
     registerOscParam("/gravity/block1/fb1/blurAmount", &fb1Filters[0]);
     registerOscParam("/gravity/block1/fb1/blurRadius", &fb1Filters[1]);
@@ -53407,23 +53407,23 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/fb1/temp2Amount", &fb1Filters[7]);
     registerOscParam("/gravity/block1/fb1/temp2q", &fb1Filters[8]);
     registerOscParam("/gravity/block1/fb1/resetFilters", &fb1FiltersReset);
-    
+
     // FB1 delay time (special float parameter)
     registerOscParam("/gravity/block1/fb1/delayTime", &fb1DelayTime);
-    
+
     // FB1 generator booleans (correct variable names)
     registerOscParam("/gravity/block1/fb1/clear", &fb1FramebufferClearSwitch);
     registerOscParam("/gravity/block1/fb1/hypercube", &block1HypercubeSwitch);
     registerOscParam("/gravity/block1/fb1/lissajousBall", &block1LissaBallSwitch);
     registerOscParam("/gravity/block1/fb1/septagram", &block1SevenStarSwitch);
     registerOscParam("/gravity/block1/fb1/dancingLine", &block1LineSwitch);
-    
+
     ofLogNotice("OSC") << "Block 1 registration complete. Parameters: " << oscRegistry.size();
 }
 
 void GuiApp::registerBlock2OscParameters() {
     ofLogNotice("OSC") << "Registering Block 2 OSC parameters...";
-    
+
     // ============== BLOCK 2 INPUT ADJUST (15 sliders) ==============
     registerOscParam("/gravity/block2/input/xDisplace", &block2InputAdjust[0]);
     registerOscParam("/gravity/block2/input/yDisplace", &block2InputAdjust[1]);
@@ -53440,7 +53440,7 @@ void GuiApp::registerBlock2OscParameters() {
     registerOscParam("/gravity/block2/input/sharpenAmount", &block2InputAdjust[12]);
     registerOscParam("/gravity/block2/input/sharpenRadius", &block2InputAdjust[13]);
     registerOscParam("/gravity/block2/input/filtersBoost", &block2InputAdjust[14]);
-    
+
     // Block 2 input booleans/ints
     registerOscParam("/gravity/block2/input/inputSelect", &block2InputSelect);
     registerOscParam("/gravity/block2/input/aspectRatio", &block2InputAspectRatioSwitch);
@@ -53455,7 +53455,7 @@ void GuiApp::registerBlock2OscParameters() {
     registerOscParam("/gravity/block2/input/rgbInvert", &block2InputRGBInvert);
     registerOscParam("/gravity/block2/input/solarize", &block2InputSolarize);
     registerOscParam("/gravity/block2/input/reset", &block2InputAdjustReset);
-    
+
     // ============== BLOCK 2 INPUT ADJUST LFO (16 params) ==============
     registerOscParam("/gravity/block2/input/lfo/xDisplaceAmp", &block2InputAdjustLfo[0]);
     registerOscParam("/gravity/block2/input/lfo/xDisplaceRate", &block2InputAdjustLfo[1]);
@@ -53474,7 +53474,7 @@ void GuiApp::registerBlock2OscParameters() {
     registerOscParam("/gravity/block2/input/lfo/kaleidoscopeSliceAmp", &block2InputAdjustLfo[14]);
     registerOscParam("/gravity/block2/input/lfo/kaleidoscopeSliceRate", &block2InputAdjustLfo[15]);
     registerOscParam("/gravity/block2/input/lfo/reset", &block2InputAdjustLfoReset);
-    
+
     // ============== FB2 MIX AND KEY (6 params) ==============
     registerOscParam("/gravity/block2/fb2/mixAmount", &fb2MixAndKey[0]);
     registerOscParam("/gravity/block2/fb2/keyRed", &fb2MixAndKey[1]);
@@ -53482,14 +53482,14 @@ void GuiApp::registerBlock2OscParameters() {
     registerOscParam("/gravity/block2/fb2/keyBlue", &fb2MixAndKey[3]);
     registerOscParam("/gravity/block2/fb2/keyThreshold", &fb2MixAndKey[4]);
     registerOscParam("/gravity/block2/fb2/keySoft", &fb2MixAndKey[5]);
-    
+
     // FB2 mix booleans/ints
     registerOscParam("/gravity/block2/fb2/keyOrder", &fb2KeyOrder);
     registerOscParam("/gravity/block2/fb2/mixType", &fb2MixType);
     registerOscParam("/gravity/block2/fb2/keyMode", &fb2KeyMode);
     registerOscParam("/gravity/block2/fb2/mixOverflow", &fb2MixOverflow);
     registerOscParam("/gravity/block2/fb2/resetMixAndKey", &fb2MixAndKeyReset);
-    
+
     // ============== FB2 MIX AND KEY LFO (6 params) ==============
     registerOscParam("/gravity/block2/fb2/lfo/mixAmountAmp", &fb2MixAndKeyLfo[0]);
     registerOscParam("/gravity/block2/fb2/lfo/mixAmountRate", &fb2MixAndKeyLfo[1]);
@@ -53498,7 +53498,7 @@ void GuiApp::registerBlock2OscParameters() {
     registerOscParam("/gravity/block2/fb2/lfo/keySoftAmp", &fb2MixAndKeyLfo[4]);
     registerOscParam("/gravity/block2/fb2/lfo/keySoftRate", &fb2MixAndKeyLfo[5]);
     registerOscParam("/gravity/block2/fb2/lfo/resetMixAndKey", &fb2MixAndKeyLfoReset);
-    
+
     // ============== FB2 GEO1 (10 params) ==============
     registerOscParam("/gravity/block2/fb2/xDisplace", &fb2Geo1[0]);
     registerOscParam("/gravity/block2/fb2/yDisplace", &fb2Geo1[1]);
@@ -53510,7 +53510,7 @@ void GuiApp::registerBlock2OscParameters() {
     registerOscParam("/gravity/block2/fb2/yShear", &fb2Geo1[7]);
     registerOscParam("/gravity/block2/fb2/kaleidoscopeAmount", &fb2Geo1[8]);
     registerOscParam("/gravity/block2/fb2/kaleidoscopeSlice", &fb2Geo1[9]);
-    
+
     // FB2 geo booleans/ints
     registerOscParam("/gravity/block2/fb2/hMirror", &fb2HMirror);
     registerOscParam("/gravity/block2/fb2/vMirror", &fb2VMirror);
@@ -53519,7 +53519,7 @@ void GuiApp::registerBlock2OscParameters() {
     registerOscParam("/gravity/block2/fb2/geoOverflow", &fb2GeoOverflow);
     registerOscParam("/gravity/block2/fb2/rotateMode", &fb2RotateMode);
     registerOscParam("/gravity/block2/fb2/resetGeo", &fb2Geo1Reset);
-    
+
     // ============== FB2 GEO1 LFO1 (8 params) ==============
     registerOscParam("/gravity/block2/fb2/lfo/xDisplaceAmp", &fb2Geo1Lfo1[0]);
     registerOscParam("/gravity/block2/fb2/lfo/xDisplaceRate", &fb2Geo1Lfo1[1]);
@@ -53530,7 +53530,7 @@ void GuiApp::registerBlock2OscParameters() {
     registerOscParam("/gravity/block2/fb2/lfo/rotateAmp", &fb2Geo1Lfo1[6]);
     registerOscParam("/gravity/block2/fb2/lfo/rotateRate", &fb2Geo1Lfo1[7]);
     registerOscParam("/gravity/block2/fb2/lfo/resetGeo1", &fb2Geo1Lfo1Reset);
-    
+
     // ============== FB2 GEO1 LFO2 (10 params) ==============
     registerOscParam("/gravity/block2/fb2/lfo/xStretchAmp", &fb2Geo1Lfo2[0]);
     registerOscParam("/gravity/block2/fb2/lfo/xStretchRate", &fb2Geo1Lfo2[1]);
@@ -53543,7 +53543,7 @@ void GuiApp::registerBlock2OscParameters() {
     registerOscParam("/gravity/block2/fb2/lfo/kaleidoscopeSliceAmp", &fb2Geo1Lfo2[8]);
     registerOscParam("/gravity/block2/fb2/lfo/kaleidoscopeSliceRate", &fb2Geo1Lfo2[9]);
     registerOscParam("/gravity/block2/fb2/lfo/resetGeo2", &fb2Geo1Lfo2Reset);
-    
+
     // ============== FB2 COLOR1 (11 params) ==============
     registerOscParam("/gravity/block2/fb2/hueOffset", &fb2Color1[0]);
     registerOscParam("/gravity/block2/fb2/saturationOffset", &fb2Color1[1]);
@@ -53556,13 +53556,13 @@ void GuiApp::registerBlock2OscParameters() {
     registerOscParam("/gravity/block2/fb2/brightPowmap", &fb2Color1[8]);
     registerOscParam("/gravity/block2/fb2/hueShaper", &fb2Color1[9]);
     registerOscParam("/gravity/block2/fb2/posterize", &fb2Color1[10]);
-    
+
     // FB2 color booleans
     registerOscParam("/gravity/block2/fb2/hueInvert", &fb2HueInvert);
     registerOscParam("/gravity/block2/fb2/saturationInvert", &fb2SaturationInvert);
     registerOscParam("/gravity/block2/fb2/brightInvert", &fb2BrightInvert);
     registerOscParam("/gravity/block2/fb2/resetColor", &fb2Color1Reset);
-    
+
     // ============== FB2 COLOR1 LFO1 (6 params) ==============
     registerOscParam("/gravity/block2/fb2/lfo/huePowmapAmp", &fb2Color1Lfo1[0]);
     registerOscParam("/gravity/block2/fb2/lfo/huePowmapRate", &fb2Color1Lfo1[1]);
@@ -53571,7 +53571,7 @@ void GuiApp::registerBlock2OscParameters() {
     registerOscParam("/gravity/block2/fb2/lfo/brightPowmapAmp", &fb2Color1Lfo1[4]);
     registerOscParam("/gravity/block2/fb2/lfo/brightPowmapRate", &fb2Color1Lfo1[5]);
     registerOscParam("/gravity/block2/fb2/lfo/resetColor", &fb2Color1Lfo1Reset);
-    
+
     // ============== FB2 FILTERS (9 params) ==============
     registerOscParam("/gravity/block2/fb2/blurAmount", &fb2Filters[0]);
     registerOscParam("/gravity/block2/fb2/blurRadius", &fb2Filters[1]);
@@ -53583,23 +53583,23 @@ void GuiApp::registerBlock2OscParameters() {
     registerOscParam("/gravity/block2/fb2/temp2Amount", &fb2Filters[7]);
     registerOscParam("/gravity/block2/fb2/temp2q", &fb2Filters[8]);
     registerOscParam("/gravity/block2/fb2/resetFilters", &fb2FiltersReset);
-    
+
     // FB2 delay time
     registerOscParam("/gravity/block2/fb2/delayTime", &fb2DelayTime);
-    
+
     // FB2 generator booleans
     registerOscParam("/gravity/block2/fb2/clear", &fb2FramebufferClearSwitch);
     registerOscParam("/gravity/block2/fb2/hypercube", &block2HypercubeSwitch);
     registerOscParam("/gravity/block2/fb2/lissajousBall", &block2LissaBallSwitch);
     registerOscParam("/gravity/block2/fb2/septagram", &block2SevenStarSwitch);
     registerOscParam("/gravity/block2/fb2/dancingLine", &block2LineSwitch);
-    
+
     ofLogNotice("OSC") << "Block 2 registration complete. Total parameters: " << oscRegistry.size();
 }
 
 void GuiApp::registerBlock3OscParameters() {
     ofLogNotice("OSC") << "Registering Block 3 OSC parameters...";
-    
+
     // ============== BLOCK 3 - B1 GEO (10 params) ==============
     registerOscParam("/gravity/block3/b1/xDisplace", &block1Geo[0]);
     registerOscParam("/gravity/block3/b1/yDisplace", &block1Geo[1]);
@@ -53613,7 +53613,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/b1/kaleidoscopeSlice", &block1Geo[9]);
     registerOscParam("/gravity/block3/b1/geoOverflow", &block1GeoOverflow);
     registerOscParam("/gravity/block3/b1/resetGeo", &block1GeoReset);
-    
+
     // ============== BLOCK 3 - B1 GEO LFO1 (8 params) ==============
     registerOscParam("/gravity/block3/lfo/b1/xDisplaceAmp", &block1Geo1Lfo1[0]);
     registerOscParam("/gravity/block3/lfo/b1/xDisplaceRate", &block1Geo1Lfo1[1]);
@@ -53624,7 +53624,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b1/rotateAmp", &block1Geo1Lfo1[6]);
     registerOscParam("/gravity/block3/lfo/b1/rotateRate", &block1Geo1Lfo1[7]);
     registerOscParam("/gravity/block3/lfo/b1/resetGeo1", &block1Geo1Lfo1Reset);
-    
+
     // ============== BLOCK 3 - B1 GEO LFO2 (10 params) ==============
     registerOscParam("/gravity/block3/lfo/b1/xStretchAmp", &block1Geo1Lfo2[0]);
     registerOscParam("/gravity/block3/lfo/b1/xStretchRate", &block1Geo1Lfo2[1]);
@@ -53637,7 +53637,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b1/kaleidoscopeSliceAmp", &block1Geo1Lfo2[8]);
     registerOscParam("/gravity/block3/lfo/b1/kaleidoscopeSliceRate", &block1Geo1Lfo2[9]);
     registerOscParam("/gravity/block3/lfo/b1/resetGeo2", &block1Geo1Lfo2Reset);
-    
+
     // ============== BLOCK 3 - B1 COLORIZE (15 params) ==============
     registerOscParam("/gravity/block3/b1/colorize/hueBand1", &block1Colorize[0]);
     registerOscParam("/gravity/block3/b1/colorize/saturationBand1", &block1Colorize[1]);
@@ -53657,7 +53657,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/b1/colorize/active", &block1ColorizeSwitch);
     registerOscParam("/gravity/block3/b1/colorize/colorspace", &block1ColorizeHSB_RGB);
     registerOscParam("/gravity/block3/b1/colorize/reset", &block1ColorizeReset);
-    
+
     // ============== BLOCK 3 - B1 COLORIZE LFO1 (12 params) ==============
     registerOscParam("/gravity/block3/lfo/b1/hueBand1Amp", &block1ColorizeLfo1[0]);
     registerOscParam("/gravity/block3/lfo/b1/saturationBand1Amp", &block1ColorizeLfo1[1]);
@@ -53672,7 +53672,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b1/saturationBand2Rate", &block1ColorizeLfo1[10]);
     registerOscParam("/gravity/block3/lfo/b1/brightBand2Rate", &block1ColorizeLfo1[11]);
     registerOscParam("/gravity/block3/lfo/b1/resetLfo1", &block1ColorizeLfo1Reset);
-    
+
     // ============== BLOCK 3 - B1 COLORIZE LFO2 (12 params) ==============
     registerOscParam("/gravity/block3/lfo/b1/hueBand3Amp", &block1ColorizeLfo2[0]);
     registerOscParam("/gravity/block3/lfo/b1/saturationBand3Amp", &block1ColorizeLfo2[1]);
@@ -53687,7 +53687,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b1/saturationBand4Rate", &block1ColorizeLfo2[10]);
     registerOscParam("/gravity/block3/lfo/b1/brightBand4Rate", &block1ColorizeLfo2[11]);
     registerOscParam("/gravity/block3/lfo/b1/resetLfo2", &block1ColorizeLfo2Reset);
-    
+
     // ============== BLOCK 3 - B1 COLORIZE LFO3 (6 params) ==============
     registerOscParam("/gravity/block3/lfo/b1/hueBand5Amp", &block1ColorizeLfo3[0]);
     registerOscParam("/gravity/block3/lfo/b1/saturationBand5Amp", &block1ColorizeLfo3[1]);
@@ -53696,14 +53696,14 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b1/saturationBand5Rate", &block1ColorizeLfo3[4]);
     registerOscParam("/gravity/block3/lfo/b1/brightBand5Rate", &block1ColorizeLfo3[5]);
     registerOscParam("/gravity/block3/lfo/b1/resetLfo3", &block1ColorizeLfo3Reset);
-    
+
     // ============== BLOCK 3 - B1 FILTERS (5 params) ==============
     registerOscParam("/gravity/block3/b1/blurAmount", &block1Filters[0]);
     registerOscParam("/gravity/block3/b1/blurRadius", &block1Filters[1]);
     registerOscParam("/gravity/block3/b1/sharpenAmount", &block1Filters[2]);
     registerOscParam("/gravity/block3/b1/sharpenRadius", &block1Filters[3]);
     registerOscParam("/gravity/block3/b1/filtersBoost", &block1Filters[4]);
-    
+
     // ============== BLOCK 3 - B2 GEO (10 params) ==============
     registerOscParam("/gravity/block3/b2/xDisplace", &block2Geo[0]);
     registerOscParam("/gravity/block3/b2/yDisplace", &block2Geo[1]);
@@ -53717,7 +53717,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/b2/kaleidoscopeSlice", &block2Geo[9]);
     registerOscParam("/gravity/block3/b2/geoOverflow", &block2GeoOverflow);
     registerOscParam("/gravity/block3/b2/resetGeo", &block2GeoReset);
-    
+
     // ============== BLOCK 3 - B2 GEO LFO1 (8 params) ==============
     registerOscParam("/gravity/block3/lfo/b2/xDisplaceAmp", &block2Geo1Lfo1[0]);
     registerOscParam("/gravity/block3/lfo/b2/xDisplaceRate", &block2Geo1Lfo1[1]);
@@ -53728,7 +53728,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b2/rotateAmp", &block2Geo1Lfo1[6]);
     registerOscParam("/gravity/block3/lfo/b2/rotateRate", &block2Geo1Lfo1[7]);
     registerOscParam("/gravity/block3/lfo/b2/resetGeo1", &block2Geo1Lfo1Reset);
-    
+
     // ============== BLOCK 3 - B2 GEO LFO2 (10 params) ==============
     registerOscParam("/gravity/block3/lfo/b2/xStretchAmp", &block2Geo1Lfo2[0]);
     registerOscParam("/gravity/block3/lfo/b2/xStretchRate", &block2Geo1Lfo2[1]);
@@ -53741,7 +53741,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b2/kaleidoscopeSliceAmp", &block2Geo1Lfo2[8]);
     registerOscParam("/gravity/block3/lfo/b2/kaleidoscopeSliceRate", &block2Geo1Lfo2[9]);
     registerOscParam("/gravity/block3/lfo/b2/resetGeo2", &block2Geo1Lfo2Reset);
-    
+
     // ============== BLOCK 3 - B2 COLORIZE (15 params) ==============
     registerOscParam("/gravity/block3/b2/colorize/hueBand1", &block2Colorize[0]);
     registerOscParam("/gravity/block3/b2/colorize/saturationBand1", &block2Colorize[1]);
@@ -53761,7 +53761,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/b2/colorize/active", &block2ColorizeSwitch);
     registerOscParam("/gravity/block3/b2/colorize/colorspace", &block2ColorizeHSB_RGB);
     registerOscParam("/gravity/block3/b2/colorize/reset", &block2ColorizeReset);
-    
+
     // ============== BLOCK 3 - B2 COLORIZE LFO1 (12 params) ==============
     registerOscParam("/gravity/block3/lfo/b2/hueBand1Amp", &block2ColorizeLfo1[0]);
     registerOscParam("/gravity/block3/lfo/b2/saturationBand1Amp", &block2ColorizeLfo1[1]);
@@ -53776,7 +53776,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b2/saturationBand2Rate", &block2ColorizeLfo1[10]);
     registerOscParam("/gravity/block3/lfo/b2/brightBand2Rate", &block2ColorizeLfo1[11]);
     registerOscParam("/gravity/block3/lfo/b2/resetLfo1", &block2ColorizeLfo1Reset);
-    
+
     // ============== BLOCK 3 - B2 COLORIZE LFO2 (12 params) ==============
     registerOscParam("/gravity/block3/lfo/b2/hueBand3Amp", &block2ColorizeLfo2[0]);
     registerOscParam("/gravity/block3/lfo/b2/saturationBand3Amp", &block2ColorizeLfo2[1]);
@@ -53791,7 +53791,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b2/saturationBand4Rate", &block2ColorizeLfo2[10]);
     registerOscParam("/gravity/block3/lfo/b2/brightBand4Rate", &block2ColorizeLfo2[11]);
     registerOscParam("/gravity/block3/lfo/b2/resetLfo2", &block2ColorizeLfo2Reset);
-    
+
     // ============== BLOCK 3 - B2 COLORIZE LFO3 (6 params) ==============
     registerOscParam("/gravity/block3/lfo/b2/hueBand5Amp", &block2ColorizeLfo3[0]);
     registerOscParam("/gravity/block3/lfo/b2/saturationBand5Amp", &block2ColorizeLfo3[1]);
@@ -53800,14 +53800,14 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b2/saturationBand5Rate", &block2ColorizeLfo3[4]);
     registerOscParam("/gravity/block3/lfo/b2/brightBand5Rate", &block2ColorizeLfo3[5]);
     registerOscParam("/gravity/block3/lfo/b2/resetLfo3", &block2ColorizeLfo3Reset);
-    
+
     // ============== BLOCK 3 - B2 FILTERS (5 params) ==============
     registerOscParam("/gravity/block3/b2/blurAmount", &block2Filters[0]);
     registerOscParam("/gravity/block3/b2/blurRadius", &block2Filters[1]);
     registerOscParam("/gravity/block3/b2/sharpenAmount", &block2Filters[2]);
     registerOscParam("/gravity/block3/b2/sharpenRadius", &block2Filters[3]);
     registerOscParam("/gravity/block3/b2/filtersBoost", &block2Filters[4]);
-    
+
     // ============== BLOCK 3 - MATRIX MIX (9 params) ==============
     registerOscParam("/gravity/block3/matrixMix/b1RedToB2Red", &matrixMix[0]);
     registerOscParam("/gravity/block3/matrixMix/b1GreenToB2Red", &matrixMix[1]);
@@ -53821,7 +53821,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/matrixMix/mixType", &matrixMixType);
     registerOscParam("/gravity/block3/matrixMix/overflow", &matrixMixOverflow);
     registerOscParam("/gravity/block3/matrixMix/reset", &matrixMixReset);
-    
+
     // ============== BLOCK 3 - MATRIX MIX LFO1 (12 params) ==============
     registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2RedAmp", &matrixMixLfo1[0]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2RedRate", &matrixMixLfo1[1]);
@@ -53836,7 +53836,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2GreenAmp", &matrixMixLfo1[10]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2GreenRate", &matrixMixLfo1[11]);
     registerOscParam("/gravity/block3/lfo/matrixMix/resetLfo1", &matrixMixLfo1Reset);
-    
+
     // ============== BLOCK 3 - MATRIX MIX LFO2 (6 params) ==============
     registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2BlueAmp", &matrixMixLfo2[0]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2BlueRate", &matrixMixLfo2[1]);
@@ -53845,7 +53845,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2RedAmp", &matrixMixLfo2[4]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2RedRate", &matrixMixLfo2[5]);
     registerOscParam("/gravity/block3/lfo/matrixMix/resetLfo2", &matrixMixLfo2Reset);
-    
+
     // ============== BLOCK 3 - FINAL MIX AND KEY (6 params) ==============
     registerOscParam("/gravity/block3/final/mixAmount", &finalMixAndKey[0]);
     registerOscParam("/gravity/block3/final/keyRed", &finalMixAndKey[1]);
@@ -53858,7 +53858,7 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/final/keyMode", &finalKeyMode);
     registerOscParam("/gravity/block3/final/mixOverflow", &finalMixOverflow);
     registerOscParam("/gravity/block3/final/reset", &finalMixAndKeyReset);
-    
+
     // ============== BLOCK 3 - FINAL MIX AND KEY LFO (6 params) ==============
     registerOscParam("/gravity/block3/lfo/final/mixAmountAmp", &finalMixAndKeyLfo[0]);
     registerOscParam("/gravity/block3/lfo/final/mixAmountRate", &finalMixAndKeyLfo[1]);
@@ -53867,17 +53867,17 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/final/keySoftAmp", &finalMixAndKeyLfo[4]);
     registerOscParam("/gravity/block3/lfo/final/keySoftRate", &finalMixAndKeyLfo[5]);
     registerOscParam("/gravity/block3/lfo/final/reset", &finalMixAndKeyLfoReset);
-    
+
     ofLogNotice("OSC") << "Block 3 registration complete. Total parameters: " << oscRegistry.size();
 }
 
 //--------------------------------------------------------------
 void GuiApp::saveVideoOscSettings() {
     ofJson settings;
-    
+
     // ========== VIDEO SETTINGS ==========
     settings["video"]["targetFPS"] = targetFPS;
-    
+
     // Input 1
     settings["video"]["input1"]["sourceType"] = input1SourceType;
     settings["video"]["input1"]["webcamDeviceID"] = input1DeviceID;
@@ -53894,7 +53894,7 @@ void GuiApp::saveVideoOscSettings() {
     } else {
         settings["video"]["input1"]["spoutSourceName"] = "";
     }
-    
+
     // Input 2
     settings["video"]["input2"]["sourceType"] = input2SourceType;
     settings["video"]["input2"]["webcamDeviceID"] = input2DeviceID;
@@ -53911,17 +53911,17 @@ void GuiApp::saveVideoOscSettings() {
     } else {
         settings["video"]["input2"]["spoutSourceName"] = "";
     }
-    
+
     // Spout outputs
     settings["video"]["spoutOutput"]["sendBlock1"] = spoutSendBlock1;
     settings["video"]["spoutOutput"]["sendBlock2"] = spoutSendBlock2;
     settings["video"]["spoutOutput"]["sendBlock3"] = spoutSendBlock3;
-    
+
     // NDI outputs
     settings["video"]["ndiOutput"]["sendBlock1"] = ndiSendBlock1;
     settings["video"]["ndiOutput"]["sendBlock2"] = ndiSendBlock2;
     settings["video"]["ndiOutput"]["sendBlock3"] = ndiSendBlock3;
-    
+
     // Resolutions
     settings["video"]["resolution"]["input1Width"] = input1Width;
     settings["video"]["resolution"]["input1Height"] = input1Height;
@@ -53935,18 +53935,18 @@ void GuiApp::saveVideoOscSettings() {
     settings["video"]["resolution"]["spoutSendHeight"] = spoutSendHeight;
     settings["video"]["resolution"]["ndiSendWidth"] = ndiSendWidth;
     settings["video"]["resolution"]["ndiSendHeight"] = ndiSendHeight;
-    
+
     // ========== OSC SETTINGS ==========
     settings["osc"]["enabled"] = oscEnabled;
     settings["osc"]["receivePort"] = oscReceivePort;
     settings["osc"]["sendIP"] = std::string(oscSendIP);
     settings["osc"]["sendPort"] = oscSendPort;
-    
+
     // Save to file
     ofFile file("settings.json", ofFile::WriteOnly);
     file << settings.dump(4);
     file.close();
-    
+
     ofLogNotice("Settings") << "Video/OSC settings saved to settings.json";
 }
 
@@ -53958,18 +53958,18 @@ void GuiApp::loadVideoOscSettings() {
         ofLogNotice("Settings") << "No settings.json found, using defaults";
         return;
     }
-    
+
     // Load JSON
     ofJson settings;
     file >> settings;
     file.close();
-    
+
     // ========== VIDEO SETTINGS ==========
     if (settings.contains("video")) {
         if (settings["video"].contains("targetFPS")) {
             targetFPS = settings["video"]["targetFPS"];
         }
-        
+
         // Input 1
         if (settings["video"].contains("input1")) {
             if (settings["video"]["input1"].contains("sourceType")) {
@@ -53992,7 +53992,7 @@ void GuiApp::loadVideoOscSettings() {
                 savedInput1SpoutName = settings["video"]["input1"]["spoutSourceName"];
             }
         }
-        
+
         // Input 2
         if (settings["video"].contains("input2")) {
             if (settings["video"]["input2"].contains("sourceType")) {
@@ -54015,7 +54015,7 @@ void GuiApp::loadVideoOscSettings() {
                 savedInput2SpoutName = settings["video"]["input2"]["spoutSourceName"];
             }
         }
-        
+
         // Spout outputs
         if (settings["video"].contains("spoutOutput")) {
             if (settings["video"]["spoutOutput"].contains("sendBlock1")) {
@@ -54028,7 +54028,7 @@ void GuiApp::loadVideoOscSettings() {
                 spoutSendBlock3 = settings["video"]["spoutOutput"]["sendBlock3"];
             }
         }
-        
+
         // NDI outputs
         if (settings["video"].contains("ndiOutput")) {
             if (settings["video"]["ndiOutput"].contains("sendBlock1")) {
@@ -54041,7 +54041,7 @@ void GuiApp::loadVideoOscSettings() {
                 ndiSendBlock3 = settings["video"]["ndiOutput"]["sendBlock3"];
             }
         }
-        
+
         // Resolutions
         if (settings["video"].contains("resolution")) {
             if (settings["video"]["resolution"].contains("input1Width")) {
@@ -54082,7 +54082,7 @@ void GuiApp::loadVideoOscSettings() {
             }
         }
     }
-    
+
     // ========== OSC SETTINGS ==========
     if (settings.contains("osc")) {
         if (settings["osc"].contains("enabled")) {
@@ -54100,9 +54100,9 @@ void GuiApp::loadVideoOscSettings() {
             oscSendPort = settings["osc"]["sendPort"];
         }
     }
-    
+
     ofLogNotice("Settings") << "Video/OSC settings loaded from settings.json";
-    
+
     // Note: NDI/Spout source name matching will happen when sources are refreshed
     // The saved names are stored in savedInput1NdiName, savedInput2NdiName, etc.
     // for matching when the source lists become available
