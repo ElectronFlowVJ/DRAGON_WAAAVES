@@ -1,9 +1,10 @@
 # Project-specific
 
 # There is actual data kept in bin/, alongside the built binary and application run log.
-bin/app.log
-bin/GRAVITY_WAAAVES
-bin/gravity_waaaves1_5
+# Exclude bin's contents, except include bin/data, and bin/data's contents.
+bin/*
+!/bin/data
+!/bin/data/*
 
 # -------------------------------------
 
