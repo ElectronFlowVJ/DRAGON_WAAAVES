@@ -50,7 +50,7 @@ uniform float block2InputBlurAmount;
 uniform float block2InputBlurRadius;
 uniform float block2InputSharpenAmount;
 uniform float block2InputSharpenRadius;
-uniform float block2InputFiltersBoost;	
+uniform float block2InputFiltersBoost;
 
 
 uniform int block2InputHMirror;
@@ -68,7 +68,7 @@ uniform int block2InputSolarize;
 uniform float fb2MixAmount;
 uniform vec3 fb2KeyValue;
 uniform float fb2KeyThreshold;
-uniform float fb2KeySoft;	
+uniform float fb2KeySoft;
 uniform int fb2MixType;
 uniform int fb2MixOverflow;
 uniform int fb2KeyOrder;
@@ -91,7 +91,7 @@ uniform vec3 fb2HSBOffset;
 uniform vec3 fb2HSBAttenuate;
 uniform vec3 fb2HSBPowmap;
 uniform float fb2HueShaper;
-	
+
 uniform float fb2Posterize;
 uniform float fb2PosterizeInvert;
 uniform int fb2PosterizeSwitch;
@@ -99,7 +99,7 @@ uniform int fb2HueInvert;
 uniform int fb2SaturationInvert;
 uniform int fb2BrightInvert;
 
-//fb2 filters 
+//fb2 filters
 uniform	float fb2BlurAmount;
 uniform	float fb2BlurRadius;
 uniform	float fb2SharpenAmount;
@@ -108,7 +108,7 @@ uniform	float fb2TemporalFilter1Amount;
 uniform	float fb2TemporalFilter1Resonance;
 uniform	float fb2TemporalFilter2Amount;
 uniform	float fb2TemporalFilter2Resonance;
-uniform float fb2FiltersBoost;	
+uniform float fb2FiltersBoost;
 
 
 
@@ -142,7 +142,7 @@ float hueShaper(float inHue,float shaper){
 }
 
 vec3 colorQuantize(vec3 inColor, float amount, float amountInvert){
-	
+
 	inColor=inColor*amount;
 	inColor=floor(inColor);
 	inColor=inColor*amountInvert;
@@ -152,7 +152,7 @@ vec3 colorQuantize(vec3 inColor, float amount, float amountInvert){
 
 vec4 blurAndSharpen(sampler2DRect blurAndSharpenTex,vec2 coord, float sharpenAmount, float sharpenRadius, float sharpenBoost,float blurRadius,float blurAmount){
 	vec4 originalColor=texture2DRect(blurAndSharpenTex,coord);
-	
+
 	//blur
 	vec4 colorBlur=texture2DRect(blurAndSharpenTex,coord+vec2(blurRadius,blurRadius))
     + texture2DRect(blurAndSharpenTex,coord+vec2(0,blurRadius))
@@ -177,18 +177,18 @@ vec4 blurAndSharpen(sampler2DRect blurAndSharpenTex,vec2 coord, float sharpenAmo
     rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(-sharpenRadius,sharpenRadius)).rgb).z+
     rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(sharpenRadius,-sharpenRadius)).rgb).z+
     rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(-sharpenRadius,-sharpenRadius)).rgb).z;
-    
+
     color_sharpen_bright=color_sharpen_bright*.125;
-    
+
     vec3 colorBlurHsb=rgb2hsb(colorBlur.rgb);
     colorBlurHsb.z-=(sharpenAmount)*color_sharpen_bright;
-    
+
     //try baking in the sharpenBoost into the amount
     //this does not work so well over here lol
     if(sharpenAmount>0){
         colorBlurHsb.z*=(1.0+sharpenAmount+sharpenBoost);
     }
-    
+
     return vec4(hsb2rgb(colorBlurHsb),1.0);
 }
 
@@ -203,7 +203,7 @@ vec2 rotate(vec2 coord,float theta,int mode){
 		coord.y=spiral+coord.y;
 		rotate_coord.x=center_coord.x*cos(theta)-center_coord.y*sin(theta);
 		rotate_coord.y=center_coord.x*sin(theta)+center_coord.y*cos(theta);
-    
+
 		rotate_coord=rotate_coord+vec2(width/2,height/2);
 	}
 	//so lets try one that does and see what happens
@@ -217,15 +217,15 @@ vec2 rotate(vec2 coord,float theta,int mode){
 		coord.y=spiral+coord.y;
 		rotate_coord.x=center_coord.x*cos(theta)-center_coord.y*sin(theta);
 		rotate_coord.y=center_coord.x*sin(theta)+center_coord.y*cos(theta);
-    
+
 		//rotate_coord=rotate_coord+vec2(width/2,height/2);
 		rotate_coord.x=width*rotate_coord.x+width/2;
 		rotate_coord.y=height*rotate_coord.y+height/2;
 	}
 
     return rotate_coord;
-    
-    
+
+
 }//endrotate
 
 vec2 rotate1(vec2 coord,float theta,int mode){
@@ -240,7 +240,7 @@ vec2 rotate1(vec2 coord,float theta,int mode){
 		coord.y=spiral+coord.y;
 		rotate_coord.x=center_coord.x*cos(theta)-center_coord.y*sin(theta);
 		rotate_coord.y=center_coord.x*sin(theta)+center_coord.y*cos(theta);
-    
+
 		rotate_coord=rotate_coord+vec2(width1/2,height1/2);
 	}
 	//so lets try one that does and see what happens
@@ -254,15 +254,15 @@ vec2 rotate1(vec2 coord,float theta,int mode){
 		coord.y=spiral+coord.y;
 		rotate_coord.x=center_coord.x*cos(theta)-center_coord.y*sin(theta);
 		rotate_coord.y=center_coord.x*sin(theta)+center_coord.y*cos(theta);
-    
+
 		//rotate_coord=rotate_coord+vec2(width1/2,height1/2);
 		rotate_coord.x=width1*rotate_coord.x+width1/2;
 		rotate_coord.y=height1*rotate_coord.y+height1/2;
 	}
 
     return rotate_coord;
-    
-    
+
+
 }//endrotate
 
 
@@ -276,7 +276,7 @@ vec2 kaleidoscope(vec2 inCoord, float segment, float slice){
 		inCoord.y=inCoord.y/height;
 
 		inCoord=2.0*inCoord-1.0;
-	
+
 		float radius=sqrt( dot(inCoord,inCoord) );
 		float angle=atan(inCoord.y,inCoord.x);
 		float segmentAngle=TWO_PI/segment;
@@ -307,7 +307,7 @@ vec2 kaleidoscope1(vec2 inCoord, float segment, float slice){
 		inCoord.y=inCoord.y/height1;
 
 		inCoord=2.0*inCoord-1.0;
-	
+
 		float radius=sqrt( dot(inCoord,inCoord) );
 		float angle=atan(inCoord.y,inCoord.x);
 		float segmentAngle=TWO_PI/segment;
@@ -357,13 +357,13 @@ float mirror(float a){
 }
 
 vec2 wrapCoord(vec2 coord){
-    
+
     //if(abs(coord.x)>width){coord.x=abs(width-coord.x);}
     //if(abs(coord.y)>height){coord.y=abs(height-coord.y);}
-    
+
     coord.x=mod(coord.x,width);
     coord.y=mod(coord.y,height);
-    
+
     return coord;
 }
 
@@ -374,26 +374,26 @@ vec2 mirrorCoord(vec2 coord){
 
     coord.x=(widthLess)-mirror(mod(coord.x,2.0*widthLess)-widthLess);
     coord.y=(heightLess)-mirror(mod(coord.y,2.0*heightLess)-heightLess);
-    
+
     return coord;
 }
 
 vec2 wrapCoord1(vec2 coord, float width1, float height1){
-   
+
     coord.x=mod(coord.x,width1);
     coord.y=mod(coord.y,height1);
-    
+
     return coord;
 }
 
 vec2 mirrorCoord1(vec2 coord, float width1, float height1){
-	
+
     width1=width1-1.0;
 	height1=height1-1.0;
-   
+
     coord.x=(width1)-mirror(mod(coord.x,2.0*width1)-width1-1.0);
     coord.y=(height1)-mirror(mod(coord.y,2.0*height1)-height1-1.0);
-    
+
     return coord;
 }
 
@@ -510,7 +510,7 @@ float keySoft,vec3 keyValue,int keyOrder,int mixOverflow,vec4 mask,int keyMaskSw
 		outColor=mix(fg,fg*bg,amount);
 	}
 	*/
-	
+
 
 	float chromaDistance=distance(keyValue,fg.rgb);
 	float lower=chromaDistance-keyThreshold;
@@ -518,9 +518,9 @@ float keySoft,vec3 keyValue,int keyOrder,int mixOverflow,vec4 mask,int keyMaskSw
 	if( chromaDistance < keyThreshold ){
 		//outColor=mix(bg,fg,keySoft*(abs(keyValue-lower)/lower));
 
-		//i don't quite think this is working, lets try something else some 
+		//i don't quite think this is working, lets try something else some
 		//other time...I think the way to do it is to have generated a blur earlier in the
-		//chain, and use the blurred value to 
+		//chain, and use the blurred value to
 		outColor=mix(bg,outColor,keySoft*abs(1.0-(chromaDistance-keyThreshold)));
 		//outColor=bg;
 		//outColor=mix(bg,fg,keySoft*abs(1.0-(chromaDistance-keyThreshold)));
@@ -540,7 +540,7 @@ float keySoft,vec3 keyValue,int keyOrder,int mixOverflow,vec4 mask,int keyMaskSw
 
 	//so masking will be a different mode than luma or chromakeying so
 	//will need to have a different switch for that integrated in here lol
-	
+
 	//taking for granted that the mask is in greyscale so any rgb value can be
 	//used as test
 	//starting off with 1 (white) returns fg and 0 (black) returns bg
@@ -562,73 +562,73 @@ void main()
 	shader2InputCoords.x*=block2AspectRatio;
 	vec4 shader2InputColor=texture(shader2Input,shader2InputCoords);
 	*/
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
 	//NEW FIXED input scaling and repositioning
 	vec2 block2InputCoords=texCoordVarying;
-	
+
 	//if inputs are from usb/spout/ndi and not from block1
 	if(block2InputMasterSwitch==1){
 		// Use texCoordVarying directly - input textures are scaled to internal resolution
 		block2InputCoords = texCoordVarying;
-		
+
 		// Apply aspect ratio adjustment
 		block2InputCoords.x *= block2InputAspectRatio;
-		
+
 		// Apply crib offset
 		block2InputCoords.x -= block2InputCribX;
-		
+
 		// Apply scale around center
 		block2InputCoords -= vec2(width/2.0, height/2.0);
 		block2InputCoords *= block2InputScaleFix + block2InputHdZCrib;
 		block2InputCoords += vec2(width/2.0, height/2.0);
-		
+
 		// HD aspect fix override
 		if(block2InputHdAspectOn==1){
 			block2InputCoords = texCoordVarying;
 			block2InputCoords.y = block2InputHdAspectXYFix.y * block2InputCoords.y;
 			block2InputCoords.x = block2InputHdAspectXYFix.x * block2InputCoords.x;
 		}
-		
+
 	}
-	
-	
+
+
 	if(block2InputHFlip==1){
 		block2InputCoords.x=block2InputWidth-block2InputCoords.x;
 	}
 	if(block2InputVFlip==1){
 		block2InputCoords.y=block2InputHeight-block2InputCoords.y;
 	}
-	
+
 	if(block2InputHMirror==1){
         if(block2InputCoords.x.x>block2InputWidthHalf){block2InputCoords.x=abs(block2InputWidth-block2InputCoords.x);}
     }//endifhflip1
     if(block2InputVMirror==1){
         if(block2InputCoords.y>block2InputHeightHalf){block2InputCoords.y=abs(block2InputHeight-block2InputCoords.y);}
     }//endifvflip1
-	
+
 	if(block2InputWidth==width){
 		block2InputCoords=kaleidoscope(block2InputCoords,block2InputKaleidoscopeAmount,block2InputKaleidoscopeSlice);
 	}
 	if(block2InputWidth==width){
-		block2InputCoords=kaleidoscope1(block2InputCoords,block2InputKaleidoscopeAmount,block2InputKaleidoscopeSlice);		
+		block2InputCoords=kaleidoscope1(block2InputCoords,block2InputKaleidoscopeAmount,block2InputKaleidoscopeSlice);
 	}
-	
-	
+
+
 	//block2InputCoords=kaleidoscope1(block2InputCoords,block2InputKaleidoscopeAmount,block2InputKaleidoscopeSlice);
-	
-		
-	block2InputCoords+=block2InputXYDisplace;	
-	
+
+
+	block2InputCoords+=block2InputXYDisplace;
+
 	//zdisplace
 	block2InputCoords-=vec2(block2InputWidthHalf,block2InputHeightHalf);
 	block2InputCoords=block2InputCoords*(block2InputZDisplace);
@@ -639,19 +639,19 @@ void main()
 		block2InputCoords=rotate(block2InputCoords,block2InputRotate,0);
 	}
 	if(block2InputWidth==width){
-		block2InputCoords=rotate1(block2InputCoords,block2InputRotate,0);		
+		block2InputCoords=rotate1(block2InputCoords,block2InputRotate,0);
 	}
-	
-	//got to fix these...	
+
+	//got to fix these...
 	if(block2InputGeoOverflow==1){block2InputCoords=wrapCoord1(block2InputCoords, block2InputWidth,block2InputHeight);}
-	if(block2InputGeoOverflow==2){block2InputCoords=mirrorCoord1(block2InputCoords, block2InputWidth,block2InputHeight);}	
-		
-		
+	if(block2InputGeoOverflow==2){block2InputCoords=mirrorCoord1(block2InputCoords, block2InputWidth,block2InputHeight);}
+
+
 	vec4 block2InputColor=blurAndSharpen(block2InputTex,block2InputCoords,block2InputSharpenAmount,block2InputSharpenRadius,
-		block2InputFiltersBoost,block2InputBlurRadius,block2InputBlurAmount);	
+		block2InputFiltersBoost,block2InputBlurRadius,block2InputBlurAmount);
     //vec4 block2InputColor = texture(block2InputTex, block2InputCoords);
 	//block2InputColor.rgb=1.0-block2InputColor.rgb;
-	
+
 	//clamp shits out
 	if(block2InputCoords.x>block2InputWidth || block2InputCoords.y> block2InputHeight || block2InputCoords.x<0.0 || block2InputCoords.y<0.0){
 		block2InputColor=vec4(0.0);
@@ -660,47 +660,47 @@ void main()
     //experiment more with this...
 	//block2InputColor.rgb+=(1.0-block2InputHSBAttenuate);
 	vec3 block2InputColorHSB=rgb2hsb(block2InputColor.rgb);
-	
+
 	//block2InputColorHSB*=block2InputHSBAttenuate;
-	
+
 	block2InputColorHSB=pow(block2InputColorHSB,block2InputHSBAttenuate);
-	
+
 	//inverts
 	if(block2InputHueInvert==1){block2InputColorHSB.x=1.0-block2InputColorHSB.x;}
 	if(block2InputSaturationInvert==1){block2InputColorHSB.y=1.0-block2InputColorHSB.y;}
 	if(block2InputBrightInvert==1){block2InputColorHSB.z=1.0-block2InputColorHSB.z;}
-	
+
 	block2InputColorHSB.x=fract(block2InputColorHSB.x);
-	
+
 	if(block2InputSolarize==1){
 		block2InputColorHSB.z=solarize(block2InputColorHSB.z);
 		//if(block2InputColorHSB.z>.5){block2InputColorHSB.z=1.0-block2InputColorHSB.z;}
 	}
-	
+
 	block2InputColor.rgb=hsb2rgb(block2InputColorHSB);
-	
-	
+
+
 	if(block2InputRGBInvert==1){block2InputColor.rgb=1.0-block2InputColor.rgb;}
-	
+
 	if(block2InputPosterizeSwitch==1){
 		block2InputColor.rgb=colorQuantize(block2InputColor.rgb,block2InputPosterize,block2InputPosterizeInvert);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
 	/*
 	vec2 fb2Coords=texCoordVarying;
 	fb2Coords.x-=5.0;
 	vec4 fb2Color=texture(tex0,fb2Coords);
 	*/
-	
-	
+
+
 	//fb2
 	vec2 fb2Coords=texCoordVarying;
 	vec2 center=vec2(width/2.0,height/2.0);
@@ -720,43 +720,43 @@ void main()
     }//endifvflip1
 
 	fb2Coords=kaleidoscope(fb2Coords,fb2KaleidoscopeAmount,fb2KaleidoscopeSlice);
-	
+
 	fb2Coords+=fb2XYDisplace;
 	fb2Coords-=center;
 	fb2Coords*=fb2ZDisplace;
 	fb2Coords+=center;
-	
+
 	fb2Coords=rotate(fb2Coords,fb2Rotate,fb2RotateMode);
-	
+
 	fb2Coords=shear(fb2Coords,fb2ShearMatrix);
-	
+
 	if(fb2GeoOverflow==1){fb2Coords=wrapCoord(fb2Coords);}
 	if(fb2GeoOverflow==2){fb2Coords=mirrorCoord(fb2Coords);}
-			
-	
-	
+
+
+
 	//vec4 blurAndSharpen(sampler2DRect blurAndSharpenTex,vec2 coord, float sharpenAmount, float sharpenRadius, float sharpenBoost,float blurRadius,float blurAmount)
 	vec4 fb2Color=blurAndSharpen(tex0,fb2Coords,fb2SharpenAmount,fb2SharpenRadius,
 		fb2FiltersBoost,fb2BlurRadius,fb2BlurAmount);
-	
+
 	//vec4 fb2Color=texture(tex0,fb2Coords);
-	
-	
-	
+
+
+
 	//clamp shits out
 	if(fb2GeoOverflow==0){
 		if(fb2Coords.x>width || fb2Coords.y> height || fb2Coords.x<0.0 || fb2Coords.y<0.0){
 			fb2Color=vec4(0.0);
 		}
 	}
-	
+
 	//fb2 color biz
 	vec3 fb2ColorHSB=rgb2hsb(fb2Color.rgb);
-	
+
 	fb2ColorHSB.x=hueShaper(fb2ColorHSB.x,fb2HueShaper);
 	fb2ColorHSB+=fb2HSBOffset;
 	fb2ColorHSB*=fb2HSBAttenuate;
-	fb2ColorHSB=pow(fb2ColorHSB,fb2HSBPowmap);	
+	fb2ColorHSB=pow(fb2ColorHSB,fb2HSBPowmap);
 
 	/*
 	if(fb2PosterizeSwitch==1){
@@ -767,18 +767,18 @@ void main()
 	if(fb2HueInvert==1){fb2ColorHSB.x=1.0-fb2ColorHSB.x;}
 	if(fb2SaturationInvert==1){fb2ColorHSB.y=1.0-fb2ColorHSB.y;}
 	if(fb2BrightInvert==1){fb2ColorHSB.z=1.0-fb2ColorHSB.z;}
-	
-	
+
+
 	fb2ColorHSB.x=fract(fb2ColorHSB.x);
 	fb2ColorHSB.y=clamp(fb2ColorHSB.y,0.0,1.0);
 	fb2ColorHSB.z=clamp(fb2ColorHSB.z,0.0,1.0);
 	fb2Color.rgb=hsb2rgb(fb2ColorHSB);
-	
+
 	if(fb2PosterizeSwitch==1){
 		fb2Color.rgb=colorQuantize(fb2Color.rgb,fb2Posterize,fb2PosterizeInvert);
 	}
-	
-		
+
+
 	vec4 outColor=mixnKeyVideo(block2InputColor,fb2Color,fb2MixAmount,fb2MixType,fb2KeyThreshold,fb2KeySoft
 					,fb2KeyValue,fb2KeyOrder,fb2MixOverflow,vec4(0.0,0.0,0.0,0.0),0);
 
@@ -789,22 +789,22 @@ void main()
 	vec4 temporalFilter1Color=texture(fb2TemporalFilter,texCoordVarying);
 	vec3 temporalFilter1ColorHSB=rgb2hsb(temporalFilter1Color.rgb);
 	vec3 temporalFilter2ColorHSB=temporalFilter1ColorHSB;
-	
+
 	//should off board this step out of the shader
 	//2 variables, tempFilResSat and tempFilResBright
 	temporalFilter1ColorHSB.y=clamp((temporalFilter1ColorHSB.y*(1.0+fb2TemporalFilter1Resonance*.25)),0.0,1.0);
 	temporalFilter1ColorHSB.z=clamp((temporalFilter1ColorHSB.z*(1.0+fb2TemporalFilter1Resonance*.5)),0.0,1.0);
-	
+
 	temporalFilter1Color.rgb=hsb2rgb(temporalFilter1ColorHSB);
 	outColor=clamp(mix(outColor,temporalFilter1Color,fb2TemporalFilter1Amount),0.0,1.0);
-	
+
 	temporalFilter2ColorHSB.y=clamp((temporalFilter2ColorHSB.y*(1.0+fb2TemporalFilter2Resonance*.25)),0.0,1.0);
 	temporalFilter2ColorHSB.z=clamp((temporalFilter2ColorHSB.z*(1.0+fb2TemporalFilter2Resonance*.5)),0.0,1.0);
-	
+
 	vec4 temporalFilter2Color=vec4(hsb2rgb(temporalFilter2ColorHSB),1.0);
 	outColor=clamp(mix(outColor,temporalFilter2Color,fb2TemporalFilter2Amount),0.0,1.0);
 
-	outColor.a=1.0;				
-	
+	outColor.a=1.0;
+
 	outputColor=outColor;
 }
