@@ -38,12 +38,12 @@ uniform vec3 block1ColorizeBand3;
 uniform vec3 block1ColorizeBand4;
 uniform vec3 block1ColorizeBand5;
 
-//block1 filters 
+//block1 filters
 uniform	float block1BlurAmount;
 uniform	float block1BlurRadius;
 uniform	float block1SharpenAmount;
 uniform	float block1SharpenRadius;
-uniform float block1FiltersBoost;	
+uniform float block1FiltersBoost;
 uniform float block1Dither;
 uniform int block1DitherSwitch;
 
@@ -70,12 +70,12 @@ uniform vec3 block2ColorizeBand3;
 uniform vec3 block2ColorizeBand4;
 uniform vec3 block2ColorizeBand5;
 
-//block2 filters 
+//block2 filters
 uniform	float block2BlurAmount;
 uniform	float block2BlurRadius;
 uniform	float block2SharpenAmount;
 uniform	float block2SharpenRadius;
-uniform float block2FiltersBoost;	
+uniform float block2FiltersBoost;
 uniform float block2Dither;
 uniform int block2DitherSwitch;
 
@@ -84,7 +84,7 @@ uniform int block2DitherSwitch;
 uniform float finalMixAmount;
 uniform vec3 finalKeyValue;
 uniform float finalKeyThreshold;
-uniform float finalKeySoft;	
+uniform float finalKeySoft;
 uniform int finalMixType;
 uniform int finalMixOverflow;
 uniform int finalKeyOrder;
@@ -160,13 +160,13 @@ float mirror(float a){
 }
 
 vec2 wrapCoord(vec2 coord){
-    
+
     //if(abs(coord.x)>width){coord.x=abs(width-coord.x);}
     //if(abs(coord.y)>height){coord.y=abs(height-coord.y);}
-    
+
     coord.x=mod(coord.x,width);
     coord.y=mod(coord.y,height);
-    
+
     return coord;
 }
 
@@ -177,7 +177,7 @@ vec2 mirrorCoord(vec2 coord){
 
     coord.x=(widthLess)-mirror(mod(coord.x,2.0*widthLess)-widthLess);
     coord.y=(heightLess)-mirror(mod(coord.y,2.0*heightLess)-heightLess);
-    
+
     return coord;
 }
 
@@ -193,7 +193,7 @@ vec2 rotate(vec2 coord,float theta,int mode){
 		coord.y=spiral+coord.y;
 		rotate_coord.x=center_coord.x*cos(theta)-center_coord.y*sin(theta);
 		rotate_coord.y=center_coord.x*sin(theta)+center_coord.y*cos(theta);
-    
+
 		rotate_coord=rotate_coord+vec2(width/2,height/2);
 	}
 	//so lets try one that does and see what happens
@@ -207,15 +207,15 @@ vec2 rotate(vec2 coord,float theta,int mode){
 		coord.y=spiral+coord.y;
 		rotate_coord.x=center_coord.x*cos(theta)-center_coord.y*sin(theta);
 		rotate_coord.y=center_coord.x*sin(theta)+center_coord.y*cos(theta);
-    
+
 		//rotate_coord=rotate_coord+vec2(width/2,height/2);
 		rotate_coord.x=width*rotate_coord.x+width/2;
 		rotate_coord.y=height*rotate_coord.y+height/2;
 	}
 
     return rotate_coord;
-    
-    
+
+
 }//endrotate
 
 vec2 kaleidoscope(vec2 inCoord, float segment, float slice){
@@ -228,7 +228,7 @@ vec2 kaleidoscope(vec2 inCoord, float segment, float slice){
 		inCoord.y=inCoord.y/height;
 
 		inCoord=2.0*inCoord-1.0;
-	
+
 		float radius=sqrt( dot(inCoord,inCoord) );
 		float angle=atan(inCoord.y,inCoord.x);
 		float segmentAngle=TWO_PI/segment;
@@ -249,7 +249,7 @@ vec2 kaleidoscope(vec2 inCoord, float segment, float slice){
 vec2 shear(vec2 inCoord, vec4 shearMatrix){
 	inCoord.x-=width/2.0;
 	inCoord.y-=height/2.0;
-	
+
 	//vec2 outCoord=vec2(0.0,0.0);
 
 	inCoord.x=shearMatrix.x*inCoord.x+shearMatrix.y*inCoord.y;
@@ -318,15 +318,15 @@ float keySoft,vec3 keyValue,int keyOrder,int mixOverflow,vec4 mask,int keyMaskSw
 	if( chromaDistance < keyThreshold ){
 		//outColor=mix(bg,fg,keySoft*(abs(keyValue-lower)/lower));
 
-		//i don't quite think this is working, lets try something else some 
+		//i don't quite think this is working, lets try something else some
 		//other time...I think the way to do it is to have generated a blur earlier in the
-		//chain, and use the blurred value to 
+		//chain, and use the blurred value to
 		outColor=mix(bg,outColor,keySoft*abs(1.0-(chromaDistance-keyThreshold)));
 		//outColor=bg;
 		//outColor=mix(bg,fg,keySoft*abs(1.0-(chromaDistance-keyThreshold)));
 	 }
 
-	
+
 	//taking for granted that the mask is in greyscale so any rgb value can be
 	//used as test
 	//starting off with 1 (white) returns fg and 0 (black) returns bg
@@ -374,7 +374,7 @@ float[2] closestColors(float inColor,float paletteSize){
 				secondClosest=temp;
 			}
 		}
-	
+
 	}
 
 	ret[0]=closest;
@@ -395,13 +395,13 @@ float dither2(float inColor,vec2 inCoord,float ditherPalette){
 	float closestColor=cs[0];
 	float secondClosestColor = cs[1];
 	float colorDiff=distance(inColor,closestColor) / distance(secondClosestColor,closestColor);
-	
+
 	return (colorDiff < indexValue) ? closestColor : secondClosestColor;
 }
 
 vec4 blurAndSharpen(sampler2DRect blurAndSharpenTex,vec2 coord, float sharpenAmount, float sharpenRadius, float sharpenBoost,float blurRadius,float blurAmount){
 	vec4 originalColor=texture2DRect(blurAndSharpenTex,coord);
-	
+
 	//blur
 	vec4 colorBlur=texture2DRect(blurAndSharpenTex,coord+vec2(blurRadius,blurRadius))
     + texture2DRect(blurAndSharpenTex,coord+vec2(0,blurRadius))
@@ -426,18 +426,18 @@ vec4 blurAndSharpen(sampler2DRect blurAndSharpenTex,vec2 coord, float sharpenAmo
     rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(-sharpenRadius,sharpenRadius)).rgb).z+
     rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(sharpenRadius,-sharpenRadius)).rgb).z+
     rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(-sharpenRadius,-sharpenRadius)).rgb).z;
-    
+
     color_sharpen_bright*=.125;
-    
+
     vec3 colorBlurHsb=rgb2hsb(colorBlur.rgb);
     colorBlurHsb.z-=(sharpenAmount)*color_sharpen_bright;
-    
+
     //try baking in the sharpenBoost into the amount
     //this does not work so well over here lol
     if(sharpenAmount>0){
         colorBlurHsb.z*=(1.0+1.75*sharpenAmount+sharpenBoost);
     }
-    
+
     return vec4(hsb2rgb(colorBlurHsb),1.0);
 }
 
@@ -447,7 +447,7 @@ void main()
 
 	//BLOCK1
 	vec2 block1Coords=texCoordVarying;
-	
+
 	//GEO
 	vec2 center=vec2(width/2.0,height/2.0);
 	//geometry
@@ -457,7 +457,7 @@ void main()
 	if(block1VFlip==1){
 		block1Coords.y=height-block1Coords.y;
 	}
-	
+
 	if(block1HMirror==1){
         if(block1Coords.x.x>width/2){block1Coords.x=abs(width-block1Coords.x);}
     }//endifhflip1
@@ -466,34 +466,34 @@ void main()
     }//endifvflip1
 
 	block1Coords=kaleidoscope(block1Coords,block1KaleidoscopeAmount,block1KaleidoscopeSlice);
-	
+
 	block1Coords+=block1XYDisplace;
 	block1Coords-=center;
 	block1Coords*=block1ZDisplace;
 	block1Coords+=center;
-	
+
 	block1Coords=rotate(block1Coords,block1Rotate,block1RotateMode);
-	
+
 	block1Coords=shear(block1Coords,block1ShearMatrix);
-	
+
 	if(block1GeoOverflow==1){block1Coords=wrapCoord(block1Coords);}
 	if(block1GeoOverflow==2){block1Coords=mirrorCoord(block1Coords);}
-	
-	
-	
+
+
+
 	vec4 block1Color=blurAndSharpen(block1Output,block1Coords,block1SharpenAmount,block1SharpenRadius,
 		block1FiltersBoost,block1BlurRadius,block1BlurAmount);
-	
+
 	if(block1GeoOverflow==0){
 		if(block1Coords.x>width || block1Coords.y> height || block1Coords.x<0.0 || block1Coords.y<0.0){
 			block1Color=vec4(0.0);
 		}
 	}
-	
+
 	//vec4 block1Color=texture(block1Output,block1Coords);
-	
+
 	vec3 block1ColorHSB=rgb2hsb(block1Color.rgb);
-	
+
 	//BLOCK1 COLORIZE
 	if(block1ColorizeSwitch==1){
 		vec3 colorizedRGB=vec3(0.0,0.0,0.0);
@@ -502,34 +502,34 @@ void main()
 		vec3 colorizedRGB3=vec3(0.0,0.0,0.0);
 		vec3 colorizedRGB4=vec3(0.0,0.0,0.0);
 		vec3 colorizedRGB5=vec3(0.0,0.0,0.0);
-		
-		
+
+
 		if(block1ColorizeHSB_RGB==0){
 			//assign bands
 			vec3 colorizedHSB1=block1ColorizeBand1+vec3(0.0,0.0,block1ColorHSB.z);
 			vec3 colorizedHSB2=block1ColorizeBand2+vec3(0.0,0.0,block1ColorHSB.z);
 			vec3 colorizedHSB3=block1ColorizeBand3+vec3(0.0,0.0,block1ColorHSB.z);
 			vec3 colorizedHSB4=block1ColorizeBand4+vec3(0.0,0.0,block1ColorHSB.z);
-			vec3 colorizedHSB5=block1ColorizeBand5+vec3(0.0,0.0,block1ColorHSB.z);	
-		
+			vec3 colorizedHSB5=block1ColorizeBand5+vec3(0.0,0.0,block1ColorHSB.z);
+
 			//convert to rgb
 			colorizedRGB1=hsb2rgb(colorizedHSB1);
 			colorizedRGB2=hsb2rgb(colorizedHSB2);
 			colorizedRGB3=hsb2rgb(colorizedHSB3);
 			colorizedRGB4=hsb2rgb(colorizedHSB4);
 			colorizedRGB5=hsb2rgb(colorizedHSB5);
-			
+
 		}
-		
+
 		if(block1ColorizeHSB_RGB==1){
 			colorizedRGB1=block1ColorizeBand1+block1Color.rgb;
 			colorizedRGB2=block1ColorizeBand2+block1Color.rgb;
 			colorizedRGB3=block1ColorizeBand3+block1Color.rgb;
 			colorizedRGB4=block1ColorizeBand4+block1Color.rgb;
 			colorizedRGB5=block1ColorizeBand5+block1Color.rgb;
-		
+
 		}
-		
+
 		if(block1ColorHSB.z<.25){
 			colorizedRGB=mix(colorizedRGB1,colorizedRGB2,block1ColorHSB.z*4.0);
 		}
@@ -542,28 +542,28 @@ void main()
 		if(block1ColorHSB.z>.75){
 			colorizedRGB=mix(colorizedRGB4,colorizedRGB5,(block1ColorHSB.z-.75)*4.0);
 		}
-		
+
 		block1Color.rgb=colorizedRGB;
 	}
-	
+
 	//dither
 	if(block1DitherSwitch==1){
 		 //rgb mode?
 		block1Color.r=dither2(block1Color.r,block1Coords,block1Dither);
 		block1Color.g=dither2(block1Color.g,block1Coords,block1Dither);
 		block1Color.b=dither2(block1Color.b,block1Coords,block1Dither);
-		
-	}	
+
+	}
 	/*
 	vec2 block2Coords=texCoordVarying;
 	vec4 block2Color=texture(block2Output,block2Coords);
 	*/
-	
-	
-	
+
+
+
 	//block2
 	vec2 block2Coords=texCoordVarying;
-	
+
 	//GEO
 	//vec2 center=vec2(640,360);
 	//geometry
@@ -573,7 +573,7 @@ void main()
 	if(block2VFlip==1){
 		block2Coords.y=height-block2Coords.y;
 	}
-	
+
 	if(block2HMirror==1){
         if(block2Coords.x.x>width/2){block2Coords.x=abs(width-block2Coords.x);}
     }//endifhflip1
@@ -582,74 +582,74 @@ void main()
     }//endifvflip1
 
 	block2Coords=kaleidoscope(block2Coords,block2KaleidoscopeAmount,block2KaleidoscopeSlice);
-	
+
 	block2Coords+=block2XYDisplace;
 	block2Coords-=center;
 	block2Coords*=block2ZDisplace;
 	block2Coords+=center;
-	
+
 	block2Coords=rotate(block2Coords,block2Rotate,block2RotateMode);
-	
+
 	block2Coords=shear(block2Coords,block2ShearMatrix);
-	
+
 	if(block2GeoOverflow==1){block2Coords=wrapCoord(block2Coords);}
 	if(block2GeoOverflow==2){block2Coords=mirrorCoord(block2Coords);}
-	
-	
-	
+
+
+
 	vec4 block2Color=blurAndSharpen(block2Output,block2Coords,block2SharpenAmount,block2SharpenRadius,
 		block2FiltersBoost,block2BlurRadius,block2BlurAmount);
-	
+
 	if(block2GeoOverflow==0){
 		if(block2Coords.x>width || block2Coords.y> height || block2Coords.x<0.0 || block2Coords.y<0.0){
 			block2Color=vec4(0.0);
 		}
 	}
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 	vec3 block2ColorHSB=rgb2hsb(block2Color.rgb);
-	
+
 	//block2 COLORIZE
 	if(block2ColorizeSwitch==1){
 		vec3 colorizedRGB=vec3(0.0,0.0,0.0);
-		
+
 		vec3 colorizedRGB1=vec3(0.0,0.0,0.0);
 		vec3 colorizedRGB2=vec3(0.0,0.0,0.0);
 		vec3 colorizedRGB3=vec3(0.0,0.0,0.0);
 		vec3 colorizedRGB4=vec3(0.0,0.0,0.0);
 		vec3 colorizedRGB5=vec3(0.0,0.0,0.0);
-		
-		
+
+
 		if(block2ColorizeHSB_RGB==0){
 			//assign bands
 			vec3 colorizedHSB1=block2ColorizeBand1+vec3(0.0,0.0,block2ColorHSB.z);
 			vec3 colorizedHSB2=block2ColorizeBand2+vec3(0.0,0.0,block2ColorHSB.z);
 			vec3 colorizedHSB3=block2ColorizeBand3+vec3(0.0,0.0,block2ColorHSB.z);
 			vec3 colorizedHSB4=block2ColorizeBand4+vec3(0.0,0.0,block2ColorHSB.z);
-			vec3 colorizedHSB5=block2ColorizeBand5+vec3(0.0,0.0,block2ColorHSB.z);	
-		
+			vec3 colorizedHSB5=block2ColorizeBand5+vec3(0.0,0.0,block2ColorHSB.z);
+
 			//convert to rgb
 			colorizedRGB1=hsb2rgb(colorizedHSB1);
 			colorizedRGB2=hsb2rgb(colorizedHSB2);
 			colorizedRGB3=hsb2rgb(colorizedHSB3);
 			colorizedRGB4=hsb2rgb(colorizedHSB4);
 			colorizedRGB5=hsb2rgb(colorizedHSB5);
-			
+
 		}
-		
+
 		if(block2ColorizeHSB_RGB==1){
 			colorizedRGB1=block2ColorizeBand1+block2Color.rgb;
 			colorizedRGB2=block2ColorizeBand2+block2Color.rgb;
 			colorizedRGB3=block2ColorizeBand3+block2Color.rgb;
 			colorizedRGB4=block2ColorizeBand4+block2Color.rgb;
 			colorizedRGB5=block2ColorizeBand5+block2Color.rgb;
-		
+
 		}
-		
+
 		if(block2ColorHSB.z<.25){
 			colorizedRGB=mix(colorizedRGB1,colorizedRGB2,block2ColorHSB.z*4.0);
 		}
@@ -662,7 +662,7 @@ void main()
 		if(block2ColorHSB.z>.75){
 			colorizedRGB=mix(colorizedRGB4,colorizedRGB5,(block2ColorHSB.z-.75)*4.0);
 		}
-		
+
 		block2Color.rgb=colorizedRGB;
 	}
 	//dither
@@ -671,33 +671,33 @@ void main()
 		block2Color.r=dither2(block2Color.r,block2Coords,block2Dither);
 		block2Color.g=dither2(block2Color.g,block2Coords,block2Dither);
 		block2Color.b=dither2(block2Color.b,block2Coords,block2Dither);
-		
+
 	}
-	
-	
-	
+
+
+
 	//matrix mixer test
 	//default atm: bg=BLOCK2, fg=BLOCK1
 	vec3 matrixMixOut=vec3(0.0,0.0,0.0);
 	vec3 fg=block1Color.rgb;
 	vec3 bg=block2Color.rgb;
-	
+
 	if(finalKeyOrder==1){
-	
+
 		fg=block2Color.rgb;
 		bg=block1Color.rgb;
 	}
 	vec3 fgR=vec3(fg.r,fg.r,fg.r);
 	vec3 fgG=vec3(fg.g,fg.g,fg.g);
 	vec3 fgB=vec3(fg.b,fg.b,fg.b);
-	
+
 	vec3 scaleVec=vec3(.33,.33,.33);
-	
+
 	//lerp
 	if(matrixMixType==0){
 		matrixMixOut.r=dot( mix(fgR,bg,bgRGBIntoFgRed ) , scaleVec );
 		matrixMixOut.g=dot( mix(fgG,bg,bgRGBIntoFgGreen) , scaleVec );
-		matrixMixOut.b=dot( mix(fgB,bg,bgRGBIntoFgBlue) , scaleVec );	
+		matrixMixOut.b=dot( mix(fgB,bg,bgRGBIntoFgBlue) , scaleVec );
 	}
 	//add
 	if(matrixMixType==1){
@@ -709,22 +709,22 @@ void main()
 	if(matrixMixType==2){
 		matrixMixOut.r=dot( abs(fgR-bgRGBIntoFgRed*bg) , scaleVec );
 		matrixMixOut.g=dot( abs(fgG-bgRGBIntoFgGreen*bg) , scaleVec );
-		matrixMixOut.b=dot( abs(fgB-bgRGBIntoFgBlue*bg) , scaleVec );	
+		matrixMixOut.b=dot( abs(fgB-bgRGBIntoFgBlue*bg) , scaleVec );
 	}
 	//mult
 	if(matrixMixType==3){
 		matrixMixOut.r=dot( mix(fgR,bg*fgR,bgRGBIntoFgRed ) , scaleVec );
 		matrixMixOut.g=dot( mix(fgG,bg*fgG,bgRGBIntoFgGreen) , scaleVec );
-		matrixMixOut.b=dot( mix(fgB,bg*fgB,bgRGBIntoFgBlue) , scaleVec );	
+		matrixMixOut.b=dot( mix(fgB,bg*fgB,bgRGBIntoFgBlue) , scaleVec );
 	}
 	//dodge
 	if(matrixMixType==4){
 		matrixMixOut.r=dot( mix(fgR,bg/(1.00001 - fgR),bgRGBIntoFgRed ) , scaleVec );
 		matrixMixOut.g=dot( mix(fgG,bg/(1.00001 - fgG),bgRGBIntoFgGreen) , scaleVec );
-		matrixMixOut.b=dot( mix(fgB,bg/(1.00001 - fgB),bgRGBIntoFgBlue) , scaleVec );	
+		matrixMixOut.b=dot( mix(fgB,bg/(1.00001 - fgB),bgRGBIntoFgBlue) , scaleVec );
 	}
-	
-	
+
+
 	if(matrixMixOverflow==0){
 		matrixMixOut=clamp(matrixMixOut,0.0,1.0);
 	}
@@ -738,9 +738,9 @@ void main()
 		matrixMixOut.g=foldover(matrixMixOut.g);
 		matrixMixOut.b=foldover(matrixMixOut.b);
 	}
-	
+
 	vec4 outColor=mixnKeyVideo(vec4(matrixMixOut,1.0),vec4(bg,1.0),finalMixAmount,finalMixType,finalKeyThreshold,finalKeySoft
 					,finalKeyValue,finalKeyOrder,finalMixOverflow,vec4(0.0,0.0,0.0,0.0),0);
-	
+
 	outputColor=outColor;
 }
