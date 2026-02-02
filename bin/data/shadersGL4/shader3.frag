@@ -452,7 +452,7 @@ void main()
 {
 
 	//BLOCK1
-	vec2 block1Coords=texCoordVarying;
+	vec2 block1Coords=texCoordVarying*vec2(width,height);
 
 	//GEO
 	vec2 center=vec2(width/2.0,height/2.0);
@@ -487,7 +487,7 @@ void main()
 
 
 
-	vec4 block1Color=blurAndSharpen(block1Output,block1Coords,block1SharpenAmount,block1SharpenRadius,
+	vec4 block1Color=blurAndSharpen(block1Output,(block1Coords/vec2(width,height)),block1SharpenAmount,block1SharpenRadius,
 		block1FiltersBoost,block1BlurRadius,block1BlurAmount);
 
 	if(block1GeoOverflow==0){
@@ -496,7 +496,7 @@ void main()
 		}
 	}
 
-	//vec4 block1Color=texture(block1Output,block1Coords);
+	//vec4 block1Color=texture(block1Output, block1Coords/vec2(width,height));
 
 	vec3 block1ColorHSB=rgb2hsb(block1Color.rgb);
 
@@ -561,14 +561,14 @@ void main()
 
 	}
 	/*
-	vec2 block2Coords=texCoordVarying;
-	vec4 block2Color=texture(block2Output,block2Coords);
+	vec2 block2Coords=texCoordVarying*vec2(width,height);
+	vec4 block2Color=texture(block2Output, block2Coords/vec2(width,height));
 	*/
 
 
 
 	//block2
-	vec2 block2Coords=texCoordVarying;
+	vec2 block2Coords=texCoordVarying*vec2(width,height);
 
 	//GEO
 	//vec2 center=vec2(640,360);
@@ -603,7 +603,7 @@ void main()
 
 
 
-	vec4 block2Color=blurAndSharpen(block2Output,block2Coords,block2SharpenAmount,block2SharpenRadius,
+	vec4 block2Color=blurAndSharpen(block2Output,(block2Coords/vec2(width,height)),block2SharpenAmount,block2SharpenRadius,
 		block2FiltersBoost,block2BlurRadius,block2BlurAmount);
 
 	if(block2GeoOverflow==0){

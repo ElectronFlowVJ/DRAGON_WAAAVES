@@ -8,7 +8,7 @@
     "video": {
         "input1": {
             "ndiSourceIndex": 0,
-            "ndiSourceName": "LIGHTING (Remote Connection 1)",
+            "ndiSourceName": "IANHDESKTOP (Synesthesia NDI)",
             "sourceType": 0,
             "spoutSourceIndex": 0,
             "spoutSourceName": "",
@@ -16,7 +16,7 @@
         },
         "input2": {
             "ndiSourceIndex": 0,
-            "ndiSourceName": "LIGHTING (Remote Connection 1)",
+            "ndiSourceName": "IANHDESKTOP (Synesthesia NDI)",
             "sourceType": 0,
             "spoutSourceIndex": 0,
             "spoutSourceName": "",
@@ -25,7 +25,7 @@
         "ndiOutput": {
             "sendBlock1": false,
             "sendBlock2": false,
-            "sendBlock3": true
+            "sendBlock3": false
         },
         "resolution": {
             "input1Height": 1080,

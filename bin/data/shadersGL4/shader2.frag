@@ -563,10 +563,13 @@ float solarize(float inBright){
 
 void main()
 {
+	// Normalized UV for block2 input (sampler2D expects 0..1)
+	vec2 block2InputUV = texCoordVarying;
+
 	/*
 	vec2 shader2InputCoords=texCoordVarying*ratio;
 	shader2InputCoords.x*=block2AspectRatio;
-	vec4 shader2InputColor=texture(shader2Input,shader2InputCoords);
+	vec4 shader2InputColor=texture(shader2Input, shader2InputCoords);
 	*/
 
 
@@ -580,12 +583,12 @@ void main()
 
 
 	//NEW FIXED input scaling and repositioning
-	vec2 block2InputCoords=texCoordVarying;
+	vec2 block2InputCoords=block2InputUV*vec2(width,height);
 
 	//if inputs are from usb/spout/ndi and not from block1
 	if(block2InputMasterSwitch==1){
 		// Use texCoordVarying directly - input textures are scaled to internal resolution
-		block2InputCoords = texCoordVarying;
+		block2InputCoords = block2InputUV*vec2(width,height);
 
 		// Apply aspect ratio adjustment
 		block2InputCoords.x *= block2InputAspectRatio;
@@ -600,7 +603,7 @@ void main()
 
 		// HD aspect fix override
 		if(block2InputHdAspectOn==1){
-			block2InputCoords = texCoordVarying;
+			block2InputCoords = block2InputUV*vec2(width,height);
 			block2InputCoords.y = block2InputHdAspectXYFix.y * block2InputCoords.y;
 			block2InputCoords.x = block2InputHdAspectXYFix.x * block2InputCoords.x;
 		}
@@ -653,9 +656,9 @@ void main()
 	if(block2InputGeoOverflow==2){block2InputCoords=mirrorCoord1(block2InputCoords, block2InputWidth,block2InputHeight);}
 
 
-	vec4 block2InputColor=blurAndSharpen(block2InputTex,block2InputCoords,block2InputSharpenAmount,block2InputSharpenRadius,
+	vec4 block2InputColor=blurAndSharpen(block2InputTex,(block2InputCoords/vec2(width,height)),block2InputSharpenAmount,block2InputSharpenRadius,
 		block2InputFiltersBoost,block2InputBlurRadius,block2InputBlurAmount);
-    //vec4 block2InputColor = texture(block2InputTex, block2InputCoords);
+    //vec4 block2InputColor = texture(block2InputTex, block2InputCoords/vec2(width,height));
 	//block2InputColor.rgb=1.0-block2InputColor.rgb;
 
 	//clamp shits out
@@ -701,14 +704,14 @@ void main()
 
 
 	/*
-	vec2 fb2Coords=texCoordVarying;
+	vec2 fb2Coords=texCoordVarying*vec2(width,height);
 	fb2Coords.x-=5.0;
-	vec4 fb2Color=texture(tex0,fb2Coords);
+	vec4 fb2Color=texture(tex0, fb2Coords/vec2(width,height));
 	*/
 
 
 	//fb2
-	vec2 fb2Coords=texCoordVarying;
+	vec2 fb2Coords=texCoordVarying*vec2(width,height);
 	vec2 center=vec2(width/2.0,height/2.0);
 	//geometry
 	if(fb2HFlip==1){
@@ -741,11 +744,11 @@ void main()
 
 
 
-	//vec4 blurAndSharpen(sampler2D blurAndSharpenTex,vec2 coord, float sharpenAmount, float sharpenRadius, float sharpenBoost,float blurRadius,float blurAmount)
-	vec4 fb2Color=blurAndSharpen(tex0,fb2Coords,fb2SharpenAmount,fb2SharpenRadius,
+	//vec4 blurAndSharpen(sampler2D blurAndSharpenTex, vec2 coord, float sharpenAmount, float sharpenRadius, float sharpenBoost,float blurRadius,float blurAmount)
+	vec4 fb2Color=blurAndSharpen(tex0,(fb2Coords/vec2(width,height)),fb2SharpenAmount,fb2SharpenRadius,
 		fb2FiltersBoost,fb2BlurRadius,fb2BlurAmount);
 
-	//vec4 fb2Color=texture(tex0,fb2Coords);
+	//vec4 fb2Color=texture(tex0, fb2Coords/vec2(width,height));
 
 
 

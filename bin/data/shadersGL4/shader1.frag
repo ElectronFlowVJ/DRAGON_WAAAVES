@@ -595,8 +595,9 @@ float solarize(float inBright){
 void main()
 {
 	//CHANNEL1-
-	//input coords - use texCoordVarying directly, input textures are scaled to internal resolution
-	vec2 ch1Coords=texCoordVarying;
+	// input coords
+	vec2 ch1UV = texCoordVarying;
+	vec2 ch1Coords = ch1UV*vec2(width,height);
 
 	ch1Coords.x*=ch1AspectRatio;
 	//this centers image but not coords
@@ -609,7 +610,7 @@ void main()
 
 	//new hd fix attempt
 	if(ch1HdAspectOn==1){
-		ch1Coords=texCoordVarying;
+		ch1Coords=ch1UV*vec2(width,height);
 		ch1Coords.y=ch1HdAspectXYFix.y*ch1Coords.y;
 		ch1Coords.x=ch1HdAspectXYFix.x*ch1Coords.x;
 	}
@@ -648,10 +649,10 @@ void main()
 
 
 	//add blur and sharpen here
-	vec4 ch1Color=blurAndSharpen(ch1Tex,ch1Coords,ch1SharpenAmount,ch1SharpenRadius,
+	vec4 ch1Color=blurAndSharpen(ch1Tex,(ch1Coords/vec2(width,height)),ch1SharpenAmount,ch1SharpenRadius,
 		ch1FiltersBoost,ch1BlurRadius,ch1BlurAmount);
 
-    //vec4 ch1Color = texture(ch1Tex, ch1Coords);
+    //vec4 ch1Color = texture(ch1Tex, ch1Coords/vec2(width,height));
 	//ch1Color.rgb=1.0-ch1Color.rgb;
 
 	//clamp shits out
@@ -709,7 +710,7 @@ void main()
 	ch2Coords=ch2Coords*(1.0+ch2ZDisplace);
 	ch2Coords+=vec2(320.0,240.0);
 
-    vec4 ch2Color = texture(ch2Tex, ch2Coords);
+    vec4 ch2Color = texture(ch2Tex, ch2Coords/vec2(width,height));
 	//ch2Color.rgb=1.0-ch2Color.rgb;
 
 	//clamp shits out
@@ -723,7 +724,7 @@ void main()
 
 	// CHANNEL2
 	// Input coords - use texCoordVarying directly, input textures are scaled to internal resolution
-	vec2 ch2Coords = texCoordVarying;
+	vec2 ch2Coords = texCoordVarying*vec2(width,height);
 
 	// Apply aspect ratio adjustment
 	ch2Coords.x *= ch2AspectRatio;
@@ -738,7 +739,7 @@ void main()
 
 	// HD aspect fix override
 	if(ch2HdAspectOn==1){
-		ch2Coords = texCoordVarying;
+		ch2Coords = texCoordVarying*vec2(width,height);
 		ch2Coords.y = ch1HdAspectXYFix.y * ch2Coords.y;
 		ch2Coords.x = ch1HdAspectXYFix.x * ch2Coords.x;
 	}
@@ -775,7 +776,7 @@ void main()
 	if(ch2GeoOverflow==1){ch2Coords=wrapCoord1(ch2Coords);}
 	if(ch2GeoOverflow==2){ch2Coords=mirrorCoord1(ch2Coords);}
 
-	vec4 ch2Color=blurAndSharpen(ch2Tex,ch2Coords,ch2SharpenAmount,ch2SharpenRadius,
+	vec4 ch2Color=blurAndSharpen(ch2Tex,(ch2Coords/vec2(width,height)),ch2SharpenAmount,ch2SharpenRadius,
 		ch2FiltersBoost,ch2BlurRadius,ch2BlurAmount);
 
 
@@ -823,7 +824,7 @@ void main()
 
 
 	//fb1
-	vec2 fb1Coords=texCoordVarying;
+	vec2 fb1Coords=texCoordVarying*vec2(width,height);
 	vec2 center=vec2(width/2.0,height/2.0);
 	//geometry
 	if(fb1HFlip==1){
@@ -866,11 +867,11 @@ void main()
 
 
 
-	//vec4 blurAndSharpen(sampler2D blurAndSharpenTex,vec2 coord, float sharpenAmount, float sharpenRadius, float sharpenBoost,float blurRadius,float blurAmount)
-	vec4 fb1Color=blurAndSharpen(tex0,fb1Coords,fb1SharpenAmount,fb1SharpenRadius,
+	//vec4 blurAndSharpen(sampler2D blurAndSharpenTex, vec2 coord, float sharpenAmount, float sharpenRadius, float sharpenBoost,float blurRadius,float blurAmount)
+	vec4 fb1Color=blurAndSharpen(tex0,(fb1Coords/vec2(width,height)),fb1SharpenAmount,fb1SharpenRadius,
 		fb1FiltersBoost,fb1BlurRadius,fb1BlurAmount);
 
-	//vec4 fb1Color=texture(tex0,fb1Coords);
+	//vec4 fb1Color=texture(tex0, fb1Coords);
 
 
 
