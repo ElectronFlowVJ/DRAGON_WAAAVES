@@ -399,33 +399,39 @@ float dither2(float inColor,vec2 inCoord,float ditherPalette){
 	return (colorDiff < indexValue) ? closestColor : secondClosestColor;
 }
 
-vec4 blurAndSharpen(sampler2D blurAndSharpenTex,vec2 coord, float sharpenAmount, float sharpenRadius, float sharpenBoost,float blurRadius,float blurAmount){
-	vec4 originalColor=texture(blurAndSharpenTex,coord);
+vec4 blurAndSharpen(sampler2D blurAndSharpenTex, vec2 coord,
+		float sharpenAmount, float sharpenRadius, float sharpenBoost,
+		float blurRadius, float blurAmount) {
+	vec4 originalColor = textureLod(blurAndSharpenTex, coord, 0);
+	vec2 texSize = vec2(textureSize(blurAndSharpenTex, 0));
+
+	vec2 blurSize = vec2(blurRadius) / (texSize - vec2(1));
+	vec2 sharpenSize = vec2(sharpenRadius) / (texSize - vec2(1));
 
 	//blur
-	vec4 colorBlur = texture(blurAndSharpenTex,coord+vec2(blurRadius,blurRadius))
-                  + texture(blurAndSharpenTex,coord+vec2(0,blurRadius))
-                  + texture(blurAndSharpenTex,coord+vec2(-blurRadius,blurRadius))
-                  + texture(blurAndSharpenTex,coord+vec2(-blurRadius,0.0))
-                  + texture(blurAndSharpenTex,coord+vec2(-blurRadius,-blurRadius))
-                  + texture(blurAndSharpenTex,coord+vec2(0.0,-blurRadius))
-                  + texture(blurAndSharpenTex,coord+vec2(blurRadius,-blurRadius))
-                  + texture(blurAndSharpenTex,coord+vec2(blurRadius,0.0));
+	vec4 colorBlur = textureLod(blurAndSharpenTex, coord + blurSize*vec2( 1, 1), 0)
+                  + textureLod(blurAndSharpenTex, coord + blurSize*vec2( 0, 1), 0)
+                  + textureLod(blurAndSharpenTex, coord + blurSize*vec2(-1, 1), 0)
+                  + textureLod(blurAndSharpenTex, coord + blurSize*vec2(-1, 0), 0)
+                  + textureLod(blurAndSharpenTex, coord + blurSize*vec2(-1,-1), 0)
+                  + textureLod(blurAndSharpenTex, coord + blurSize*vec2( 0,-1), 0)
+                  + textureLod(blurAndSharpenTex, coord + blurSize*vec2( 1,-1), 0)
+                  + textureLod(blurAndSharpenTex, coord + blurSize*vec2( 1, 0), 0);
 
 	colorBlur*=.125;
 
 	colorBlur=mix(originalColor,colorBlur,blurAmount);
 
 	//sharpen
-    float color_sharpen_bright=
-    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(sharpenRadius,0)).rgb).z+
-    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(-sharpenRadius,0)).rgb).z+
-    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(0,sharpenRadius)).rgb).z+
-    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(0,-sharpenRadius)).rgb).z+
-    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(sharpenRadius,sharpenRadius)).rgb).z+
-    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(-sharpenRadius,sharpenRadius)).rgb).z+
-    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(sharpenRadius,-sharpenRadius)).rgb).z+
-    rgb2hsb(texture(blurAndSharpenTex,coord+vec2(-sharpenRadius,-sharpenRadius)).rgb).z;
+	float color_sharpen_bright =
+		rgb2hsb(textureLod(blurAndSharpenTex, coord + sharpenSize*vec2( 1, 0), 0).rgb).z+
+		rgb2hsb(textureLod(blurAndSharpenTex, coord + sharpenSize*vec2(-1, 0), 0).rgb).z+
+		rgb2hsb(textureLod(blurAndSharpenTex, coord + sharpenSize*vec2( 0, 1), 0).rgb).z+
+		rgb2hsb(textureLod(blurAndSharpenTex, coord + sharpenSize*vec2( 0,-1), 0).rgb).z+
+		rgb2hsb(textureLod(blurAndSharpenTex, coord + sharpenSize*vec2( 1, 1), 0).rgb).z+
+		rgb2hsb(textureLod(blurAndSharpenTex, coord + sharpenSize*vec2(-1, 1), 0).rgb).z+
+		rgb2hsb(textureLod(blurAndSharpenTex, coord + sharpenSize*vec2( 1,-1), 0).rgb).z+
+		rgb2hsb(textureLod(blurAndSharpenTex, coord + sharpenSize*vec2(-1,-1), 0).rgb).z;
 
     color_sharpen_bright=color_sharpen_bright*.125;
 
