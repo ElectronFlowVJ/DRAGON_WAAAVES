@@ -7,9 +7,9 @@ const float PI=3.1415926535;
 const float TWO_PI=6.2831855;
 
 
-uniform sampler2DRect block2InputTex;
-uniform sampler2DRect tex0; //fb2 for now
-uniform sampler2DRect fb2TemporalFilter;
+uniform sampler2D block2InputTex;
+uniform sampler2D tex0; //fb2 for now
+uniform sampler2D fb2TemporalFilter;
 
 uniform float ratio;
 uniform float block2AspectRatio;
@@ -150,18 +150,27 @@ vec3 colorQuantize(vec3 inColor, float amount, float amountInvert){
 	return inColor;
 }
 
-vec4 blurAndSharpen(sampler2DRect blurAndSharpenTex,vec2 coord, float sharpenAmount, float sharpenRadius, float sharpenBoost,float blurRadius,float blurAmount){
-	vec4 originalColor=texture2DRect(blurAndSharpenTex,coord);
+vec4 blurAndSharpen(sampler2D blurAndSharpenTex,vec2 coord, float sharpenAmount, float sharpenRadius, float sharpenBoost,float blurRadius,float blurAmount){
+	vec2 texSize = vec2(textureSize(blurAndSharpenTex, 0));
+	vec2 texNormScale = vec2(1) / (texSize - vec(1));
+	coord *= texNormScale;
+
+	vec2 blurSize = vec2(blurRadius) * texNormScale;
+	vec2 sharpenSize = vec2(sharpenRadius) * texNormScale;
+
+	// -
+
+	vec4 originalColor=textureLod(blurAndSharpenTex,coord, 0);
 
 	//blur
-	vec4 colorBlur=texture2DRect(blurAndSharpenTex,coord+vec2(blurRadius,blurRadius))
-    + texture2DRect(blurAndSharpenTex,coord+vec2(0,blurRadius))
-    + texture2DRect(blurAndSharpenTex,coord+vec2(-blurRadius,blurRadius))
-    +texture2DRect(blurAndSharpenTex,coord+vec2(-blurRadius,0.0))
-    +texture2DRect(blurAndSharpenTex,coord+vec2(-blurRadius,-blurRadius))
-    +texture2DRect(blurAndSharpenTex,coord+vec2(0.0,-blurRadius))
-    +texture2DRect(blurAndSharpenTex,coord+vec2(blurRadius,-blurRadius))
-    +texture2DRect(blurAndSharpenTex,coord+vec2(blurRadius,0.0));
+	vec4 colorBlur = textureLod(blurAndSharpenTex, coord + vec2( 1, 1)*blurSize)
+                  + textureLod(blurAndSharpenTex, coord + vec2( 0, 1)*blurSize)
+                  + textureLod(blurAndSharpenTex, coord + vec2(-1, 1)*blurSize)
+                  + textureLod(blurAndSharpenTex, coord + vec2(-1, 0)*blurSize)
+                  + textureLod(blurAndSharpenTex, coord + vec2(-1,-1)*blurSize)
+                  + textureLod(blurAndSharpenTex, coord + vec2( 0,-1)*blurSize)
+                  + textureLod(blurAndSharpenTex, coord + vec2( 1,-1)*blurSize)
+                  + textureLod(blurAndSharpenTex, coord + vec2( 1, 0)*blurSize);
 
 	colorBlur*=.125;
 
@@ -169,14 +178,14 @@ vec4 blurAndSharpen(sampler2DRect blurAndSharpenTex,vec2 coord, float sharpenAmo
 
 	//sharpen
     float color_sharpen_bright=
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(sharpenRadius,0)).rgb).z+
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(-sharpenRadius,0)).rgb).z+
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(0,sharpenRadius)).rgb).z+
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(0,-sharpenRadius)).rgb).z+
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(sharpenRadius,sharpenRadius)).rgb).z+
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(-sharpenRadius,sharpenRadius)).rgb).z+
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(sharpenRadius,-sharpenRadius)).rgb).z+
-    rgb2hsb(texture2DRect(blurAndSharpenTex,coord+vec2(-sharpenRadius,-sharpenRadius)).rgb).z;
+    rgb2hsb(textureLod(blurAndSharpenTex, coord + vec2( 1, 0)*sharpenSize).rgb).z+
+    rgb2hsb(textureLod(blurAndSharpenTex, coord + vec2(-1, 0)*sharpenSize).rgb).z+
+    rgb2hsb(textureLod(blurAndSharpenTex, coord + vec2( 0, 1)*sharpenSize).rgb).z+
+    rgb2hsb(textureLod(blurAndSharpenTex, coord + vec2( 0,-1)*sharpenSize).rgb).z+
+    rgb2hsb(textureLod(blurAndSharpenTex, coord + vec2( 1, 1)*sharpenSize).rgb).z+
+    rgb2hsb(textureLod(blurAndSharpenTex, coord + vec2(-1, 1)*sharpenSize).rgb).z+
+    rgb2hsb(textureLod(blurAndSharpenTex, coord + vec2( 1,-1)*sharpenSize).rgb).z+
+    rgb2hsb(textureLod(blurAndSharpenTex, coord + vec2(-1,-1)*sharpenSize).rgb).z;
 
     color_sharpen_bright=color_sharpen_bright*.125;
 
@@ -735,7 +744,7 @@ void main()
 
 
 
-	//vec4 blurAndSharpen(sampler2DRect blurAndSharpenTex,vec2 coord, float sharpenAmount, float sharpenRadius, float sharpenBoost,float blurRadius,float blurAmount)
+	//vec4 blurAndSharpen(sampler2D blurAndSharpenTex,vec2 coord, float sharpenAmount, float sharpenRadius, float sharpenBoost,float blurRadius,float blurAmount)
 	vec4 fb2Color=blurAndSharpen(tex0,fb2Coords,fb2SharpenAmount,fb2SharpenRadius,
 		fb2FiltersBoost,fb2BlurRadius,fb2BlurAmount);
 

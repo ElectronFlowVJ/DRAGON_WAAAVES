@@ -4,7 +4,7 @@
 
 #version 150
 
-uniform sampler2DRect uyvyTex;
+uniform sampler2D uyvyTex;
 uniform int colormatrix; // 0 = BT.601, 1 = BT.709, 2 = BT.2020
 
 in vec2 vTexCoord; // from vertex shader
@@ -12,19 +12,22 @@ out vec4 fragColor;
 
 void main()
 {
+	vec2 texSize = vec2(textureSize(uyvyTex, 0));
+    vec2 texNormScale = vec(1) / (texSize - vec(1)); // [0,W-1] -> [0,1]
+
 	// Full-width output pixel coordinates
     vec2 outCoord = vTexCoord * vec2(2.0, 1.0);
 
 	// Source UYVY (half width)
     vec2 srcCoord = vec2(floor(outCoord.x * 0.5), outCoord.y);
-    vec4 uyvy = texture(uyvyTex, srcCoord);
+    vec4 uyvy = texture(uyvyTex, texNormScale * srcCoord);
 
     // Select Y0/Y1
     float Y = mod(floor(outCoord.x), 2.0) < 1.0 ? uyvy.g : uyvy.a;
-	
+
 	// Y limited in [16/255, 235/255] convert to full range
 	Y = (Y - 16.0/255.0) * (255.0/(235.0-16.0));
-	
+
 	// Chroma
 	float U = uyvy.r;
     float V = uyvy.b;
@@ -36,12 +39,12 @@ void main()
     // Center chroma around 0
 	U = U - 0.5;
     V = V - 0.5;
-	
+
     // NDI docs:
     // SD  > BT.601
     // HD  > BT.709
     // UHD > BT.2020
-	
+
  	vec3 rgb;
 	if (colormatrix == 0) {
 		// BT.601
