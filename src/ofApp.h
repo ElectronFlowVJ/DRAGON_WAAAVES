@@ -5,7 +5,13 @@
 #include "ofxOsc.h"
 #include "ofxNDIreceiver.h"
 #include "ofxNDIsender.h"
+
+#if defined(TARGET_WIN32)
 #include "ofxSpout.h"
+#define OFAPP_HAS_SPOUT 1
+#else
+#define OFAPP_HAS_SPOUT 0
+#endif
 
 #define ROOT_THREE 1.73205080757
 
@@ -95,6 +101,7 @@ class ofApp : public ofBaseApp{
 	ofFbo ndiFbo2;  // FBO for scaling NDI input 2 to 640x480
 	void refreshNdiSources();
 
+#if OFAPP_HAS_SPOUT
 	// Spout receivers
 	ofxSpout::Receiver spoutReceiver1;
 	ofxSpout::Receiver spoutReceiver2;
@@ -110,6 +117,7 @@ class ofApp : public ofBaseApp{
 	ofFbo spoutSendFbo1;  // FBO for flipping Block 1 output
 	ofFbo spoutSendFbo2;  // FBO for flipping Block 2 output
 	ofFbo spoutSendFbo3;  // FBO for flipping Block 3 output
+#endif
 
 	// NDI senders (one per output channel)
 	ofxNDIsender ndiSenderBlock1;

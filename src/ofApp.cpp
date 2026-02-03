@@ -1,5 +1,7 @@
 #include "ofApp.h"
+#if OFAPP_HAS_SPOUT
 #include "SpoutReceiver.h"  // For Spout sender enumeration
+#endif
 //globals
 
 
@@ -37,7 +39,9 @@ void allocateGpuOnlyFbo(ofFbo& fbo, int width, int height) {
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	ofDisableArbTex();
+	// Ensure texture coordinates are in pixel space for shaders that expect it.
+	ofDisableNormalizedTexCoords();
+	ofLogNotice("Shader") << "Normalized Tex Coords: " << (ofGetUsingNormalizedTexCoords() ? "ON" : "OFF");
 	ofSetFrameRate(30);
 	ofBackground(0);
 	ofHideCursor();
@@ -59,9 +63,37 @@ void ofApp::setup(){
 	framebufferSetup();
 
 	//keep this last in setup for easier debugging
-	shader1.load("shadersGL4/shader1");
-	shader2.load("shadersGL4/shader2");
-	shader3.load("shadersGL4/shader3");
+	std::string shaderDir = "shadersGL4";
+	bool useGLES = false;
+
+#if defined(TARGET_OPENGLES)
+	useGLES = true;
+#endif
+
+	const char* glVersionCStr = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+	std::string glVersionStr = glVersionCStr ? std::string(glVersionCStr) : std::string();
+	if (glVersionStr.find("OpenGL ES") != std::string::npos) {
+		useGLES = true;
+	}
+
+	if (!useGLES && ofGetGLRenderer() && ofGetGLRenderer()->getGLVersionMajor() < 4) {
+		useGLES = true;
+	}
+
+	if (useGLES) {
+		shaderDir = "shadersGLES2";
+	}
+
+	if (ofGetGLRenderer()) {
+		ofLogNotice("Shader") << "GL Version: "
+			<< ofGetGLRenderer()->getGLVersionMajor() << "."
+			<< ofGetGLRenderer()->getGLVersionMinor()
+			<< " (" << glVersionStr << ")";
+	}
+	ofLogNotice("Shader") << "Using shader directory: " << shaderDir;
+	shader1.load(shaderDir + "/shader1");
+	shader2.load(shaderDir + "/shader2");
+	shader3.load(shaderDir + "/shader3");
 
 	dummyTex.allocate(internalWidth, internalHeight, GL_RGBA);
 
@@ -774,7 +806,9 @@ void ofApp::draw(){
 		} else if (gui->input1SourceType == 1) {
 			shader1.setUniformTexture("ch1Tex",ndiFbo1.getTexture(),2);
 		} else {
+#if OFAPP_HAS_SPOUT
 			shader1.setUniformTexture("ch1Tex",spoutFbo1.getTexture(),2);
+#endif
 		}
 
 	}
@@ -787,7 +821,9 @@ void ofApp::draw(){
 		} else if (gui->input2SourceType == 1) {
 			shader1.setUniformTexture("ch1Tex",ndiFbo2.getTexture(),2);
 		} else {
+#if OFAPP_HAS_SPOUT
 			shader1.setUniformTexture("ch1Tex",spoutFbo2.getTexture(),2);
+#endif
 		}
 
 	}
@@ -885,7 +921,9 @@ void ofApp::draw(){
 		} else if (gui->input1SourceType == 1) {
 			shader1.setUniformTexture("ch2Tex",ndiFbo1.getTexture(),3);
 		} else {
+#if OFAPP_HAS_SPOUT
 			shader1.setUniformTexture("ch2Tex",spoutFbo1.getTexture(),3);
+#endif
 		}
 	}
 	if(gui->ch2InputSelect==1){
@@ -897,7 +935,9 @@ void ofApp::draw(){
 		} else if (gui->input2SourceType == 1) {
 			shader1.setUniformTexture("ch2Tex",ndiFbo2.getTexture(),3);
 		} else {
+#if OFAPP_HAS_SPOUT
 			shader1.setUniformTexture("ch2Tex",spoutFbo2.getTexture(),3);
+#endif
 		}
 	}
 
@@ -1058,6 +1098,7 @@ void ofApp::draw(){
     }
 	framebuffer1.end();
 
+#if OFAPP_HAS_SPOUT
 	// Spout send for Block 1
 	if(gui->spoutSendBlock1){
 		glFlush();
@@ -1067,6 +1108,9 @@ void ofApp::draw(){
 		spoutSendFbo1.end();
 		spoutSenderBlock1.send(spoutSendFbo1.getTexture());
 	}
+#else
+	// Spout not supported on this platform.
+#endif
 
 	// NDI send for Block 1
 	if(gui->ndiSendBlock1){
@@ -1148,7 +1192,9 @@ void ofApp::draw(){
 		} else if (gui->input1SourceType == 1) {
 			shader2.setUniformTexture("block2InputTex",ndiFbo1.getTexture(),6);
 		} else {
+#if OFAPP_HAS_SPOUT
 			shader2.setUniformTexture("block2InputTex",spoutFbo1.getTexture(),6);
+#endif
 		}
 		// Inputs are now pre-scaled to internal resolution
 
@@ -1165,7 +1211,9 @@ void ofApp::draw(){
 		} else if (gui->input2SourceType == 1) {
 			shader2.setUniformTexture("block2InputTex",ndiFbo2.getTexture(),6);
 		} else {
+#if OFAPP_HAS_SPOUT
 			shader2.setUniformTexture("block2InputTex",spoutFbo2.getTexture(),6);
+#endif
 		}
 		// Inputs are now pre-scaled to internal resolution
 	}
@@ -1319,6 +1367,7 @@ void ofApp::draw(){
     }
 	framebuffer2.end();
 
+#if OFAPP_HAS_SPOUT
 	// Spout send for Block 2
 	if(gui->spoutSendBlock2){
 		glFlush();
@@ -1328,6 +1377,9 @@ void ofApp::draw(){
 		spoutSendFbo2.end();
 		spoutSenderBlock2.send(spoutSendFbo2.getTexture());
 	}
+#else
+	// Spout not supported on this platform.
+#endif
 
 	// NDI send for Block 2
 	if(gui->ndiSendBlock2){
@@ -1518,6 +1570,7 @@ void ofApp::draw(){
 	shader3.end();
 	framebuffer3.end();
 
+#if OFAPP_HAS_SPOUT
 	// Spout send for Block 3 (final output)
 	if(gui->spoutSendBlock3){
 		glFlush();
@@ -1527,6 +1580,9 @@ void ofApp::draw(){
 		spoutSendFbo3.end();
 		spoutSenderBlock3.send(spoutSendFbo3.getTexture());
 	}
+#else
+	// Spout not supported on this platform.
+#endif
 
 	// NDI send for Block 3 (final output)
 	if(gui->ndiSendBlock3){
@@ -1635,6 +1691,7 @@ void ofApp::inputSetup(){
 	ndiTexture1.loadData(blackPixels);
 	ndiTexture2.loadData(blackPixels);
 
+#if OFAPP_HAS_SPOUT
 	// Allocate Spout input FBOs at INTERNAL resolution - GPU-only
 	allocateGpuOnlyFbo(spoutFbo1, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(spoutFbo2, internalWidth, internalHeight);
@@ -1652,6 +1709,7 @@ void ofApp::inputSetup(){
 	spoutSenderBlock1.init("GwBlock1", spoutSendWidth, spoutSendHeight, GL_RGBA);
 	spoutSenderBlock2.init("GwBlock2", spoutSendWidth, spoutSendHeight, GL_RGBA);
 	spoutSenderBlock3.init("GwBlock3", spoutSendWidth, spoutSendHeight, GL_RGBA);
+#endif
 
 	// Allocate NDI sender FBOs at ndi send resolution
 	// NOTE: These NEED CPU backing because NDI reads pixels back to CPU for network transmission
@@ -1718,6 +1776,7 @@ void ofApp::inputUpdate(){
 		}
 		ndiFbo1.end();
 	} else if (gui->input1SourceType == 2) {
+#if OFAPP_HAS_SPOUT
 		// Spout - receive from active sender and scale into FBO
 		if (spoutReceiver1.isInitialized()) {
 			spoutReceiver1.receive(spoutTexture1);
@@ -1735,6 +1794,7 @@ void ofApp::inputUpdate(){
 			spoutTexture1.draw(0, 0, spoutFbo1.getWidth(), spoutFbo1.getHeight());
 		}
 		spoutFbo1.end();
+#endif
 	}
 
 	// Update Input 2 based on source type
@@ -1768,6 +1828,7 @@ void ofApp::inputUpdate(){
 		}
 		ndiFbo2.end();
 	} else if (gui->input2SourceType == 2) {
+#if OFAPP_HAS_SPOUT
 		// Spout - receive from active sender and scale into FBO
 		if (spoutReceiver2.isInitialized()) {
 			spoutReceiver2.receive(spoutTexture2);
@@ -1785,6 +1846,7 @@ void ofApp::inputUpdate(){
 			spoutTexture2.draw(0, 0, spoutFbo2.getWidth(), spoutFbo2.getHeight());
 		}
 		spoutFbo2.end();
+#endif
 	}
 }
 
@@ -1798,7 +1860,9 @@ void ofApp::inputTest(){
 		} else if (gui->input1SourceType == 1) {
 			ndiFbo1.draw(0, 0);
 		} else {
+#if OFAPP_HAS_SPOUT
 			spoutFbo1.draw(0, 0);
+#endif
 		}
 	}
 	if(testSwitch1==2){
@@ -1807,7 +1871,9 @@ void ofApp::inputTest(){
 		} else if (gui->input2SourceType == 1) {
 			ndiFbo2.draw(0, 0);
 		} else {
+#if OFAPP_HAS_SPOUT
 			spoutFbo2.draw(0, 0);
+#endif
 		}
 	}
 
@@ -1822,7 +1888,9 @@ void ofApp::reinitializeInputs(){
 		// Webcam
 		ofLogNotice("Video Input") << "Input 1: Webcam Device " << gui->input1DeviceID;
 		ndiReceiver1.ReleaseReceiver();
+#if OFAPP_HAS_SPOUT
 		spoutReceiver1.release();
+#endif
 		input1.close();
 		input1.setVerbose(true);
 		input1.setDeviceID(gui->input1DeviceID);
@@ -1831,7 +1899,9 @@ void ofApp::reinitializeInputs(){
 	} else if (gui->input1SourceType == 1) {
 		// NDI
 		input1.close();
+#if OFAPP_HAS_SPOUT
 		spoutReceiver1.release();
+#endif
 		if (gui->input1NdiSourceIndex < gui->ndiSourceNames.size()) {
 			string sourceName = gui->ndiSourceNames[gui->input1NdiSourceIndex];
 			ofLogNotice("Video Input") << "Input 1: NDI Source " << sourceName;
@@ -1842,6 +1912,7 @@ void ofApp::reinitializeInputs(){
 			}
 		}
 	} else if (gui->input1SourceType == 2) {
+#if OFAPP_HAS_SPOUT
 		// Spout
 		input1.close();
 		ndiReceiver1.ReleaseReceiver();
@@ -1855,6 +1926,7 @@ void ofApp::reinitializeInputs(){
 			ofLogNotice("Video Input") << "Input 1: Spout (active sender)";
 			spoutReceiver1.init();
 		}
+#endif
 	}
 
 	// Handle Input 2
@@ -1862,7 +1934,9 @@ void ofApp::reinitializeInputs(){
 		// Webcam
 		ofLogNotice("Video Input") << "Input 2: Webcam Device " << gui->input2DeviceID;
 		ndiReceiver2.ReleaseReceiver();
+#if OFAPP_HAS_SPOUT
 		spoutReceiver2.release();
+#endif
 		input2.close();
 		input2.setVerbose(true);
 		input2.setDeviceID(gui->input2DeviceID);
@@ -1871,7 +1945,9 @@ void ofApp::reinitializeInputs(){
 	} else if (gui->input2SourceType == 1) {
 		// NDI
 		input2.close();
+#if OFAPP_HAS_SPOUT
 		spoutReceiver2.release();
+#endif
 		if (gui->input2NdiSourceIndex < gui->ndiSourceNames.size()) {
 			string sourceName = gui->ndiSourceNames[gui->input2NdiSourceIndex];
 			ofLogNotice("Video Input") << "Input 2: NDI Source " << sourceName;
@@ -1882,6 +1958,7 @@ void ofApp::reinitializeInputs(){
 			}
 		}
 	} else if (gui->input2SourceType == 2) {
+#if OFAPP_HAS_SPOUT
 		// Spout
 		input2.close();
 		ndiReceiver2.ReleaseReceiver();
@@ -1895,6 +1972,7 @@ void ofApp::reinitializeInputs(){
 			ofLogNotice("Video Input") << "Input 2: Spout (active sender)";
 			spoutReceiver2.init();
 		}
+#endif
 	}
 
 	ofLogNotice("Video Input") << "Reinitialization complete";
@@ -1925,6 +2003,7 @@ void ofApp::refreshNdiSources(){
 }
 
 //---------------------------------------------------------
+#if OFAPP_HAS_SPOUT
 void ofApp::refreshSpoutSources(){
 	ofLogNotice("Spout") << "Scanning for Spout senders...";
 
@@ -1949,6 +2028,12 @@ void ofApp::refreshSpoutSources(){
 
 	ofLogNotice("Spout") << "Total Spout senders added: " << gui->spoutSourceNames.size();
 }
+#else
+void ofApp::refreshSpoutSources(){
+	gui->spoutSourceNames.clear();
+	ofLogNotice("Spout") << "Spout is not supported on this platform.";
+}
+#endif
 
 //---------------------------------------------------------
 void ofApp::framebufferSetup(){
@@ -2013,6 +2098,7 @@ void ofApp::reinitializeResolutions(){
 	allocateGpuOnlyFbo(ndiFbo1, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(ndiFbo2, internalWidth, internalHeight);
 
+#if OFAPP_HAS_SPOUT
 	// Reallocate Spout input FBOs at INTERNAL resolution - GPU-only
 	allocateGpuOnlyFbo(spoutFbo1, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(spoutFbo2, internalWidth, internalHeight);
@@ -2021,6 +2107,7 @@ void ofApp::reinitializeResolutions(){
 	allocateGpuOnlyFbo(spoutSendFbo1, spoutSendWidth, spoutSendHeight);
 	allocateGpuOnlyFbo(spoutSendFbo2, spoutSendWidth, spoutSendHeight);
 	allocateGpuOnlyFbo(spoutSendFbo3, spoutSendWidth, spoutSendHeight);
+#endif
 
 	// Reallocate NDI send FBOs at ndi send resolution
 	// NOTE: These NEED CPU backing because NDI reads pixels back to CPU for network transmission
