@@ -433,6 +433,10 @@ void GuiApp::draw(){
 		}
 
 		static int item_saveState = 0;
+		// Sync GUI dropdown with OSC-updated value
+		if (item_saveState != saveStateSelectSwitch) {
+			item_saveState = saveStateSelectSwitch;
+		}
 		if (ImGui::Combo("##select a save state", &item_saveState, saveStateSelectItems, IM_ARRAYSIZE(saveStateSelectItems))) {
 			saveStateSelectSwitch=item_saveState;
 			if (mainApp) mainApp->sendOscParameter("/gravity/preset/selectSave", static_cast<float>(saveStateSelectSwitch));
@@ -463,6 +467,10 @@ void GuiApp::draw(){
 			loadStateSelectItems[i]=saveStateNamesChar[i];
 		}
 		static int item_loadState = 0;
+		// Sync GUI dropdown with OSC-updated value
+		if (item_loadState != loadStateSelectSwitch) {
+			item_loadState = loadStateSelectSwitch;
+		}
 		if (ImGui::Combo("##select a load state", &item_loadState, loadStateSelectItems, IM_ARRAYSIZE(loadStateSelectItems))) {
 			loadStateSelectSwitch=item_loadState;
 			if (mainApp) mainApp->sendOscParameter("/gravity/preset/selectLoad", static_cast<float>(loadStateSelectSwitch));
@@ -475,14 +483,6 @@ void GuiApp::draw(){
 
 		if (ImGui::Button("load")) {
 			loadALL=1;
-			ImGui::OpenPopup("load successful");
-		}
-		if(ImGui::BeginPopupModal("load successful")){
-			string success=saveStateNames[loadStateSelectSwitch]+ " loaded successfully";
-			ImGui::Text(success.c_str());
-			if(ImGui::Button("okay")){ImGui::CloseCurrentPopup();}
-			ImGui::SetItemDefaultFocus();
-			ImGui::EndPopup();
 		}
 
 		ImGui::SameLine();
