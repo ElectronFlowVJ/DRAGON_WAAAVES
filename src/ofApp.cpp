@@ -39,8 +39,10 @@ void allocateGpuOnlyFbo(ofFbo& fbo, int width, int height) {
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	// Ensure texture coordinates are in pixel space for shaders that expect it.
-	ofDisableNormalizedTexCoords();
+	// Shaders use sampler2D (not sampler2DRect), so we need GL_TEXTURE_2D target
+	ofDisableArbTex();
+	// Enable normalized texture coordinates (0-1 range) for sampler2D
+	ofEnableNormalizedTexCoords();
 	ofLogNotice("Shader") << "Normalized Tex Coords: " << (ofGetUsingNormalizedTexCoords() ? "ON" : "OFF");
 	ofSetFrameRate(30);
 	ofBackground(0);
