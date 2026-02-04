@@ -189,9 +189,9 @@ public:
 	int input2NdiSourceIndex = 0;
 	bool refreshNdiSources = false;
 
-#if OFAPP_HAS_SPOUT
-	// Spout Input Settings
+	// Spout Input Settings (stub implementation needs spoutSourceNames vector on all platforms)
 	std::vector<std::string> spoutSourceNames;  // Available Spout senders
+#if OFAPP_HAS_SPOUT
 	int input1SpoutSourceIndex = 0;
 	int input2SpoutSourceIndex = 0;
 	bool refreshSpoutSources = false;

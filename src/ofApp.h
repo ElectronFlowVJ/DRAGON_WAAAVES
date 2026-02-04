@@ -136,10 +136,8 @@ class ofApp : public ofBaseApp{
 	int ndiSendWidth = 1280;
 	int ndiSendHeight = 720;
 
-#if OFAPP_HAS_SPOUT
-	// Spout source management
+	// Spout source management (stub implementation exists on non-Windows)
 	void refreshSpoutSources();
-#endif
 
 	//framebuffers
 	void framebufferSetup();
