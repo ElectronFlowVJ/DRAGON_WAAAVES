@@ -1125,45 +1125,79 @@ void GuiApp::draw(){
 								midi2Gui(ch1AdjustLfoMidiActive, ch1AdjustLfo, ch1AdjustLfoMidiGui);
 								ImGui::Separator();
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								ImGuiSliderFloatOSC("x <-> a      ##ch1", &ch1AdjustLfo[0], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/xDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x <-> r      ##ch1", &ch1AdjustLfo[1], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/xDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch1xShape", &ch1AdjustLfoShape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch1/lfo/xDisplaceShape", static_cast<float>(ch1AdjustLfoShape[0]));
+								}
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("y <-> a      ##ch1", &ch1AdjustLfo[2], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/yDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y <-> r      ##ch1", &ch1AdjustLfo[3], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/yDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch1yShape", &ch1AdjustLfoShape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch1/lfo/yDisplaceShape", static_cast<float>(ch1AdjustLfoShape[1]));
+								}
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("z <-> a      ##ch1", &ch1AdjustLfo[4], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/zDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("z <-> r      ##ch1", &ch1AdjustLfo[5], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/zDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch1zShape", &ch1AdjustLfoShape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch1/lfo/zDisplaceShape", static_cast<float>(ch1AdjustLfoShape[2]));
+								}
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("rotate <-> a ##ch1", &ch1AdjustLfo[6], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/rotateAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("rotate <-> r ##ch1", &ch1AdjustLfo[7], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/rotateRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch1rotateShape", &ch1AdjustLfoShape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch1/lfo/rotateShape", static_cast<float>(ch1AdjustLfoShape[3]));
+								}
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("hue ^^ a     ##ch1", &ch1AdjustLfo[8], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/hueOffsetAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("hue ^^ r     ##ch1", &ch1AdjustLfo[9], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/hueOffsetRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch1hueShape", &ch1AdjustLfoShape[4], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch1/lfo/hueOffsetShape", static_cast<float>(ch1AdjustLfoShape[4]));
+								}
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("sat ^^ a     ##ch1", &ch1AdjustLfo[10], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/saturationOffsetAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("sat ^^ r     ##ch1", &ch1AdjustLfo[11], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/saturationOffsetRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch1satShape", &ch1AdjustLfoShape[5], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch1/lfo/saturationOffsetShape", static_cast<float>(ch1AdjustLfoShape[5]));
+								}
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("bri ^^ a     ##ch1", &ch1AdjustLfo[12], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/brightOffsetAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("bri ^^ r     ##ch1", &ch1AdjustLfo[13], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/brightOffsetRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch1briShape", &ch1AdjustLfoShape[6], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch1/lfo/brightOffsetShape", static_cast<float>(ch1AdjustLfoShape[6]));
+								}
 
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("kaleid sli a ##ch1", &ch1AdjustLfo[14], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/kaleidoscopeSliceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("kaleid sli r ##ch1", &ch1AdjustLfo[15], -1.0f, 1.0f, "/gravity/block1/ch1/lfo/kaleidoscopeSliceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch1kaleidShape", &ch1AdjustLfoShape[7], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch1/lfo/kaleidoscopeSliceShape", static_cast<float>(ch1AdjustLfoShape[7]));
+								}
 							}
 							else
 							{
@@ -1198,18 +1232,32 @@ void GuiApp::draw(){
 
 								midi2Gui(ch2MixAndKeyLfoMidiActive, ch2MixAndKeyLfo, ch2MixAndKeyLfoMidiGui);
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("mix a       ##ch2", &ch2MixAndKeyLfo[0],-1.0,1.0, "/gravity/block1/ch2/lfo/mixAmountAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("mix r       ##ch2", &ch2MixAndKeyLfo[1],-1.0,1.0, "/gravity/block1/ch2/lfo/mixAmountRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch2mixShape", &ch2MixAndKeyLfoShape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/lfo/mixAmountShape", static_cast<float>(ch2MixAndKeyLfoShape[0]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("ky thresh a ##ch2", &ch2MixAndKeyLfo[2],-1.0,1.0, "/gravity/block1/ch2/lfo/keyThresholdAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("ky thresh r ##ch2", &ch2MixAndKeyLfo[3],-1.0,1.0, "/gravity/block1/ch2/lfo/keyThresholdRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch2keyThreshShape", &ch2MixAndKeyLfoShape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/lfo/keyThresholdShape", static_cast<float>(ch2MixAndKeyLfoShape[1]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("ky soft a   ##ch2", &ch2MixAndKeyLfo[4],-1.0,1.0, "/gravity/block1/ch2/lfo/keySoftAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("ky soft r   ##ch2", &ch2MixAndKeyLfo[5],-1.0,1.0, "/gravity/block1/ch2/lfo/keySoftRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch2keySoftShape", &ch2MixAndKeyLfoShape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/lfo/keySoftShape", static_cast<float>(ch2MixAndKeyLfoShape[2]));
+								}
 
 								//looks like we could just add AND wipe mode too here without too much issue, so we could simultaneously
 								//wipe and mix and key without having alternate modes
@@ -1248,38 +1296,68 @@ void GuiApp::draw(){
 								midi2Gui(ch2AdjustLfoMidiActive, ch2AdjustLfo, ch2AdjustLfoMidiGui);
 								ImGui::Separator();
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								ImGuiSliderFloatOSC("x <-> a      ##ch2", &ch2AdjustLfo[0], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/xDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x <-> r      ##ch2", &ch2AdjustLfo[1], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/xDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch2xShape", &ch2AdjustLfoShape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/lfo/xDisplaceShape", static_cast<float>(ch2AdjustLfoShape[0]));
+								}
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("y <-> a      ##ch2", &ch2AdjustLfo[2], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/yDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y <-> r      ##ch2", &ch2AdjustLfo[3], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/yDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch2yShape", &ch2AdjustLfoShape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/lfo/yDisplaceShape", static_cast<float>(ch2AdjustLfoShape[1]));
+								}
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("z <-> a      ##ch2", &ch2AdjustLfo[4], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/zDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("z <-> r      ##ch2", &ch2AdjustLfo[5], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/zDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch2zShape", &ch2AdjustLfoShape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/lfo/zDisplaceShape", static_cast<float>(ch2AdjustLfoShape[2]));
+								}
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("rotate <-> a ##ch2", &ch2AdjustLfo[6], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/rotateAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("rotate <-> r ##ch2", &ch2AdjustLfo[7], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/rotateRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch2rotateShape", &ch2AdjustLfoShape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/lfo/rotateShape", static_cast<float>(ch2AdjustLfoShape[3]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("hue ^^ a     ##ch2", &ch2AdjustLfo[8], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/hueOffsetAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("hue ^^ r     ##ch2", &ch2AdjustLfo[9], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/hueOffsetRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch2hueShape", &ch2AdjustLfoShape[4], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/lfo/hueOffsetShape", static_cast<float>(ch2AdjustLfoShape[4]));
+								}
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("sat ^^ a     ##ch2", &ch2AdjustLfo[10], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/saturationOffsetAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("sat ^^ r     ##ch2", &ch2AdjustLfo[11], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/saturationOffsetRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch2satShape", &ch2AdjustLfoShape[5], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/lfo/saturationOffsetShape", static_cast<float>(ch2AdjustLfoShape[5]));
+								}
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("bri ^^ a     ##ch2", &ch2AdjustLfo[12], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/brightOffsetAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("bri ^^ r     ##ch2", &ch2AdjustLfo[13], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/brightOffsetRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch2briShape", &ch2AdjustLfoShape[6], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/lfo/brightOffsetShape", static_cast<float>(ch2AdjustLfoShape[6]));
+								}
 
 
 								ImGui::Separator();
@@ -1287,6 +1365,10 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("kaleid sli a ##ch2", &ch2AdjustLfo[14], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/kaleidoscopeSliceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("kaleid sli r ##ch2", &ch2AdjustLfo[15], -1.0f, 1.0f, "/gravity/block1/ch2/lfo/kaleidoscopeSliceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##ch2kaleidShape", &ch2AdjustLfoShape[7], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/ch2/lfo/kaleidoscopeSliceShape", static_cast<float>(ch2AdjustLfoShape[7]));
+								}
 							}
 							else
 							{
@@ -1679,18 +1761,32 @@ void GuiApp::draw(){
 
 								midi2Gui(fb1MixAndKeyLfoMidiActive, fb1MixAndKeyLfo, fb1MixAndKeyLfoMidiGui);
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("mix a       ##fb1", &fb1MixAndKeyLfo[0],-1.0,1.0, "/gravity/block1/fb1/lfo/mixAmountAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("mix r       ##fb1", &fb1MixAndKeyLfo[1],-1.0,1.0, "/gravity/block1/fb1/lfo/mixAmountRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb1mixShape", &fb1MixAndKeyLfoShape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lfo/mixAmountShape", static_cast<float>(fb1MixAndKeyLfoShape[0]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("ky thresh a ##fb1", &fb1MixAndKeyLfo[2],-1.0,1.0, "/gravity/block1/fb1/lfo/keyThresholdAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("ky thresh r ##fb1", &fb1MixAndKeyLfo[3],-1.0,1.0, "/gravity/block1/fb1/lfo/keyThresholdRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb1keyThreshShape", &fb1MixAndKeyLfoShape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lfo/keyThresholdShape", static_cast<float>(fb1MixAndKeyLfoShape[1]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("ky soft a   ##fb1", &fb1MixAndKeyLfo[4],-1.0,1.0, "/gravity/block1/fb1/lfo/keySoftAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("ky soft r   ##fb1", &fb1MixAndKeyLfo[5],-1.0,1.0, "/gravity/block1/fb1/lfo/keySoftRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb1keySoftShape", &fb1MixAndKeyLfoShape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lfo/keySoftShape", static_cast<float>(fb1MixAndKeyLfoShape[2]));
+								}
 
 							}
 							else
@@ -1727,22 +1823,40 @@ void GuiApp::draw(){
 
 								midi2Gui(fb1Geo1Lfo1MidiActive, fb1Geo1Lfo1, fb1Geo1Lfo1MidiGui);
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x <-> a      ##fb1Lfo", &fb1Geo1Lfo1[0],-1.0,1.0, "/gravity/block1/fb1/lfo/xDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x <-> r      ##fb1Lfo", &fb1Geo1Lfo1[1],-1.0,1.0, "/gravity/block1/fb1/lfo/xDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb1xShape", &fb1Geo1Lfo1Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lfo/xDisplaceShape", static_cast<float>(fb1Geo1Lfo1Shape[0]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("y <-> a      ##fb1Lfo", &fb1Geo1Lfo1[2],-1.0,1.0, "/gravity/block1/fb1/lfo/yDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y <-> r      ##fb1Lfo", &fb1Geo1Lfo1[3],-1.0,1.0, "/gravity/block1/fb1/lfo/yDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb1yShape", &fb1Geo1Lfo1Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lfo/yDisplaceShape", static_cast<float>(fb1Geo1Lfo1Shape[1]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("z <-> a      ##fb1Lfo", &fb1Geo1Lfo1[4],-1.0,1.0, "/gravity/block1/fb1/lfo/zDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("z <-> r      ##fb1Lfo", &fb1Geo1Lfo1[5],-1.0,1.0, "/gravity/block1/fb1/lfo/zDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb1zShape", &fb1Geo1Lfo1Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lfo/zDisplaceShape", static_cast<float>(fb1Geo1Lfo1Shape[2]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("rotate <-> a ##fb1Lfo", &fb1Geo1Lfo1[6],-1.0,1.0, "/gravity/block1/fb1/lfo/rotateAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("rotate <-> r ##fb1Lfo", &fb1Geo1Lfo1[7],-1.0,1.0, "/gravity/block1/fb1/lfo/rotateRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb1rotateShape", &fb1Geo1Lfo1Shape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lfo/rotateShape", static_cast<float>(fb1Geo1Lfo1Shape[3]));
+								}
 							}
 							else
 							{
@@ -1778,27 +1892,49 @@ void GuiApp::draw(){
 
 								midi2Gui(fb1Geo1Lfo2MidiActive, fb1Geo1Lfo2, fb1Geo1Lfo2MidiGui);
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x stretch a  ##fb1lfo", &fb1Geo1Lfo2[0],-1.0,1.0, "/gravity/block1/fb1/lfo/xStretchAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x stretch r  ##fb1lfo", &fb1Geo1Lfo2[1],-1.0,1.0, "/gravity/block1/fb1/lfo/xStretchRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb1xStretchShape", &fb1Geo1Lfo2Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lfo/xStretchShape", static_cast<float>(fb1Geo1Lfo2Shape[0]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("y stretch a  ##fb1lfo", &fb1Geo1Lfo2[2],-1.0,1.0, "/gravity/block1/fb1/lfo/yStretchAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y stretch r  ##fb1lfo", &fb1Geo1Lfo2[3],-1.0,1.0, "/gravity/block1/fb1/lfo/yStretchRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb1yStretchShape", &fb1Geo1Lfo2Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lfo/yStretchShape", static_cast<float>(fb1Geo1Lfo2Shape[1]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x shear a    ##fb1lfo", &fb1Geo1Lfo2[4],-1.0,1.0, "/gravity/block1/fb1/lfo/xShearAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x shear r    ##fb1lfo", &fb1Geo1Lfo2[5],-1.0,1.0, "/gravity/block1/fb1/lfo/xShearRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb1xShearShape", &fb1Geo1Lfo2Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lfo/xShearShape", static_cast<float>(fb1Geo1Lfo2Shape[2]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("y shear a    ##fb1lfo", &fb1Geo1Lfo2[6],-1.0,1.0, "/gravity/block1/fb1/lfo/yShearAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y shear r    ##fb1lfo", &fb1Geo1Lfo2[7],-1.0,1.0, "/gravity/block1/fb1/lfo/yShearRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb1yShearShape", &fb1Geo1Lfo2Shape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lfo/yShearShape", static_cast<float>(fb1Geo1Lfo2Shape[3]));
+								}
 
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("kaleid sl a  ##fb1lfo", &fb1Geo1Lfo2[8],-1.0,1.0, "/gravity/block1/fb1/lfo/kaleidoscopeSliceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("kaleid sl r  ##fb1lfo", &fb1Geo1Lfo2[9],-1.0,1.0, "/gravity/block1/fb1/lfo/kaleidoscopeSliceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb1kaleidShape", &fb1Geo1Lfo2Shape[4], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lfo/kaleidoscopeSliceShape", static_cast<float>(fb1Geo1Lfo2Shape[4]));
+								}
 							}
 							else
 							{
@@ -1833,18 +1969,32 @@ void GuiApp::draw(){
 
 								midi2Gui(fb1Color1Lfo1MidiActive, fb1Color1Lfo1, fb1Color1Lfo1MidiGui);
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("hue ** a     ##fb1lfo", &fb1Color1Lfo1[0],-1.0,1.0, "/gravity/block1/fb1/lfo/huePowmapAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("hue ** r     ##fb1lfo", &fb1Color1Lfo1[1],-1.0,1.0, "/gravity/block1/fb1/lfo/huePowmapRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb1hueShape", &fb1Color1Lfo1Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lfo/huePowmapShape", static_cast<float>(fb1Color1Lfo1Shape[0]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("sat ** a     ##fb1lfo", &fb1Color1Lfo1[2],-1.0,1.0, "/gravity/block1/fb1/lfo/saturationPowmapAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("sat ** r     ##fb1lfo", &fb1Color1Lfo1[3],-1.0,1.0, "/gravity/block1/fb1/lfo/saturationPowmapRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb1satShape", &fb1Color1Lfo1Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lfo/saturationPowmapShape", static_cast<float>(fb1Color1Lfo1Shape[1]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("bri ** a     ##fb1lfo", &fb1Color1Lfo1[4],-1.0,1.0, "/gravity/block1/fb1/lfo/brightPowmapAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("bri ** r     ##fb1lfo", &fb1Color1Lfo1[5],-1.0,1.0, "/gravity/block1/fb1/lfo/brightPowmapRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb1briShape", &fb1Color1Lfo1Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lfo/brightPowmapShape", static_cast<float>(fb1Color1Lfo1Shape[2]));
+								}
 							}
 							else
 							{
@@ -2037,38 +2187,68 @@ void GuiApp::draw(){
 						midi2Gui(block2InputAdjustLfoMidiActive, block2InputAdjustLfo, block2InputAdjustLfoMidiGui);
 						ImGui::Separator();
 
+						const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 						ImGuiSliderFloatOSC("x <-> a      ##block2Input", &block2InputAdjustLfo[0], -1.0f, 1.0f, "/gravity/block2/input/lfo/xDisplaceAmp");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("x <-> r      ##block2Input", &block2InputAdjustLfo[1], -1.0f, 1.0f, "/gravity/block2/input/lfo/xDisplaceRate");
+						ImGui::SameLine();
+						if (ImGui::Combo("##block2InputxShape", &block2InputAdjustLfoShape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+							if (mainApp) mainApp->sendOscParameter("/gravity/block2/input/lfo/xDisplaceShape", static_cast<float>(block2InputAdjustLfoShape[0]));
+						}
 						ImGui::Separator();
 
 						ImGuiSliderFloatOSC("y <-> a      ##block2Input", &block2InputAdjustLfo[2], -1.0f, 1.0f, "/gravity/block2/input/lfo/yDisplaceAmp");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("y <-> r      ##block2Input", &block2InputAdjustLfo[3], -1.0f, 1.0f, "/gravity/block2/input/lfo/yDisplaceRate");
+						ImGui::SameLine();
+						if (ImGui::Combo("##block2InputyShape", &block2InputAdjustLfoShape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+							if (mainApp) mainApp->sendOscParameter("/gravity/block2/input/lfo/yDisplaceShape", static_cast<float>(block2InputAdjustLfoShape[1]));
+						}
 						ImGui::Separator();
 
 						ImGuiSliderFloatOSC("z <-> a      ##block2Input", &block2InputAdjustLfo[4], -1.0f, 1.0f, "/gravity/block2/input/lfo/zDisplaceAmp");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("z <-> r      ##block2Input", &block2InputAdjustLfo[5], -1.0f, 1.0f, "/gravity/block2/input/lfo/zDisplaceRate");
+						ImGui::SameLine();
+						if (ImGui::Combo("##block2InputzShape", &block2InputAdjustLfoShape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+							if (mainApp) mainApp->sendOscParameter("/gravity/block2/input/lfo/zDisplaceShape", static_cast<float>(block2InputAdjustLfoShape[2]));
+						}
 						ImGui::Separator();
 
 						ImGuiSliderFloatOSC("rotate <-> a ##block2Input", &block2InputAdjustLfo[6], -1.0f, 1.0f, "/gravity/block2/input/lfo/rotateAmp");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("rotate <-> r ##block2Input", &block2InputAdjustLfo[7], -1.0f, 1.0f, "/gravity/block2/input/lfo/rotateRate");
+						ImGui::SameLine();
+						if (ImGui::Combo("##block2InputrotateShape", &block2InputAdjustLfoShape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+							if (mainApp) mainApp->sendOscParameter("/gravity/block2/input/lfo/rotateShape", static_cast<float>(block2InputAdjustLfoShape[3]));
+						}
 						ImGui::Separator();
 						ImGuiSliderFloatOSC("hue ^^ a     ##block2Input", &block2InputAdjustLfo[8], -1.0f, 1.0f, "/gravity/block2/input/lfo/hueOffsetAmp");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("hue ^^ r     ##block2Input", &block2InputAdjustLfo[9], -1.0f, 1.0f, "/gravity/block2/input/lfo/hueOffsetRate");
+						ImGui::SameLine();
+						if (ImGui::Combo("##block2InputhueShape", &block2InputAdjustLfoShape[4], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+							if (mainApp) mainApp->sendOscParameter("/gravity/block2/input/lfo/hueOffsetShape", static_cast<float>(block2InputAdjustLfoShape[4]));
+						}
 						ImGui::Separator();
 
 						ImGuiSliderFloatOSC("sat ^^ a     ##block2Input", &block2InputAdjustLfo[10], -1.0f, 1.0f, "/gravity/block2/input/lfo/saturationOffsetAmp");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("sat ^^ r     ##block2Input", &block2InputAdjustLfo[11], -1.0f, 1.0f, "/gravity/block2/input/lfo/saturationOffsetRate");
+						ImGui::SameLine();
+						if (ImGui::Combo("##block2InputsatShape", &block2InputAdjustLfoShape[5], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+							if (mainApp) mainApp->sendOscParameter("/gravity/block2/input/lfo/saturationOffsetShape", static_cast<float>(block2InputAdjustLfoShape[5]));
+						}
 						ImGui::Separator();
 
 						ImGuiSliderFloatOSC("bri ^^ a     ##block2Input", &block2InputAdjustLfo[12], -1.0f, 1.0f, "/gravity/block2/input/lfo/brightOffsetAmp");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("bri ^^ r     ##block2Input", &block2InputAdjustLfo[13], -1.0f, 1.0f, "/gravity/block2/input/lfo/brightOffsetRate");
+						ImGui::SameLine();
+						if (ImGui::Combo("##block2InputbriShape", &block2InputAdjustLfoShape[6], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+							if (mainApp) mainApp->sendOscParameter("/gravity/block2/input/lfo/brightOffsetShape", static_cast<float>(block2InputAdjustLfoShape[6]));
+						}
 
 
 						ImGui::Separator();
@@ -2076,6 +2256,10 @@ void GuiApp::draw(){
 						ImGuiSliderFloatOSC("kaleid sli a ##block2Input", &block2InputAdjustLfo[14], -1.0f, 1.0f, "/gravity/block2/input/lfo/kaleidoscopeSliceAmp");
 						ImGui::SameLine();
 						ImGuiSliderFloatOSC("kaleid sli r ##block2Input", &block2InputAdjustLfo[15], -1.0f, 1.0f, "/gravity/block2/input/lfo/kaleidoscopeSliceRate");
+						ImGui::SameLine();
+						if (ImGui::Combo("##block2InputkaleidShape", &block2InputAdjustLfoShape[7], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+							if (mainApp) mainApp->sendOscParameter("/gravity/block2/input/lfo/kaleidoscopeSliceShape", static_cast<float>(block2InputAdjustLfoShape[7]));
+						}
 
 						ImGui::EndTabItem();
 					}
@@ -2457,18 +2641,32 @@ void GuiApp::draw(){
 
 								midi2Gui(fb2MixAndKeyLfoMidiActive, fb2MixAndKeyLfo, fb2MixAndKeyLfoMidiGui);
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("mix a       ##fb2", &fb2MixAndKeyLfo[0],-1.0,1.0, "/gravity/block2/fb2/lfo/mixAmountAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("mix r       ##fb2", &fb2MixAndKeyLfo[1],-1.0,1.0, "/gravity/block2/fb2/lfo/mixAmountRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb2mixShape", &fb2MixAndKeyLfoShape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lfo/mixAmountShape", static_cast<float>(fb2MixAndKeyLfoShape[0]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("ky thresh a ##fb2", &fb2MixAndKeyLfo[2],-1.0,1.0, "/gravity/block2/fb2/lfo/keyThresholdAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("ky thresh r ##fb2", &fb2MixAndKeyLfo[3],-1.0,1.0, "/gravity/block2/fb2/lfo/keyThresholdRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb2keyThreshShape", &fb2MixAndKeyLfoShape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lfo/keyThresholdShape", static_cast<float>(fb2MixAndKeyLfoShape[1]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("ky soft a   ##fb2", &fb2MixAndKeyLfo[4],-1.0,1.0, "/gravity/block2/fb2/lfo/keySoftAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("ky soft r   ##fb2", &fb2MixAndKeyLfo[5],-1.0,1.0, "/gravity/block2/fb2/lfo/keySoftRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb2keySoftShape", &fb2MixAndKeyLfoShape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lfo/keySoftShape", static_cast<float>(fb2MixAndKeyLfoShape[2]));
+								}
 							}
 							else
 							{
@@ -2503,22 +2701,40 @@ void GuiApp::draw(){
 
 								midi2Gui(fb2Geo1Lfo1MidiActive, fb2Geo1Lfo1, fb2Geo1Lfo1MidiGui);
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x <-> a      ##fb2Lfo", &fb2Geo1Lfo1[0],-1.0,1.0, "/gravity/block2/fb2/lfo/xDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x <-> r      ##fb2Lfo", &fb2Geo1Lfo1[1],-1.0,1.0, "/gravity/block2/fb2/lfo/xDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb2xShape", &fb2Geo1Lfo1Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lfo/xDisplaceShape", static_cast<float>(fb2Geo1Lfo1Shape[0]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("y <-> a      ##fb2Lfo", &fb2Geo1Lfo1[2],-1.0,1.0, "/gravity/block2/fb2/lfo/yDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y <-> r      ##fb2Lfo", &fb2Geo1Lfo1[3],-1.0,1.0, "/gravity/block2/fb2/lfo/yDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb2yShape", &fb2Geo1Lfo1Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lfo/yDisplaceShape", static_cast<float>(fb2Geo1Lfo1Shape[1]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("z <-> a      ##fb2Lfo", &fb2Geo1Lfo1[4],-1.0,1.0, "/gravity/block2/fb2/lfo/zDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("z <-> r      ##fb2Lfo", &fb2Geo1Lfo1[5],-1.0,1.0, "/gravity/block2/fb2/lfo/zDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb2zShape", &fb2Geo1Lfo1Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lfo/zDisplaceShape", static_cast<float>(fb2Geo1Lfo1Shape[2]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("rotate <-> a ##fb2Lfo", &fb2Geo1Lfo1[6],-1.0,1.0, "/gravity/block2/fb2/lfo/rotateAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("rotate <-> r ##fb2Lfo", &fb2Geo1Lfo1[7],-1.0,1.0, "/gravity/block2/fb2/lfo/rotateRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb2rotateShape", &fb2Geo1Lfo1Shape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lfo/rotateShape", static_cast<float>(fb2Geo1Lfo1Shape[3]));
+								}
 							}
 							else
 							{
@@ -2554,27 +2770,49 @@ void GuiApp::draw(){
 
 								midi2Gui(fb2Geo1Lfo2MidiActive, fb2Geo1Lfo2, fb2Geo1Lfo2MidiGui);
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x stretch a  ##fb2lfo", &fb2Geo1Lfo2[0],-1.0,1.0, "/gravity/block2/fb2/lfo/xStretchAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x stretch r  ##fb2lfo", &fb2Geo1Lfo2[1],-1.0,1.0, "/gravity/block2/fb2/lfo/xStretchRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb2xStretchShape", &fb2Geo1Lfo2Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lfo/xStretchShape", static_cast<float>(fb2Geo1Lfo2Shape[0]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("y stretch a  ##fb2lfo", &fb2Geo1Lfo2[2],-1.0,1.0, "/gravity/block2/fb2/lfo/yStretchAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y stretch r  ##fb2lfo", &fb2Geo1Lfo2[3],-1.0,1.0, "/gravity/block2/fb2/lfo/yStretchRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb2yStretchShape", &fb2Geo1Lfo2Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lfo/yStretchShape", static_cast<float>(fb2Geo1Lfo2Shape[1]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x shear a    ##fb2lfo", &fb2Geo1Lfo2[4],-1.0,1.0, "/gravity/block2/fb2/lfo/xShearAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x shear r    ##fb2lfo", &fb2Geo1Lfo2[5],-1.0,1.0, "/gravity/block2/fb2/lfo/xShearRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb2xShearShape", &fb2Geo1Lfo2Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lfo/xShearShape", static_cast<float>(fb2Geo1Lfo2Shape[2]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("y shear a    ##fb2lfo", &fb2Geo1Lfo2[6],-1.0,1.0, "/gravity/block2/fb2/lfo/yShearAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y shear r    ##fb2lfo", &fb2Geo1Lfo2[7],-1.0,1.0, "/gravity/block2/fb2/lfo/yShearRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb2yShearShape", &fb2Geo1Lfo2Shape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lfo/yShearShape", static_cast<float>(fb2Geo1Lfo2Shape[3]));
+								}
 
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("kaleid sl a  ##fb2lfo", &fb2Geo1Lfo2[8],-1.0,1.0, "/gravity/block2/fb2/lfo/kaleidoscopeSliceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("kaleid sl r  ##fb2lfo", &fb2Geo1Lfo2[9],-1.0,1.0, "/gravity/block2/fb2/lfo/kaleidoscopeSliceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb2kaleidShape", &fb2Geo1Lfo2Shape[4], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lfo/kaleidoscopeSliceShape", static_cast<float>(fb2Geo1Lfo2Shape[4]));
+								}
 							}
 							else
 							{
@@ -2609,18 +2847,32 @@ void GuiApp::draw(){
 
 								midi2Gui(fb2Color1Lfo1MidiActive, fb2Color1Lfo1, fb2Color1Lfo1MidiGui);
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("hue ** a     ##fb2lfo", &fb2Color1Lfo1[0],-1.0,1.0, "/gravity/block2/fb2/lfo/huePowmapAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("hue ** r     ##fb2lfo", &fb2Color1Lfo1[1],-1.0,1.0, "/gravity/block2/fb2/lfo/huePowmapRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb2hueShape", &fb2Color1Lfo1Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lfo/huePowmapShape", static_cast<float>(fb2Color1Lfo1Shape[0]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("sat ** a     ##fb2lfo", &fb2Color1Lfo1[2],-1.0,1.0, "/gravity/block2/fb2/lfo/saturationPowmapAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("sat ** r     ##fb2lfo", &fb2Color1Lfo1[3],-1.0,1.0, "/gravity/block2/fb2/lfo/saturationPowmapRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb2satShape", &fb2Color1Lfo1Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lfo/saturationPowmapShape", static_cast<float>(fb2Color1Lfo1Shape[1]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("bri ** a     ##fb2lfo", &fb2Color1Lfo1[4],-1.0,1.0, "/gravity/block2/fb2/lfo/brightPowmapAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("bri ** r     ##fb2lfo", &fb2Color1Lfo1[5],-1.0,1.0, "/gravity/block2/fb2/lfo/brightPowmapRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##fb2briShape", &fb2Color1Lfo1Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lfo/brightPowmapShape", static_cast<float>(fb2Color1Lfo1Shape[2]));
+								}
 							}
 							else
 							{
@@ -2955,22 +3207,40 @@ void GuiApp::draw(){
 
 								midi2Gui(block1Geo1Lfo1MidiActive, block1Geo1Lfo1, block1Geo1Lfo1MidiGui);
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x <-> a      ##block1Lfo", &block1Geo1Lfo1[0],-1.0,1.0, "/gravity/block3/lfo/b1/xDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x <-> r      ##block1Lfo", &block1Geo1Lfo1[1],-1.0,1.0, "/gravity/block3/lfo/b1/xDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1xShape", &block1Geo1Lfo1Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/xDisplaceShape", static_cast<float>(block1Geo1Lfo1Shape[0]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("y <-> a      ##block1Lfo", &block1Geo1Lfo1[2],-1.0,1.0, "/gravity/block3/lfo/b1/yDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y <-> r      ##block1Lfo", &block1Geo1Lfo1[3],-1.0,1.0, "/gravity/block3/lfo/b1/yDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1yShape", &block1Geo1Lfo1Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/yDisplaceShape", static_cast<float>(block1Geo1Lfo1Shape[1]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("z <-> a      ##block1Lfo", &block1Geo1Lfo1[4],-1.0,1.0, "/gravity/block3/lfo/b1/zDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("z <-> r      ##block1Lfo", &block1Geo1Lfo1[5],-1.0,1.0, "/gravity/block3/lfo/b1/zDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1zShape", &block1Geo1Lfo1Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/zDisplaceShape", static_cast<float>(block1Geo1Lfo1Shape[2]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("rotate <-> a ##block1Lfo", &block1Geo1Lfo1[6],-1.0,1.0, "/gravity/block3/lfo/b1/rotateAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("rotate <-> r ##block1Lfo", &block1Geo1Lfo1[7],-1.0,1.0, "/gravity/block3/lfo/b1/rotateRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1rotateShape", &block1Geo1Lfo1Shape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/rotateShape", static_cast<float>(block1Geo1Lfo1Shape[3]));
+								}
 							}
 							else
 							{
@@ -3006,26 +3276,48 @@ void GuiApp::draw(){
 
 								midi2Gui(block1Geo1Lfo2MidiActive, block1Geo1Lfo2, block1Geo1Lfo2MidiGui);
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x stretch a  ##block1lfo", &block1Geo1Lfo2[0],-1.0,1.0, "/gravity/block3/lfo/b1/xStretchAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x stretch r  ##block1lfo", &block1Geo1Lfo2[1],-1.0,1.0, "/gravity/block3/lfo/b1/xStretchRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1xStretchShape", &block1Geo1Lfo2Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/xStretchShape", static_cast<float>(block1Geo1Lfo2Shape[0]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("y stretch a  ##block1lfo", &block1Geo1Lfo2[2],-1.0,1.0, "/gravity/block3/lfo/b1/yStretchAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y stretch r  ##block1lfo", &block1Geo1Lfo2[3],-1.0,1.0, "/gravity/block3/lfo/b1/yStretchRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1yStretchShape", &block1Geo1Lfo2Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/yStretchShape", static_cast<float>(block1Geo1Lfo2Shape[1]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x shear a    ##block1lfo", &block1Geo1Lfo2[4],-1.0,1.0, "/gravity/block3/lfo/b1/xShearAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x shear r    ##block1lfo", &block1Geo1Lfo2[5],-1.0,1.0, "/gravity/block3/lfo/b1/xShearRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1xShearShape", &block1Geo1Lfo2Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/xShearShape", static_cast<float>(block1Geo1Lfo2Shape[2]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("y shear a    ##block1lfo", &block1Geo1Lfo2[6],-1.0,1.0, "/gravity/block3/lfo/b1/yShearAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y shear r    ##block1lfo", &block1Geo1Lfo2[7],-1.0,1.0, "/gravity/block3/lfo/b1/yShearRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1yShearShape", &block1Geo1Lfo2Shape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/yShearShape", static_cast<float>(block1Geo1Lfo2Shape[3]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("kaleid sl a  ##block1lfo", &block1Geo1Lfo2[8],-1.0,1.0, "/gravity/block3/lfo/b1/kaleidoscopeSliceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("kaleid sl r  ##block1lfo", &block1Geo1Lfo2[9],-1.0,1.0, "/gravity/block3/lfo/b1/kaleidoscopeSliceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1kaleidShape", &block1Geo1Lfo2Shape[4], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/kaleidoscopeSliceShape", static_cast<float>(block1Geo1Lfo2Shape[4]));
+								}
 							}
 							else
 							{
@@ -3060,6 +3352,8 @@ void GuiApp::draw(){
 
 								midi2Gui(block1ColorizeLfo1MidiActive, block1ColorizeLfo1, block1ColorizeLfo1MidiGui);
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								if(block1ColorizeHSB_RGB==0){
 									ImGui::Text("hue                    ");
 									ImGui::SameLine();
@@ -3093,6 +3387,18 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("##6", &block1ColorizeLfo1[5],-1.0,1.0, "/gravity/block3/lfo/b1/brightBand1Rate");
 								ImGui::SameLine();
 								ImGui::Text("band 1 r");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1Col1hueBand1Shape", &block1ColorizeLfo1Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/hueBand1Shape", static_cast<float>(block1ColorizeLfo1Shape[0]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1Col1satBand1Shape", &block1ColorizeLfo1Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/saturationBand1Shape", static_cast<float>(block1ColorizeLfo1Shape[1]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1Col1briBand1Shape", &block1ColorizeLfo1Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/brightBand1Shape", static_cast<float>(block1ColorizeLfo1Shape[2]));
+								}
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("##7",&block1ColorizeLfo1[6],-1.0,1.0, "/gravity/block3/lfo/b1/hueBand2Amp");
@@ -3111,6 +3417,18 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("##12",&block1ColorizeLfo1[11],-1.0,1.0, "/gravity/block3/lfo/b1/brightBand2Rate");
 								ImGui::SameLine();
 								ImGui::Text("band 2 r");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1Col1hueBand2Shape", &block1ColorizeLfo1Shape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/hueBand2Shape", static_cast<float>(block1ColorizeLfo1Shape[3]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1Col1satBand2Shape", &block1ColorizeLfo1Shape[4], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/saturationBand2Shape", static_cast<float>(block1ColorizeLfo1Shape[4]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1Col1briBand2Shape", &block1ColorizeLfo1Shape[5], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/brightBand2Shape", static_cast<float>(block1ColorizeLfo1Shape[5]));
+								}
 							}
 							else
 							{
@@ -3144,6 +3462,8 @@ void GuiApp::draw(){
 								}
 
 								midi2Gui(block1ColorizeLfo2MidiActive, block1ColorizeLfo2, block1ColorizeLfo2MidiGui);
+
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
 
 								if(block1ColorizeHSB_RGB==0){
 									ImGui::Text("hue                    ");
@@ -3179,6 +3499,18 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("##6", &block1ColorizeLfo2[5],-1.0,1.0, "/gravity/block3/lfo/b1/brightBand3Rate");
 								ImGui::SameLine();
 								ImGui::Text("band 3 r");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1Col2hueBand3Shape", &block1ColorizeLfo2Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/hueBand3Shape", static_cast<float>(block1ColorizeLfo2Shape[0]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1Col2satBand3Shape", &block1ColorizeLfo2Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/saturationBand3Shape", static_cast<float>(block1ColorizeLfo2Shape[1]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1Col2briBand3Shape", &block1ColorizeLfo2Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/brightBand3Shape", static_cast<float>(block1ColorizeLfo2Shape[2]));
+								}
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("##7",&block1ColorizeLfo2[6],-1.0,1.0, "/gravity/block3/lfo/b1/hueBand4Amp");
@@ -3197,6 +3529,18 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("##12",&block1ColorizeLfo2[11],-1.0,1.0, "/gravity/block3/lfo/b1/brightBand4Rate");
 								ImGui::SameLine();
 								ImGui::Text("band 4 r");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1Col2hueBand4Shape", &block1ColorizeLfo2Shape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/hueBand4Shape", static_cast<float>(block1ColorizeLfo2Shape[3]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1Col2satBand4Shape", &block1ColorizeLfo2Shape[4], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/saturationBand4Shape", static_cast<float>(block1ColorizeLfo2Shape[4]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1Col2briBand4Shape", &block1ColorizeLfo2Shape[5], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/brightBand4Shape", static_cast<float>(block1ColorizeLfo2Shape[5]));
+								}
 							}
 							else
 							{
@@ -3230,6 +3574,8 @@ void GuiApp::draw(){
 								}
 
 								midi2Gui(block1ColorizeLfo3MidiActive, block1ColorizeLfo3, block1ColorizeLfo3MidiGui);
+
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
 
 								if(block1ColorizeHSB_RGB==0){
 									ImGui::Text("hue                    ");
@@ -3265,6 +3611,18 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("##6", &block1ColorizeLfo3[5],-1.0,1.0, "/gravity/block3/lfo/b1/brightBand5Rate");
 								ImGui::SameLine();
 								ImGui::Text("band 5 r");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1Col3hueBand5Shape", &block1ColorizeLfo3Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/hueBand5Shape", static_cast<float>(block1ColorizeLfo3Shape[0]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1Col3satBand5Shape", &block1ColorizeLfo3Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/saturationBand5Shape", static_cast<float>(block1ColorizeLfo3Shape[1]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block1Col3briBand5Shape", &block1ColorizeLfo3Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b1/brightBand5Shape", static_cast<float>(block1ColorizeLfo3Shape[2]));
+								}
 								ImGui::Separator();
 
 							}
@@ -3548,22 +3906,40 @@ void GuiApp::draw(){
 
 								midi2Gui(block2Geo1Lfo1MidiActive, block2Geo1Lfo1, block2Geo1Lfo1MidiGui);
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x <-> a      ##block2Lfo", &block2Geo1Lfo1[0],-1.0,1.0, "/gravity/block3/lfo/b2/xDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x <-> r      ##block2Lfo", &block2Geo1Lfo1[1],-1.0,1.0, "/gravity/block3/lfo/b2/xDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2xShape", &block2Geo1Lfo1Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/xDisplaceShape", static_cast<float>(block2Geo1Lfo1Shape[0]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("y <-> a      ##block2Lfo", &block2Geo1Lfo1[2],-1.0,1.0, "/gravity/block3/lfo/b2/yDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y <-> r      ##block2Lfo", &block2Geo1Lfo1[3],-1.0,1.0, "/gravity/block3/lfo/b2/yDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2yShape", &block2Geo1Lfo1Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/yDisplaceShape", static_cast<float>(block2Geo1Lfo1Shape[1]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("z <-> a      ##block2Lfo", &block2Geo1Lfo1[4],-1.0,1.0, "/gravity/block3/lfo/b2/zDisplaceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("z <-> r      ##block2Lfo", &block2Geo1Lfo1[5],-1.0,1.0, "/gravity/block3/lfo/b2/zDisplaceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2zShape", &block2Geo1Lfo1Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/zDisplaceShape", static_cast<float>(block2Geo1Lfo1Shape[2]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("rotate <-> a ##block2Lfo", &block2Geo1Lfo1[6],-1.0,1.0, "/gravity/block3/lfo/b2/rotateAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("rotate <-> r ##block2Lfo", &block2Geo1Lfo1[7],-1.0,1.0, "/gravity/block3/lfo/b2/rotateRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2rotateShape", &block2Geo1Lfo1Shape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/rotateShape", static_cast<float>(block2Geo1Lfo1Shape[3]));
+								}
 							}
 							else
 							{
@@ -3599,27 +3975,48 @@ void GuiApp::draw(){
 
 								midi2Gui(block2Geo1Lfo2MidiActive, block2Geo1Lfo2, block2Geo1Lfo2MidiGui);
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
 
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x stretch a  ##block2lfo", &block2Geo1Lfo2[0],-1.0,1.0, "/gravity/block3/lfo/b2/xStretchAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x stretch r  ##block2lfo", &block2Geo1Lfo2[1],-1.0,1.0, "/gravity/block3/lfo/b2/xStretchRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2xStretchShape", &block2Geo1Lfo2Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/xStretchShape", static_cast<float>(block2Geo1Lfo2Shape[0]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("y stretch a  ##block2lfo", &block2Geo1Lfo2[2],-1.0,1.0, "/gravity/block3/lfo/b2/yStretchAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y stretch r  ##block2lfo", &block2Geo1Lfo2[3],-1.0,1.0, "/gravity/block3/lfo/b2/yStretchRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2yStretchShape", &block2Geo1Lfo2Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/yStretchShape", static_cast<float>(block2Geo1Lfo2Shape[1]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("x shear a    ##block2lfo", &block2Geo1Lfo2[4],-1.0,1.0, "/gravity/block3/lfo/b2/xShearAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("x shear r    ##block2lfo", &block2Geo1Lfo2[5],-1.0,1.0, "/gravity/block3/lfo/b2/xShearRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2xShearShape", &block2Geo1Lfo2Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/xShearShape", static_cast<float>(block2Geo1Lfo2Shape[2]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("y shear a    ##block2lfo", &block2Geo1Lfo2[6],-1.0,1.0, "/gravity/block3/lfo/b2/yShearAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("y shear r    ##block2lfo", &block2Geo1Lfo2[7],-1.0,1.0, "/gravity/block3/lfo/b2/yShearRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2yShearShape", &block2Geo1Lfo2Shape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/yShearShape", static_cast<float>(block2Geo1Lfo2Shape[3]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("kaleid sl a  ##block2lfo", &block2Geo1Lfo2[8],-1.0,1.0, "/gravity/block3/lfo/b2/kaleidoscopeSliceAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("kaleid sl r  ##block2lfo", &block2Geo1Lfo2[9],-1.0,1.0, "/gravity/block3/lfo/b2/kaleidoscopeSliceRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2kaleidShape", &block2Geo1Lfo2Shape[4], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/kaleidoscopeSliceShape", static_cast<float>(block2Geo1Lfo2Shape[4]));
+								}
 							}
 							else
 							{
@@ -3653,6 +4050,8 @@ void GuiApp::draw(){
 								}
 
 								midi2Gui(block2ColorizeLfo1MidiActive, block2ColorizeLfo1, block2ColorizeLfo1MidiGui);
+
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
 
 								if(block2ColorizeHSB_RGB==0){
 									ImGui::Text("hue                    ");
@@ -3688,6 +4087,18 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("##6", &block2ColorizeLfo1[5],-1.0,1.0, "/gravity/block3/lfo/b2/brightBand1Rate");
 								ImGui::SameLine();
 								ImGui::Text("band 1 r");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2Col1hueBand1Shape", &block2ColorizeLfo1Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/hueBand1Shape", static_cast<float>(block2ColorizeLfo1Shape[0]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2Col1satBand1Shape", &block2ColorizeLfo1Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/saturationBand1Shape", static_cast<float>(block2ColorizeLfo1Shape[1]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2Col1briBand1Shape", &block2ColorizeLfo1Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/brightBand1Shape", static_cast<float>(block2ColorizeLfo1Shape[2]));
+								}
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("##7",&block2ColorizeLfo1[6],-1.0,1.0, "/gravity/block3/lfo/b2/hueBand2Amp");
@@ -3706,6 +4117,18 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("##12",&block2ColorizeLfo1[11],-1.0,1.0, "/gravity/block3/lfo/b2/brightBand2Rate");
 								ImGui::SameLine();
 								ImGui::Text("band 2 r");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2Col1hueBand2Shape", &block2ColorizeLfo1Shape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/hueBand2Shape", static_cast<float>(block2ColorizeLfo1Shape[3]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2Col1satBand2Shape", &block2ColorizeLfo1Shape[4], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/saturationBand2Shape", static_cast<float>(block2ColorizeLfo1Shape[4]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2Col1briBand2Shape", &block2ColorizeLfo1Shape[5], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/brightBand2Shape", static_cast<float>(block2ColorizeLfo1Shape[5]));
+								}
 							}
 							else
 							{
@@ -3739,6 +4162,8 @@ void GuiApp::draw(){
 								}
 
 								midi2Gui(block2ColorizeLfo2MidiActive, block2ColorizeLfo2, block2ColorizeLfo2MidiGui);
+
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
 
 								if(block2ColorizeHSB_RGB==0){
 									ImGui::Text("hue                    ");
@@ -3774,6 +4199,18 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("##6", &block2ColorizeLfo2[5],-1.0,1.0, "/gravity/block3/lfo/b2/brightBand3Rate");
 								ImGui::SameLine();
 								ImGui::Text("band 3 r");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2Col2hueBand3Shape", &block2ColorizeLfo2Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/hueBand3Shape", static_cast<float>(block2ColorizeLfo2Shape[0]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2Col2satBand3Shape", &block2ColorizeLfo2Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/saturationBand3Shape", static_cast<float>(block2ColorizeLfo2Shape[1]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2Col2briBand3Shape", &block2ColorizeLfo2Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/brightBand3Shape", static_cast<float>(block2ColorizeLfo2Shape[2]));
+								}
 								ImGui::Separator();
 
 								ImGuiSliderFloatOSC("##7",&block2ColorizeLfo2[6],-1.0,1.0, "/gravity/block3/lfo/b2/hueBand4Amp");
@@ -3792,6 +4229,18 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("##12",&block2ColorizeLfo2[11],-1.0,1.0, "/gravity/block3/lfo/b2/brightBand4Rate");
 								ImGui::SameLine();
 								ImGui::Text("band 4 r");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2Col2hueBand4Shape", &block2ColorizeLfo2Shape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/hueBand4Shape", static_cast<float>(block2ColorizeLfo2Shape[3]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2Col2satBand4Shape", &block2ColorizeLfo2Shape[4], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/saturationBand4Shape", static_cast<float>(block2ColorizeLfo2Shape[4]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2Col2briBand4Shape", &block2ColorizeLfo2Shape[5], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/brightBand4Shape", static_cast<float>(block2ColorizeLfo2Shape[5]));
+								}
 							}
 							else
 							{
@@ -3825,6 +4274,8 @@ void GuiApp::draw(){
 								}
 
 								midi2Gui(block2ColorizeLfo3MidiActive, block2ColorizeLfo3, block2ColorizeLfo3MidiGui);
+
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
 
 								if(block2ColorizeHSB_RGB==0){
 									ImGui::Text("hue                    ");
@@ -3860,6 +4311,18 @@ void GuiApp::draw(){
 								ImGuiSliderFloatOSC("##6", &block2ColorizeLfo3[5],-1.0,1.0, "/gravity/block3/lfo/b2/brightBand5Rate");
 								ImGui::SameLine();
 								ImGui::Text("band 5 r");
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2Col3hueBand5Shape", &block2ColorizeLfo3Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/hueBand5Shape", static_cast<float>(block2ColorizeLfo3Shape[0]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2Col3satBand5Shape", &block2ColorizeLfo3Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/saturationBand5Shape", static_cast<float>(block2ColorizeLfo3Shape[1]));
+								}
+								ImGui::SameLine();
+								if (ImGui::Combo("##block2Col3briBand5Shape", &block2ColorizeLfo3Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/b2/brightBand5Shape", static_cast<float>(block2ColorizeLfo3Shape[2]));
+								}
 								ImGui::Separator();
 							}
 							else
@@ -4090,6 +4553,8 @@ void GuiApp::draw(){
 
 									midi2Gui(matrixMixLfo1MidiActive, matrixMixLfo1, matrixMixLfo1MidiGui);
 
+									const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 									if( finalKeyOrder==0){
 										ImGui::Text("B_2   ->    ");
 									}
@@ -4141,6 +4606,18 @@ void GuiApp::draw(){
 									ImGui::Text("   ");
 									ImGui::SameLine();
 									ImGuiSliderFloatOSC("##6", &matrixMixLfo1[5],-1.0,1.0, "/gravity/block3/lfo/matrixMix/b1RedToB2BlueRate");
+									ImGui::SameLine();
+									if (ImGui::Combo("##matrixMix1RedToRedShape", &matrixMixLfo1Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+										if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/matrixMix/b1RedToB2RedShape", static_cast<float>(matrixMixLfo1Shape[0]));
+									}
+									ImGui::SameLine();
+									if (ImGui::Combo("##matrixMix1RedToGreenShape", &matrixMixLfo1Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+										if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/matrixMix/b1RedToB2GreenShape", static_cast<float>(matrixMixLfo1Shape[1]));
+									}
+									ImGui::SameLine();
+									if (ImGui::Combo("##matrixMix1RedToBlueShape", &matrixMixLfo1Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+										if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/matrixMix/b1RedToB2BlueShape", static_cast<float>(matrixMixLfo1Shape[2]));
+									}
 
 									ImGui::Separator();
 
@@ -4179,6 +4656,18 @@ void GuiApp::draw(){
 									ImGui::Text("   ");
 									ImGui::SameLine();
 									ImGuiSliderFloatOSC("##12",&matrixMixLfo1[11],-1.0,1.0, "/gravity/block3/lfo/matrixMix/b1GreenToB2BlueRate");
+									ImGui::SameLine();
+									if (ImGui::Combo("##matrixMix1GreenToRedShape", &matrixMixLfo1Shape[3], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+										if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/matrixMix/b1GreenToB2RedShape", static_cast<float>(matrixMixLfo1Shape[3]));
+									}
+									ImGui::SameLine();
+									if (ImGui::Combo("##matrixMix1GreenToGreenShape", &matrixMixLfo1Shape[4], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+										if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/matrixMix/b1GreenToB2GreenShape", static_cast<float>(matrixMixLfo1Shape[4]));
+									}
+									ImGui::SameLine();
+									if (ImGui::Combo("##matrixMix1GreenToBlueShape", &matrixMixLfo1Shape[5], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+										if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/matrixMix/b1GreenToB2BlueShape", static_cast<float>(matrixMixLfo1Shape[5]));
+									}
 
 									ImGui::PopItemWidth();
 								}
@@ -4215,6 +4704,8 @@ void GuiApp::draw(){
 									ImGui::Separator();
 
 									midi2Gui(matrixMixLfo2MidiActive, matrixMixLfo2, matrixMixLfo2MidiGui);
+
+									const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
 
 									if( finalKeyOrder==0){
 										ImGui::Text("B_2   ->    ");
@@ -4267,6 +4758,18 @@ void GuiApp::draw(){
 									ImGui::Text("   ");
 									ImGui::SameLine();
 									ImGuiSliderFloatOSC("##6",&matrixMixLfo2[5],-1.0,1.0, "/gravity/block3/lfo/matrixMix/b1BlueToB2BlueRate");
+									ImGui::SameLine();
+									if (ImGui::Combo("##matrixMix2BlueToRedShape", &matrixMixLfo2Shape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+										if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/matrixMix/b1BlueToB2RedShape", static_cast<float>(matrixMixLfo2Shape[0]));
+									}
+									ImGui::SameLine();
+									if (ImGui::Combo("##matrixMix2BlueToGreenShape", &matrixMixLfo2Shape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+										if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/matrixMix/b1BlueToB2GreenShape", static_cast<float>(matrixMixLfo2Shape[1]));
+									}
+									ImGui::SameLine();
+									if (ImGui::Combo("##matrixMix2BlueToBlueShape", &matrixMixLfo2Shape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+										if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/matrixMix/b1BlueToB2BlueShape", static_cast<float>(matrixMixLfo2Shape[2]));
+									}
 									ImGui::Separator();
 									ImGui::PopItemWidth();
 								}
@@ -4305,18 +4808,32 @@ void GuiApp::draw(){
 
 								midi2Gui(finalMixAndKeyLfoMidiActive, finalMixAndKeyLfo, finalMixAndKeyLfoMidiGui);
 
+								const char* lfoShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("mix a       ##final", &finalMixAndKeyLfo[0],-1.0,1.0, "/gravity/block3/lfo/final/mixAmountAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("mix r       ##final", &finalMixAndKeyLfo[1],-1.0,1.0, "/gravity/block3/lfo/final/mixAmountRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##finalmixShape", &finalMixAndKeyLfoShape[0], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/final/mixAmountShape", static_cast<float>(finalMixAndKeyLfoShape[0]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("ky thresh a ##final", &finalMixAndKeyLfo[2],-1.0,1.0, "/gravity/block3/lfo/final/keyThresholdAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("ky thresh r ##final", &finalMixAndKeyLfo[3],-1.0,1.0, "/gravity/block3/lfo/final/keyThresholdRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##finalkeyThreshShape", &finalMixAndKeyLfoShape[1], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/final/keyThresholdShape", static_cast<float>(finalMixAndKeyLfoShape[1]));
+								}
 								ImGui::Separator();
 								ImGuiSliderFloatOSC("ky soft a   ##final", &finalMixAndKeyLfo[4],-1.0,1.0, "/gravity/block3/lfo/final/keySoftAmp");
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("ky soft r   ##final", &finalMixAndKeyLfo[5],-1.0,1.0, "/gravity/block3/lfo/final/keySoftRate");
+								ImGui::SameLine();
+								if (ImGui::Combo("##finalkeySoftShape", &finalMixAndKeyLfoShape[2], lfoShapes, IM_ARRAYSIZE(lfoShapes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/lfo/final/keySoftShape", static_cast<float>(finalMixAndKeyLfoShape[2]));
+								}
 							}
 							else
 							{
@@ -5832,8 +6349,11 @@ void GuiApp::saveEverything(){
 		saveBuffer["BLOCK_1"]["ch2Adjust"][i]=ch2Adjust[i];
 
 		saveBuffer["BLOCK_1"]["ch1AdjustLfo"][i]=ch1AdjustLfo[i];
+		saveBuffer["BLOCK_1"]["ch1AdjustLfoShape"][i]=ch1AdjustLfoShape[i];
 		saveBuffer["BLOCK_1"]["ch2MixAndKeyLfo"][i]=ch2MixAndKeyLfo[i];
+		saveBuffer["BLOCK_1"]["ch2MixAndKeyLfoShape"][i]=ch2MixAndKeyLfoShape[i];
 		saveBuffer["BLOCK_1"]["ch2AdjustLfo"][i]=ch2AdjustLfo[i];
+		saveBuffer["BLOCK_1"]["ch2AdjustLfoShape"][i]=ch2AdjustLfoShape[i];
 
 		saveBuffer["BLOCK_1"]["fb1MixAndKey"][i]=fb1MixAndKey[i];
 		saveBuffer["BLOCK_1"]["fb1Geo1"][i]=fb1Geo1[i];
@@ -5841,9 +6361,13 @@ void GuiApp::saveEverything(){
 		saveBuffer["BLOCK_1"]["fb1Filters"][i]=fb1Filters[i];
 
 		saveBuffer["BLOCK_1"]["fb1MixAndKeyLfo"][i]=fb1MixAndKeyLfo[i];
+		saveBuffer["BLOCK_1"]["fb1MixAndKeyLfoShape"][i]=fb1MixAndKeyLfoShape[i];
 		saveBuffer["BLOCK_1"]["fb1Geo1Lfo1"][i]=fb1Geo1Lfo1[i];
+		saveBuffer["BLOCK_1"]["fb1Geo1Lfo1Shape"][i]=fb1Geo1Lfo1Shape[i];
 		saveBuffer["BLOCK_1"]["fb1Geo1Lfo2"][i]=fb1Geo1Lfo2[i];
+		saveBuffer["BLOCK_1"]["fb1Geo1Lfo2Shape"][i]=fb1Geo1Lfo2Shape[i];
 		saveBuffer["BLOCK_1"]["fb1Color1Lfo1"][i]=fb1Color1Lfo1[i];
+		saveBuffer["BLOCK_1"]["fb1Color1Lfo1Shape"][i]=fb1Color1Lfo1Shape[i];
 	}
 
 	//BLOCK 1 discretes
@@ -5908,6 +6432,7 @@ void GuiApp::saveEverything(){
 		saveBuffer["BLOCK_2"]["block2InputAdjust"][i]=block2InputAdjust[i];
 
 		saveBuffer["BLOCK_2"]["block2InputAdjustLfo"][i]=block2InputAdjustLfo[i];
+		saveBuffer["BLOCK_2"]["block2InputAdjustLfoShape"][i]=block2InputAdjustLfoShape[i];
 
 		saveBuffer["BLOCK_2"]["fb2MixAndKey"][i]=fb2MixAndKey[i];
 		saveBuffer["BLOCK_2"]["fb2Geo1"][i]=fb2Geo1[i];
@@ -5915,9 +6440,13 @@ void GuiApp::saveEverything(){
 		saveBuffer["BLOCK_2"]["fb2Filters"][i]=fb2Filters[i];
 
 		saveBuffer["BLOCK_2"]["fb2MixAndKeyLfo"][i]=fb2MixAndKeyLfo[i];
+		saveBuffer["BLOCK_2"]["fb2MixAndKeyLfoShape"][i]=fb2MixAndKeyLfoShape[i];
 		saveBuffer["BLOCK_2"]["fb2Geo1Lfo1"][i]=fb2Geo1Lfo1[i];
+		saveBuffer["BLOCK_2"]["fb2Geo1Lfo1Shape"][i]=fb2Geo1Lfo1Shape[i];
 		saveBuffer["BLOCK_2"]["fb2Geo1Lfo2"][i]=fb2Geo1Lfo2[i];
+		saveBuffer["BLOCK_2"]["fb2Geo1Lfo2Shape"][i]=fb2Geo1Lfo2Shape[i];
 		saveBuffer["BLOCK_2"]["fb2Color1Lfo1"][i]=fb2Color1Lfo1[i];
+		saveBuffer["BLOCK_2"]["fb2Color1Lfo1Shape"][i]=fb2Color1Lfo1Shape[i];
 	}
 
 
@@ -5969,27 +6498,41 @@ void GuiApp::saveEverything(){
 		saveBuffer["BLOCK_3"]["block1Filters"][i]=block1Filters[i];
 
 		saveBuffer["BLOCK_3"]["block1Geo1Lfo1"][i]=block1Geo1Lfo1[i];
+		saveBuffer["BLOCK_3"]["block1Geo1Lfo1Shape"][i]=block1Geo1Lfo1Shape[i];
 		saveBuffer["BLOCK_3"]["block1Geo1Lfo2"][i]=block1Geo1Lfo2[i];
+		saveBuffer["BLOCK_3"]["block1Geo1Lfo2Shape"][i]=block1Geo1Lfo2Shape[i];
 		saveBuffer["BLOCK_3"]["block1ColorizeLfo1"][i]=block1ColorizeLfo1[i];
+		saveBuffer["BLOCK_3"]["block1ColorizeLfo1Shape"][i]=block1ColorizeLfo1Shape[i];
 		saveBuffer["BLOCK_3"]["block1ColorizeLfo2"][i]=block1ColorizeLfo2[i];
+		saveBuffer["BLOCK_3"]["block1ColorizeLfo2Shape"][i]=block1ColorizeLfo2Shape[i];
 		saveBuffer["BLOCK_3"]["block1ColorizeLfo3"][i]=block1ColorizeLfo3[i];
+		saveBuffer["BLOCK_3"]["block1ColorizeLfo3Shape"][i]=block1ColorizeLfo3Shape[i];
+		saveBuffer["BLOCK_3"]["block1Color1Lfo1Shape"][i]=block1Color1Lfo1Shape[i];
 
 		saveBuffer["BLOCK_3"]["block2Geo"][i]=block2Geo[i];
 		saveBuffer["BLOCK_3"]["block2Colorize"][i]=block2Colorize[i];
 		saveBuffer["BLOCK_3"]["block2Filters"][i]=block2Filters[i];
 
 		saveBuffer["BLOCK_3"]["block2Geo1Lfo1"][i]=block2Geo1Lfo1[i];
+		saveBuffer["BLOCK_3"]["block2Geo1Lfo1Shape"][i]=block2Geo1Lfo1Shape[i];
 		saveBuffer["BLOCK_3"]["block2Geo1Lfo2"][i]=block2Geo1Lfo2[i];
+		saveBuffer["BLOCK_3"]["block2Geo1Lfo2Shape"][i]=block2Geo1Lfo2Shape[i];
 		saveBuffer["BLOCK_3"]["block2ColorizeLfo1"][i]=block2ColorizeLfo1[i];
+		saveBuffer["BLOCK_3"]["block2ColorizeLfo1Shape"][i]=block2ColorizeLfo1Shape[i];
 		saveBuffer["BLOCK_3"]["block2ColorizeLfo2"][i]=block2ColorizeLfo2[i];
+		saveBuffer["BLOCK_3"]["block2ColorizeLfo2Shape"][i]=block2ColorizeLfo2Shape[i];
 		saveBuffer["BLOCK_3"]["block2ColorizeLfo3"][i]=block2ColorizeLfo3[i];
+		saveBuffer["BLOCK_3"]["block2ColorizeLfo3Shape"][i]=block2ColorizeLfo3Shape[i];
 
 		saveBuffer["BLOCK_3"]["matrixMix"][i]=matrixMix[i];
 		saveBuffer["BLOCK_3"]["finalMixAndKey"][i]=finalMixAndKey[i];
 
 		saveBuffer["BLOCK_3"]["matrixMixLfo1"][i]=matrixMixLfo1[i];
+		saveBuffer["BLOCK_3"]["matrixMixLfo1Shape"][i]=matrixMixLfo1Shape[i];
 		saveBuffer["BLOCK_3"]["matrixMixLfo2"][i]=matrixMixLfo2[i];
+		saveBuffer["BLOCK_3"]["matrixMixLfo2Shape"][i]=matrixMixLfo2Shape[i];
 		saveBuffer["BLOCK_3"]["finalMixAndKeyLfo"][i]=finalMixAndKeyLfo[i];
+		saveBuffer["BLOCK_3"]["finalMixAndKeyLfoShape"][i]=finalMixAndKeyLfoShape[i];
 
 	}
 
@@ -6905,8 +7448,25 @@ void GuiApp::loadEverything(){
 		ch2Adjust[i]=loadBuffer["BLOCK_1"]["ch2Adjust"][i];
 
 		ch1AdjustLfo[i]=loadBuffer["BLOCK_1"]["ch1AdjustLfo"][i];
+		if (loadBuffer["BLOCK_1"].contains("ch1AdjustLfoShape")) {
+			ch1AdjustLfoShape[i] = loadBuffer["BLOCK_1"]["ch1AdjustLfoShape"][i];
+		} else {
+			ch1AdjustLfoShape[i] = 0;  // Default to Sine for old presets
+		}
+
 		ch2MixAndKeyLfo[i]=loadBuffer["BLOCK_1"]["ch2MixAndKeyLfo"][i];
+		if (loadBuffer["BLOCK_1"].contains("ch2MixAndKeyLfoShape")) {
+			ch2MixAndKeyLfoShape[i] = loadBuffer["BLOCK_1"]["ch2MixAndKeyLfoShape"][i];
+		} else {
+			ch2MixAndKeyLfoShape[i] = 0;  // Default to Sine for old presets
+		}
+
 		ch2AdjustLfo[i]=loadBuffer["BLOCK_1"]["ch2AdjustLfo"][i];
+		if (loadBuffer["BLOCK_1"].contains("ch2AdjustLfoShape")) {
+			ch2AdjustLfoShape[i] = loadBuffer["BLOCK_1"]["ch2AdjustLfoShape"][i];
+		} else {
+			ch2AdjustLfoShape[i] = 0;  // Default to Sine for old presets
+		}
 
 		fb1MixAndKey[i]=loadBuffer["BLOCK_1"]["fb1MixAndKey"][i];
 		fb1Geo1[i]=loadBuffer["BLOCK_1"]["fb1Geo1"][i];
@@ -6914,9 +7474,32 @@ void GuiApp::loadEverything(){
 		fb1Filters[i]=loadBuffer["BLOCK_1"]["fb1Filters"][i];
 
 		fb1MixAndKeyLfo[i]=loadBuffer["BLOCK_1"]["fb1MixAndKeyLfo"][i];
+		if (loadBuffer["BLOCK_1"].contains("fb1MixAndKeyLfoShape")) {
+			fb1MixAndKeyLfoShape[i] = loadBuffer["BLOCK_1"]["fb1MixAndKeyLfoShape"][i];
+		} else {
+			fb1MixAndKeyLfoShape[i] = 0;  // Default to Sine for old presets
+		}
+
 		fb1Geo1Lfo1[i]=loadBuffer["BLOCK_1"]["fb1Geo1Lfo1"][i];
+		if (loadBuffer["BLOCK_1"].contains("fb1Geo1Lfo1Shape")) {
+			fb1Geo1Lfo1Shape[i] = loadBuffer["BLOCK_1"]["fb1Geo1Lfo1Shape"][i];
+		} else {
+			fb1Geo1Lfo1Shape[i] = 0;  // Default to Sine for old presets
+		}
+
 		fb1Geo1Lfo2[i]=loadBuffer["BLOCK_1"]["fb1Geo1Lfo2"][i];
+		if (loadBuffer["BLOCK_1"].contains("fb1Geo1Lfo2Shape")) {
+			fb1Geo1Lfo2Shape[i] = loadBuffer["BLOCK_1"]["fb1Geo1Lfo2Shape"][i];
+		} else {
+			fb1Geo1Lfo2Shape[i] = 0;  // Default to Sine for old presets
+		}
+
 		fb1Color1Lfo1[i]=loadBuffer["BLOCK_1"]["fb1Color1Lfo1"][i];
+		if (loadBuffer["BLOCK_1"].contains("fb1Color1Lfo1Shape")) {
+			fb1Color1Lfo1Shape[i] = loadBuffer["BLOCK_1"]["fb1Color1Lfo1Shape"][i];
+		} else {
+			fb1Color1Lfo1Shape[i] = 0;  // Default to Sine for old presets
+		}
 	}
 
 	//DISCRETES
@@ -6979,6 +7562,11 @@ void GuiApp::loadEverything(){
 		block2InputAdjust[i]=loadBuffer["BLOCK_2"]["block2InputAdjust"][i];
 
 		block2InputAdjustLfo[i]=loadBuffer["BLOCK_2"]["block2InputAdjustLfo"][i];
+		if (loadBuffer["BLOCK_2"].contains("block2InputAdjustLfoShape")) {
+			block2InputAdjustLfoShape[i] = loadBuffer["BLOCK_2"]["block2InputAdjustLfoShape"][i];
+		} else {
+			block2InputAdjustLfoShape[i] = 0;  // Default to Sine for old presets
+		}
 
 		fb2MixAndKey[i]=loadBuffer["BLOCK_2"]["fb2MixAndKey"][i];
 		fb2Geo1[i]=loadBuffer["BLOCK_2"]["fb2Geo1"][i];
@@ -6986,9 +7574,32 @@ void GuiApp::loadEverything(){
 		fb2Filters[i]=loadBuffer["BLOCK_2"]["fb2Filters"][i];
 
 		fb2MixAndKeyLfo[i]=loadBuffer["BLOCK_2"]["fb2MixAndKeyLfo"][i];
+		if (loadBuffer["BLOCK_2"].contains("fb2MixAndKeyLfoShape")) {
+			fb2MixAndKeyLfoShape[i] = loadBuffer["BLOCK_2"]["fb2MixAndKeyLfoShape"][i];
+		} else {
+			fb2MixAndKeyLfoShape[i] = 0;  // Default to Sine for old presets
+		}
+
 		fb2Geo1Lfo1[i]=loadBuffer["BLOCK_2"]["fb2Geo1Lfo1"][i];
+		if (loadBuffer["BLOCK_2"].contains("fb2Geo1Lfo1Shape")) {
+			fb2Geo1Lfo1Shape[i] = loadBuffer["BLOCK_2"]["fb2Geo1Lfo1Shape"][i];
+		} else {
+			fb2Geo1Lfo1Shape[i] = 0;  // Default to Sine for old presets
+		}
+
 		fb2Geo1Lfo2[i]=loadBuffer["BLOCK_2"]["fb2Geo1Lfo2"][i];
+		if (loadBuffer["BLOCK_2"].contains("fb2Geo1Lfo2Shape")) {
+			fb2Geo1Lfo2Shape[i] = loadBuffer["BLOCK_2"]["fb2Geo1Lfo2Shape"][i];
+		} else {
+			fb2Geo1Lfo2Shape[i] = 0;  // Default to Sine for old presets
+		}
+
 		fb2Color1Lfo1[i]=loadBuffer["BLOCK_2"]["fb2Color1Lfo1"][i];
+		if (loadBuffer["BLOCK_2"].contains("fb2Color1Lfo1Shape")) {
+			fb2Color1Lfo1Shape[i] = loadBuffer["BLOCK_2"]["fb2Color1Lfo1Shape"][i];
+		} else {
+			fb2Color1Lfo1Shape[i] = 0;  // Default to Sine for old presets
+		}
 	}
 
 	//DISCRETES
@@ -7037,27 +7648,108 @@ void GuiApp::loadEverything(){
 		block1Filters[i]=loadBuffer["BLOCK_3"]["block1Filters"][i];
 
 		block1Geo1Lfo1[i]=loadBuffer["BLOCK_3"]["block1Geo1Lfo1"][i];
+		if (loadBuffer["BLOCK_3"].contains("block1Geo1Lfo1Shape")) {
+			block1Geo1Lfo1Shape[i] = loadBuffer["BLOCK_3"]["block1Geo1Lfo1Shape"][i];
+		} else {
+			block1Geo1Lfo1Shape[i] = 0;  // Default to Sine for old presets
+		}
+
 		block1Geo1Lfo2[i]=loadBuffer["BLOCK_3"]["block1Geo1Lfo2"][i];
+		if (loadBuffer["BLOCK_3"].contains("block1Geo1Lfo2Shape")) {
+			block1Geo1Lfo2Shape[i] = loadBuffer["BLOCK_3"]["block1Geo1Lfo2Shape"][i];
+		} else {
+			block1Geo1Lfo2Shape[i] = 0;  // Default to Sine for old presets
+		}
+
 		block1ColorizeLfo1[i]=loadBuffer["BLOCK_3"]["block1ColorizeLfo1"][i];
+		if (loadBuffer["BLOCK_3"].contains("block1ColorizeLfo1Shape")) {
+			block1ColorizeLfo1Shape[i] = loadBuffer["BLOCK_3"]["block1ColorizeLfo1Shape"][i];
+		} else {
+			block1ColorizeLfo1Shape[i] = 0;  // Default to Sine for old presets
+		}
+
 		block1ColorizeLfo2[i]=loadBuffer["BLOCK_3"]["block1ColorizeLfo2"][i];
+		if (loadBuffer["BLOCK_3"].contains("block1ColorizeLfo2Shape")) {
+			block1ColorizeLfo2Shape[i] = loadBuffer["BLOCK_3"]["block1ColorizeLfo2Shape"][i];
+		} else {
+			block1ColorizeLfo2Shape[i] = 0;  // Default to Sine for old presets
+		}
+
 		block1ColorizeLfo3[i]=loadBuffer["BLOCK_3"]["block1ColorizeLfo3"][i];
+		if (loadBuffer["BLOCK_3"].contains("block1ColorizeLfo3Shape")) {
+			block1ColorizeLfo3Shape[i] = loadBuffer["BLOCK_3"]["block1ColorizeLfo3Shape"][i];
+		} else {
+			block1ColorizeLfo3Shape[i] = 0;  // Default to Sine for old presets
+		}
+
+		if (loadBuffer["BLOCK_3"].contains("block1Color1Lfo1Shape")) {
+			block1Color1Lfo1Shape[i] = loadBuffer["BLOCK_3"]["block1Color1Lfo1Shape"][i];
+		} else {
+			block1Color1Lfo1Shape[i] = 0;  // Default to Sine for old presets
+		}
 
 		block2Geo[i]=loadBuffer["BLOCK_3"]["block2Geo"][i];
 		block2Colorize[i]=loadBuffer["BLOCK_3"]["block2Colorize"][i];
 		block2Filters[i]=loadBuffer["BLOCK_3"]["block2Filters"][i];
 
 		block2Geo1Lfo1[i]=loadBuffer["BLOCK_3"]["block2Geo1Lfo1"][i];
+		if (loadBuffer["BLOCK_3"].contains("block2Geo1Lfo1Shape")) {
+			block2Geo1Lfo1Shape[i] = loadBuffer["BLOCK_3"]["block2Geo1Lfo1Shape"][i];
+		} else {
+			block2Geo1Lfo1Shape[i] = 0;  // Default to Sine for old presets
+		}
+
 		block2Geo1Lfo2[i]=loadBuffer["BLOCK_3"]["block2Geo1Lfo2"][i];
+		if (loadBuffer["BLOCK_3"].contains("block2Geo1Lfo2Shape")) {
+			block2Geo1Lfo2Shape[i] = loadBuffer["BLOCK_3"]["block2Geo1Lfo2Shape"][i];
+		} else {
+			block2Geo1Lfo2Shape[i] = 0;  // Default to Sine for old presets
+		}
+
 		block2ColorizeLfo1[i]=loadBuffer["BLOCK_3"]["block2ColorizeLfo1"][i];
+		if (loadBuffer["BLOCK_3"].contains("block2ColorizeLfo1Shape")) {
+			block2ColorizeLfo1Shape[i] = loadBuffer["BLOCK_3"]["block2ColorizeLfo1Shape"][i];
+		} else {
+			block2ColorizeLfo1Shape[i] = 0;  // Default to Sine for old presets
+		}
+
 		block2ColorizeLfo2[i]=loadBuffer["BLOCK_3"]["block2ColorizeLfo2"][i];
+		if (loadBuffer["BLOCK_3"].contains("block2ColorizeLfo2Shape")) {
+			block2ColorizeLfo2Shape[i] = loadBuffer["BLOCK_3"]["block2ColorizeLfo2Shape"][i];
+		} else {
+			block2ColorizeLfo2Shape[i] = 0;  // Default to Sine for old presets
+		}
+
 		block2ColorizeLfo3[i]=loadBuffer["BLOCK_3"]["block2ColorizeLfo3"][i];
+		if (loadBuffer["BLOCK_3"].contains("block2ColorizeLfo3Shape")) {
+			block2ColorizeLfo3Shape[i] = loadBuffer["BLOCK_3"]["block2ColorizeLfo3Shape"][i];
+		} else {
+			block2ColorizeLfo3Shape[i] = 0;  // Default to Sine for old presets
+		}
 
 		matrixMix[i]=loadBuffer["BLOCK_3"]["matrixMix"][i];
 		finalMixAndKey[i]=loadBuffer["BLOCK_3"]["finalMixAndKey"][i];
 
 		matrixMixLfo1[i]=loadBuffer["BLOCK_3"]["matrixMixLfo1"][i];
+		if (loadBuffer["BLOCK_3"].contains("matrixMixLfo1Shape")) {
+			matrixMixLfo1Shape[i] = loadBuffer["BLOCK_3"]["matrixMixLfo1Shape"][i];
+		} else {
+			matrixMixLfo1Shape[i] = 0;  // Default to Sine for old presets
+		}
+
 		matrixMixLfo2[i]=loadBuffer["BLOCK_3"]["matrixMixLfo2"][i];
+		if (loadBuffer["BLOCK_3"].contains("matrixMixLfo2Shape")) {
+			matrixMixLfo2Shape[i] = loadBuffer["BLOCK_3"]["matrixMixLfo2Shape"][i];
+		} else {
+			matrixMixLfo2Shape[i] = 0;  // Default to Sine for old presets
+		}
+
 		finalMixAndKeyLfo[i]=loadBuffer["BLOCK_3"]["finalMixAndKeyLfo"][i];
+		if (loadBuffer["BLOCK_3"].contains("finalMixAndKeyLfoShape")) {
+			finalMixAndKeyLfoShape[i] = loadBuffer["BLOCK_3"]["finalMixAndKeyLfoShape"][i];
+		} else {
+			finalMixAndKeyLfoShape[i] = 0;  // Default to Sine for old presets
+		}
 
 	}
 
@@ -7744,6 +8436,33 @@ void GuiApp::allArrayClear(){
 		finalMixAndKeyLfo[i]=0.0f;
 		finalMixAndKeyLfoMidiActive[i]=0;
 
+		// Initialize all LFO shape arrays to Sine (0)
+		ch1AdjustLfoShape[i] = 0;
+		ch2MixAndKeyLfoShape[i] = 0;
+		ch2AdjustLfoShape[i] = 0;
+		fb1MixAndKeyLfoShape[i] = 0;
+		fb1Geo1Lfo1Shape[i] = 0;
+		fb1Geo1Lfo2Shape[i] = 0;
+		fb1Color1Lfo1Shape[i] = 0;
+		block2InputAdjustLfoShape[i] = 0;
+		fb2MixAndKeyLfoShape[i] = 0;
+		fb2Geo1Lfo1Shape[i] = 0;
+		fb2Geo1Lfo2Shape[i] = 0;
+		fb2Color1Lfo1Shape[i] = 0;
+		block1Geo1Lfo1Shape[i] = 0;
+		block1Geo1Lfo2Shape[i] = 0;
+		block1ColorizeLfo1Shape[i] = 0;
+		block1ColorizeLfo2Shape[i] = 0;
+		block1ColorizeLfo3Shape[i] = 0;
+		block1Color1Lfo1Shape[i] = 0;
+		block2Geo1Lfo1Shape[i] = 0;
+		block2Geo1Lfo2Shape[i] = 0;
+		block2ColorizeLfo1Shape[i] = 0;
+		block2ColorizeLfo2Shape[i] = 0;
+		block2ColorizeLfo3Shape[i] = 0;
+		matrixMixLfo1Shape[i] = 0;
+		matrixMixLfo2Shape[i] = 0;
+		finalMixAndKeyLfoShape[i] = 0;
 
 	}
 
@@ -53266,20 +53985,28 @@ void GuiApp::registerBlock1OscParameters() {
     // ============== CH1 ADJUST LFO (16 params) ==============
     registerOscParam("/gravity/block1/ch1/lfo/xDisplaceAmp", &ch1AdjustLfo[0]);
     registerOscParam("/gravity/block1/ch1/lfo/xDisplaceRate", &ch1AdjustLfo[1]);
+    registerOscParam("/gravity/block1/ch1/lfo/xDisplaceShape", &ch1AdjustLfoShape[0]);
     registerOscParam("/gravity/block1/ch1/lfo/yDisplaceAmp", &ch1AdjustLfo[2]);
     registerOscParam("/gravity/block1/ch1/lfo/yDisplaceRate", &ch1AdjustLfo[3]);
+    registerOscParam("/gravity/block1/ch1/lfo/yDisplaceShape", &ch1AdjustLfoShape[1]);
     registerOscParam("/gravity/block1/ch1/lfo/zDisplaceAmp", &ch1AdjustLfo[4]);
     registerOscParam("/gravity/block1/ch1/lfo/zDisplaceRate", &ch1AdjustLfo[5]);
+    registerOscParam("/gravity/block1/ch1/lfo/zDisplaceShape", &ch1AdjustLfoShape[2]);
     registerOscParam("/gravity/block1/ch1/lfo/rotateAmp", &ch1AdjustLfo[6]);
     registerOscParam("/gravity/block1/ch1/lfo/rotateRate", &ch1AdjustLfo[7]);
+    registerOscParam("/gravity/block1/ch1/lfo/rotateShape", &ch1AdjustLfoShape[3]);
     registerOscParam("/gravity/block1/ch1/lfo/hueOffsetAmp", &ch1AdjustLfo[8]);
     registerOscParam("/gravity/block1/ch1/lfo/hueOffsetRate", &ch1AdjustLfo[9]);
+    registerOscParam("/gravity/block1/ch1/lfo/hueOffsetShape", &ch1AdjustLfoShape[4]);
     registerOscParam("/gravity/block1/ch1/lfo/saturationOffsetAmp", &ch1AdjustLfo[10]);
     registerOscParam("/gravity/block1/ch1/lfo/saturationOffsetRate", &ch1AdjustLfo[11]);
+    registerOscParam("/gravity/block1/ch1/lfo/saturationOffsetShape", &ch1AdjustLfoShape[5]);
     registerOscParam("/gravity/block1/ch1/lfo/brightOffsetAmp", &ch1AdjustLfo[12]);
     registerOscParam("/gravity/block1/ch1/lfo/brightOffsetRate", &ch1AdjustLfo[13]);
+    registerOscParam("/gravity/block1/ch1/lfo/brightOffsetShape", &ch1AdjustLfoShape[6]);
     registerOscParam("/gravity/block1/ch1/lfo/kaleidoscopeSliceAmp", &ch1AdjustLfo[14]);
     registerOscParam("/gravity/block1/ch1/lfo/kaleidoscopeSliceRate", &ch1AdjustLfo[15]);
+    registerOscParam("/gravity/block1/ch1/lfo/kaleidoscopeSliceShape", &ch1AdjustLfoShape[7]);
     registerOscParam("/gravity/block1/ch1/lfo/reset", &ch1AdjustLfoReset);
 
     // ============== CH2 MIX AND KEY (6 params) ==============
@@ -53300,10 +54027,13 @@ void GuiApp::registerBlock1OscParameters() {
     // ============== CH2 MIX AND KEY LFO (6 params) ==============
     registerOscParam("/gravity/block1/ch2/lfo/mixAmountAmp", &ch2MixAndKeyLfo[0]);
     registerOscParam("/gravity/block1/ch2/lfo/mixAmountRate", &ch2MixAndKeyLfo[1]);
+    registerOscParam("/gravity/block1/ch2/lfo/mixAmountShape", &ch2MixAndKeyLfoShape[0]);
     registerOscParam("/gravity/block1/ch2/lfo/keyThresholdAmp", &ch2MixAndKeyLfo[2]);
     registerOscParam("/gravity/block1/ch2/lfo/keyThresholdRate", &ch2MixAndKeyLfo[3]);
+    registerOscParam("/gravity/block1/ch2/lfo/keyThresholdShape", &ch2MixAndKeyLfoShape[1]);
     registerOscParam("/gravity/block1/ch2/lfo/keySoftAmp", &ch2MixAndKeyLfo[4]);
     registerOscParam("/gravity/block1/ch2/lfo/keySoftRate", &ch2MixAndKeyLfo[5]);
+    registerOscParam("/gravity/block1/ch2/lfo/keySoftShape", &ch2MixAndKeyLfoShape[2]);
     registerOscParam("/gravity/block1/ch2/lfo/resetMixAndKey", &ch2MixAndKeyLfoReset);
 
     // ============== CH2 ADJUST (15 sliders) ==============
@@ -53341,20 +54071,28 @@ void GuiApp::registerBlock1OscParameters() {
     // ============== CH2 ADJUST LFO (16 params) ==============
     registerOscParam("/gravity/block1/ch2/lfo/xDisplaceAmp", &ch2AdjustLfo[0]);
     registerOscParam("/gravity/block1/ch2/lfo/xDisplaceRate", &ch2AdjustLfo[1]);
+    registerOscParam("/gravity/block1/ch2/lfo/xDisplaceShape", &ch2AdjustLfoShape[0]);
     registerOscParam("/gravity/block1/ch2/lfo/yDisplaceAmp", &ch2AdjustLfo[2]);
     registerOscParam("/gravity/block1/ch2/lfo/yDisplaceRate", &ch2AdjustLfo[3]);
+    registerOscParam("/gravity/block1/ch2/lfo/yDisplaceShape", &ch2AdjustLfoShape[1]);
     registerOscParam("/gravity/block1/ch2/lfo/zDisplaceAmp", &ch2AdjustLfo[4]);
     registerOscParam("/gravity/block1/ch2/lfo/zDisplaceRate", &ch2AdjustLfo[5]);
+    registerOscParam("/gravity/block1/ch2/lfo/zDisplaceShape", &ch2AdjustLfoShape[2]);
     registerOscParam("/gravity/block1/ch2/lfo/rotateAmp", &ch2AdjustLfo[6]);
     registerOscParam("/gravity/block1/ch2/lfo/rotateRate", &ch2AdjustLfo[7]);
+    registerOscParam("/gravity/block1/ch2/lfo/rotateShape", &ch2AdjustLfoShape[3]);
     registerOscParam("/gravity/block1/ch2/lfo/hueOffsetAmp", &ch2AdjustLfo[8]);
     registerOscParam("/gravity/block1/ch2/lfo/hueOffsetRate", &ch2AdjustLfo[9]);
+    registerOscParam("/gravity/block1/ch2/lfo/hueOffsetShape", &ch2AdjustLfoShape[4]);
     registerOscParam("/gravity/block1/ch2/lfo/saturationOffsetAmp", &ch2AdjustLfo[10]);
     registerOscParam("/gravity/block1/ch2/lfo/saturationOffsetRate", &ch2AdjustLfo[11]);
+    registerOscParam("/gravity/block1/ch2/lfo/saturationOffsetShape", &ch2AdjustLfoShape[5]);
     registerOscParam("/gravity/block1/ch2/lfo/brightOffsetAmp", &ch2AdjustLfo[12]);
     registerOscParam("/gravity/block1/ch2/lfo/brightOffsetRate", &ch2AdjustLfo[13]);
+    registerOscParam("/gravity/block1/ch2/lfo/brightOffsetShape", &ch2AdjustLfoShape[6]);
     registerOscParam("/gravity/block1/ch2/lfo/kaleidoscopeSliceAmp", &ch2AdjustLfo[14]);
     registerOscParam("/gravity/block1/ch2/lfo/kaleidoscopeSliceRate", &ch2AdjustLfo[15]);
+    registerOscParam("/gravity/block1/ch2/lfo/kaleidoscopeSliceShape", &ch2AdjustLfoShape[7]);
     registerOscParam("/gravity/block1/ch2/lfo/reset", &ch2AdjustLfoReset);
 
     // ============== FB1 MIX AND KEY (6 params) ==============
@@ -53375,10 +54113,13 @@ void GuiApp::registerBlock1OscParameters() {
     // ============== FB1 MIX AND KEY LFO (6 params) ==============
     registerOscParam("/gravity/block1/fb1/lfo/mixAmountAmp", &fb1MixAndKeyLfo[0]);
     registerOscParam("/gravity/block1/fb1/lfo/mixAmountRate", &fb1MixAndKeyLfo[1]);
+    registerOscParam("/gravity/block1/fb1/lfo/mixAmountShape", &fb1MixAndKeyLfoShape[0]);
     registerOscParam("/gravity/block1/fb1/lfo/keyThresholdAmp", &fb1MixAndKeyLfo[2]);
     registerOscParam("/gravity/block1/fb1/lfo/keyThresholdRate", &fb1MixAndKeyLfo[3]);
+    registerOscParam("/gravity/block1/fb1/lfo/keyThresholdShape", &fb1MixAndKeyLfoShape[1]);
     registerOscParam("/gravity/block1/fb1/lfo/keySoftAmp", &fb1MixAndKeyLfo[4]);
     registerOscParam("/gravity/block1/fb1/lfo/keySoftRate", &fb1MixAndKeyLfo[5]);
+    registerOscParam("/gravity/block1/fb1/lfo/keySoftShape", &fb1MixAndKeyLfoShape[2]);
     registerOscParam("/gravity/block1/fb1/lfo/resetMixAndKey", &fb1MixAndKeyLfoReset);
 
     // ============== FB1 GEO1 (10 params) ==============
@@ -53405,25 +54146,34 @@ void GuiApp::registerBlock1OscParameters() {
     // ============== FB1 GEO1 LFO1 (8 params) ==============
     registerOscParam("/gravity/block1/fb1/lfo/xDisplaceAmp", &fb1Geo1Lfo1[0]);
     registerOscParam("/gravity/block1/fb1/lfo/xDisplaceRate", &fb1Geo1Lfo1[1]);
+    registerOscParam("/gravity/block1/fb1/lfo/xDisplaceShape", &fb1Geo1Lfo1Shape[0]);
     registerOscParam("/gravity/block1/fb1/lfo/yDisplaceAmp", &fb1Geo1Lfo1[2]);
     registerOscParam("/gravity/block1/fb1/lfo/yDisplaceRate", &fb1Geo1Lfo1[3]);
+    registerOscParam("/gravity/block1/fb1/lfo/yDisplaceShape", &fb1Geo1Lfo1Shape[1]);
     registerOscParam("/gravity/block1/fb1/lfo/zDisplaceAmp", &fb1Geo1Lfo1[4]);
     registerOscParam("/gravity/block1/fb1/lfo/zDisplaceRate", &fb1Geo1Lfo1[5]);
+    registerOscParam("/gravity/block1/fb1/lfo/zDisplaceShape", &fb1Geo1Lfo1Shape[2]);
     registerOscParam("/gravity/block1/fb1/lfo/rotateAmp", &fb1Geo1Lfo1[6]);
     registerOscParam("/gravity/block1/fb1/lfo/rotateRate", &fb1Geo1Lfo1[7]);
+    registerOscParam("/gravity/block1/fb1/lfo/rotateShape", &fb1Geo1Lfo1Shape[3]);
     registerOscParam("/gravity/block1/fb1/lfo/resetGeo1", &fb1Geo1Lfo1Reset);
 
     // ============== FB1 GEO1 LFO2 (10 params) ==============
     registerOscParam("/gravity/block1/fb1/lfo/xStretchAmp", &fb1Geo1Lfo2[0]);
     registerOscParam("/gravity/block1/fb1/lfo/xStretchRate", &fb1Geo1Lfo2[1]);
+    registerOscParam("/gravity/block1/fb1/lfo/xStretchShape", &fb1Geo1Lfo2Shape[0]);
     registerOscParam("/gravity/block1/fb1/lfo/yStretchAmp", &fb1Geo1Lfo2[2]);
     registerOscParam("/gravity/block1/fb1/lfo/yStretchRate", &fb1Geo1Lfo2[3]);
+    registerOscParam("/gravity/block1/fb1/lfo/yStretchShape", &fb1Geo1Lfo2Shape[1]);
     registerOscParam("/gravity/block1/fb1/lfo/xShearAmp", &fb1Geo1Lfo2[4]);
     registerOscParam("/gravity/block1/fb1/lfo/xShearRate", &fb1Geo1Lfo2[5]);
+    registerOscParam("/gravity/block1/fb1/lfo/xShearShape", &fb1Geo1Lfo2Shape[2]);
     registerOscParam("/gravity/block1/fb1/lfo/yShearAmp", &fb1Geo1Lfo2[6]);
     registerOscParam("/gravity/block1/fb1/lfo/yShearRate", &fb1Geo1Lfo2[7]);
+    registerOscParam("/gravity/block1/fb1/lfo/yShearShape", &fb1Geo1Lfo2Shape[3]);
     registerOscParam("/gravity/block1/fb1/lfo/kaleidoscopeSliceAmp", &fb1Geo1Lfo2[8]);
     registerOscParam("/gravity/block1/fb1/lfo/kaleidoscopeSliceRate", &fb1Geo1Lfo2[9]);
+    registerOscParam("/gravity/block1/fb1/lfo/kaleidoscopeSliceShape", &fb1Geo1Lfo2Shape[4]);
     registerOscParam("/gravity/block1/fb1/lfo/resetGeo2", &fb1Geo1Lfo2Reset);
 
     // ============== FB1 COLOR1 (11 params) ==============
@@ -53448,10 +54198,13 @@ void GuiApp::registerBlock1OscParameters() {
     // ============== FB1 COLOR1 LFO1 (6 params) ==============
     registerOscParam("/gravity/block1/fb1/lfo/huePowmapAmp", &fb1Color1Lfo1[0]);
     registerOscParam("/gravity/block1/fb1/lfo/huePowmapRate", &fb1Color1Lfo1[1]);
+    registerOscParam("/gravity/block1/fb1/lfo/huePowmapShape", &fb1Color1Lfo1Shape[0]);
     registerOscParam("/gravity/block1/fb1/lfo/saturationPowmapAmp", &fb1Color1Lfo1[2]);
     registerOscParam("/gravity/block1/fb1/lfo/saturationPowmapRate", &fb1Color1Lfo1[3]);
+    registerOscParam("/gravity/block1/fb1/lfo/saturationPowmapShape", &fb1Color1Lfo1Shape[1]);
     registerOscParam("/gravity/block1/fb1/lfo/brightPowmapAmp", &fb1Color1Lfo1[4]);
     registerOscParam("/gravity/block1/fb1/lfo/brightPowmapRate", &fb1Color1Lfo1[5]);
+    registerOscParam("/gravity/block1/fb1/lfo/brightPowmapShape", &fb1Color1Lfo1Shape[2]);
     registerOscParam("/gravity/block1/fb1/lfo/resetColor", &fb1Color1Lfo1Reset);
 
     // ============== FB1 FILTERS (9 params) ==============
@@ -53517,20 +54270,28 @@ void GuiApp::registerBlock2OscParameters() {
     // ============== BLOCK 2 INPUT ADJUST LFO (16 params) ==============
     registerOscParam("/gravity/block2/input/lfo/xDisplaceAmp", &block2InputAdjustLfo[0]);
     registerOscParam("/gravity/block2/input/lfo/xDisplaceRate", &block2InputAdjustLfo[1]);
+    registerOscParam("/gravity/block2/input/lfo/xDisplaceShape", &block2InputAdjustLfoShape[0]);
     registerOscParam("/gravity/block2/input/lfo/yDisplaceAmp", &block2InputAdjustLfo[2]);
     registerOscParam("/gravity/block2/input/lfo/yDisplaceRate", &block2InputAdjustLfo[3]);
+    registerOscParam("/gravity/block2/input/lfo/yDisplaceShape", &block2InputAdjustLfoShape[1]);
     registerOscParam("/gravity/block2/input/lfo/zDisplaceAmp", &block2InputAdjustLfo[4]);
     registerOscParam("/gravity/block2/input/lfo/zDisplaceRate", &block2InputAdjustLfo[5]);
+    registerOscParam("/gravity/block2/input/lfo/zDisplaceShape", &block2InputAdjustLfoShape[2]);
     registerOscParam("/gravity/block2/input/lfo/rotateAmp", &block2InputAdjustLfo[6]);
     registerOscParam("/gravity/block2/input/lfo/rotateRate", &block2InputAdjustLfo[7]);
+    registerOscParam("/gravity/block2/input/lfo/rotateShape", &block2InputAdjustLfoShape[3]);
     registerOscParam("/gravity/block2/input/lfo/hueOffsetAmp", &block2InputAdjustLfo[8]);
     registerOscParam("/gravity/block2/input/lfo/hueOffsetRate", &block2InputAdjustLfo[9]);
+    registerOscParam("/gravity/block2/input/lfo/hueOffsetShape", &block2InputAdjustLfoShape[4]);
     registerOscParam("/gravity/block2/input/lfo/saturationOffsetAmp", &block2InputAdjustLfo[10]);
     registerOscParam("/gravity/block2/input/lfo/saturationOffsetRate", &block2InputAdjustLfo[11]);
+    registerOscParam("/gravity/block2/input/lfo/saturationOffsetShape", &block2InputAdjustLfoShape[5]);
     registerOscParam("/gravity/block2/input/lfo/brightOffsetAmp", &block2InputAdjustLfo[12]);
     registerOscParam("/gravity/block2/input/lfo/brightOffsetRate", &block2InputAdjustLfo[13]);
+    registerOscParam("/gravity/block2/input/lfo/brightOffsetShape", &block2InputAdjustLfoShape[6]);
     registerOscParam("/gravity/block2/input/lfo/kaleidoscopeSliceAmp", &block2InputAdjustLfo[14]);
     registerOscParam("/gravity/block2/input/lfo/kaleidoscopeSliceRate", &block2InputAdjustLfo[15]);
+    registerOscParam("/gravity/block2/input/lfo/kaleidoscopeSliceShape", &block2InputAdjustLfoShape[7]);
     registerOscParam("/gravity/block2/input/lfo/reset", &block2InputAdjustLfoReset);
 
     // ============== FB2 MIX AND KEY (6 params) ==============
@@ -53551,10 +54312,13 @@ void GuiApp::registerBlock2OscParameters() {
     // ============== FB2 MIX AND KEY LFO (6 params) ==============
     registerOscParam("/gravity/block2/fb2/lfo/mixAmountAmp", &fb2MixAndKeyLfo[0]);
     registerOscParam("/gravity/block2/fb2/lfo/mixAmountRate", &fb2MixAndKeyLfo[1]);
+    registerOscParam("/gravity/block2/fb2/lfo/mixAmountShape", &fb2MixAndKeyLfoShape[0]);
     registerOscParam("/gravity/block2/fb2/lfo/keyThresholdAmp", &fb2MixAndKeyLfo[2]);
     registerOscParam("/gravity/block2/fb2/lfo/keyThresholdRate", &fb2MixAndKeyLfo[3]);
+    registerOscParam("/gravity/block2/fb2/lfo/keyThresholdShape", &fb2MixAndKeyLfoShape[1]);
     registerOscParam("/gravity/block2/fb2/lfo/keySoftAmp", &fb2MixAndKeyLfo[4]);
     registerOscParam("/gravity/block2/fb2/lfo/keySoftRate", &fb2MixAndKeyLfo[5]);
+    registerOscParam("/gravity/block2/fb2/lfo/keySoftShape", &fb2MixAndKeyLfoShape[2]);
     registerOscParam("/gravity/block2/fb2/lfo/resetMixAndKey", &fb2MixAndKeyLfoReset);
 
     // ============== FB2 GEO1 (10 params) ==============
@@ -53581,25 +54345,34 @@ void GuiApp::registerBlock2OscParameters() {
     // ============== FB2 GEO1 LFO1 (8 params) ==============
     registerOscParam("/gravity/block2/fb2/lfo/xDisplaceAmp", &fb2Geo1Lfo1[0]);
     registerOscParam("/gravity/block2/fb2/lfo/xDisplaceRate", &fb2Geo1Lfo1[1]);
+    registerOscParam("/gravity/block2/fb2/lfo/xDisplaceShape", &fb2Geo1Lfo1Shape[0]);
     registerOscParam("/gravity/block2/fb2/lfo/yDisplaceAmp", &fb2Geo1Lfo1[2]);
     registerOscParam("/gravity/block2/fb2/lfo/yDisplaceRate", &fb2Geo1Lfo1[3]);
+    registerOscParam("/gravity/block2/fb2/lfo/yDisplaceShape", &fb2Geo1Lfo1Shape[1]);
     registerOscParam("/gravity/block2/fb2/lfo/zDisplaceAmp", &fb2Geo1Lfo1[4]);
     registerOscParam("/gravity/block2/fb2/lfo/zDisplaceRate", &fb2Geo1Lfo1[5]);
+    registerOscParam("/gravity/block2/fb2/lfo/zDisplaceShape", &fb2Geo1Lfo1Shape[2]);
     registerOscParam("/gravity/block2/fb2/lfo/rotateAmp", &fb2Geo1Lfo1[6]);
     registerOscParam("/gravity/block2/fb2/lfo/rotateRate", &fb2Geo1Lfo1[7]);
+    registerOscParam("/gravity/block2/fb2/lfo/rotateShape", &fb2Geo1Lfo1Shape[3]);
     registerOscParam("/gravity/block2/fb2/lfo/resetGeo1", &fb2Geo1Lfo1Reset);
 
     // ============== FB2 GEO1 LFO2 (10 params) ==============
     registerOscParam("/gravity/block2/fb2/lfo/xStretchAmp", &fb2Geo1Lfo2[0]);
     registerOscParam("/gravity/block2/fb2/lfo/xStretchRate", &fb2Geo1Lfo2[1]);
+    registerOscParam("/gravity/block2/fb2/lfo/xStretchShape", &fb2Geo1Lfo2Shape[0]);
     registerOscParam("/gravity/block2/fb2/lfo/yStretchAmp", &fb2Geo1Lfo2[2]);
     registerOscParam("/gravity/block2/fb2/lfo/yStretchRate", &fb2Geo1Lfo2[3]);
+    registerOscParam("/gravity/block2/fb2/lfo/yStretchShape", &fb2Geo1Lfo2Shape[1]);
     registerOscParam("/gravity/block2/fb2/lfo/xShearAmp", &fb2Geo1Lfo2[4]);
     registerOscParam("/gravity/block2/fb2/lfo/xShearRate", &fb2Geo1Lfo2[5]);
+    registerOscParam("/gravity/block2/fb2/lfo/xShearShape", &fb2Geo1Lfo2Shape[2]);
     registerOscParam("/gravity/block2/fb2/lfo/yShearAmp", &fb2Geo1Lfo2[6]);
     registerOscParam("/gravity/block2/fb2/lfo/yShearRate", &fb2Geo1Lfo2[7]);
+    registerOscParam("/gravity/block2/fb2/lfo/yShearShape", &fb2Geo1Lfo2Shape[3]);
     registerOscParam("/gravity/block2/fb2/lfo/kaleidoscopeSliceAmp", &fb2Geo1Lfo2[8]);
     registerOscParam("/gravity/block2/fb2/lfo/kaleidoscopeSliceRate", &fb2Geo1Lfo2[9]);
+    registerOscParam("/gravity/block2/fb2/lfo/kaleidoscopeSliceShape", &fb2Geo1Lfo2Shape[4]);
     registerOscParam("/gravity/block2/fb2/lfo/resetGeo2", &fb2Geo1Lfo2Reset);
 
     // ============== FB2 COLOR1 (11 params) ==============
@@ -53624,10 +54397,13 @@ void GuiApp::registerBlock2OscParameters() {
     // ============== FB2 COLOR1 LFO1 (6 params) ==============
     registerOscParam("/gravity/block2/fb2/lfo/huePowmapAmp", &fb2Color1Lfo1[0]);
     registerOscParam("/gravity/block2/fb2/lfo/huePowmapRate", &fb2Color1Lfo1[1]);
+    registerOscParam("/gravity/block2/fb2/lfo/huePowmapShape", &fb2Color1Lfo1Shape[0]);
     registerOscParam("/gravity/block2/fb2/lfo/saturationPowmapAmp", &fb2Color1Lfo1[2]);
     registerOscParam("/gravity/block2/fb2/lfo/saturationPowmapRate", &fb2Color1Lfo1[3]);
+    registerOscParam("/gravity/block2/fb2/lfo/saturationPowmapShape", &fb2Color1Lfo1Shape[1]);
     registerOscParam("/gravity/block2/fb2/lfo/brightPowmapAmp", &fb2Color1Lfo1[4]);
     registerOscParam("/gravity/block2/fb2/lfo/brightPowmapRate", &fb2Color1Lfo1[5]);
+    registerOscParam("/gravity/block2/fb2/lfo/brightPowmapShape", &fb2Color1Lfo1Shape[2]);
     registerOscParam("/gravity/block2/fb2/lfo/resetColor", &fb2Color1Lfo1Reset);
 
     // ============== FB2 FILTERS (9 params) ==============
@@ -53675,25 +54451,34 @@ void GuiApp::registerBlock3OscParameters() {
     // ============== BLOCK 3 - B1 GEO LFO1 (8 params) ==============
     registerOscParam("/gravity/block3/lfo/b1/xDisplaceAmp", &block1Geo1Lfo1[0]);
     registerOscParam("/gravity/block3/lfo/b1/xDisplaceRate", &block1Geo1Lfo1[1]);
+    registerOscParam("/gravity/block3/lfo/b1/xDisplaceShape", &block1Geo1Lfo1Shape[0]);
     registerOscParam("/gravity/block3/lfo/b1/yDisplaceAmp", &block1Geo1Lfo1[2]);
     registerOscParam("/gravity/block3/lfo/b1/yDisplaceRate", &block1Geo1Lfo1[3]);
+    registerOscParam("/gravity/block3/lfo/b1/yDisplaceShape", &block1Geo1Lfo1Shape[1]);
     registerOscParam("/gravity/block3/lfo/b1/zDisplaceAmp", &block1Geo1Lfo1[4]);
     registerOscParam("/gravity/block3/lfo/b1/zDisplaceRate", &block1Geo1Lfo1[5]);
+    registerOscParam("/gravity/block3/lfo/b1/zDisplaceShape", &block1Geo1Lfo1Shape[2]);
     registerOscParam("/gravity/block3/lfo/b1/rotateAmp", &block1Geo1Lfo1[6]);
     registerOscParam("/gravity/block3/lfo/b1/rotateRate", &block1Geo1Lfo1[7]);
+    registerOscParam("/gravity/block3/lfo/b1/rotateShape", &block1Geo1Lfo1Shape[3]);
     registerOscParam("/gravity/block3/lfo/b1/resetGeo1", &block1Geo1Lfo1Reset);
 
     // ============== BLOCK 3 - B1 GEO LFO2 (10 params) ==============
     registerOscParam("/gravity/block3/lfo/b1/xStretchAmp", &block1Geo1Lfo2[0]);
     registerOscParam("/gravity/block3/lfo/b1/xStretchRate", &block1Geo1Lfo2[1]);
+    registerOscParam("/gravity/block3/lfo/b1/xStretchShape", &block1Geo1Lfo2Shape[0]);
     registerOscParam("/gravity/block3/lfo/b1/yStretchAmp", &block1Geo1Lfo2[2]);
     registerOscParam("/gravity/block3/lfo/b1/yStretchRate", &block1Geo1Lfo2[3]);
+    registerOscParam("/gravity/block3/lfo/b1/yStretchShape", &block1Geo1Lfo2Shape[1]);
     registerOscParam("/gravity/block3/lfo/b1/xShearAmp", &block1Geo1Lfo2[4]);
     registerOscParam("/gravity/block3/lfo/b1/xShearRate", &block1Geo1Lfo2[5]);
+    registerOscParam("/gravity/block3/lfo/b1/xShearShape", &block1Geo1Lfo2Shape[2]);
     registerOscParam("/gravity/block3/lfo/b1/yShearAmp", &block1Geo1Lfo2[6]);
     registerOscParam("/gravity/block3/lfo/b1/yShearRate", &block1Geo1Lfo2[7]);
+    registerOscParam("/gravity/block3/lfo/b1/yShearShape", &block1Geo1Lfo2Shape[3]);
     registerOscParam("/gravity/block3/lfo/b1/kaleidoscopeSliceAmp", &block1Geo1Lfo2[8]);
     registerOscParam("/gravity/block3/lfo/b1/kaleidoscopeSliceRate", &block1Geo1Lfo2[9]);
+    registerOscParam("/gravity/block3/lfo/b1/kaleidoscopeSliceShape", &block1Geo1Lfo2Shape[4]);
     registerOscParam("/gravity/block3/lfo/b1/resetGeo2", &block1Geo1Lfo2Reset);
 
     // ============== BLOCK 3 - B1 COLORIZE (15 params) ==============
@@ -53721,14 +54506,20 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b1/saturationBand1Amp", &block1ColorizeLfo1[1]);
     registerOscParam("/gravity/block3/lfo/b1/brightBand1Amp", &block1ColorizeLfo1[2]);
     registerOscParam("/gravity/block3/lfo/b1/hueBand1Rate", &block1ColorizeLfo1[3]);
+    registerOscParam("/gravity/block3/lfo/b1/hueBand1Shape", &block1ColorizeLfo1Shape[0]);
     registerOscParam("/gravity/block3/lfo/b1/saturationBand1Rate", &block1ColorizeLfo1[4]);
+    registerOscParam("/gravity/block3/lfo/b1/saturationBand1Shape", &block1ColorizeLfo1Shape[1]);
     registerOscParam("/gravity/block3/lfo/b1/brightBand1Rate", &block1ColorizeLfo1[5]);
+    registerOscParam("/gravity/block3/lfo/b1/brightBand1Shape", &block1ColorizeLfo1Shape[2]);
     registerOscParam("/gravity/block3/lfo/b1/hueBand2Amp", &block1ColorizeLfo1[6]);
     registerOscParam("/gravity/block3/lfo/b1/saturationBand2Amp", &block1ColorizeLfo1[7]);
     registerOscParam("/gravity/block3/lfo/b1/brightBand2Amp", &block1ColorizeLfo1[8]);
     registerOscParam("/gravity/block3/lfo/b1/hueBand2Rate", &block1ColorizeLfo1[9]);
+    registerOscParam("/gravity/block3/lfo/b1/hueBand2Shape", &block1ColorizeLfo1Shape[3]);
     registerOscParam("/gravity/block3/lfo/b1/saturationBand2Rate", &block1ColorizeLfo1[10]);
+    registerOscParam("/gravity/block3/lfo/b1/saturationBand2Shape", &block1ColorizeLfo1Shape[4]);
     registerOscParam("/gravity/block3/lfo/b1/brightBand2Rate", &block1ColorizeLfo1[11]);
+    registerOscParam("/gravity/block3/lfo/b1/brightBand2Shape", &block1ColorizeLfo1Shape[5]);
     registerOscParam("/gravity/block3/lfo/b1/resetLfo1", &block1ColorizeLfo1Reset);
 
     // ============== BLOCK 3 - B1 COLORIZE LFO2 (12 params) ==============
@@ -53736,14 +54527,20 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b1/saturationBand3Amp", &block1ColorizeLfo2[1]);
     registerOscParam("/gravity/block3/lfo/b1/brightBand3Amp", &block1ColorizeLfo2[2]);
     registerOscParam("/gravity/block3/lfo/b1/hueBand3Rate", &block1ColorizeLfo2[3]);
+    registerOscParam("/gravity/block3/lfo/b1/hueBand3Shape", &block1ColorizeLfo2Shape[0]);
     registerOscParam("/gravity/block3/lfo/b1/saturationBand3Rate", &block1ColorizeLfo2[4]);
+    registerOscParam("/gravity/block3/lfo/b1/saturationBand3Shape", &block1ColorizeLfo2Shape[1]);
     registerOscParam("/gravity/block3/lfo/b1/brightBand3Rate", &block1ColorizeLfo2[5]);
+    registerOscParam("/gravity/block3/lfo/b1/brightBand3Shape", &block1ColorizeLfo2Shape[2]);
     registerOscParam("/gravity/block3/lfo/b1/hueBand4Amp", &block1ColorizeLfo2[6]);
     registerOscParam("/gravity/block3/lfo/b1/saturationBand4Amp", &block1ColorizeLfo2[7]);
     registerOscParam("/gravity/block3/lfo/b1/brightBand4Amp", &block1ColorizeLfo2[8]);
     registerOscParam("/gravity/block3/lfo/b1/hueBand4Rate", &block1ColorizeLfo2[9]);
+    registerOscParam("/gravity/block3/lfo/b1/hueBand4Shape", &block1ColorizeLfo2Shape[3]);
     registerOscParam("/gravity/block3/lfo/b1/saturationBand4Rate", &block1ColorizeLfo2[10]);
+    registerOscParam("/gravity/block3/lfo/b1/saturationBand4Shape", &block1ColorizeLfo2Shape[4]);
     registerOscParam("/gravity/block3/lfo/b1/brightBand4Rate", &block1ColorizeLfo2[11]);
+    registerOscParam("/gravity/block3/lfo/b1/brightBand4Shape", &block1ColorizeLfo2Shape[5]);
     registerOscParam("/gravity/block3/lfo/b1/resetLfo2", &block1ColorizeLfo2Reset);
 
     // ============== BLOCK 3 - B1 COLORIZE LFO3 (6 params) ==============
@@ -53751,8 +54548,11 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b1/saturationBand5Amp", &block1ColorizeLfo3[1]);
     registerOscParam("/gravity/block3/lfo/b1/brightBand5Amp", &block1ColorizeLfo3[2]);
     registerOscParam("/gravity/block3/lfo/b1/hueBand5Rate", &block1ColorizeLfo3[3]);
+    registerOscParam("/gravity/block3/lfo/b1/hueBand5Shape", &block1ColorizeLfo3Shape[0]);
     registerOscParam("/gravity/block3/lfo/b1/saturationBand5Rate", &block1ColorizeLfo3[4]);
+    registerOscParam("/gravity/block3/lfo/b1/saturationBand5Shape", &block1ColorizeLfo3Shape[1]);
     registerOscParam("/gravity/block3/lfo/b1/brightBand5Rate", &block1ColorizeLfo3[5]);
+    registerOscParam("/gravity/block3/lfo/b1/brightBand5Shape", &block1ColorizeLfo3Shape[2]);
     registerOscParam("/gravity/block3/lfo/b1/resetLfo3", &block1ColorizeLfo3Reset);
 
     // ============== BLOCK 3 - B1 FILTERS (6 params) ==============
@@ -53781,25 +54581,34 @@ void GuiApp::registerBlock3OscParameters() {
     // ============== BLOCK 3 - B2 GEO LFO1 (8 params) ==============
     registerOscParam("/gravity/block3/lfo/b2/xDisplaceAmp", &block2Geo1Lfo1[0]);
     registerOscParam("/gravity/block3/lfo/b2/xDisplaceRate", &block2Geo1Lfo1[1]);
+    registerOscParam("/gravity/block3/lfo/b2/xDisplaceShape", &block2Geo1Lfo1Shape[0]);
     registerOscParam("/gravity/block3/lfo/b2/yDisplaceAmp", &block2Geo1Lfo1[2]);
     registerOscParam("/gravity/block3/lfo/b2/yDisplaceRate", &block2Geo1Lfo1[3]);
+    registerOscParam("/gravity/block3/lfo/b2/yDisplaceShape", &block2Geo1Lfo1Shape[1]);
     registerOscParam("/gravity/block3/lfo/b2/zDisplaceAmp", &block2Geo1Lfo1[4]);
     registerOscParam("/gravity/block3/lfo/b2/zDisplaceRate", &block2Geo1Lfo1[5]);
+    registerOscParam("/gravity/block3/lfo/b2/zDisplaceShape", &block2Geo1Lfo1Shape[2]);
     registerOscParam("/gravity/block3/lfo/b2/rotateAmp", &block2Geo1Lfo1[6]);
     registerOscParam("/gravity/block3/lfo/b2/rotateRate", &block2Geo1Lfo1[7]);
+    registerOscParam("/gravity/block3/lfo/b2/rotateShape", &block2Geo1Lfo1Shape[3]);
     registerOscParam("/gravity/block3/lfo/b2/resetGeo1", &block2Geo1Lfo1Reset);
 
     // ============== BLOCK 3 - B2 GEO LFO2 (10 params) ==============
     registerOscParam("/gravity/block3/lfo/b2/xStretchAmp", &block2Geo1Lfo2[0]);
     registerOscParam("/gravity/block3/lfo/b2/xStretchRate", &block2Geo1Lfo2[1]);
+    registerOscParam("/gravity/block3/lfo/b2/xStretchShape", &block2Geo1Lfo2Shape[0]);
     registerOscParam("/gravity/block3/lfo/b2/yStretchAmp", &block2Geo1Lfo2[2]);
     registerOscParam("/gravity/block3/lfo/b2/yStretchRate", &block2Geo1Lfo2[3]);
+    registerOscParam("/gravity/block3/lfo/b2/yStretchShape", &block2Geo1Lfo2Shape[1]);
     registerOscParam("/gravity/block3/lfo/b2/xShearAmp", &block2Geo1Lfo2[4]);
     registerOscParam("/gravity/block3/lfo/b2/xShearRate", &block2Geo1Lfo2[5]);
+    registerOscParam("/gravity/block3/lfo/b2/xShearShape", &block2Geo1Lfo2Shape[2]);
     registerOscParam("/gravity/block3/lfo/b2/yShearAmp", &block2Geo1Lfo2[6]);
     registerOscParam("/gravity/block3/lfo/b2/yShearRate", &block2Geo1Lfo2[7]);
+    registerOscParam("/gravity/block3/lfo/b2/yShearShape", &block2Geo1Lfo2Shape[3]);
     registerOscParam("/gravity/block3/lfo/b2/kaleidoscopeSliceAmp", &block2Geo1Lfo2[8]);
     registerOscParam("/gravity/block3/lfo/b2/kaleidoscopeSliceRate", &block2Geo1Lfo2[9]);
+    registerOscParam("/gravity/block3/lfo/b2/kaleidoscopeSliceShape", &block2Geo1Lfo2Shape[4]);
     registerOscParam("/gravity/block3/lfo/b2/resetGeo2", &block2Geo1Lfo2Reset);
 
     // ============== BLOCK 3 - B2 COLORIZE (15 params) ==============
@@ -53827,14 +54636,20 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b2/saturationBand1Amp", &block2ColorizeLfo1[1]);
     registerOscParam("/gravity/block3/lfo/b2/brightBand1Amp", &block2ColorizeLfo1[2]);
     registerOscParam("/gravity/block3/lfo/b2/hueBand1Rate", &block2ColorizeLfo1[3]);
+    registerOscParam("/gravity/block3/lfo/b2/hueBand1Shape", &block2ColorizeLfo1Shape[0]);
     registerOscParam("/gravity/block3/lfo/b2/saturationBand1Rate", &block2ColorizeLfo1[4]);
+    registerOscParam("/gravity/block3/lfo/b2/saturationBand1Shape", &block2ColorizeLfo1Shape[1]);
     registerOscParam("/gravity/block3/lfo/b2/brightBand1Rate", &block2ColorizeLfo1[5]);
+    registerOscParam("/gravity/block3/lfo/b2/brightBand1Shape", &block2ColorizeLfo1Shape[2]);
     registerOscParam("/gravity/block3/lfo/b2/hueBand2Amp", &block2ColorizeLfo1[6]);
     registerOscParam("/gravity/block3/lfo/b2/saturationBand2Amp", &block2ColorizeLfo1[7]);
     registerOscParam("/gravity/block3/lfo/b2/brightBand2Amp", &block2ColorizeLfo1[8]);
     registerOscParam("/gravity/block3/lfo/b2/hueBand2Rate", &block2ColorizeLfo1[9]);
+    registerOscParam("/gravity/block3/lfo/b2/hueBand2Shape", &block2ColorizeLfo1Shape[3]);
     registerOscParam("/gravity/block3/lfo/b2/saturationBand2Rate", &block2ColorizeLfo1[10]);
+    registerOscParam("/gravity/block3/lfo/b2/saturationBand2Shape", &block2ColorizeLfo1Shape[4]);
     registerOscParam("/gravity/block3/lfo/b2/brightBand2Rate", &block2ColorizeLfo1[11]);
+    registerOscParam("/gravity/block3/lfo/b2/brightBand2Shape", &block2ColorizeLfo1Shape[5]);
     registerOscParam("/gravity/block3/lfo/b2/resetLfo1", &block2ColorizeLfo1Reset);
 
     // ============== BLOCK 3 - B2 COLORIZE LFO2 (12 params) ==============
@@ -53842,14 +54657,20 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b2/saturationBand3Amp", &block2ColorizeLfo2[1]);
     registerOscParam("/gravity/block3/lfo/b2/brightBand3Amp", &block2ColorizeLfo2[2]);
     registerOscParam("/gravity/block3/lfo/b2/hueBand3Rate", &block2ColorizeLfo2[3]);
+    registerOscParam("/gravity/block3/lfo/b2/hueBand3Shape", &block2ColorizeLfo2Shape[0]);
     registerOscParam("/gravity/block3/lfo/b2/saturationBand3Rate", &block2ColorizeLfo2[4]);
+    registerOscParam("/gravity/block3/lfo/b2/saturationBand3Shape", &block2ColorizeLfo2Shape[1]);
     registerOscParam("/gravity/block3/lfo/b2/brightBand3Rate", &block2ColorizeLfo2[5]);
+    registerOscParam("/gravity/block3/lfo/b2/brightBand3Shape", &block2ColorizeLfo2Shape[2]);
     registerOscParam("/gravity/block3/lfo/b2/hueBand4Amp", &block2ColorizeLfo2[6]);
     registerOscParam("/gravity/block3/lfo/b2/saturationBand4Amp", &block2ColorizeLfo2[7]);
     registerOscParam("/gravity/block3/lfo/b2/brightBand4Amp", &block2ColorizeLfo2[8]);
     registerOscParam("/gravity/block3/lfo/b2/hueBand4Rate", &block2ColorizeLfo2[9]);
+    registerOscParam("/gravity/block3/lfo/b2/hueBand4Shape", &block2ColorizeLfo2Shape[3]);
     registerOscParam("/gravity/block3/lfo/b2/saturationBand4Rate", &block2ColorizeLfo2[10]);
+    registerOscParam("/gravity/block3/lfo/b2/saturationBand4Shape", &block2ColorizeLfo2Shape[4]);
     registerOscParam("/gravity/block3/lfo/b2/brightBand4Rate", &block2ColorizeLfo2[11]);
+    registerOscParam("/gravity/block3/lfo/b2/brightBand4Shape", &block2ColorizeLfo2Shape[5]);
     registerOscParam("/gravity/block3/lfo/b2/resetLfo2", &block2ColorizeLfo2Reset);
 
     // ============== BLOCK 3 - B2 COLORIZE LFO3 (6 params) ==============
@@ -53857,8 +54678,11 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b2/saturationBand5Amp", &block2ColorizeLfo3[1]);
     registerOscParam("/gravity/block3/lfo/b2/brightBand5Amp", &block2ColorizeLfo3[2]);
     registerOscParam("/gravity/block3/lfo/b2/hueBand5Rate", &block2ColorizeLfo3[3]);
+    registerOscParam("/gravity/block3/lfo/b2/hueBand5Shape", &block2ColorizeLfo3Shape[0]);
     registerOscParam("/gravity/block3/lfo/b2/saturationBand5Rate", &block2ColorizeLfo3[4]);
+    registerOscParam("/gravity/block3/lfo/b2/saturationBand5Shape", &block2ColorizeLfo3Shape[1]);
     registerOscParam("/gravity/block3/lfo/b2/brightBand5Rate", &block2ColorizeLfo3[5]);
+    registerOscParam("/gravity/block3/lfo/b2/brightBand5Shape", &block2ColorizeLfo3Shape[2]);
     registerOscParam("/gravity/block3/lfo/b2/resetLfo3", &block2ColorizeLfo3Reset);
 
     // ============== BLOCK 3 - B2 FILTERS (6 params) ==============
@@ -53887,25 +54711,34 @@ void GuiApp::registerBlock3OscParameters() {
     // ============== BLOCK 3 - MATRIX MIX LFO1 (12 params) ==============
     registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2RedAmp", &matrixMixLfo1[0]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2RedRate", &matrixMixLfo1[1]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2RedShape", &matrixMixLfo1Shape[0]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1GreenToB2RedAmp", &matrixMixLfo1[2]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1GreenToB2RedRate", &matrixMixLfo1[3]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1GreenToB2RedShape", &matrixMixLfo1Shape[1]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2RedAmp", &matrixMixLfo1[4]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2RedRate", &matrixMixLfo1[5]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2RedShape", &matrixMixLfo1Shape[2]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2GreenAmp", &matrixMixLfo1[6]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2GreenRate", &matrixMixLfo1[7]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2GreenShape", &matrixMixLfo1Shape[3]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1GreenToB2GreenAmp", &matrixMixLfo1[8]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1GreenToB2GreenRate", &matrixMixLfo1[9]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1GreenToB2GreenShape", &matrixMixLfo1Shape[4]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2GreenAmp", &matrixMixLfo1[10]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2GreenRate", &matrixMixLfo1[11]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2GreenShape", &matrixMixLfo1Shape[5]);
     registerOscParam("/gravity/block3/lfo/matrixMix/resetLfo1", &matrixMixLfo1Reset);
 
     // ============== BLOCK 3 - MATRIX MIX LFO2 (6 params) ==============
     registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2BlueAmp", &matrixMixLfo2[0]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2BlueRate", &matrixMixLfo2[1]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1RedToB2BlueShape", &matrixMixLfo2Shape[0]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1GreenToB2BlueAmp", &matrixMixLfo2[2]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1GreenToB2BlueRate", &matrixMixLfo2[3]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1GreenToB2BlueShape", &matrixMixLfo2Shape[1]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2RedAmp", &matrixMixLfo2[4]);
     registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2RedRate", &matrixMixLfo2[5]);
+    registerOscParam("/gravity/block3/lfo/matrixMix/b1BlueToB2RedShape", &matrixMixLfo2Shape[2]);
     registerOscParam("/gravity/block3/lfo/matrixMix/resetLfo2", &matrixMixLfo2Reset);
 
     // ============== BLOCK 3 - FINAL MIX AND KEY (6 params) ==============
@@ -53924,10 +54757,13 @@ void GuiApp::registerBlock3OscParameters() {
     // ============== BLOCK 3 - FINAL MIX AND KEY LFO (6 params) ==============
     registerOscParam("/gravity/block3/lfo/final/mixAmountAmp", &finalMixAndKeyLfo[0]);
     registerOscParam("/gravity/block3/lfo/final/mixAmountRate", &finalMixAndKeyLfo[1]);
+    registerOscParam("/gravity/block3/lfo/final/mixAmountShape", &finalMixAndKeyLfoShape[0]);
     registerOscParam("/gravity/block3/lfo/final/keyThresholdAmp", &finalMixAndKeyLfo[2]);
     registerOscParam("/gravity/block3/lfo/final/keyThresholdRate", &finalMixAndKeyLfo[3]);
+    registerOscParam("/gravity/block3/lfo/final/keyThresholdShape", &finalMixAndKeyLfoShape[1]);
     registerOscParam("/gravity/block3/lfo/final/keySoftAmp", &finalMixAndKeyLfo[4]);
     registerOscParam("/gravity/block3/lfo/final/keySoftRate", &finalMixAndKeyLfo[5]);
+    registerOscParam("/gravity/block3/lfo/final/keySoftShape", &finalMixAndKeyLfoShape[2]);
     registerOscParam("/gravity/block3/lfo/final/reset", &finalMixAndKeyLfoReset);
 
     ofLogNotice("OSC") << "Block 3 registration complete. Total parameters: " << oscRegistry.size();

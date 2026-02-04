@@ -159,8 +159,35 @@ void ofApp::update(){
 }
 //------------------------------------------------------------
 float ofApp::lfo(float amp, float rate,int shape){
+    float waveValue = 0.0f;
 
-    return amp*sin(rate);
+    switch(shape) {
+        case 0: // Sine (default)
+            waveValue = sin(rate);
+            break;
+
+        case 1: // Triangle
+            waveValue = (2.0f / PI) * asin(sin(rate));
+            break;
+
+        case 2: // Ramp (rising sawtooth)
+            waveValue = (2.0f / TWO_PI) * fmod(rate + PI, TWO_PI) - 1.0f;
+            break;
+
+        case 3: // Saw (falling sawtooth)
+            waveValue = 1.0f - (2.0f / TWO_PI) * fmod(rate + PI, TWO_PI);
+            break;
+
+        case 4: // Square (50% duty cycle)
+            waveValue = (sin(rate) >= 0.0f) ? 1.0f : -1.0f;
+            break;
+
+        default: // Fallback to sine
+            waveValue = sin(rate);
+            break;
+    }
+
+    return amp * waveValue;
 }
 
 
@@ -607,164 +634,164 @@ void ofApp::draw(){
 	//BLOCK1 inputs lfo
 
 	//ch1
-	ch1XDisplace+=lfo(ch1XDisplaceC*(gui->ch1AdjustLfo[0]),ch1XDisplaceTheta,0);
-	ch1YDisplace+=lfo(ch1YDisplaceC*(gui->ch1AdjustLfo[2]),ch1YDisplaceTheta,0);
-	ch1ZDisplace+=lfo(ch1ZDisplaceC*(gui->ch1AdjustLfo[4]),ch1ZDisplaceTheta,0);
-	ch1Rotate+=lfo(ch1RotateC*(gui->ch1AdjustLfo[6]),ch1RotateTheta,0);
-	ch1HueAttenuate+=lfo((gui->ch1AdjustLfo[8]),ch1HueAttenuateTheta,0);
-	ch1SaturationAttenuate+=lfo((gui->ch1AdjustLfo[10]),ch1SaturationAttenuateTheta,0);
-	ch1BrightAttenuate+=lfo((gui->ch1AdjustLfo[12]),ch1BrightAttenuateTheta,0);
-	ch1KaleidoscopeSlice+=lfo( ch1KaleidoscopeSliceC*(gui->ch1AdjustLfo[14]),ch1KaleidoscopeSliceTheta ,0 );
+	ch1XDisplace+=lfo(ch1XDisplaceC*(gui->ch1AdjustLfo[0]),ch1XDisplaceTheta,gui->ch1AdjustLfoShape[0]);
+	ch1YDisplace+=lfo(ch1YDisplaceC*(gui->ch1AdjustLfo[2]),ch1YDisplaceTheta,gui->ch1AdjustLfoShape[1]);
+	ch1ZDisplace+=lfo(ch1ZDisplaceC*(gui->ch1AdjustLfo[4]),ch1ZDisplaceTheta,gui->ch1AdjustLfoShape[2]);
+	ch1Rotate+=lfo(ch1RotateC*(gui->ch1AdjustLfo[6]),ch1RotateTheta,gui->ch1AdjustLfoShape[3]);
+	ch1HueAttenuate+=lfo((gui->ch1AdjustLfo[8]),ch1HueAttenuateTheta,gui->ch1AdjustLfoShape[4]);
+	ch1SaturationAttenuate+=lfo((gui->ch1AdjustLfo[10]),ch1SaturationAttenuateTheta,gui->ch1AdjustLfoShape[5]);
+	ch1BrightAttenuate+=lfo((gui->ch1AdjustLfo[12]),ch1BrightAttenuateTheta,gui->ch1AdjustLfoShape[6]);
+	ch1KaleidoscopeSlice+=lfo( ch1KaleidoscopeSliceC*(gui->ch1AdjustLfo[14]),ch1KaleidoscopeSliceTheta ,gui->ch1AdjustLfoShape[7] );
 
 	//ch2 lfo add on
-	ch2MixAmount+=lfo(mixAmountC*(gui->ch2MixAndKeyLfo[0]),ch2MixAmountTheta,0);
-	ch2KeyThreshold+=lfo(keyThresholdC*(gui->ch2MixAndKeyLfo[2]),ch2KeyThresholdTheta,0);
-	ch2KeySoft+=lfo((gui->ch2MixAndKeyLfo[4]),ch2KeySoftTheta,0);
+	ch2MixAmount+=lfo(mixAmountC*(gui->ch2MixAndKeyLfo[0]),ch2MixAmountTheta,gui->ch2MixAndKeyLfoShape[0]);
+	ch2KeyThreshold+=lfo(keyThresholdC*(gui->ch2MixAndKeyLfo[2]),ch2KeyThresholdTheta,gui->ch2MixAndKeyLfoShape[1]);
+	ch2KeySoft+=lfo((gui->ch2MixAndKeyLfo[4]),ch2KeySoftTheta,gui->ch2MixAndKeyLfoShape[2]);
 
-	ch2XDisplace+=lfo(ch2XDisplaceC*(gui->ch2AdjustLfo[0]),ch2XDisplaceTheta,0);
-	ch2YDisplace+=lfo(ch2YDisplaceC*(gui->ch2AdjustLfo[2]),ch2YDisplaceTheta,0);
-	ch2ZDisplace+=lfo(ch2ZDisplaceC*(gui->ch2AdjustLfo[4]),ch2ZDisplaceTheta,0);
-	ch2Rotate+=lfo(ch2RotateC*(gui->ch2AdjustLfo[6]),ch2RotateTheta,0);
-	ch2HueAttenuate+=lfo((gui->ch2AdjustLfo[8]),ch2HueAttenuateTheta,0);
-	ch2SaturationAttenuate+=lfo((gui->ch2AdjustLfo[10]),ch2SaturationAttenuateTheta,0);
-	ch2BrightAttenuate+=lfo((gui->ch2AdjustLfo[12]),ch2BrightAttenuateTheta,0);
-	ch2KaleidoscopeSlice+=lfo( ch2KaleidoscopeSliceC*(gui->ch2AdjustLfo[14]),ch2KaleidoscopeSliceTheta ,0 );
+	ch2XDisplace+=lfo(ch2XDisplaceC*(gui->ch2AdjustLfo[0]),ch2XDisplaceTheta,gui->ch2AdjustLfoShape[0]);
+	ch2YDisplace+=lfo(ch2YDisplaceC*(gui->ch2AdjustLfo[2]),ch2YDisplaceTheta,gui->ch2AdjustLfoShape[1]);
+	ch2ZDisplace+=lfo(ch2ZDisplaceC*(gui->ch2AdjustLfo[4]),ch2ZDisplaceTheta,gui->ch2AdjustLfoShape[2]);
+	ch2Rotate+=lfo(ch2RotateC*(gui->ch2AdjustLfo[6]),ch2RotateTheta,gui->ch2AdjustLfoShape[3]);
+	ch2HueAttenuate+=lfo((gui->ch2AdjustLfo[8]),ch2HueAttenuateTheta,gui->ch2AdjustLfoShape[4]);
+	ch2SaturationAttenuate+=lfo((gui->ch2AdjustLfo[10]),ch2SaturationAttenuateTheta,gui->ch2AdjustLfoShape[5]);
+	ch2BrightAttenuate+=lfo((gui->ch2AdjustLfo[12]),ch2BrightAttenuateTheta,gui->ch2AdjustLfoShape[6]);
+	ch2KaleidoscopeSlice+=lfo( ch2KaleidoscopeSliceC*(gui->ch2AdjustLfo[14]),ch2KaleidoscopeSliceTheta ,gui->ch2AdjustLfoShape[7] );
 
 	//fb1 lfo add on
-	fb1MixAmount+=lfo(mixAmountC*(gui->fb1MixAndKeyLfo[0]),fb1MixAmountTheta,0);
-	fb1KeyThreshold+=lfo(keyThresholdC*(gui->fb1MixAndKeyLfo[2]),fb1KeyThresholdTheta,0);
-	fb1KeySoft+=lfo((gui->fb1MixAndKeyLfo[4]),fb1KeySoftTheta,0);
+	fb1MixAmount+=lfo(mixAmountC*(gui->fb1MixAndKeyLfo[0]),fb1MixAmountTheta,gui->fb1MixAndKeyLfoShape[0]);
+	fb1KeyThreshold+=lfo(keyThresholdC*(gui->fb1MixAndKeyLfo[2]),fb1KeyThresholdTheta,gui->fb1MixAndKeyLfoShape[1]);
+	fb1KeySoft+=lfo((gui->fb1MixAndKeyLfo[4]),fb1KeySoftTheta,gui->fb1MixAndKeyLfoShape[2]);
 
-	fb1XDisplace+=lfo(fb1XDisplaceC*(gui->fb1Geo1Lfo1[0]),fb1XDisplaceTheta,0);
-	fb1YDisplace+=lfo(fb1YDisplaceC*(gui->fb1Geo1Lfo1[2]),fb1YDisplaceTheta,0);
-	fb1ZDisplace+=lfo(fb1ZDisplaceC*(gui->fb1Geo1Lfo1[4]),fb1ZDisplaceTheta,0);
-	fb1Rotate+=lfo(fb1RotateC*(gui->fb1Geo1Lfo1[6]),fb1RotateTheta,0);
+	fb1XDisplace+=lfo(fb1XDisplaceC*(gui->fb1Geo1Lfo1[0]),fb1XDisplaceTheta,gui->fb1Geo1Lfo1Shape[0]);
+	fb1YDisplace+=lfo(fb1YDisplaceC*(gui->fb1Geo1Lfo1[2]),fb1YDisplaceTheta,gui->fb1Geo1Lfo1Shape[1]);
+	fb1ZDisplace+=lfo(fb1ZDisplaceC*(gui->fb1Geo1Lfo1[4]),fb1ZDisplaceTheta,gui->fb1Geo1Lfo1Shape[2]);
+	fb1Rotate+=lfo(fb1RotateC*(gui->fb1Geo1Lfo1[6]),fb1RotateTheta,gui->fb1Geo1Lfo1Shape[3]);
 
-	fb1ShearMatrix1+=lfo(fb1ShearMatrix1C*(gui->fb1Geo1Lfo2[0]),fb1ShearMatrix1Theta,0);
-	fb1ShearMatrix2+=lfo(fb1ShearMatrix2C*(gui->fb1Geo1Lfo2[4]),fb1ShearMatrix2Theta,0);
-	fb1ShearMatrix3+=lfo(fb1ShearMatrix3C*(gui->fb1Geo1Lfo2[6]),fb1ShearMatrix3Theta,0);
-	fb1ShearMatrix4+=lfo(fb1ShearMatrix4C*(gui->fb1Geo1Lfo2[2]),fb1ShearMatrix4Theta,0);
-	fb1KaleidoscopeSlice+=lfo(fb1KaleidoscopeSliceC*(gui->fb1Geo1Lfo2[8]),fb1KaleidoscopeSliceTheta,0);
+	fb1ShearMatrix1+=lfo(fb1ShearMatrix1C*(gui->fb1Geo1Lfo2[0]),fb1ShearMatrix1Theta,gui->fb1Geo1Lfo2Shape[0]);
+	fb1ShearMatrix2+=lfo(fb1ShearMatrix2C*(gui->fb1Geo1Lfo2[4]),fb1ShearMatrix2Theta,gui->fb1Geo1Lfo2Shape[2]);
+	fb1ShearMatrix3+=lfo(fb1ShearMatrix3C*(gui->fb1Geo1Lfo2[6]),fb1ShearMatrix3Theta,gui->fb1Geo1Lfo2Shape[3]);
+	fb1ShearMatrix4+=lfo(fb1ShearMatrix4C*(gui->fb1Geo1Lfo2[2]),fb1ShearMatrix4Theta,gui->fb1Geo1Lfo2Shape[1]);
+	fb1KaleidoscopeSlice+=lfo(fb1KaleidoscopeSliceC*(gui->fb1Geo1Lfo2[8]),fb1KaleidoscopeSliceTheta,gui->fb1Geo1Lfo2Shape[4]);
 
-	fb1HueAttenuate+=lfo(fb1HueAttenuateC*(gui->fb1Color1Lfo1[0]),fb1HueAttenuateTheta,0);
-	fb1SaturationAttenuate+=lfo(fb1SaturationAttenuateC*(gui->fb1Color1Lfo1[2]),fb1SaturationAttenuateTheta,0);
-	fb1BrightAttenuate+=lfo(fb1BrightAttenuateC*(gui->fb1Color1Lfo1[4]),fb1BrightAttenuateTheta,0);
+	fb1HueAttenuate+=lfo(fb1HueAttenuateC*(gui->fb1Color1Lfo1[0]),fb1HueAttenuateTheta,gui->fb1Color1Lfo1Shape[0]);
+	fb1SaturationAttenuate+=lfo(fb1SaturationAttenuateC*(gui->fb1Color1Lfo1[2]),fb1SaturationAttenuateTheta,gui->fb1Color1Lfo1Shape[1]);
+	fb1BrightAttenuate+=lfo(fb1BrightAttenuateC*(gui->fb1Color1Lfo1[4]),fb1BrightAttenuateTheta,gui->fb1Color1Lfo1Shape[2]);
 
 
 	//block2Input
-	block2InputXDisplace+=lfo(block2InputXDisplaceC*(gui->block2InputAdjustLfo[0]),block2InputXDisplaceTheta,0);
-	block2InputYDisplace+=lfo(block2InputYDisplaceC*(gui->block2InputAdjustLfo[2]),block2InputYDisplaceTheta,0);
-	block2InputZDisplace+=lfo(block2InputZDisplaceC*(gui->block2InputAdjustLfo[4]),block2InputZDisplaceTheta,0);
-	block2InputRotate+=lfo(block2InputRotateC*(gui->block2InputAdjustLfo[6]),block2InputRotateTheta,0);
-	block2InputHueAttenuate+=lfo((gui->block2InputAdjustLfo[8]),block2InputHueAttenuateTheta,0);
-	block2InputSaturationAttenuate+=lfo((gui->block2InputAdjustLfo[10]),block2InputSaturationAttenuateTheta,0);
-	block2InputBrightAttenuate+=lfo((gui->block2InputAdjustLfo[12]),block2InputBrightAttenuateTheta,0);
+	block2InputXDisplace+=lfo(block2InputXDisplaceC*(gui->block2InputAdjustLfo[0]),block2InputXDisplaceTheta,gui->block2InputAdjustLfoShape[0]);
+	block2InputYDisplace+=lfo(block2InputYDisplaceC*(gui->block2InputAdjustLfo[2]),block2InputYDisplaceTheta,gui->block2InputAdjustLfoShape[1]);
+	block2InputZDisplace+=lfo(block2InputZDisplaceC*(gui->block2InputAdjustLfo[4]),block2InputZDisplaceTheta,gui->block2InputAdjustLfoShape[2]);
+	block2InputRotate+=lfo(block2InputRotateC*(gui->block2InputAdjustLfo[6]),block2InputRotateTheta,gui->block2InputAdjustLfoShape[3]);
+	block2InputHueAttenuate+=lfo((gui->block2InputAdjustLfo[8]),block2InputHueAttenuateTheta,gui->block2InputAdjustLfoShape[4]);
+	block2InputSaturationAttenuate+=lfo((gui->block2InputAdjustLfo[10]),block2InputSaturationAttenuateTheta,gui->block2InputAdjustLfoShape[5]);
+	block2InputBrightAttenuate+=lfo((gui->block2InputAdjustLfo[12]),block2InputBrightAttenuateTheta,gui->block2InputAdjustLfoShape[6]);
 	block2InputKaleidoscopeSlice+=lfo( block2InputKaleidoscopeSliceC*(gui->block2InputAdjustLfo[14]),
-		block2InputKaleidoscopeSliceTheta ,0 );
+		block2InputKaleidoscopeSliceTheta ,gui->block2InputAdjustLfoShape[7] );
 
 	//fb2 lfo addon
-	fb2MixAmount+=lfo(mixAmountC*(gui->fb2MixAndKeyLfo[0]),fb2MixAmountTheta,0);
-	fb2KeyThreshold+=lfo(keyThresholdC*(gui->fb2MixAndKeyLfo[2]),fb2KeyThresholdTheta,0);
-	fb2KeySoft+=lfo((gui->fb2MixAndKeyLfo[4]),fb2KeySoftTheta,0);
+	fb2MixAmount+=lfo(mixAmountC*(gui->fb2MixAndKeyLfo[0]),fb2MixAmountTheta,gui->fb2MixAndKeyLfoShape[0]);
+	fb2KeyThreshold+=lfo(keyThresholdC*(gui->fb2MixAndKeyLfo[2]),fb2KeyThresholdTheta,gui->fb2MixAndKeyLfoShape[1]);
+	fb2KeySoft+=lfo((gui->fb2MixAndKeyLfo[4]),fb2KeySoftTheta,gui->fb2MixAndKeyLfoShape[2]);
 
-	fb2XDisplace+=lfo(fb2XDisplaceC*(gui->fb2Geo1Lfo1[0]),fb2XDisplaceTheta,0);
-	fb2YDisplace+=lfo(fb2YDisplaceC*(gui->fb2Geo1Lfo1[2]),fb2YDisplaceTheta,0);
-	fb2ZDisplace+=lfo(fb2ZDisplaceC*(gui->fb2Geo1Lfo1[4]),fb2ZDisplaceTheta,0);
-	fb2Rotate+=lfo(fb2RotateC*(gui->fb2Geo1Lfo1[6]),fb2RotateTheta,0);
+	fb2XDisplace+=lfo(fb2XDisplaceC*(gui->fb2Geo1Lfo1[0]),fb2XDisplaceTheta,gui->fb2Geo1Lfo1Shape[0]);
+	fb2YDisplace+=lfo(fb2YDisplaceC*(gui->fb2Geo1Lfo1[2]),fb2YDisplaceTheta,gui->fb2Geo1Lfo1Shape[1]);
+	fb2ZDisplace+=lfo(fb2ZDisplaceC*(gui->fb2Geo1Lfo1[4]),fb2ZDisplaceTheta,gui->fb2Geo1Lfo1Shape[2]);
+	fb2Rotate+=lfo(fb2RotateC*(gui->fb2Geo1Lfo1[6]),fb2RotateTheta,gui->fb2Geo1Lfo1Shape[3]);
 
 
-	fb2ShearMatrix1+=lfo(fb2ShearMatrix1C*(gui->fb2Geo1Lfo2[0]),fb2ShearMatrix1Theta,0);
-	fb2ShearMatrix2+=lfo(fb2ShearMatrix2C*(gui->fb2Geo1Lfo2[4]),fb2ShearMatrix2Theta,0);
-	fb2ShearMatrix3+=lfo(fb2ShearMatrix3C*(gui->fb2Geo1Lfo2[6]),fb2ShearMatrix3Theta,0);
-	fb2ShearMatrix4+=lfo(fb2ShearMatrix4C*(gui->fb2Geo1Lfo2[2]),fb2ShearMatrix4Theta,0);
-	fb2KaleidoscopeSlice+=lfo(fb2KaleidoscopeSliceC*(gui->fb2Geo1Lfo2[8]),fb2KaleidoscopeSliceTheta,0);
+	fb2ShearMatrix1+=lfo(fb2ShearMatrix1C*(gui->fb2Geo1Lfo2[0]),fb2ShearMatrix1Theta,gui->fb2Geo1Lfo2Shape[0]);
+	fb2ShearMatrix2+=lfo(fb2ShearMatrix2C*(gui->fb2Geo1Lfo2[4]),fb2ShearMatrix2Theta,gui->fb2Geo1Lfo2Shape[2]);
+	fb2ShearMatrix3+=lfo(fb2ShearMatrix3C*(gui->fb2Geo1Lfo2[6]),fb2ShearMatrix3Theta,gui->fb2Geo1Lfo2Shape[3]);
+	fb2ShearMatrix4+=lfo(fb2ShearMatrix4C*(gui->fb2Geo1Lfo2[2]),fb2ShearMatrix4Theta,gui->fb2Geo1Lfo2Shape[1]);
+	fb2KaleidoscopeSlice+=lfo(fb2KaleidoscopeSliceC*(gui->fb2Geo1Lfo2[8]),fb2KaleidoscopeSliceTheta,gui->fb2Geo1Lfo2Shape[4]);
 
-	fb2HueAttenuate+=lfo(fb2HueAttenuateC*(gui->fb2Color1Lfo1[0]),fb2HueAttenuateTheta,0);
-	fb2SaturationAttenuate+=lfo(fb2SaturationAttenuateC*(gui->fb2Color1Lfo1[2]),fb2SaturationAttenuateTheta,0);
-	fb2BrightAttenuate+=lfo(fb2BrightAttenuateC*(gui->fb2Color1Lfo1[4]),fb2BrightAttenuateTheta,0);
+	fb2HueAttenuate+=lfo(fb2HueAttenuateC*(gui->fb2Color1Lfo1[0]),fb2HueAttenuateTheta,gui->fb2Color1Lfo1Shape[0]);
+	fb2SaturationAttenuate+=lfo(fb2SaturationAttenuateC*(gui->fb2Color1Lfo1[2]),fb2SaturationAttenuateTheta,gui->fb2Color1Lfo1Shape[1]);
+	fb2BrightAttenuate+=lfo(fb2BrightAttenuateC*(gui->fb2Color1Lfo1[4]),fb2BrightAttenuateTheta,gui->fb2Color1Lfo1Shape[2]);
 
 	//BLOCK3
 
 	//block1 geo
-	block1XDisplace+=lfo(block1XDisplaceC*(gui->block1Geo1Lfo1[0]),block1XDisplaceTheta,0);
-	block1YDisplace+=lfo(block1YDisplaceC*(gui->block1Geo1Lfo1[2]),block1YDisplaceTheta,0);
-	block1ZDisplace+=lfo(block1ZDisplaceC*(gui->block1Geo1Lfo1[4]),block1ZDisplaceTheta,0);
-	block1Rotate+=lfo(block1RotateC*(gui->block1Geo1Lfo1[6]),block1RotateTheta,0);
+	block1XDisplace+=lfo(block1XDisplaceC*(gui->block1Geo1Lfo1[0]),block1XDisplaceTheta,gui->block1Geo1Lfo1Shape[0]);
+	block1YDisplace+=lfo(block1YDisplaceC*(gui->block1Geo1Lfo1[2]),block1YDisplaceTheta,gui->block1Geo1Lfo1Shape[1]);
+	block1ZDisplace+=lfo(block1ZDisplaceC*(gui->block1Geo1Lfo1[4]),block1ZDisplaceTheta,gui->block1Geo1Lfo1Shape[2]);
+	block1Rotate+=lfo(block1RotateC*(gui->block1Geo1Lfo1[6]),block1RotateTheta,gui->block1Geo1Lfo1Shape[3]);
 
-	block1ShearMatrix1+=lfo(block1ShearMatrix1C*(gui->block1Geo1Lfo2[0]),block1ShearMatrix1Theta,0);
-	block1ShearMatrix2+=lfo(block1ShearMatrix2C*(gui->block1Geo1Lfo2[4]),block1ShearMatrix2Theta,0);
-	block1ShearMatrix3+=lfo(block1ShearMatrix3C*(gui->block1Geo1Lfo2[6]),block1ShearMatrix3Theta,0);
-	block1ShearMatrix4+=lfo(block1ShearMatrix4C*(gui->block1Geo1Lfo2[2]),block1ShearMatrix4Theta,0);
-	block1KaleidoscopeSlice+=lfo(block1KaleidoscopeSliceC*(gui->block1Geo1Lfo2[8]),block1KaleidoscopeSliceTheta,0);
+	block1ShearMatrix1+=lfo(block1ShearMatrix1C*(gui->block1Geo1Lfo2[0]),block1ShearMatrix1Theta,gui->block1Geo1Lfo2Shape[0]);
+	block1ShearMatrix2+=lfo(block1ShearMatrix2C*(gui->block1Geo1Lfo2[4]),block1ShearMatrix2Theta,gui->block1Geo1Lfo2Shape[2]);
+	block1ShearMatrix3+=lfo(block1ShearMatrix3C*(gui->block1Geo1Lfo2[6]),block1ShearMatrix3Theta,gui->block1Geo1Lfo2Shape[3]);
+	block1ShearMatrix4+=lfo(block1ShearMatrix4C*(gui->block1Geo1Lfo2[2]),block1ShearMatrix4Theta,gui->block1Geo1Lfo2Shape[1]);
+	block1KaleidoscopeSlice+=lfo(block1KaleidoscopeSliceC*(gui->block1Geo1Lfo2[8]),block1KaleidoscopeSliceTheta,gui->block1Geo1Lfo2Shape[4]);
 
 	//block1 colorize
-	block1ColorizeHueBand1+=lfo( (gui->block1ColorizeLfo1[0]) , block1ColorizeHueBand1Theta , 0  );
-	block1ColorizeSaturationBand1+=lfo( (gui->block1ColorizeLfo1[1]) , block1ColorizeSaturationBand1Theta , 0  );
-	block1ColorizeBrightBand1+=lfo( (gui->block1ColorizeLfo1[2]) , block1ColorizeBrightBand1Theta , 0  );
-	block1ColorizeHueBand2+=lfo( (gui->block1ColorizeLfo1[6]) , block1ColorizeHueBand2Theta , 0  );
-	block1ColorizeSaturationBand2+=lfo( (gui->block1ColorizeLfo1[7]) , block1ColorizeSaturationBand2Theta , 0  );
-	block1ColorizeBrightBand2+=lfo( (gui->block1ColorizeLfo1[8]) , block1ColorizeBrightBand2Theta , 0  );
+	block1ColorizeHueBand1+=lfo( (gui->block1ColorizeLfo1[0]) , block1ColorizeHueBand1Theta , gui->block1ColorizeLfo1Shape[0]  );
+	block1ColorizeSaturationBand1+=lfo( (gui->block1ColorizeLfo1[1]) , block1ColorizeSaturationBand1Theta , gui->block1ColorizeLfo1Shape[1]  );
+	block1ColorizeBrightBand1+=lfo( (gui->block1ColorizeLfo1[2]) , block1ColorizeBrightBand1Theta , gui->block1ColorizeLfo1Shape[2]  );
+	block1ColorizeHueBand2+=lfo( (gui->block1ColorizeLfo1[6]) , block1ColorizeHueBand2Theta , gui->block1ColorizeLfo1Shape[3]  );
+	block1ColorizeSaturationBand2+=lfo( (gui->block1ColorizeLfo1[7]) , block1ColorizeSaturationBand2Theta , gui->block1ColorizeLfo1Shape[4]  );
+	block1ColorizeBrightBand2+=lfo( (gui->block1ColorizeLfo1[8]) , block1ColorizeBrightBand2Theta , gui->block1ColorizeLfo1Shape[5]  );
 
-	block1ColorizeHueBand3+=lfo( (gui->block1ColorizeLfo2[0]) , block1ColorizeHueBand3Theta , 0  );
-	block1ColorizeSaturationBand3+=lfo( (gui->block1ColorizeLfo2[1]) , block1ColorizeSaturationBand3Theta , 0  );
-	block1ColorizeBrightBand3+=lfo( (gui->block1ColorizeLfo2[2]) , block1ColorizeBrightBand3Theta , 0  );
-	block1ColorizeHueBand4+=lfo( (gui->block1ColorizeLfo2[6]) , block1ColorizeHueBand4Theta , 0  );
-	block1ColorizeSaturationBand4+=lfo( (gui->block1ColorizeLfo2[7]) , block1ColorizeSaturationBand4Theta , 0  );
-	block1ColorizeBrightBand4+=lfo( (gui->block1ColorizeLfo2[8]) , block1ColorizeBrightBand4Theta , 0  );
+	block1ColorizeHueBand3+=lfo( (gui->block1ColorizeLfo2[0]) , block1ColorizeHueBand3Theta , gui->block1ColorizeLfo2Shape[0]  );
+	block1ColorizeSaturationBand3+=lfo( (gui->block1ColorizeLfo2[1]) , block1ColorizeSaturationBand3Theta , gui->block1ColorizeLfo2Shape[1]  );
+	block1ColorizeBrightBand3+=lfo( (gui->block1ColorizeLfo2[2]) , block1ColorizeBrightBand3Theta , gui->block1ColorizeLfo2Shape[2]  );
+	block1ColorizeHueBand4+=lfo( (gui->block1ColorizeLfo2[6]) , block1ColorizeHueBand4Theta , gui->block1ColorizeLfo2Shape[3]  );
+	block1ColorizeSaturationBand4+=lfo( (gui->block1ColorizeLfo2[7]) , block1ColorizeSaturationBand4Theta , gui->block1ColorizeLfo2Shape[4]  );
+	block1ColorizeBrightBand4+=lfo( (gui->block1ColorizeLfo2[8]) , block1ColorizeBrightBand4Theta , gui->block1ColorizeLfo2Shape[5]  );
 
-	block1ColorizeHueBand5+=lfo( (gui->block1ColorizeLfo3[0]) , block1ColorizeHueBand5Theta , 0  );
-	block1ColorizeSaturationBand5+=lfo( (gui->block1ColorizeLfo3[1]) , block1ColorizeSaturationBand5Theta , 0  );
-	block1ColorizeBrightBand5+=lfo( (gui->block1ColorizeLfo3[2]) , block1ColorizeBrightBand5Theta , 0  );
+	block1ColorizeHueBand5+=lfo( (gui->block1ColorizeLfo3[0]) , block1ColorizeHueBand5Theta , gui->block1ColorizeLfo3Shape[0]  );
+	block1ColorizeSaturationBand5+=lfo( (gui->block1ColorizeLfo3[1]) , block1ColorizeSaturationBand5Theta , gui->block1ColorizeLfo3Shape[1]  );
+	block1ColorizeBrightBand5+=lfo( (gui->block1ColorizeLfo3[2]) , block1ColorizeBrightBand5Theta , gui->block1ColorizeLfo3Shape[2]  );
 
 	//block2 geo
-	block2XDisplace+=lfo(block2XDisplaceC*(gui->block2Geo1Lfo1[0]),block2XDisplaceTheta,0);
-	block2YDisplace+=lfo(block2YDisplaceC*(gui->block2Geo1Lfo1[2]),block2YDisplaceTheta,0);
-	block2ZDisplace+=lfo(block2ZDisplaceC*(gui->block2Geo1Lfo1[4]),block2ZDisplaceTheta,0);
-	block2Rotate+=lfo(block2RotateC*(gui->block2Geo1Lfo1[6]),block2RotateTheta,0);
+	block2XDisplace+=lfo(block2XDisplaceC*(gui->block2Geo1Lfo1[0]),block2XDisplaceTheta,gui->block2Geo1Lfo1Shape[0]);
+	block2YDisplace+=lfo(block2YDisplaceC*(gui->block2Geo1Lfo1[2]),block2YDisplaceTheta,gui->block2Geo1Lfo1Shape[1]);
+	block2ZDisplace+=lfo(block2ZDisplaceC*(gui->block2Geo1Lfo1[4]),block2ZDisplaceTheta,gui->block2Geo1Lfo1Shape[2]);
+	block2Rotate+=lfo(block2RotateC*(gui->block2Geo1Lfo1[6]),block2RotateTheta,gui->block2Geo1Lfo1Shape[3]);
 
-	block2ShearMatrix1+=lfo(block2ShearMatrix1C*(gui->block2Geo1Lfo2[0]),block2ShearMatrix1Theta,0);
-	block2ShearMatrix2+=lfo(block2ShearMatrix2C*(gui->block2Geo1Lfo2[4]),block2ShearMatrix2Theta,0);
-	block2ShearMatrix3+=lfo(block2ShearMatrix3C*(gui->block2Geo1Lfo2[6]),block2ShearMatrix3Theta,0);
-	block2ShearMatrix4+=lfo(block2ShearMatrix4C*(gui->block2Geo1Lfo2[2]),block2ShearMatrix4Theta,0);
-	block2KaleidoscopeSlice+=lfo(block2KaleidoscopeSliceC*(gui->block2Geo1Lfo2[8]),block2KaleidoscopeSliceTheta,0);
+	block2ShearMatrix1+=lfo(block2ShearMatrix1C*(gui->block2Geo1Lfo2[0]),block2ShearMatrix1Theta,gui->block2Geo1Lfo2Shape[0]);
+	block2ShearMatrix2+=lfo(block2ShearMatrix2C*(gui->block2Geo1Lfo2[4]),block2ShearMatrix2Theta,gui->block2Geo1Lfo2Shape[2]);
+	block2ShearMatrix3+=lfo(block2ShearMatrix3C*(gui->block2Geo1Lfo2[6]),block2ShearMatrix3Theta,gui->block2Geo1Lfo2Shape[3]);
+	block2ShearMatrix4+=lfo(block2ShearMatrix4C*(gui->block2Geo1Lfo2[2]),block2ShearMatrix4Theta,gui->block2Geo1Lfo2Shape[1]);
+	block2KaleidoscopeSlice+=lfo(block2KaleidoscopeSliceC*(gui->block2Geo1Lfo2[8]),block2KaleidoscopeSliceTheta,gui->block2Geo1Lfo2Shape[4]);
 
 	//block2 colorize
-	block2ColorizeHueBand1+=lfo( (gui->block2ColorizeLfo1[0]) , block2ColorizeHueBand1Theta , 0  );
-	block2ColorizeSaturationBand1+=lfo( (gui->block2ColorizeLfo1[1]) , block2ColorizeSaturationBand1Theta , 0  );
-	block2ColorizeBrightBand1+=lfo( (gui->block2ColorizeLfo1[2]) , block2ColorizeBrightBand1Theta , 0  );
-	block2ColorizeHueBand2+=lfo( (gui->block2ColorizeLfo1[6]) , block2ColorizeHueBand2Theta , 0  );
-	block2ColorizeSaturationBand2+=lfo( (gui->block2ColorizeLfo1[7]) , block2ColorizeSaturationBand2Theta , 0  );
-	block2ColorizeBrightBand2+=lfo( (gui->block2ColorizeLfo1[8]) , block2ColorizeBrightBand2Theta , 0  );
+	block2ColorizeHueBand1+=lfo( (gui->block2ColorizeLfo1[0]) , block2ColorizeHueBand1Theta , gui->block2ColorizeLfo1Shape[0]  );
+	block2ColorizeSaturationBand1+=lfo( (gui->block2ColorizeLfo1[1]) , block2ColorizeSaturationBand1Theta , gui->block2ColorizeLfo1Shape[1]  );
+	block2ColorizeBrightBand1+=lfo( (gui->block2ColorizeLfo1[2]) , block2ColorizeBrightBand1Theta , gui->block2ColorizeLfo1Shape[2]  );
+	block2ColorizeHueBand2+=lfo( (gui->block2ColorizeLfo1[6]) , block2ColorizeHueBand2Theta , gui->block2ColorizeLfo1Shape[3]  );
+	block2ColorizeSaturationBand2+=lfo( (gui->block2ColorizeLfo1[7]) , block2ColorizeSaturationBand2Theta , gui->block2ColorizeLfo1Shape[4]  );
+	block2ColorizeBrightBand2+=lfo( (gui->block2ColorizeLfo1[8]) , block2ColorizeBrightBand2Theta , gui->block2ColorizeLfo1Shape[5]  );
 
-	block2ColorizeHueBand3+=lfo( (gui->block2ColorizeLfo2[0]) , block2ColorizeHueBand3Theta , 0  );
-	block2ColorizeSaturationBand3+=lfo( (gui->block2ColorizeLfo2[1]) , block2ColorizeSaturationBand3Theta , 0  );
-	block2ColorizeBrightBand3+=lfo( (gui->block2ColorizeLfo2[2]) , block2ColorizeBrightBand3Theta , 0  );
-	block2ColorizeHueBand4+=lfo( (gui->block2ColorizeLfo2[6]) , block2ColorizeHueBand4Theta , 0  );
-	block2ColorizeSaturationBand4+=lfo( (gui->block2ColorizeLfo2[7]) , block2ColorizeSaturationBand4Theta , 0  );
-	block2ColorizeBrightBand4+=lfo( (gui->block2ColorizeLfo2[8]) , block2ColorizeBrightBand4Theta , 0  );
+	block2ColorizeHueBand3+=lfo( (gui->block2ColorizeLfo2[0]) , block2ColorizeHueBand3Theta , gui->block2ColorizeLfo2Shape[0]  );
+	block2ColorizeSaturationBand3+=lfo( (gui->block2ColorizeLfo2[1]) , block2ColorizeSaturationBand3Theta , gui->block2ColorizeLfo2Shape[1]  );
+	block2ColorizeBrightBand3+=lfo( (gui->block2ColorizeLfo2[2]) , block2ColorizeBrightBand3Theta , gui->block2ColorizeLfo2Shape[2]  );
+	block2ColorizeHueBand4+=lfo( (gui->block2ColorizeLfo2[6]) , block2ColorizeHueBand4Theta , gui->block2ColorizeLfo2Shape[3]  );
+	block2ColorizeSaturationBand4+=lfo( (gui->block2ColorizeLfo2[7]) , block2ColorizeSaturationBand4Theta , gui->block2ColorizeLfo2Shape[4]  );
+	block2ColorizeBrightBand4+=lfo( (gui->block2ColorizeLfo2[8]) , block2ColorizeBrightBand4Theta , gui->block2ColorizeLfo2Shape[5]  );
 
-	block2ColorizeHueBand5+=lfo( (gui->block2ColorizeLfo3[0]) , block2ColorizeHueBand5Theta , 0  );
-	block2ColorizeSaturationBand5+=lfo( (gui->block2ColorizeLfo3[1]) , block2ColorizeSaturationBand5Theta , 0  );
-	block2ColorizeBrightBand5+=lfo( (gui->block2ColorizeLfo3[2]) , block2ColorizeBrightBand5Theta , 0  );
+	block2ColorizeHueBand5+=lfo( (gui->block2ColorizeLfo3[0]) , block2ColorizeHueBand5Theta , gui->block2ColorizeLfo3Shape[0]  );
+	block2ColorizeSaturationBand5+=lfo( (gui->block2ColorizeLfo3[1]) , block2ColorizeSaturationBand5Theta , gui->block2ColorizeLfo3Shape[1]  );
+	block2ColorizeBrightBand5+=lfo( (gui->block2ColorizeLfo3[2]) , block2ColorizeBrightBand5Theta , gui->block2ColorizeLfo3Shape[2]  );
 
 
 	//matrix mixer
-	matrixMixBgRedIntoFgRed+=lfo( matrixMixC*(gui->matrixMixLfo1[0]), matrixMixBgRedIntoFgRedTheta , 0 );
-	matrixMixBgGreenIntoFgRed+=lfo( matrixMixC*(gui->matrixMixLfo1[1]), matrixMixBgGreenIntoFgRedTheta , 0 );
-	matrixMixBgBlueIntoFgRed+=lfo( matrixMixC*(gui->matrixMixLfo1[2]), matrixMixBgBlueIntoFgRedTheta , 0 );
+	matrixMixBgRedIntoFgRed+=lfo( matrixMixC*(gui->matrixMixLfo1[0]), matrixMixBgRedIntoFgRedTheta , gui->matrixMixLfo1Shape[0] );
+	matrixMixBgGreenIntoFgRed+=lfo( matrixMixC*(gui->matrixMixLfo1[1]), matrixMixBgGreenIntoFgRedTheta , gui->matrixMixLfo1Shape[1] );
+	matrixMixBgBlueIntoFgRed+=lfo( matrixMixC*(gui->matrixMixLfo1[2]), matrixMixBgBlueIntoFgRedTheta , gui->matrixMixLfo1Shape[2] );
 
-	matrixMixBgRedIntoFgGreen+=lfo( matrixMixC*(gui->matrixMixLfo1[6]), matrixMixBgRedIntoFgGreenTheta , 0 );
-	matrixMixBgGreenIntoFgGreen+=lfo( matrixMixC*(gui->matrixMixLfo1[7]), matrixMixBgGreenIntoFgGreenTheta , 0 );
-	matrixMixBgBlueIntoFgGreen+=lfo( matrixMixC*(gui->matrixMixLfo1[8]), matrixMixBgBlueIntoFgGreenTheta , 0 );
+	matrixMixBgRedIntoFgGreen+=lfo( matrixMixC*(gui->matrixMixLfo1[6]), matrixMixBgRedIntoFgGreenTheta , gui->matrixMixLfo1Shape[3] );
+	matrixMixBgGreenIntoFgGreen+=lfo( matrixMixC*(gui->matrixMixLfo1[7]), matrixMixBgGreenIntoFgGreenTheta , gui->matrixMixLfo1Shape[4] );
+	matrixMixBgBlueIntoFgGreen+=lfo( matrixMixC*(gui->matrixMixLfo1[8]), matrixMixBgBlueIntoFgGreenTheta , gui->matrixMixLfo1Shape[5] );
 
-	matrixMixBgRedIntoFgBlue+=lfo( matrixMixC*(gui->matrixMixLfo2[0]), matrixMixBgRedIntoFgBlueTheta , 0 );
-	matrixMixBgGreenIntoFgBlue+=lfo( matrixMixC*(gui->matrixMixLfo2[1]), matrixMixBgGreenIntoFgBlueTheta , 0 );
-	matrixMixBgBlueIntoFgBlue+=lfo( matrixMixC*(gui->matrixMixLfo2[2]), matrixMixBgBlueIntoFgBlueTheta , 0 );
+	matrixMixBgRedIntoFgBlue+=lfo( matrixMixC*(gui->matrixMixLfo2[0]), matrixMixBgRedIntoFgBlueTheta , gui->matrixMixLfo2Shape[0] );
+	matrixMixBgGreenIntoFgBlue+=lfo( matrixMixC*(gui->matrixMixLfo2[1]), matrixMixBgGreenIntoFgBlueTheta , gui->matrixMixLfo2Shape[1] );
+	matrixMixBgBlueIntoFgBlue+=lfo( matrixMixC*(gui->matrixMixLfo2[2]), matrixMixBgBlueIntoFgBlueTheta , gui->matrixMixLfo2Shape[2] );
 
 	//final lfo addon
-	finalMixAmount+=lfo(mixAmountC*(gui->finalMixAndKeyLfo[0]),finalMixAmountTheta,0);
-	finalKeyThreshold+=lfo(keyThresholdC*(gui->finalMixAndKeyLfo[2]),finalKeyThresholdTheta,0);
-	finalKeySoft+=lfo((gui->finalMixAndKeyLfo[4]),finalKeySoftTheta,0);
+	finalMixAmount+=lfo(mixAmountC*(gui->finalMixAndKeyLfo[0]),finalMixAmountTheta,gui->finalMixAndKeyLfoShape[0]);
+	finalKeyThreshold+=lfo(keyThresholdC*(gui->finalMixAndKeyLfo[2]),finalKeyThresholdTheta,gui->finalMixAndKeyLfoShape[1]);
+	finalKeySoft+=lfo((gui->finalMixAndKeyLfo[4]),finalKeySoftTheta,gui->finalMixAndKeyLfoShape[2]);
 
 
 

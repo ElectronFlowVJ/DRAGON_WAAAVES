@@ -1884,6 +1884,36 @@ public:
 	float finalMixAndKeyLfo[PARAMETER_ARRAY_LENGTH];
 	bool finalMixAndKeyLfoMidiActive[PARAMETER_ARRAY_LENGTH];
 
+	// ============== LFO SHAPE ARRAYS ==============
+	// LFO Shape arrays - one int per parameter pair
+	// Shape values: 0=Sine, 1=Triangle, 2=Ramp, 3=Saw, 4=Square
+	int ch1AdjustLfoShape[PARAMETER_ARRAY_LENGTH];         // 8 shapes used (indices 0-7)
+	int ch2MixAndKeyLfoShape[PARAMETER_ARRAY_LENGTH];      // 3 shapes used (indices 0-2)
+	int ch2AdjustLfoShape[PARAMETER_ARRAY_LENGTH];         // 8 shapes used
+	int fb1MixAndKeyLfoShape[PARAMETER_ARRAY_LENGTH];      // 3 shapes used
+	int fb1Geo1Lfo1Shape[PARAMETER_ARRAY_LENGTH];          // 4 shapes used
+	int fb1Geo1Lfo2Shape[PARAMETER_ARRAY_LENGTH];          // 5 shapes used
+	int fb1Color1Lfo1Shape[PARAMETER_ARRAY_LENGTH];        // 3 shapes used
+	int block2InputAdjustLfoShape[PARAMETER_ARRAY_LENGTH]; // 8 shapes used
+	int fb2MixAndKeyLfoShape[PARAMETER_ARRAY_LENGTH];      // 3 shapes used
+	int fb2Geo1Lfo1Shape[PARAMETER_ARRAY_LENGTH];          // 4 shapes used
+	int fb2Geo1Lfo2Shape[PARAMETER_ARRAY_LENGTH];          // 5 shapes used
+	int fb2Color1Lfo1Shape[PARAMETER_ARRAY_LENGTH];        // 3 shapes used
+	int block1Geo1Lfo1Shape[PARAMETER_ARRAY_LENGTH];       // 4 shapes used
+	int block1Geo1Lfo2Shape[PARAMETER_ARRAY_LENGTH];       // 5 shapes used
+	int block1ColorizeLfo1Shape[PARAMETER_ARRAY_LENGTH];   // 6 shapes used
+	int block1ColorizeLfo2Shape[PARAMETER_ARRAY_LENGTH];   // 6 shapes used
+	int block1ColorizeLfo3Shape[PARAMETER_ARRAY_LENGTH];   // 3 shapes used
+	int block1Color1Lfo1Shape[PARAMETER_ARRAY_LENGTH];     // (legacy - may not be used)
+	int block2Geo1Lfo1Shape[PARAMETER_ARRAY_LENGTH];       // 4 shapes used
+	int block2Geo1Lfo2Shape[PARAMETER_ARRAY_LENGTH];       // 5 shapes used
+	int block2ColorizeLfo1Shape[PARAMETER_ARRAY_LENGTH];   // 6 shapes used
+	int block2ColorizeLfo2Shape[PARAMETER_ARRAY_LENGTH];   // 6 shapes used
+	int block2ColorizeLfo3Shape[PARAMETER_ARRAY_LENGTH];   // 3 shapes used
+	int matrixMixLfo1Shape[PARAMETER_ARRAY_LENGTH];        // 6 shapes used
+	int matrixMixLfo2Shape[PARAMETER_ARRAY_LENGTH];        // 3 shapes used
+	int finalMixAndKeyLfoShape[PARAMETER_ARRAY_LENGTH];    // 3 shapes used
+
 	// ============== OSC PARAMETER REGISTRY ==============
 	// Registry of all OSC-controllable parameters
 	std::vector<OscParameter> oscRegistry;
