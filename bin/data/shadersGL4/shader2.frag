@@ -358,8 +358,8 @@ vec2 shear1(vec2 inCoord, vec4 shearMatrix){
 }
 
 float mirror(float a){
-	if(a>0){return a;}
-	if(a<0){return -(1+a);}
+	if(a > 0.0) return a;
+	return -(1.0 + a);
 }
 
 vec2 wrapCoord(vec2 coord){
