@@ -46,6 +46,7 @@ uniform	float block1SharpenRadius;
 uniform float block1FiltersBoost;
 uniform float block1Dither;
 uniform int block1DitherSwitch;
+uniform int block1DitherType;
 
 //block2 geo
 uniform vec2 block2XYDisplace;
@@ -78,6 +79,7 @@ uniform	float block2SharpenRadius;
 uniform float block2FiltersBoost;
 uniform float block2Dither;
 uniform int block2DitherSwitch;
+uniform int block2DitherType;
 
 
 //final mix
@@ -383,12 +385,21 @@ float[2] closestColors(float inColor,float paletteSize){
 	return ret;
 }
 
-float dither2(float inColor,vec2 inCoord,float ditherPalette){
+float dither2(float inColor,vec2 inCoord,float ditherPalette,int ditherType){
 	//index value
-	int x=int(mod(inCoord.x,4));
-	int y=int(mod(inCoord.y,4));
-	//float indexValue=indexMatrix4x4[(x+y*4)]*.0625;
-	float indexValue=indexMatrix8x8[(x+y*8)]*.015625;
+	float indexValue;
+
+	if(ditherType == 0) {
+		// 4x4 matrix
+		int x=int(mod(inCoord.x,4));
+		int y=int(mod(inCoord.y,4));
+		indexValue=indexMatrix4x4[(x+y*4)]*.0625;
+	} else {
+		// 8x8 matrix (default)
+		int x=int(mod(inCoord.x,8));
+		int y=int(mod(inCoord.y,8));
+		indexValue=indexMatrix8x8[(x+y*8)]*.015625;
+	}
 
 	float[2] cs=closestColors(inColor,ditherPalette);
 
@@ -555,9 +566,9 @@ void main()
 	//dither
 	if(block1DitherSwitch==1){
 		 //rgb mode?
-		block1Color.r=dither2(block1Color.r,block1Coords,block1Dither);
-		block1Color.g=dither2(block1Color.g,block1Coords,block1Dither);
-		block1Color.b=dither2(block1Color.b,block1Coords,block1Dither);
+		block1Color.r=dither2(block1Color.r,block1Coords,block1Dither,block1DitherType);
+		block1Color.g=dither2(block1Color.g,block1Coords,block1Dither,block1DitherType);
+		block1Color.b=dither2(block1Color.b,block1Coords,block1Dither,block1DitherType);
 
 	}
 	/*
@@ -674,9 +685,9 @@ void main()
 	//dither
 	if(block2DitherSwitch==1){
 		 //rgb mode?
-		block2Color.r=dither2(block2Color.r,block2Coords,block2Dither);
-		block2Color.g=dither2(block2Color.g,block2Coords,block2Dither);
-		block2Color.b=dither2(block2Color.b,block2Coords,block2Dither);
+		block2Color.r=dither2(block2Color.r,block2Coords,block2Dither,block2DitherType);
+		block2Color.g=dither2(block2Color.g,block2Coords,block2Dither,block2DitherType);
+		block2Color.b=dither2(block2Color.b,block2Coords,block2Dither,block2DitherType);
 
 	}
 

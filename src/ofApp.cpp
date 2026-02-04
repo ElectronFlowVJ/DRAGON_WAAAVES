@@ -542,7 +542,7 @@ void ofApp::draw(){
 	float block1SharpenAmount=block1SharpenAmountC*(gui->block1Filters[2]);
 	float block1SharpenRadius=block1FilterRadiusC*(gui->block1Filters[3])+1.0;
 	float block1FiltersBoost=(gui->block1Filters[4]);
-	float block1Dither=block1DitherC*(1.0-gui->block1Filters[5])+1.0;
+	float block1Dither=(block1DitherC-1.0)*(1.0-gui->block1Filters[5])+2.0;
 
 	//block2 Geo
 	float block2XDisplace=block2XDisplaceC*(gui->block2Geo[0]);
@@ -579,7 +579,7 @@ void ofApp::draw(){
 	float block2SharpenAmount=block2SharpenAmountC*(gui->block2Filters[2]);
 	float block2SharpenRadius=block2FilterRadiusC*(gui->block2Filters[3])+1.0;
 	float block2FiltersBoost=(gui->block2Filters[4]);
-	float block2Dither=block2DitherC*(1.0-gui->block2Filters[5])+1.0;
+	float block2Dither=(block2DitherC-1.0)*(1.0-gui->block2Filters[5])+2.0;
 
 	//matrixMixer
 	float matrixMixBgRedIntoFgRed=matrixMixC*(gui->matrixMix[0]);
@@ -1483,6 +1483,7 @@ void ofApp::draw(){
 	bool block1DitherSwitch=0;
 	if(gui->block1Filters[5] >0){block1DitherSwitch=1;}
 	shader3.setUniform1i("block1DitherSwitch",block1DitherSwitch);
+	shader3.setUniform1i("block1DitherType",gui->block1DitherType);
 
 
 	//block2geo1
@@ -1532,6 +1533,7 @@ void ofApp::draw(){
 	bool block2DitherSwitch=0;
 	if(gui->block2Filters[5] >0){block2DitherSwitch=1;}
 	shader3.setUniform1i("block2DitherSwitch",block2DitherSwitch);
+	shader3.setUniform1i("block2DitherType",gui->block2DitherType);
 
 
 
@@ -2540,6 +2542,7 @@ void ofApp::processOscMessages() {
         if (processOscLfoParamsBlock3B1(address, value)) continue;
         if (processOscLfoParamsBlock3B2AndMatrix(address, value)) continue;
         if (processOscResetCommands(address)) continue;
+        if (processOscPresetCommands(address, m)) continue;
     }
 }
 
@@ -3356,12 +3359,47 @@ bool ofApp::processOscResetCommands(const string& address) {
 }
 
 //--------------------------------------------------------------
+bool ofApp::processOscPresetCommands(const string& address, const ofxOscMessage& m) {
+    // Preset selection commands (just change dropdown, don't load/save)
+    if (address == "/gravity/preset/selectLoad") {
+        if (m.getNumArgs() > 0) {
+            int presetIndex = static_cast<int>(m.getArgAsFloat(0));
+            gui->loadStateSelectSwitch = presetIndex;
+        }
+    }
+    else if (address == "/gravity/preset/selectSave") {
+        if (m.getNumArgs() > 0) {
+            int presetIndex = static_cast<int>(m.getArgAsFloat(0));
+            gui->saveStateSelectSwitch = presetIndex;
+        }
+    }
+    // Preset action commands (actually load/save)
+    else if (address == "/gravity/preset/load") {
+        gui->loadALL = 1;
+    }
+    else if (address == "/gravity/preset/save") {
+        gui->saveALL = 1;
+    }
+    else return false;
+    return true;
+}
+
+//--------------------------------------------------------------
 void ofApp::sendOscParameter(string address, float value) {
     if (!oscEnabled || !gui->oscEnabled) return;
 
     ofxOscMessage m;
     m.setAddress(address);
     m.addFloatArg(value);
+    oscSender.sendMessage(m, true);
+}
+//--------------------------------------------------------------
+void ofApp::sendOscString(string address, string value) {
+    if (!oscEnabled || !gui->oscEnabled) return;
+
+    ofxOscMessage m;
+    m.setAddress(address);
+    m.addStringArg(value);
     oscSender.sendMessage(m, true);
 }
 //--------------------------------------------------------------

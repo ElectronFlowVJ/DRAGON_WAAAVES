@@ -35,6 +35,7 @@ class ofApp : public ofBaseApp{
 		void setupOsc();
 		void processOscMessages();
 		void sendOscParameter(string address, float value);
+		void sendOscString(string address, string value);
 		void sendAllOscParameters();
 		void reloadOscSettings();
 		bool oscEnabled;
@@ -60,6 +61,7 @@ class ofApp : public ofBaseApp{
 		bool processOscLfoParamsBlock3B1(const string& address, float value);
 		bool processOscLfoParamsBlock3B2AndMatrix(const string& address, float value);
 		bool processOscResetCommands(const string& address);
+		bool processOscPresetCommands(const string& address, const ofxOscMessage& m);
 
 	//globals
 	// Input resolutions

@@ -1736,6 +1736,7 @@ public:
 	bool block1FiltersReset=0;
 	float block1Filters[PARAMETER_ARRAY_LENGTH];
 	bool block1FiltersMidiActive[PARAMETER_ARRAY_LENGTH];
+	int block1DitherType=1;
 
 	//block1 Geo1Lfo1 pmidi syncing & paramater bizness
 	bool block1Geo1Lfo1MidiGui=0;
@@ -1812,6 +1813,7 @@ public:
 	bool block2FiltersReset=0;
 	float block2Filters[PARAMETER_ARRAY_LENGTH];
 	bool block2FiltersMidiActive[PARAMETER_ARRAY_LENGTH];
+	int block2DitherType=1;
 
 	//block2 Geo1Lfo1 pmidi syncing & paramater bizness
 	bool block2Geo1Lfo1MidiGui=0;

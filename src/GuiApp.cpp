@@ -186,6 +186,11 @@ void GuiApp::update(){
 
 	if(saveALL==1){
 		saveEverything();
+		// Send OSC notification for save with preset name
+		if (mainApp) {
+			mainApp->sendOscParameter("/gravity/preset/save", 1.0f);
+			mainApp->sendOscString("/gravity/preset/savedName", saveStateNames[saveStateSelectSwitch]);
+		}
 		saveALL=0;
 	}
 	if(loadALL==1){
@@ -195,6 +200,12 @@ void GuiApp::update(){
 		loadEverything();
 		//fb1FramebufferClearSwitch=1;
 		//fb2FramebufferClearSwitch=1;
+		// Send OSC notification for load with preset name and send all parameters
+		if (mainApp) {
+			mainApp->sendOscParameter("/gravity/preset/load", 1.0f);
+			mainApp->sendOscString("/gravity/preset/loadedName", saveStateNames[loadStateSelectSwitch]);
+			mainApp->sendAllOscParameters();
+		}
 		loadALL=0;
 		//turn macros on!
 		macroDataMidiGui=1;
@@ -422,7 +433,10 @@ void GuiApp::draw(){
 		}
 
 		static int item_saveState = 0;
-		ImGui::Combo("##select a save state", &item_saveState, saveStateSelectItems, IM_ARRAYSIZE(saveStateSelectItems));
+		if (ImGui::Combo("##select a save state", &item_saveState, saveStateSelectItems, IM_ARRAYSIZE(saveStateSelectItems))) {
+			saveStateSelectSwitch=item_saveState;
+			if (mainApp) mainApp->sendOscParameter("/gravity/preset/selectSave", static_cast<float>(saveStateSelectSwitch));
+		}
 		saveStateSelectSwitch=item_saveState;
 		ImGui::SameLine();
 		ImGui::Text(" ");
@@ -449,7 +463,10 @@ void GuiApp::draw(){
 			loadStateSelectItems[i]=saveStateNamesChar[i];
 		}
 		static int item_loadState = 0;
-		ImGui::Combo("##select a load state", &item_loadState, loadStateSelectItems, IM_ARRAYSIZE(loadStateSelectItems));
+		if (ImGui::Combo("##select a load state", &item_loadState, loadStateSelectItems, IM_ARRAYSIZE(loadStateSelectItems))) {
+			loadStateSelectSwitch=item_loadState;
+			if (mainApp) mainApp->sendOscParameter("/gravity/preset/selectLoad", static_cast<float>(loadStateSelectSwitch));
+		}
 		loadStateSelectSwitch=item_loadState;
 
 		ImGui::SameLine();
@@ -2893,7 +2910,13 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("sharp rad  ##block1", &block1Filters[3],-1.0,1.0, "/gravity/block3/b1/sharpenRadius");
 								ImGui::Separator();
+								ImGuiSliderFloatOSC("dither amt ##block1", &block1Filters[5],-1.0,1.0, "/gravity/block3/b1/ditherAmount");
+								ImGui::SameLine();
 								ImGuiSliderFloatOSC("filt boost ##block1", &block1Filters[4],-1.0,1.0, "/gravity/block3/b1/filtersBoost");
+								const char* ditherTypes[] = { "4x4 Bayer", "8x8 Bayer" };
+								if (ImGui::Combo("dither type ##block1", &block1DitherType, ditherTypes, IM_ARRAYSIZE(ditherTypes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/b1/ditherType", static_cast<float>(block1DitherType));
+								}
 							}
 							else
 							{
@@ -3480,7 +3503,13 @@ void GuiApp::draw(){
 								ImGui::SameLine();
 								ImGuiSliderFloatOSC("sharp rad  ##block2", &block2Filters[3],-1.0,1.0, "/gravity/block3/b2/sharpenRadius");
 								ImGui::Separator();
+								ImGuiSliderFloatOSC("dither amt ##block2", &block2Filters[5],-1.0,1.0, "/gravity/block3/b2/ditherAmount");
+								ImGui::SameLine();
 								ImGuiSliderFloatOSC("filt boost ##block2", &block2Filters[4],-1.0,1.0, "/gravity/block3/b2/filtersBoost");
+								const char* ditherTypes[] = { "4x4 Bayer", "8x8 Bayer" };
+								if (ImGui::Combo("dither type ##block2", &block2DitherType, ditherTypes, IM_ARRAYSIZE(ditherTypes))) {
+									if (mainApp) mainApp->sendOscParameter("/gravity/block3/b2/ditherType", static_cast<float>(block2DitherType));
+								}
 							}
 							else
 							{
@@ -52056,6 +52085,7 @@ void GuiApp::initializeNames(){
 	block1FiltersNames[2]="b1 sharp amt";
 	block1FiltersNames[3]="b1 sharp rad";
 	block1FiltersNames[4]="b1 filt boost";
+	block1FiltersNames[5]="b1 dither amt";
 
 	block1Geo1Lfo1Names[0]="b1 x <-> a";
 	block1Geo1Lfo1Names[1]="b1 x <-> r";
@@ -52144,6 +52174,7 @@ void GuiApp::initializeNames(){
 	block2FiltersNames[2]="b2 sharp amt";
 	block2FiltersNames[3]="b2 sharp rad";
 	block2FiltersNames[4]="b2 filt boost";
+	block2FiltersNames[5]="b2 dither amt";
 
 	block2Geo1Lfo1Names[0]="b2 x <-> a";
 	block2Geo1Lfo1Names[1]="b2 x <-> r";
@@ -53724,12 +53755,14 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b1/brightBand5Rate", &block1ColorizeLfo3[5]);
     registerOscParam("/gravity/block3/lfo/b1/resetLfo3", &block1ColorizeLfo3Reset);
 
-    // ============== BLOCK 3 - B1 FILTERS (5 params) ==============
+    // ============== BLOCK 3 - B1 FILTERS (6 params) ==============
     registerOscParam("/gravity/block3/b1/blurAmount", &block1Filters[0]);
     registerOscParam("/gravity/block3/b1/blurRadius", &block1Filters[1]);
     registerOscParam("/gravity/block3/b1/sharpenAmount", &block1Filters[2]);
     registerOscParam("/gravity/block3/b1/sharpenRadius", &block1Filters[3]);
     registerOscParam("/gravity/block3/b1/filtersBoost", &block1Filters[4]);
+    registerOscParam("/gravity/block3/b1/ditherAmount", &block1Filters[5]);
+    registerOscParam("/gravity/block3/b1/ditherType", &block1DitherType);
 
     // ============== BLOCK 3 - B2 GEO (10 params) ==============
     registerOscParam("/gravity/block3/b2/xDisplace", &block2Geo[0]);
@@ -53828,12 +53861,14 @@ void GuiApp::registerBlock3OscParameters() {
     registerOscParam("/gravity/block3/lfo/b2/brightBand5Rate", &block2ColorizeLfo3[5]);
     registerOscParam("/gravity/block3/lfo/b2/resetLfo3", &block2ColorizeLfo3Reset);
 
-    // ============== BLOCK 3 - B2 FILTERS (5 params) ==============
+    // ============== BLOCK 3 - B2 FILTERS (6 params) ==============
     registerOscParam("/gravity/block3/b2/blurAmount", &block2Filters[0]);
     registerOscParam("/gravity/block3/b2/blurRadius", &block2Filters[1]);
     registerOscParam("/gravity/block3/b2/sharpenAmount", &block2Filters[2]);
     registerOscParam("/gravity/block3/b2/sharpenRadius", &block2Filters[3]);
     registerOscParam("/gravity/block3/b2/filtersBoost", &block2Filters[4]);
+    registerOscParam("/gravity/block3/b2/ditherAmount", &block2Filters[5]);
+    registerOscParam("/gravity/block3/b2/ditherType", &block2DitherType);
 
     // ============== BLOCK 3 - MATRIX MIX (9 params) ==============
     registerOscParam("/gravity/block3/matrixMix/b1RedToB2Red", &matrixMix[0]);
