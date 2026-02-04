@@ -78,9 +78,11 @@ class ofApp : public ofBaseApp{
 	int internalWidth;
 	int internalHeight;
 
+#if OFAPP_HAS_SPOUT
 	// Spout send resolution
 	int spoutSendWidth = 1280;
 	int spoutSendHeight = 720;
+#endif
 
 	//video inputs
 	void inputSetup();
@@ -134,8 +136,10 @@ class ofApp : public ofBaseApp{
 	int ndiSendWidth = 1280;
 	int ndiSendHeight = 720;
 
+#if OFAPP_HAS_SPOUT
 	// Spout source management
 	void refreshSpoutSources();
+#endif
 
 	//framebuffers
 	void framebufferSetup();

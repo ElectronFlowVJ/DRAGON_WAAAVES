@@ -110,7 +110,9 @@ void GuiApp::setup(){
 
 	// Trigger source refresh and apply loaded settings on startup
 	refreshNdiSources = true;
+#if OFAPP_HAS_SPOUT
 	refreshSpoutSources = true;
+#endif
 	resolutionChangeRequested = true;
 	oscSettingsReloadRequested = true;
 
@@ -4342,17 +4344,24 @@ void GuiApp::draw(){
 				if (ImGui::Button("Refresh NDI Sources")) {
 					refreshNdiSources = true;
 				}
+#if OFAPP_HAS_SPOUT
 				ImGui::SameLine();
 				if (ImGui::Button("Refresh Spout Sources")) {
 					refreshSpoutSources = true;
 				}
+#endif
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
 
 				// Device counts
+#if OFAPP_HAS_SPOUT
 				ImGui::Text("Found %d webcams, %d NDI sources, %d Spout senders",
 					(int)videoDevices.size(), (int)ndiSourceNames.size(), (int)spoutSourceNames.size());
+#else
+				ImGui::Text("Found %d webcams, %d NDI sources",
+					(int)videoDevices.size(), (int)ndiSourceNames.size());
+#endif
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
@@ -4371,10 +4380,12 @@ void GuiApp::draw(){
 				if (ImGui::RadioButton("NDI##1", input1SourceType == 1)) {
 					input1SourceType = 1;
 				}
+#if OFAPP_HAS_SPOUT
 				ImGui::SameLine();
 				if (ImGui::RadioButton("Spout##1", input1SourceType == 2)) {
 					input1SourceType = 2;
 				}
+#endif
 
 				// Show appropriate dropdown based on source type
 				if (input1SourceType == 0) {
@@ -4415,7 +4426,9 @@ void GuiApp::draw(){
 					} else {
 						ImGui::Text("No NDI sources found");
 					}
-				} else if (input1SourceType == 2) {
+				}
+#if OFAPP_HAS_SPOUT
+				else if (input1SourceType == 2) {
 					// Spout dropdown
 					if (spoutSourceNames.size() > 0) {
 						if (ImGui::BeginCombo("##input1spout",
@@ -4436,6 +4449,7 @@ void GuiApp::draw(){
 						ImGui::TextDisabled("Click 'Refresh Spout Sources'");
 					}
 				}
+#endif
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
@@ -4454,10 +4468,12 @@ void GuiApp::draw(){
 				if (ImGui::RadioButton("NDI##2", input2SourceType == 1)) {
 					input2SourceType = 1;
 				}
+#if OFAPP_HAS_SPOUT
 				ImGui::SameLine();
 				if (ImGui::RadioButton("Spout##2", input2SourceType == 2)) {
 					input2SourceType = 2;
 				}
+#endif
 
 				// Show appropriate dropdown based on source type
 				if (input2SourceType == 0) {
@@ -4498,7 +4514,9 @@ void GuiApp::draw(){
 					} else {
 						ImGui::Text("No NDI sources found");
 					}
-				} else if (input2SourceType == 2) {
+				}
+#if OFAPP_HAS_SPOUT
+				else if (input2SourceType == 2) {
 					// Spout dropdown
 					if (spoutSourceNames.size() > 0) {
 						if (ImGui::BeginCombo("##input2spout",
@@ -4519,6 +4537,7 @@ void GuiApp::draw(){
 						ImGui::TextDisabled("Click 'Refresh Spout Sources'");
 					}
 				}
+#endif
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
@@ -4539,6 +4558,7 @@ void GuiApp::draw(){
 				ImGui::Separator();
 				ImGui::Spacing();
 
+#if OFAPP_HAS_SPOUT
 				// ========== SPOUT OUTPUT ==========
 				ImGui::Text("SPOUT OUTPUT");
 				ImGui::Spacing();
@@ -4553,6 +4573,7 @@ void GuiApp::draw(){
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
+#endif
 
 				// ========== NDI OUTPUT ==========
 				ImGui::Text("NDI OUTPUT");
@@ -4621,6 +4642,7 @@ void GuiApp::draw(){
 				ImGui::Separator();
 				ImGui::Spacing();
 
+#if OFAPP_HAS_SPOUT
 				// Spout Send Resolution
 				ImGui::Text("Spout Send Resolution:");
 				ImGui::SetNextItemWidth(80);
@@ -4630,6 +4652,7 @@ void GuiApp::draw(){
 				ImGui::SameLine();
 				ImGui::SetNextItemWidth(80);
 				ImGui::InputScalar("##spoutHeight", ImGuiDataType_S32, &spoutSendHeight);
+#endif
 
 				// NDI Send Resolution
 				ImGui::Text("NDI Send Resolution:");
@@ -4662,10 +4685,12 @@ void GuiApp::draw(){
 				if (outputHeight < 240) outputHeight = 240;
 				if (outputHeight > 2160) outputHeight = 2160;
 
+#if OFAPP_HAS_SPOUT
 				if (spoutSendWidth < 320) spoutSendWidth = 320;
 				if (spoutSendWidth > 3840) spoutSendWidth = 3840;
 				if (spoutSendHeight < 240) spoutSendHeight = 240;
 				if (spoutSendHeight > 2160) spoutSendHeight = 2160;
+#endif
 
 				if (ndiSendWidth < 320) ndiSendWidth = 320;
 				if (ndiSendWidth > 3840) ndiSendWidth = 3840;
@@ -4739,12 +4764,14 @@ void GuiApp::draw(){
 					ImGui::TextWrapped("For more information, visit: ndi.video");
 					ImGui::Spacing();
 
+#if OFAPP_HAS_SPOUT
 					// Spout2
 					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "Spout2");
 					ImGui::TextWrapped("Copyright (c) 2020-2024, Lynn Jarvis. All rights reserved.");
 					ImGui::TextWrapped("BSD 2-Clause License");
 					ImGui::TextWrapped("https://github.com/leadedge/Spout2");
 					ImGui::Spacing();
+#endif
 
 					// ofxNDI
 					ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "ofxNDI");
@@ -53882,40 +53909,49 @@ void GuiApp::saveVideoOscSettings() {
     settings["video"]["input1"]["sourceType"] = input1SourceType;
     settings["video"]["input1"]["webcamDeviceID"] = input1DeviceID;
     settings["video"]["input1"]["ndiSourceIndex"] = input1NdiSourceIndex;
+#if OFAPP_HAS_SPOUT
     settings["video"]["input1"]["spoutSourceIndex"] = input1SpoutSourceIndex;
+#endif
     // Save source names for matching
     if (input1NdiSourceIndex < ndiSourceNames.size()) {
         settings["video"]["input1"]["ndiSourceName"] = ndiSourceNames[input1NdiSourceIndex];
     } else {
         settings["video"]["input1"]["ndiSourceName"] = "";
     }
+#if OFAPP_HAS_SPOUT
     if (input1SpoutSourceIndex < spoutSourceNames.size()) {
         settings["video"]["input1"]["spoutSourceName"] = spoutSourceNames[input1SpoutSourceIndex];
     } else {
         settings["video"]["input1"]["spoutSourceName"] = "";
     }
+#endif
 
     // Input 2
     settings["video"]["input2"]["sourceType"] = input2SourceType;
     settings["video"]["input2"]["webcamDeviceID"] = input2DeviceID;
     settings["video"]["input2"]["ndiSourceIndex"] = input2NdiSourceIndex;
+#if OFAPP_HAS_SPOUT
     settings["video"]["input2"]["spoutSourceIndex"] = input2SpoutSourceIndex;
+#endif
     // Save source names for matching
     if (input2NdiSourceIndex < ndiSourceNames.size()) {
         settings["video"]["input2"]["ndiSourceName"] = ndiSourceNames[input2NdiSourceIndex];
     } else {
         settings["video"]["input2"]["ndiSourceName"] = "";
     }
+#if OFAPP_HAS_SPOUT
     if (input2SpoutSourceIndex < spoutSourceNames.size()) {
         settings["video"]["input2"]["spoutSourceName"] = spoutSourceNames[input2SpoutSourceIndex];
     } else {
         settings["video"]["input2"]["spoutSourceName"] = "";
     }
+#endif
 
-    // Spout outputs
+#if OFAPP_HAS_SPOUT
     settings["video"]["spoutOutput"]["sendBlock1"] = spoutSendBlock1;
     settings["video"]["spoutOutput"]["sendBlock2"] = spoutSendBlock2;
     settings["video"]["spoutOutput"]["sendBlock3"] = spoutSendBlock3;
+#endif
 
     // NDI outputs
     settings["video"]["ndiOutput"]["sendBlock1"] = ndiSendBlock1;
@@ -53931,8 +53967,10 @@ void GuiApp::saveVideoOscSettings() {
     settings["video"]["resolution"]["internalHeight"] = internalHeight;
     settings["video"]["resolution"]["outputWidth"] = outputWidth;
     settings["video"]["resolution"]["outputHeight"] = outputHeight;
+#if OFAPP_HAS_SPOUT
     settings["video"]["resolution"]["spoutSendWidth"] = spoutSendWidth;
     settings["video"]["resolution"]["spoutSendHeight"] = spoutSendHeight;
+#endif
     settings["video"]["resolution"]["ndiSendWidth"] = ndiSendWidth;
     settings["video"]["resolution"]["ndiSendHeight"] = ndiSendHeight;
 
@@ -53981,16 +54019,20 @@ void GuiApp::loadVideoOscSettings() {
             if (settings["video"]["input1"].contains("ndiSourceIndex")) {
                 input1NdiSourceIndex = settings["video"]["input1"]["ndiSourceIndex"];
             }
+#if OFAPP_HAS_SPOUT
             if (settings["video"]["input1"].contains("spoutSourceIndex")) {
                 input1SpoutSourceIndex = settings["video"]["input1"]["spoutSourceIndex"];
             }
+#endif
             // Load saved names for later matching
             if (settings["video"]["input1"].contains("ndiSourceName")) {
                 savedInput1NdiName = settings["video"]["input1"]["ndiSourceName"];
             }
+#if OFAPP_HAS_SPOUT
             if (settings["video"]["input1"].contains("spoutSourceName")) {
                 savedInput1SpoutName = settings["video"]["input1"]["spoutSourceName"];
             }
+#endif
         }
 
         // Input 2
@@ -54004,19 +54046,23 @@ void GuiApp::loadVideoOscSettings() {
             if (settings["video"]["input2"].contains("ndiSourceIndex")) {
                 input2NdiSourceIndex = settings["video"]["input2"]["ndiSourceIndex"];
             }
+#if OFAPP_HAS_SPOUT
             if (settings["video"]["input2"].contains("spoutSourceIndex")) {
                 input2SpoutSourceIndex = settings["video"]["input2"]["spoutSourceIndex"];
             }
+#endif
             // Load saved names for later matching
             if (settings["video"]["input2"].contains("ndiSourceName")) {
                 savedInput2NdiName = settings["video"]["input2"]["ndiSourceName"];
             }
+#if OFAPP_HAS_SPOUT
             if (settings["video"]["input2"].contains("spoutSourceName")) {
                 savedInput2SpoutName = settings["video"]["input2"]["spoutSourceName"];
             }
+#endif
         }
 
-        // Spout outputs
+#if OFAPP_HAS_SPOUT
         if (settings["video"].contains("spoutOutput")) {
             if (settings["video"]["spoutOutput"].contains("sendBlock1")) {
                 spoutSendBlock1 = settings["video"]["spoutOutput"]["sendBlock1"];
@@ -54028,6 +54074,7 @@ void GuiApp::loadVideoOscSettings() {
                 spoutSendBlock3 = settings["video"]["spoutOutput"]["sendBlock3"];
             }
         }
+#endif
 
         // NDI outputs
         if (settings["video"].contains("ndiOutput")) {
@@ -54068,12 +54115,14 @@ void GuiApp::loadVideoOscSettings() {
             if (settings["video"]["resolution"].contains("outputHeight")) {
                 outputHeight = settings["video"]["resolution"]["outputHeight"];
             }
+#if OFAPP_HAS_SPOUT
             if (settings["video"]["resolution"].contains("spoutSendWidth")) {
                 spoutSendWidth = settings["video"]["resolution"]["spoutSendWidth"];
             }
             if (settings["video"]["resolution"].contains("spoutSendHeight")) {
                 spoutSendHeight = settings["video"]["resolution"]["spoutSendHeight"];
             }
+#endif
             if (settings["video"]["resolution"].contains("ndiSendWidth")) {
                 ndiSendWidth = settings["video"]["resolution"]["ndiSendWidth"];
             }
@@ -54103,7 +54152,10 @@ void GuiApp::loadVideoOscSettings() {
 
     ofLogNotice("Settings") << "Video/OSC settings loaded from settings.json";
 
-    // Note: NDI/Spout source name matching will happen when sources are refreshed
-    // The saved names are stored in savedInput1NdiName, savedInput2NdiName, etc.
+    // Note: NDI source name matching will happen when sources are refreshed
+    // The saved names are stored in savedInput1NdiName, savedInput2NdiName
+#if OFAPP_HAS_SPOUT
+    // and savedInput1SpoutName, savedInput2SpoutName
+#endif
     // for matching when the source lists become available
 }

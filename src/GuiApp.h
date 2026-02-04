@@ -23,6 +23,12 @@ class ofApp;
 #include <map>
 #include <atomic>
 
+#if defined(TARGET_WIN32)
+#define OFAPP_HAS_SPOUT 1
+#else
+#define OFAPP_HAS_SPOUT 0
+#endif
+
 #define PARAMETER_ARRAY_LENGTH 16
 
 // OSC Parameter types
@@ -171,13 +177,19 @@ public:
 	void refreshVideoDevices();
 
 	// NDI Input Settings
+#if OFAPP_HAS_SPOUT
 	int input1SourceType = 0;  // 0 = Webcam, 1 = NDI, 2 = Spout
 	int input2SourceType = 0;  // 0 = Webcam, 1 = NDI, 2 = Spout
+#else
+	int input1SourceType = 0;  // 0 = Webcam, 1 = NDI
+	int input2SourceType = 0;  // 0 = Webcam, 1 = NDI
+#endif
 	std::vector<std::string> ndiSourceNames;
 	int input1NdiSourceIndex = 0;
 	int input2NdiSourceIndex = 0;
 	bool refreshNdiSources = false;
 
+#if OFAPP_HAS_SPOUT
 	// Spout Input Settings
 	std::vector<std::string> spoutSourceNames;  // Available Spout senders
 	int input1SpoutSourceIndex = 0;
@@ -188,13 +200,14 @@ public:
 	bool spoutSendBlock1 = false;  // Enable Spout output for Block 1
 	bool spoutSendBlock2 = false;  // Enable Spout output for Block 2
 	bool spoutSendBlock3 = false;  // Enable Spout output for Block 3 (final)
+#endif
 
 	// NDI Output Settings
 	bool ndiSendBlock1 = false;  // Enable NDI output for Block 1
 	bool ndiSendBlock2 = false;  // Enable NDI output for Block 2
 	bool ndiSendBlock3 = false;  // Enable NDI output for Block 3 (final)
 
-	// NDI send resolution (separate from Spout)
+	// NDI send resolution
 	int ndiSendWidth = 1280;
 	int ndiSendHeight = 720;
 
@@ -217,9 +230,11 @@ public:
 	int outputWidth = 1280;
 	int outputHeight = 720;
 
+#if OFAPP_HAS_SPOUT
 	// Spout send resolution (separate from internal)
 	int spoutSendWidth = 1280;
 	int spoutSendHeight = 720;
+#endif
 
 	bool resolutionChangeRequested = false;
 
@@ -1894,8 +1909,10 @@ public:
 	// Saved source names (for matching on load)
 	std::string savedInput1NdiName;
 	std::string savedInput2NdiName;
+#if OFAPP_HAS_SPOUT
 	std::string savedInput1SpoutName;
 	std::string savedInput2SpoutName;
+#endif
 
 	// Attributions popup
 	bool showAttributionsPopup = false;

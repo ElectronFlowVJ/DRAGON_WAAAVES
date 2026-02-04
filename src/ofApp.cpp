@@ -57,8 +57,10 @@ void ofApp::setup(){
 	outputHeight = 720;
 	internalWidth = 1280;
 	internalHeight = 720;
+#if OFAPP_HAS_SPOUT
 	spoutSendWidth = 1280;
 	spoutSendHeight = 720;
+#endif
 
 	inputSetup();
 
@@ -119,11 +121,13 @@ void ofApp::update(){
 		gui->refreshNdiSources = false;
 	}
 
+#if OFAPP_HAS_SPOUT
 	// Check if Spout sources need to be refreshed
 	if(gui->refreshSpoutSources){
 		refreshSpoutSources();
 		gui->refreshSpoutSources = false;
 	}
+#endif
 
 	// Check if resolution needs to be changed
 	if(gui->resolutionChangeRequested){
@@ -135,8 +139,10 @@ void ofApp::update(){
 		internalHeight = gui->internalHeight;
 		outputWidth = gui->outputWidth;
 		outputHeight = gui->outputHeight;
+#if OFAPP_HAS_SPOUT
 		spoutSendWidth = gui->spoutSendWidth;
 		spoutSendHeight = gui->spoutSendHeight;
+#endif
 		reinitializeResolutions();
 		gui->resolutionChangeRequested = false;
 	}
@@ -2060,7 +2066,9 @@ void ofApp::reinitializeResolutions(){
 	ofLogNotice("Resolution") << "  Input 2: " << input2Width << "x" << input2Height;
 	ofLogNotice("Resolution") << "  Internal: " << internalWidth << "x" << internalHeight;
 	ofLogNotice("Resolution") << "  Output: " << outputWidth << "x" << outputHeight;
+#if OFAPP_HAS_SPOUT
 	ofLogNotice("Resolution") << "  Spout Send: " << spoutSendWidth << "x" << spoutSendHeight;
+#endif
 
 	// Reinitialize webcams at new resolution if they're the active source
 	if (gui->input1SourceType == 0) {
