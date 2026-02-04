@@ -1426,7 +1426,7 @@ void ofApp::draw(){
 	ofViewport(0, 0, framebuffer3.getWidth(), framebuffer3.getHeight());
 	ofSetupScreenOrtho(framebuffer3.getWidth(), framebuffer3.getHeight());
 	shader3.begin();
-	dummyTex.draw(0, 0, internalWidth, internalHeight);
+	dummyTex.draw(0, 0, framebuffer3.getWidth(), framebuffer3.getHeight());
 
 	shader3.setUniformTexture("block2Output",framebuffer2.getTexture(),8);
 	shader3.setUniformTexture("block1Output",framebuffer1.getTexture(),9);
@@ -2051,7 +2051,7 @@ void ofApp::framebufferSetup(){
 	// These are GPU-only (no CPU backing needed)
 	allocateGpuOnlyFbo(framebuffer1, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(framebuffer2, internalWidth, internalHeight);
-	allocateGpuOnlyFbo(framebuffer3, internalWidth, internalHeight);
+	allocateGpuOnlyFbo(framebuffer3, outputWidth, outputHeight);
 
 	// pastFrames also use internal resolution - GPU-only for major RAM savings
 	for(int i=0;i<pastFramesSize;i++){
@@ -2092,10 +2092,10 @@ void ofApp::reinitializeResolutions(){
 	allocateGpuOnlyFbo(webcamFbo1, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(webcamFbo2, internalWidth, internalHeight);
 
-	// Reallocate main framebuffers at internal resolution - GPU-only
+	// Reallocate main framebuffers - framebuffer3 at output resolution - GPU-only
 	allocateGpuOnlyFbo(framebuffer1, internalWidth, internalHeight);
 	allocateGpuOnlyFbo(framebuffer2, internalWidth, internalHeight);
-	allocateGpuOnlyFbo(framebuffer3, internalWidth, internalHeight);
+	allocateGpuOnlyFbo(framebuffer3, outputWidth, outputHeight);
 
 	// Reallocate dummyTex at internal resolution
 	dummyTex.allocate(internalWidth, internalHeight, GL_RGBA);
