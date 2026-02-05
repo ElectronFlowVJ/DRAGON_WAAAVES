@@ -55162,6 +55162,7 @@ void GuiApp::loadVideoOscSettings() {
     if (settings.contains("video")) {
         if (settings["video"].contains("targetFPS")) {
             targetFPS = settings["video"]["targetFPS"];
+            fpsChangeRequested = true;  // Apply loaded FPS on next update
         }
 
         // Input 1
