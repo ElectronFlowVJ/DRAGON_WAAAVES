@@ -378,7 +378,7 @@ void GuiApp::draw(){
 	float windowWidthHalf=420;
 
 
-	auto mainSettings = ofxImGui::Settings();
+	//auto mainSettings = ofxImGui::Settings(); // Removed - not used and ImHelpers.h not included by default in ofxImGui develop branch
 	//change header colors
     ImGui::StyleColorsDark();
 

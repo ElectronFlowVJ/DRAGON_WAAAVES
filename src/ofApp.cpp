@@ -2,6 +2,7 @@
 #if OFAPP_HAS_SPOUT
 #include "SpoutReceiver.h"  // For Spout sender enumeration
 #endif
+#include <GLFW/glfw3.h>  // For window decoration toggling (F10)
 //globals
 
 
