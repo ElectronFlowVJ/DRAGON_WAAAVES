@@ -94,6 +94,9 @@ public:
 
 	// Pointer to main app for OSC reloading
 	class ofApp* mainApp;
+
+	// Reference to GUI window for fullscreen/decoration toggling
+	shared_ptr<ofAppBaseWindow> guiWindow;
 	void sendOscIfChanged(const string& address, float value);
 	void setup();
 	void update();

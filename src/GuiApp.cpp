@@ -6,6 +6,7 @@
 
 
 #include "GuiApp.h"
+#include <GLFW/glfw3.h>  // For window decoration toggling (F10)
 
 // ===== OSC-ENABLED SLIDER MACRO =====
 // This macro wraps ImGui::SliderFloat to automatically send OSC when values change
@@ -8075,6 +8076,30 @@ void GuiApp::newMidiMessage(ofxMidiMessage& msg) {
 
 //--------------------------------------------------------------
 void GuiApp::keyPressed(int key) {
+	// F11 - Toggle fullscreen
+	// F10 - Toggle window decorations (borders/title bar)
+
+	if (key == OF_KEY_F11 && guiWindow) {
+		ofLogNotice("GuiApp") << "Toggling fullscreen (F11)";
+		guiWindow->toggleFullscreen();
+	}
+
+	if (key == OF_KEY_F10 && guiWindow) {
+		// Get GLFW window handle and toggle decoration
+		GLFWwindow* glfwWin = (GLFWwindow*)((ofAppGLFWWindow*)guiWindow.get())->getGLFWWindow();
+		if (glfwWin) {
+			int decorated = glfwGetWindowAttrib(glfwWin, GLFW_DECORATED);
+			ofLogNotice("GuiApp") << "Toggling window decorations (F10): " << (decorated ? "OFF" : "ON");
+			glfwSetWindowAttrib(glfwWin, GLFW_DECORATED, !decorated);
+		}
+	}
+
+	if (key == OF_KEY_F1) {
+		ofLogNotice("GuiApp") << "Keyboard shortcuts:";
+		ofLogNotice("GuiApp") << "F11 - Toggle fullscreen on GUI window";
+		ofLogNotice("GuiApp") << "F10 - Toggle window decorations (borders)";
+	}
+
 	/*
     if (key == 'a') {tweakHue += .01; cout<<"hue = "<<tweakHue<<endl;}
     if (key == 'z') {tweakHue -= .01; cout<<"hue = "<<tweakHue<<endl;}

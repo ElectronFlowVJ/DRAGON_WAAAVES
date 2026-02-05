@@ -30,6 +30,7 @@ int main() {
     mainApp->gui = guiApp;
     guiApp->mainApp = mainApp.get();
     mainApp->mainWindow = mainWindow;
+    guiApp->guiWindow = guiWindow;
 
     ofRunApp(guiWindow, guiApp);
     ofRunApp(mainWindow, mainApp);
