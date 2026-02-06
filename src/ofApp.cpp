@@ -357,6 +357,46 @@ void ofApp::lfoUpdate(){
 	finalKeyThresholdTheta+=lfoRateC*(gui->finalMixAndKeyLfo[3]);
 	finalKeySoftTheta+=lfoRateC*(gui->finalMixAndKeyLfo[5]);
 
+	// Lissajous 1 LFO theta updates
+	lissajous1XFreqLfoTheta += lfoRateC * gui->lissajous1XFreqLfoRate;
+	lissajous1YFreqLfoTheta += lfoRateC * gui->lissajous1YFreqLfoRate;
+	lissajous1ZFreqLfoTheta += lfoRateC * gui->lissajous1ZFreqLfoRate;
+	lissajous1XAmpLfoTheta += lfoRateC * gui->lissajous1XAmpLfoRate;
+	lissajous1YAmpLfoTheta += lfoRateC * gui->lissajous1YAmpLfoRate;
+	lissajous1ZAmpLfoTheta += lfoRateC * gui->lissajous1ZAmpLfoRate;
+	lissajous1XPhaseLfoTheta += lfoRateC * gui->lissajous1XPhaseLfoRate;
+	lissajous1YPhaseLfoTheta += lfoRateC * gui->lissajous1YPhaseLfoRate;
+	lissajous1ZPhaseLfoTheta += lfoRateC * gui->lissajous1ZPhaseLfoRate;
+	lissajous1XOffsetLfoTheta += lfoRateC * gui->lissajous1XOffsetLfoRate;
+	lissajous1YOffsetLfoTheta += lfoRateC * gui->lissajous1YOffsetLfoRate;
+	lissajous1SpeedLfoTheta += lfoRateC * gui->lissajous1SpeedLfoRate;
+	lissajous1SizeLfoTheta += lfoRateC * gui->lissajous1SizeLfoRate;
+	lissajous1NumPointsLfoTheta += lfoRateC * gui->lissajous1NumPointsLfoRate;
+	lissajous1LineWidthLfoTheta += lfoRateC * gui->lissajous1LineWidthLfoRate;
+	lissajous1ColorSpeedLfoTheta += lfoRateC * gui->lissajous1ColorSpeedLfoRate;
+	lissajous1HueLfoTheta += lfoRateC * gui->lissajous1HueLfoRate;
+	lissajous1HueSpreadLfoTheta += lfoRateC * gui->lissajous1HueSpreadLfoRate;
+
+	// Lissajous 2 LFO theta updates
+	lissajous2XFreqLfoTheta += lfoRateC * gui->lissajous2XFreqLfoRate;
+	lissajous2YFreqLfoTheta += lfoRateC * gui->lissajous2YFreqLfoRate;
+	lissajous2ZFreqLfoTheta += lfoRateC * gui->lissajous2ZFreqLfoRate;
+	lissajous2XAmpLfoTheta += lfoRateC * gui->lissajous2XAmpLfoRate;
+	lissajous2YAmpLfoTheta += lfoRateC * gui->lissajous2YAmpLfoRate;
+	lissajous2ZAmpLfoTheta += lfoRateC * gui->lissajous2ZAmpLfoRate;
+	lissajous2XPhaseLfoTheta += lfoRateC * gui->lissajous2XPhaseLfoRate;
+	lissajous2YPhaseLfoTheta += lfoRateC * gui->lissajous2YPhaseLfoRate;
+	lissajous2ZPhaseLfoTheta += lfoRateC * gui->lissajous2ZPhaseLfoRate;
+	lissajous2XOffsetLfoTheta += lfoRateC * gui->lissajous2XOffsetLfoRate;
+	lissajous2YOffsetLfoTheta += lfoRateC * gui->lissajous2YOffsetLfoRate;
+	lissajous2SpeedLfoTheta += lfoRateC * gui->lissajous2SpeedLfoRate;
+	lissajous2SizeLfoTheta += lfoRateC * gui->lissajous2SizeLfoRate;
+	lissajous2NumPointsLfoTheta += lfoRateC * gui->lissajous2NumPointsLfoRate;
+	lissajous2LineWidthLfoTheta += lfoRateC * gui->lissajous2LineWidthLfoRate;
+	lissajous2ColorSpeedLfoTheta += lfoRateC * gui->lissajous2ColorSpeedLfoRate;
+	lissajous2HueLfoTheta += lfoRateC * gui->lissajous2HueLfoRate;
+	lissajous2HueSpreadLfoTheta += lfoRateC * gui->lissajous2HueSpreadLfoRate;
+
 }
 
 //--------------------------------------------------------------
@@ -1116,7 +1156,8 @@ void ofApp::draw(){
 
     // Switch to perspective for 3D geometry drawing
     if(gui->block1LineSwitch==1 || gui->block1SevenStarSwitch==1 ||
-       gui->block1LissaBallSwitch==1 || gui->block1HypercubeSwitch==1){
+       gui->block1LissaBallSwitch==1 || gui->block1HypercubeSwitch==1 ||
+       gui->block1LissajousCurveSwitch==1){
         ofSetupScreenPerspective(framebuffer1.getWidth(), framebuffer1.getHeight());
     }
 
@@ -1131,6 +1172,9 @@ void ofApp::draw(){
     }
     if(gui->block1HypercubeSwitch==1){
         hypercube_draw();
+    }
+    if(gui->block1LissajousCurveSwitch==1){
+        lissajousCurve1Draw();
     }
 	framebuffer1.end();
 
@@ -1385,7 +1429,8 @@ void ofApp::draw(){
 
     // Switch to perspective for 3D geometry drawing
     if(gui->block2LineSwitch==1 || gui->block2SevenStarSwitch==1 ||
-       gui->block2LissaBallSwitch==1 || gui->block2HypercubeSwitch==1){
+       gui->block2LissaBallSwitch==1 || gui->block2HypercubeSwitch==1 ||
+       gui->block2LissajousCurveSwitch==1){
         ofSetupScreenPerspective(framebuffer2.getWidth(), framebuffer2.getHeight());
     }
 
@@ -1400,6 +1445,9 @@ void ofApp::draw(){
     }
 	if(gui->block2HypercubeSwitch==1){
         hypercube_draw();
+    }
+    if(gui->block2LissajousCurveSwitch==1){
+        lissajousCurve2Draw();
     }
 	framebuffer2.end();
 
@@ -2526,6 +2574,209 @@ void ofApp::drawSpiralEllipse() {
 }
 
 //--------------------------------------------------------------
+// Lissajous Curve Generator - Waveshape function
+float ofApp::lissajousWave(float theta, int shape) {
+	switch(shape) {
+		case 0: return sin(theta);                                         // Sine
+		case 1: return (2.0f / PI) * asin(sin(theta));                    // Triangle
+		case 2: return (2.0f / TWO_PI) * fmod(theta + PI, TWO_PI) - 1.0f; // Ramp
+		case 3: return 1.0f - (2.0f / TWO_PI) * fmod(theta + PI, TWO_PI); // Saw
+		case 4: return (sin(theta) >= 0.0f) ? 1.0f : -1.0f;               // Square
+		default: return sin(theta);
+	}
+}
+
+//--------------------------------------------------------------
+// Lissajous Curve Generator - Block 1
+void ofApp::lissajousCurve1Draw() {
+	// Apply LFO modulation to base params
+	float xFreqMod = gui->lissajous1XFreq + lfo(gui->lissajous1XFreqLfoAmp, lissajous1XFreqLfoTheta, gui->lissajous1XFreqLfoShape);
+	float yFreqMod = gui->lissajous1YFreq + lfo(gui->lissajous1YFreqLfoAmp, lissajous1YFreqLfoTheta, gui->lissajous1YFreqLfoShape);
+	float zFreqMod = gui->lissajous1ZFreq + lfo(gui->lissajous1ZFreqLfoAmp, lissajous1ZFreqLfoTheta, gui->lissajous1ZFreqLfoShape);
+	float xAmpMod = gui->lissajous1XAmp + lfo(gui->lissajous1XAmpLfoAmp, lissajous1XAmpLfoTheta, gui->lissajous1XAmpLfoShape);
+	float yAmpMod = gui->lissajous1YAmp + lfo(gui->lissajous1YAmpLfoAmp, lissajous1YAmpLfoTheta, gui->lissajous1YAmpLfoShape);
+	float zAmpMod = gui->lissajous1ZAmp + lfo(gui->lissajous1ZAmpLfoAmp, lissajous1ZAmpLfoTheta, gui->lissajous1ZAmpLfoShape);
+	float xPhaseMod = gui->lissajous1XPhase + lfo(gui->lissajous1XPhaseLfoAmp, lissajous1XPhaseLfoTheta, gui->lissajous1XPhaseLfoShape);
+	float yPhaseMod = gui->lissajous1YPhase + lfo(gui->lissajous1YPhaseLfoAmp, lissajous1YPhaseLfoTheta, gui->lissajous1YPhaseLfoShape);
+	float zPhaseMod = gui->lissajous1ZPhase + lfo(gui->lissajous1ZPhaseLfoAmp, lissajous1ZPhaseLfoTheta, gui->lissajous1ZPhaseLfoShape);
+	float xOffsetMod = gui->lissajous1XOffset + lfo(gui->lissajous1XOffsetLfoAmp, lissajous1XOffsetLfoTheta, gui->lissajous1XOffsetLfoShape);
+	float yOffsetMod = gui->lissajous1YOffset + lfo(gui->lissajous1YOffsetLfoAmp, lissajous1YOffsetLfoTheta, gui->lissajous1YOffsetLfoShape);
+	float speedMod = gui->lissajous1Speed + lfo(gui->lissajous1SpeedLfoAmp, lissajous1SpeedLfoTheta, gui->lissajous1SpeedLfoShape);
+	float sizeMod = gui->lissajous1Size + lfo(gui->lissajous1SizeLfoAmp, lissajous1SizeLfoTheta, gui->lissajous1SizeLfoShape);
+	float numPointsMod = gui->lissajous1NumPoints + lfo(gui->lissajous1NumPointsLfoAmp, lissajous1NumPointsLfoTheta, gui->lissajous1NumPointsLfoShape);
+	float lineWidthMod = gui->lissajous1LineWidth + lfo(gui->lissajous1LineWidthLfoAmp, lissajous1LineWidthLfoTheta, gui->lissajous1LineWidthLfoShape);
+	float colorSpeedMod = gui->lissajous1ColorSpeed + lfo(gui->lissajous1ColorSpeedLfoAmp, lissajous1ColorSpeedLfoTheta, gui->lissajous1ColorSpeedLfoShape);
+	float hueMod = gui->lissajous1Hue + lfo(gui->lissajous1HueLfoAmp, lissajous1HueLfoTheta, gui->lissajous1HueLfoShape);
+	float hueSpreadMod = gui->lissajous1HueSpread + lfo(gui->lissajous1HueSpreadLfoAmp, lissajous1HueSpreadLfoTheta, gui->lissajous1HueSpreadLfoShape);
+
+	// Clamp modulated values to valid ranges
+	xFreqMod = ofClamp(xFreqMod, 0.0f, 1.0f);
+	yFreqMod = ofClamp(yFreqMod, 0.0f, 1.0f);
+	zFreqMod = ofClamp(zFreqMod, 0.0f, 1.0f);
+	xAmpMod = ofClamp(xAmpMod, 0.0f, 1.0f);
+	yAmpMod = ofClamp(yAmpMod, 0.0f, 1.0f);
+	zAmpMod = ofClamp(zAmpMod, 0.0f, 1.0f);
+	xOffsetMod = ofClamp(xOffsetMod, 0.0f, 1.0f);
+	yOffsetMod = ofClamp(yOffsetMod, 0.0f, 1.0f);
+	speedMod = ofClamp(speedMod, 0.0f, 1.0f);
+	sizeMod = ofClamp(sizeMod, 0.0f, 1.0f);
+	numPointsMod = ofClamp(numPointsMod, 0.0f, 1.0f);
+	lineWidthMod = ofClamp(lineWidthMod, 0.0f, 1.0f);
+	colorSpeedMod = ofClamp(colorSpeedMod, 0.0f, 1.0f);
+	hueMod = ofClamp(hueMod, 0.0f, 1.0f);
+	hueSpreadMod = ofClamp(hueSpreadMod, 0.0f, 1.0f);
+
+	// Map to useful ranges
+	float xFreq = xFreqMod * 10.0f;
+	float yFreq = yFreqMod * 10.0f;
+	float zFreq = zFreqMod * 10.0f;
+	float xAmp = xAmpMod * outputHeight * 0.35f;
+	float yAmp = yAmpMod * outputHeight * 0.35f;
+	float zAmp = zAmpMod * outputHeight * 0.25f;
+	float xPhase = xPhaseMod * TWO_PI;
+	float yPhase = yPhaseMod * TWO_PI;
+	float zPhase = zPhaseMod * TWO_PI;
+	float xCenter = (xOffsetMod - 0.5f) * outputWidth;
+	float yCenter = (yOffsetMod - 0.5f) * outputHeight;
+	float sizeScale = 0.5f + sizeMod * 1.5f;
+	int numPoints = 50 + int(numPointsMod * 450);
+	float lineWidth = 1.0f + lineWidthMod * 9.0f;
+
+	// Update animation thetas
+	lissajous1Theta += speedMod * 0.1f;
+	lissajous1ColorTheta += colorSpeedMod * 0.05f;
+
+	// Wrap thetas to avoid float overflow
+	if (lissajous1Theta > TWO_PI * 1000) lissajous1Theta = fmod(lissajous1Theta, TWO_PI * 100);
+	if (lissajous1ColorTheta > TWO_PI * 1000) lissajous1ColorTheta = fmod(lissajous1ColorTheta, TWO_PI * 100);
+
+	ofPushMatrix();
+	ofTranslate(outputWidth / 2 + xCenter, outputHeight / 2 + yCenter);
+	ofSetLineWidth(lineWidth);
+
+	// Use ofMesh for proper per-vertex colors
+	ofMesh mesh;
+	mesh.setMode(OF_PRIMITIVE_LINE_STRIP);
+
+	for (int i = 0; i < numPoints; i++) {
+		float t = lissajous1Theta + (float(i) / numPoints) * TWO_PI * 4;
+
+		float x = xAmp * sizeScale * lissajousWave(xFreq * t + xPhase, gui->lissajous1XShape);
+		float y = yAmp * sizeScale * lissajousWave(yFreq * t + yPhase, gui->lissajous1YShape);
+		float z = zAmp * sizeScale * lissajousWave(zFreq * t + zPhase, gui->lissajous1ZShape);
+
+		// Color with base hue and spread along curve
+		float positionHue = (float(i) / numPoints) * hueSpreadMod;
+		float hue = fmod(hueMod + positionHue + lissajous1ColorTheta, 1.0f);
+		ofColor c;
+		c.setHsb(hue * 255, 200, 220);
+
+		mesh.addVertex(glm::vec3(x, y, z));
+		mesh.addColor(c);
+	}
+
+	mesh.draw();
+
+	ofSetLineWidth(1);
+	ofPopMatrix();
+}
+
+//--------------------------------------------------------------
+// Lissajous Curve Generator - Block 2
+void ofApp::lissajousCurve2Draw() {
+	// Apply LFO modulation to base params
+	float xFreqMod = gui->lissajous2XFreq + lfo(gui->lissajous2XFreqLfoAmp, lissajous2XFreqLfoTheta, gui->lissajous2XFreqLfoShape);
+	float yFreqMod = gui->lissajous2YFreq + lfo(gui->lissajous2YFreqLfoAmp, lissajous2YFreqLfoTheta, gui->lissajous2YFreqLfoShape);
+	float zFreqMod = gui->lissajous2ZFreq + lfo(gui->lissajous2ZFreqLfoAmp, lissajous2ZFreqLfoTheta, gui->lissajous2ZFreqLfoShape);
+	float xAmpMod = gui->lissajous2XAmp + lfo(gui->lissajous2XAmpLfoAmp, lissajous2XAmpLfoTheta, gui->lissajous2XAmpLfoShape);
+	float yAmpMod = gui->lissajous2YAmp + lfo(gui->lissajous2YAmpLfoAmp, lissajous2YAmpLfoTheta, gui->lissajous2YAmpLfoShape);
+	float zAmpMod = gui->lissajous2ZAmp + lfo(gui->lissajous2ZAmpLfoAmp, lissajous2ZAmpLfoTheta, gui->lissajous2ZAmpLfoShape);
+	float xPhaseMod = gui->lissajous2XPhase + lfo(gui->lissajous2XPhaseLfoAmp, lissajous2XPhaseLfoTheta, gui->lissajous2XPhaseLfoShape);
+	float yPhaseMod = gui->lissajous2YPhase + lfo(gui->lissajous2YPhaseLfoAmp, lissajous2YPhaseLfoTheta, gui->lissajous2YPhaseLfoShape);
+	float zPhaseMod = gui->lissajous2ZPhase + lfo(gui->lissajous2ZPhaseLfoAmp, lissajous2ZPhaseLfoTheta, gui->lissajous2ZPhaseLfoShape);
+	float xOffsetMod = gui->lissajous2XOffset + lfo(gui->lissajous2XOffsetLfoAmp, lissajous2XOffsetLfoTheta, gui->lissajous2XOffsetLfoShape);
+	float yOffsetMod = gui->lissajous2YOffset + lfo(gui->lissajous2YOffsetLfoAmp, lissajous2YOffsetLfoTheta, gui->lissajous2YOffsetLfoShape);
+	float speedMod = gui->lissajous2Speed + lfo(gui->lissajous2SpeedLfoAmp, lissajous2SpeedLfoTheta, gui->lissajous2SpeedLfoShape);
+	float sizeMod = gui->lissajous2Size + lfo(gui->lissajous2SizeLfoAmp, lissajous2SizeLfoTheta, gui->lissajous2SizeLfoShape);
+	float numPointsMod = gui->lissajous2NumPoints + lfo(gui->lissajous2NumPointsLfoAmp, lissajous2NumPointsLfoTheta, gui->lissajous2NumPointsLfoShape);
+	float lineWidthMod = gui->lissajous2LineWidth + lfo(gui->lissajous2LineWidthLfoAmp, lissajous2LineWidthLfoTheta, gui->lissajous2LineWidthLfoShape);
+	float colorSpeedMod = gui->lissajous2ColorSpeed + lfo(gui->lissajous2ColorSpeedLfoAmp, lissajous2ColorSpeedLfoTheta, gui->lissajous2ColorSpeedLfoShape);
+	float hueMod = gui->lissajous2Hue + lfo(gui->lissajous2HueLfoAmp, lissajous2HueLfoTheta, gui->lissajous2HueLfoShape);
+	float hueSpreadMod = gui->lissajous2HueSpread + lfo(gui->lissajous2HueSpreadLfoAmp, lissajous2HueSpreadLfoTheta, gui->lissajous2HueSpreadLfoShape);
+
+	// Clamp modulated values to valid ranges
+	xFreqMod = ofClamp(xFreqMod, 0.0f, 1.0f);
+	yFreqMod = ofClamp(yFreqMod, 0.0f, 1.0f);
+	zFreqMod = ofClamp(zFreqMod, 0.0f, 1.0f);
+	xAmpMod = ofClamp(xAmpMod, 0.0f, 1.0f);
+	yAmpMod = ofClamp(yAmpMod, 0.0f, 1.0f);
+	zAmpMod = ofClamp(zAmpMod, 0.0f, 1.0f);
+	xOffsetMod = ofClamp(xOffsetMod, 0.0f, 1.0f);
+	yOffsetMod = ofClamp(yOffsetMod, 0.0f, 1.0f);
+	speedMod = ofClamp(speedMod, 0.0f, 1.0f);
+	sizeMod = ofClamp(sizeMod, 0.0f, 1.0f);
+	numPointsMod = ofClamp(numPointsMod, 0.0f, 1.0f);
+	lineWidthMod = ofClamp(lineWidthMod, 0.0f, 1.0f);
+	colorSpeedMod = ofClamp(colorSpeedMod, 0.0f, 1.0f);
+	hueMod = ofClamp(hueMod, 0.0f, 1.0f);
+	hueSpreadMod = ofClamp(hueSpreadMod, 0.0f, 1.0f);
+
+	// Map to useful ranges
+	float xFreq = xFreqMod * 10.0f;
+	float yFreq = yFreqMod * 10.0f;
+	float zFreq = zFreqMod * 10.0f;
+	float xAmp = xAmpMod * outputHeight * 0.35f;
+	float yAmp = yAmpMod * outputHeight * 0.35f;
+	float zAmp = zAmpMod * outputHeight * 0.25f;
+	float xPhase = xPhaseMod * TWO_PI;
+	float yPhase = yPhaseMod * TWO_PI;
+	float zPhase = zPhaseMod * TWO_PI;
+	float xCenter = (xOffsetMod - 0.5f) * outputWidth;
+	float yCenter = (yOffsetMod - 0.5f) * outputHeight;
+	float sizeScale = 0.5f + sizeMod * 1.5f;
+	int numPoints = 50 + int(numPointsMod * 450);
+	float lineWidth = 1.0f + lineWidthMod * 9.0f;
+
+	// Update animation thetas
+	lissajous2Theta += speedMod * 0.1f;
+	lissajous2ColorTheta += colorSpeedMod * 0.05f;
+
+	// Wrap thetas to avoid float overflow
+	if (lissajous2Theta > TWO_PI * 1000) lissajous2Theta = fmod(lissajous2Theta, TWO_PI * 100);
+	if (lissajous2ColorTheta > TWO_PI * 1000) lissajous2ColorTheta = fmod(lissajous2ColorTheta, TWO_PI * 100);
+
+	ofPushMatrix();
+	ofTranslate(outputWidth / 2 + xCenter, outputHeight / 2 + yCenter);
+	ofSetLineWidth(lineWidth);
+
+	// Use ofMesh for proper per-vertex colors
+	ofMesh mesh;
+	mesh.setMode(OF_PRIMITIVE_LINE_STRIP);
+
+	for (int i = 0; i < numPoints; i++) {
+		float t = lissajous2Theta + (float(i) / numPoints) * TWO_PI * 4;
+
+		float x = xAmp * sizeScale * lissajousWave(xFreq * t + xPhase, gui->lissajous2XShape);
+		float y = yAmp * sizeScale * lissajousWave(yFreq * t + yPhase, gui->lissajous2YShape);
+		float z = zAmp * sizeScale * lissajousWave(zFreq * t + zPhase, gui->lissajous2ZShape);
+
+		// Color with base hue and spread along curve
+		float positionHue = (float(i) / numPoints) * hueSpreadMod;
+		float hue = fmod(hueMod + positionHue + lissajous2ColorTheta, 1.0f);
+		ofColor c;
+		c.setHsb(hue * 255, 200, 220);
+
+		mesh.addVertex(glm::vec3(x, y, z));
+		mesh.addColor(c);
+	}
+
+	mesh.draw();
+
+	ofSetLineWidth(1);
+	ofPopMatrix();
+}
+
+//--------------------------------------------------------------
 void ofApp::setupOsc() {
     oscReceiver.setup(gui->oscReceivePort);
     oscSender.setup(gui->oscSendIP, gui->oscSendPort);
@@ -2555,7 +2806,7 @@ void ofApp::processOscMessages() {
 
         // Try registry lookup first (handles all registered parameters)
         auto it = gui->oscAddressMap.find(address);
-        if (it != gui->oscAddressMap.end()) {
+        if (it != gui->oscAddressMap.end() && it->second != nullptr) {
             it->second->setValueFromFloat(value);
             continue;  // Found in registry, skip the helper functions
         }
@@ -3505,7 +3756,9 @@ void ofApp::sendAllOscParameters() {
 
     // Send all parameters from the registry
     for (const auto& param : gui->oscRegistry) {
-        sendOscParameter(param.address, param.getValueAsFloat());
+        if (!param.address.empty()) {
+            sendOscParameter(param.address, param.getValueAsFloat());
+        }
     }
 
     // Resume receiving

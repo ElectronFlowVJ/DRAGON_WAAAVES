@@ -1779,6 +1779,179 @@ void GuiApp::draw(){
 									if (ImGui::Checkbox("lissajous ball ##fb1",&block1LissaBallSwitch)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajousBall", block1LissaBallSwitch ? 1.0f : 0.0f);
 						}
+									if (ImGui::Checkbox("lissajous curve ##fb1",&block1LissajousCurveSwitch)) {
+							if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajousCurve", block1LissajousCurveSwitch ? 1.0f : 0.0f);
+						}
+									if(block1LissajousCurveSwitch) {
+										ImGui::Indent();
+										const char* lissShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
+										// ---- X AXIS ----
+										if(ImGui::TreeNode("X Axis ##liss1")) {
+											ImGuiSliderFloatOSC("freq ##liss1x", &lissajous1XFreq, 0.0, 1.0, "/gravity/block1/fb1/lissajous/xFreq");
+											ImGuiSliderFloatOSC("amp  ##liss1x", &lissajous1XAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/xAmp");
+											ImGuiSliderFloatOSC("phase##liss1x", &lissajous1XPhase, 0.0, 1.0, "/gravity/block1/fb1/lissajous/xPhase");
+											if (ImGui::Combo("shape##liss1x", &lissajous1XShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/xShape", static_cast<float>(lissajous1XShape));
+											}
+											ImGui::Separator();
+											ImGui::Text("X Freq LFO");
+											ImGuiSliderFloatOSC("amp ##xfreqlfo1", &lissajous1XFreqLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/xFreqAmp");
+											ImGuiSliderFloatOSC("rate##xfreqlfo1", &lissajous1XFreqLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/xFreqRate");
+											if (ImGui::Combo("shape##xfreqlfo1", &lissajous1XFreqLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/xFreqShape", static_cast<float>(lissajous1XFreqLfoShape));
+											}
+											ImGui::Text("X Amp LFO");
+											ImGuiSliderFloatOSC("amp ##xamplfo1", &lissajous1XAmpLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/xAmpAmp");
+											ImGuiSliderFloatOSC("rate##xamplfo1", &lissajous1XAmpLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/xAmpRate");
+											if (ImGui::Combo("shape##xamplfo1", &lissajous1XAmpLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/xAmpShape", static_cast<float>(lissajous1XAmpLfoShape));
+											}
+											ImGui::Text("X Phase LFO");
+											ImGuiSliderFloatOSC("amp ##xphaselfo1", &lissajous1XPhaseLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/xPhaseAmp");
+											ImGuiSliderFloatOSC("rate##xphaselfo1", &lissajous1XPhaseLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/xPhaseRate");
+											if (ImGui::Combo("shape##xphaselfo1", &lissajous1XPhaseLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/xPhaseShape", static_cast<float>(lissajous1XPhaseLfoShape));
+											}
+											ImGui::TreePop();
+										}
+
+										// ---- Y AXIS ----
+										if(ImGui::TreeNode("Y Axis ##liss1")) {
+											ImGuiSliderFloatOSC("freq ##liss1y", &lissajous1YFreq, 0.0, 1.0, "/gravity/block1/fb1/lissajous/yFreq");
+											ImGuiSliderFloatOSC("amp  ##liss1y", &lissajous1YAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/yAmp");
+											ImGuiSliderFloatOSC("phase##liss1y", &lissajous1YPhase, 0.0, 1.0, "/gravity/block1/fb1/lissajous/yPhase");
+											if (ImGui::Combo("shape##liss1y", &lissajous1YShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/yShape", static_cast<float>(lissajous1YShape));
+											}
+											ImGui::Separator();
+											ImGui::Text("Y Freq LFO");
+											ImGuiSliderFloatOSC("amp ##yfreqlfo1", &lissajous1YFreqLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/yFreqAmp");
+											ImGuiSliderFloatOSC("rate##yfreqlfo1", &lissajous1YFreqLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/yFreqRate");
+											if (ImGui::Combo("shape##yfreqlfo1", &lissajous1YFreqLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/yFreqShape", static_cast<float>(lissajous1YFreqLfoShape));
+											}
+											ImGui::Text("Y Amp LFO");
+											ImGuiSliderFloatOSC("amp ##yamplfo1", &lissajous1YAmpLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/yAmpAmp");
+											ImGuiSliderFloatOSC("rate##yamplfo1", &lissajous1YAmpLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/yAmpRate");
+											if (ImGui::Combo("shape##yamplfo1", &lissajous1YAmpLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/yAmpShape", static_cast<float>(lissajous1YAmpLfoShape));
+											}
+											ImGui::Text("Y Phase LFO");
+											ImGuiSliderFloatOSC("amp ##yphaselfo1", &lissajous1YPhaseLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/yPhaseAmp");
+											ImGuiSliderFloatOSC("rate##yphaselfo1", &lissajous1YPhaseLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/yPhaseRate");
+											if (ImGui::Combo("shape##yphaselfo1", &lissajous1YPhaseLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/yPhaseShape", static_cast<float>(lissajous1YPhaseLfoShape));
+											}
+											ImGui::TreePop();
+										}
+
+										// ---- Z AXIS ----
+										if(ImGui::TreeNode("Z Axis ##liss1")) {
+											ImGuiSliderFloatOSC("freq ##liss1z", &lissajous1ZFreq, 0.0, 1.0, "/gravity/block1/fb1/lissajous/zFreq");
+											ImGuiSliderFloatOSC("amp  ##liss1z", &lissajous1ZAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/zAmp");
+											ImGuiSliderFloatOSC("phase##liss1z", &lissajous1ZPhase, 0.0, 1.0, "/gravity/block1/fb1/lissajous/zPhase");
+											if (ImGui::Combo("shape##liss1z", &lissajous1ZShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/zShape", static_cast<float>(lissajous1ZShape));
+											}
+											ImGui::Separator();
+											ImGui::Text("Z Freq LFO");
+											ImGuiSliderFloatOSC("amp ##zfreqlfo1", &lissajous1ZFreqLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/zFreqAmp");
+											ImGuiSliderFloatOSC("rate##zfreqlfo1", &lissajous1ZFreqLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/zFreqRate");
+											if (ImGui::Combo("shape##zfreqlfo1", &lissajous1ZFreqLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/zFreqShape", static_cast<float>(lissajous1ZFreqLfoShape));
+											}
+											ImGui::Text("Z Amp LFO");
+											ImGuiSliderFloatOSC("amp ##zamplfo1", &lissajous1ZAmpLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/zAmpAmp");
+											ImGuiSliderFloatOSC("rate##zamplfo1", &lissajous1ZAmpLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/zAmpRate");
+											if (ImGui::Combo("shape##zamplfo1", &lissajous1ZAmpLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/zAmpShape", static_cast<float>(lissajous1ZAmpLfoShape));
+											}
+											ImGui::Text("Z Phase LFO");
+											ImGuiSliderFloatOSC("amp ##zphaselfo1", &lissajous1ZPhaseLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/zPhaseAmp");
+											ImGuiSliderFloatOSC("rate##zphaselfo1", &lissajous1ZPhaseLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/zPhaseRate");
+											if (ImGui::Combo("shape##zphaselfo1", &lissajous1ZPhaseLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/zPhaseShape", static_cast<float>(lissajous1ZPhaseLfoShape));
+											}
+											ImGui::TreePop();
+										}
+
+										// ---- POSITION ----
+										if(ImGui::TreeNode("Position ##liss1")) {
+											ImGuiSliderFloatOSC("x offset##liss1", &lissajous1XOffset, 0.0, 1.0, "/gravity/block1/fb1/lissajous/xOffset");
+											ImGuiSliderFloatOSC("y offset##liss1", &lissajous1YOffset, 0.0, 1.0, "/gravity/block1/fb1/lissajous/yOffset");
+											ImGui::Separator();
+											ImGui::Text("X Offset LFO");
+											ImGuiSliderFloatOSC("amp ##xofflfo1", &lissajous1XOffsetLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/xOffsetAmp");
+											ImGuiSliderFloatOSC("rate##xofflfo1", &lissajous1XOffsetLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/xOffsetRate");
+											if (ImGui::Combo("shape##xofflfo1", &lissajous1XOffsetLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/xOffsetShape", static_cast<float>(lissajous1XOffsetLfoShape));
+											}
+											ImGui::Text("Y Offset LFO");
+											ImGuiSliderFloatOSC("amp ##yofflfo1", &lissajous1YOffsetLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/yOffsetAmp");
+											ImGuiSliderFloatOSC("rate##yofflfo1", &lissajous1YOffsetLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/yOffsetRate");
+											if (ImGui::Combo("shape##yofflfo1", &lissajous1YOffsetLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/yOffsetShape", static_cast<float>(lissajous1YOffsetLfoShape));
+											}
+											ImGui::TreePop();
+										}
+
+										// ---- APPEARANCE ----
+										if(ImGui::TreeNode("Appearance ##liss1")) {
+											ImGuiSliderFloatOSC("speed    ##liss1", &lissajous1Speed, 0.0, 1.0, "/gravity/block1/fb1/lissajous/speed");
+											ImGuiSliderFloatOSC("size     ##liss1", &lissajous1Size, 0.0, 1.0, "/gravity/block1/fb1/lissajous/size");
+											ImGuiSliderFloatOSC("points   ##liss1", &lissajous1NumPoints, 0.0, 1.0, "/gravity/block1/fb1/lissajous/numPoints");
+											ImGuiSliderFloatOSC("lineWidth##liss1", &lissajous1LineWidth, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lineWidth");
+											ImGuiSliderFloatOSC("colorSpd ##liss1", &lissajous1ColorSpeed, 0.0, 1.0, "/gravity/block1/fb1/lissajous/colorSpeed");
+											ImGuiSliderFloatOSC("hue      ##liss1", &lissajous1Hue, 0.0, 1.0, "/gravity/block1/fb1/lissajous/hue");
+											ImGuiSliderFloatOSC("hueSpread##liss1", &lissajous1HueSpread, 0.0, 1.0, "/gravity/block1/fb1/lissajous/hueSpread");
+											ImGui::Separator();
+											ImGui::Text("Speed LFO");
+											ImGuiSliderFloatOSC("amp ##speedlfo1", &lissajous1SpeedLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/speedAmp");
+											ImGuiSliderFloatOSC("rate##speedlfo1", &lissajous1SpeedLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/speedRate");
+											if (ImGui::Combo("shape##speedlfo1", &lissajous1SpeedLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/speedShape", static_cast<float>(lissajous1SpeedLfoShape));
+											}
+											ImGui::Text("Size LFO");
+											ImGuiSliderFloatOSC("amp ##sizelfo1", &lissajous1SizeLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/sizeAmp");
+											ImGuiSliderFloatOSC("rate##sizelfo1", &lissajous1SizeLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/sizeRate");
+											if (ImGui::Combo("shape##sizelfo1", &lissajous1SizeLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/sizeShape", static_cast<float>(lissajous1SizeLfoShape));
+											}
+											ImGui::Text("NumPoints LFO");
+											ImGuiSliderFloatOSC("amp ##pointslfo1", &lissajous1NumPointsLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/numPointsAmp");
+											ImGuiSliderFloatOSC("rate##pointslfo1", &lissajous1NumPointsLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/numPointsRate");
+											if (ImGui::Combo("shape##pointslfo1", &lissajous1NumPointsLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/numPointsShape", static_cast<float>(lissajous1NumPointsLfoShape));
+											}
+											ImGui::Text("LineWidth LFO");
+											ImGuiSliderFloatOSC("amp ##linewidthlfo1", &lissajous1LineWidthLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/lineWidthAmp");
+											ImGuiSliderFloatOSC("rate##linewidthlfo1", &lissajous1LineWidthLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/lineWidthRate");
+											if (ImGui::Combo("shape##linewidthlfo1", &lissajous1LineWidthLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/lineWidthShape", static_cast<float>(lissajous1LineWidthLfoShape));
+											}
+											ImGui::Text("ColorSpeed LFO");
+											ImGuiSliderFloatOSC("amp ##colorspdlfo1", &lissajous1ColorSpeedLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/colorSpeedAmp");
+											ImGuiSliderFloatOSC("rate##colorspdlfo1", &lissajous1ColorSpeedLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/colorSpeedRate");
+											if (ImGui::Combo("shape##colorspdlfo1", &lissajous1ColorSpeedLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/colorSpeedShape", static_cast<float>(lissajous1ColorSpeedLfoShape));
+											}
+											ImGui::Text("Hue LFO");
+											ImGuiSliderFloatOSC("amp ##huelfo1", &lissajous1HueLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/hueAmp");
+											ImGuiSliderFloatOSC("rate##huelfo1", &lissajous1HueLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/hueRate");
+											if (ImGui::Combo("shape##huelfo1", &lissajous1HueLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/hueShape", static_cast<float>(lissajous1HueLfoShape));
+											}
+											ImGui::Text("HueSpread LFO");
+											ImGuiSliderFloatOSC("amp ##huespreadlfo1", &lissajous1HueSpreadLfoAmp, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/hueSpreadAmp");
+											ImGuiSliderFloatOSC("rate##huespreadlfo1", &lissajous1HueSpreadLfoRate, 0.0, 1.0, "/gravity/block1/fb1/lissajous/lfo/hueSpreadRate");
+											if (ImGui::Combo("shape##huespreadlfo1", &lissajous1HueSpreadLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block1/fb1/lissajous/lfo/hueSpreadShape", static_cast<float>(lissajous1HueSpreadLfoShape));
+											}
+											ImGui::TreePop();
+										}
+										ImGui::Unindent();
+									}
 								}
 								else
 								{
@@ -2727,6 +2900,179 @@ void GuiApp::draw(){
 									if (ImGui::Checkbox("lissajous ball ##fb2",&block2LissaBallSwitch)) {
 							if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajousBall", block2LissaBallSwitch ? 1.0f : 0.0f);
 						}
+									if (ImGui::Checkbox("lissajous curve ##fb2",&block2LissajousCurveSwitch)) {
+							if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajousCurve", block2LissajousCurveSwitch ? 1.0f : 0.0f);
+						}
+									if(block2LissajousCurveSwitch) {
+										ImGui::Indent();
+										const char* lissShapes[] = {"Sine", "Triangle", "Ramp", "Saw", "Square"};
+
+										// ---- X AXIS ----
+										if(ImGui::TreeNode("X Axis ##liss2")) {
+											ImGuiSliderFloatOSC("freq ##liss2x", &lissajous2XFreq, 0.0, 1.0, "/gravity/block2/fb2/lissajous/xFreq");
+											ImGuiSliderFloatOSC("amp  ##liss2x", &lissajous2XAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/xAmp");
+											ImGuiSliderFloatOSC("phase##liss2x", &lissajous2XPhase, 0.0, 1.0, "/gravity/block2/fb2/lissajous/xPhase");
+											if (ImGui::Combo("shape##liss2x", &lissajous2XShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/xShape", static_cast<float>(lissajous2XShape));
+											}
+											ImGui::Separator();
+											ImGui::Text("X Freq LFO");
+											ImGuiSliderFloatOSC("amp ##xfreqlfo2", &lissajous2XFreqLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/xFreqAmp");
+											ImGuiSliderFloatOSC("rate##xfreqlfo2", &lissajous2XFreqLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/xFreqRate");
+											if (ImGui::Combo("shape##xfreqlfo2", &lissajous2XFreqLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/xFreqShape", static_cast<float>(lissajous2XFreqLfoShape));
+											}
+											ImGui::Text("X Amp LFO");
+											ImGuiSliderFloatOSC("amp ##xamplfo2", &lissajous2XAmpLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/xAmpAmp");
+											ImGuiSliderFloatOSC("rate##xamplfo2", &lissajous2XAmpLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/xAmpRate");
+											if (ImGui::Combo("shape##xamplfo2", &lissajous2XAmpLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/xAmpShape", static_cast<float>(lissajous2XAmpLfoShape));
+											}
+											ImGui::Text("X Phase LFO");
+											ImGuiSliderFloatOSC("amp ##xphaselfo2", &lissajous2XPhaseLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/xPhaseAmp");
+											ImGuiSliderFloatOSC("rate##xphaselfo2", &lissajous2XPhaseLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/xPhaseRate");
+											if (ImGui::Combo("shape##xphaselfo2", &lissajous2XPhaseLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/xPhaseShape", static_cast<float>(lissajous2XPhaseLfoShape));
+											}
+											ImGui::TreePop();
+										}
+
+										// ---- Y AXIS ----
+										if(ImGui::TreeNode("Y Axis ##liss2")) {
+											ImGuiSliderFloatOSC("freq ##liss2y", &lissajous2YFreq, 0.0, 1.0, "/gravity/block2/fb2/lissajous/yFreq");
+											ImGuiSliderFloatOSC("amp  ##liss2y", &lissajous2YAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/yAmp");
+											ImGuiSliderFloatOSC("phase##liss2y", &lissajous2YPhase, 0.0, 1.0, "/gravity/block2/fb2/lissajous/yPhase");
+											if (ImGui::Combo("shape##liss2y", &lissajous2YShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/yShape", static_cast<float>(lissajous2YShape));
+											}
+											ImGui::Separator();
+											ImGui::Text("Y Freq LFO");
+											ImGuiSliderFloatOSC("amp ##yfreqlfo2", &lissajous2YFreqLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/yFreqAmp");
+											ImGuiSliderFloatOSC("rate##yfreqlfo2", &lissajous2YFreqLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/yFreqRate");
+											if (ImGui::Combo("shape##yfreqlfo2", &lissajous2YFreqLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/yFreqShape", static_cast<float>(lissajous2YFreqLfoShape));
+											}
+											ImGui::Text("Y Amp LFO");
+											ImGuiSliderFloatOSC("amp ##yamplfo2", &lissajous2YAmpLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/yAmpAmp");
+											ImGuiSliderFloatOSC("rate##yamplfo2", &lissajous2YAmpLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/yAmpRate");
+											if (ImGui::Combo("shape##yamplfo2", &lissajous2YAmpLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/yAmpShape", static_cast<float>(lissajous2YAmpLfoShape));
+											}
+											ImGui::Text("Y Phase LFO");
+											ImGuiSliderFloatOSC("amp ##yphaselfo2", &lissajous2YPhaseLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/yPhaseAmp");
+											ImGuiSliderFloatOSC("rate##yphaselfo2", &lissajous2YPhaseLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/yPhaseRate");
+											if (ImGui::Combo("shape##yphaselfo2", &lissajous2YPhaseLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/yPhaseShape", static_cast<float>(lissajous2YPhaseLfoShape));
+											}
+											ImGui::TreePop();
+										}
+
+										// ---- Z AXIS ----
+										if(ImGui::TreeNode("Z Axis ##liss2")) {
+											ImGuiSliderFloatOSC("freq ##liss2z", &lissajous2ZFreq, 0.0, 1.0, "/gravity/block2/fb2/lissajous/zFreq");
+											ImGuiSliderFloatOSC("amp  ##liss2z", &lissajous2ZAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/zAmp");
+											ImGuiSliderFloatOSC("phase##liss2z", &lissajous2ZPhase, 0.0, 1.0, "/gravity/block2/fb2/lissajous/zPhase");
+											if (ImGui::Combo("shape##liss2z", &lissajous2ZShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/zShape", static_cast<float>(lissajous2ZShape));
+											}
+											ImGui::Separator();
+											ImGui::Text("Z Freq LFO");
+											ImGuiSliderFloatOSC("amp ##zfreqlfo2", &lissajous2ZFreqLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/zFreqAmp");
+											ImGuiSliderFloatOSC("rate##zfreqlfo2", &lissajous2ZFreqLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/zFreqRate");
+											if (ImGui::Combo("shape##zfreqlfo2", &lissajous2ZFreqLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/zFreqShape", static_cast<float>(lissajous2ZFreqLfoShape));
+											}
+											ImGui::Text("Z Amp LFO");
+											ImGuiSliderFloatOSC("amp ##zamplfo2", &lissajous2ZAmpLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/zAmpAmp");
+											ImGuiSliderFloatOSC("rate##zamplfo2", &lissajous2ZAmpLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/zAmpRate");
+											if (ImGui::Combo("shape##zamplfo2", &lissajous2ZAmpLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/zAmpShape", static_cast<float>(lissajous2ZAmpLfoShape));
+											}
+											ImGui::Text("Z Phase LFO");
+											ImGuiSliderFloatOSC("amp ##zphaselfo2", &lissajous2ZPhaseLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/zPhaseAmp");
+											ImGuiSliderFloatOSC("rate##zphaselfo2", &lissajous2ZPhaseLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/zPhaseRate");
+											if (ImGui::Combo("shape##zphaselfo2", &lissajous2ZPhaseLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/zPhaseShape", static_cast<float>(lissajous2ZPhaseLfoShape));
+											}
+											ImGui::TreePop();
+										}
+
+										// ---- POSITION ----
+										if(ImGui::TreeNode("Position ##liss2")) {
+											ImGuiSliderFloatOSC("x offset##liss2", &lissajous2XOffset, 0.0, 1.0, "/gravity/block2/fb2/lissajous/xOffset");
+											ImGuiSliderFloatOSC("y offset##liss2", &lissajous2YOffset, 0.0, 1.0, "/gravity/block2/fb2/lissajous/yOffset");
+											ImGui::Separator();
+											ImGui::Text("X Offset LFO");
+											ImGuiSliderFloatOSC("amp ##xofflfo2", &lissajous2XOffsetLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/xOffsetAmp");
+											ImGuiSliderFloatOSC("rate##xofflfo2", &lissajous2XOffsetLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/xOffsetRate");
+											if (ImGui::Combo("shape##xofflfo2", &lissajous2XOffsetLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/xOffsetShape", static_cast<float>(lissajous2XOffsetLfoShape));
+											}
+											ImGui::Text("Y Offset LFO");
+											ImGuiSliderFloatOSC("amp ##yofflfo2", &lissajous2YOffsetLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/yOffsetAmp");
+											ImGuiSliderFloatOSC("rate##yofflfo2", &lissajous2YOffsetLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/yOffsetRate");
+											if (ImGui::Combo("shape##yofflfo2", &lissajous2YOffsetLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/yOffsetShape", static_cast<float>(lissajous2YOffsetLfoShape));
+											}
+											ImGui::TreePop();
+										}
+
+										// ---- APPEARANCE ----
+										if(ImGui::TreeNode("Appearance ##liss2")) {
+											ImGuiSliderFloatOSC("speed    ##liss2", &lissajous2Speed, 0.0, 1.0, "/gravity/block2/fb2/lissajous/speed");
+											ImGuiSliderFloatOSC("size     ##liss2", &lissajous2Size, 0.0, 1.0, "/gravity/block2/fb2/lissajous/size");
+											ImGuiSliderFloatOSC("points   ##liss2", &lissajous2NumPoints, 0.0, 1.0, "/gravity/block2/fb2/lissajous/numPoints");
+											ImGuiSliderFloatOSC("lineWidth##liss2", &lissajous2LineWidth, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lineWidth");
+											ImGuiSliderFloatOSC("colorSpd ##liss2", &lissajous2ColorSpeed, 0.0, 1.0, "/gravity/block2/fb2/lissajous/colorSpeed");
+											ImGuiSliderFloatOSC("hue      ##liss2", &lissajous2Hue, 0.0, 1.0, "/gravity/block2/fb2/lissajous/hue");
+											ImGuiSliderFloatOSC("hueSpread##liss2", &lissajous2HueSpread, 0.0, 1.0, "/gravity/block2/fb2/lissajous/hueSpread");
+											ImGui::Separator();
+											ImGui::Text("Speed LFO");
+											ImGuiSliderFloatOSC("amp ##speedlfo2", &lissajous2SpeedLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/speedAmp");
+											ImGuiSliderFloatOSC("rate##speedlfo2", &lissajous2SpeedLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/speedRate");
+											if (ImGui::Combo("shape##speedlfo2", &lissajous2SpeedLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/speedShape", static_cast<float>(lissajous2SpeedLfoShape));
+											}
+											ImGui::Text("Size LFO");
+											ImGuiSliderFloatOSC("amp ##sizelfo2", &lissajous2SizeLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/sizeAmp");
+											ImGuiSliderFloatOSC("rate##sizelfo2", &lissajous2SizeLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/sizeRate");
+											if (ImGui::Combo("shape##sizelfo2", &lissajous2SizeLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/sizeShape", static_cast<float>(lissajous2SizeLfoShape));
+											}
+											ImGui::Text("NumPoints LFO");
+											ImGuiSliderFloatOSC("amp ##pointslfo2", &lissajous2NumPointsLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/numPointsAmp");
+											ImGuiSliderFloatOSC("rate##pointslfo2", &lissajous2NumPointsLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/numPointsRate");
+											if (ImGui::Combo("shape##pointslfo2", &lissajous2NumPointsLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/numPointsShape", static_cast<float>(lissajous2NumPointsLfoShape));
+											}
+											ImGui::Text("LineWidth LFO");
+											ImGuiSliderFloatOSC("amp ##linewidthlfo2", &lissajous2LineWidthLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/lineWidthAmp");
+											ImGuiSliderFloatOSC("rate##linewidthlfo2", &lissajous2LineWidthLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/lineWidthRate");
+											if (ImGui::Combo("shape##linewidthlfo2", &lissajous2LineWidthLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/lineWidthShape", static_cast<float>(lissajous2LineWidthLfoShape));
+											}
+											ImGui::Text("ColorSpeed LFO");
+											ImGuiSliderFloatOSC("amp ##colorspdlfo2", &lissajous2ColorSpeedLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/colorSpeedAmp");
+											ImGuiSliderFloatOSC("rate##colorspdlfo2", &lissajous2ColorSpeedLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/colorSpeedRate");
+											if (ImGui::Combo("shape##colorspdlfo2", &lissajous2ColorSpeedLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/colorSpeedShape", static_cast<float>(lissajous2ColorSpeedLfoShape));
+											}
+											ImGui::Text("Hue LFO");
+											ImGuiSliderFloatOSC("amp ##huelfo2", &lissajous2HueLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/hueAmp");
+											ImGuiSliderFloatOSC("rate##huelfo2", &lissajous2HueLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/hueRate");
+											if (ImGui::Combo("shape##huelfo2", &lissajous2HueLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/hueShape", static_cast<float>(lissajous2HueLfoShape));
+											}
+											ImGui::Text("HueSpread LFO");
+											ImGuiSliderFloatOSC("amp ##huespreadlfo2", &lissajous2HueSpreadLfoAmp, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/hueSpreadAmp");
+											ImGuiSliderFloatOSC("rate##huespreadlfo2", &lissajous2HueSpreadLfoRate, 0.0, 1.0, "/gravity/block2/fb2/lissajous/lfo/hueSpreadRate");
+											if (ImGui::Combo("shape##huespreadlfo2", &lissajous2HueSpreadLfoShape, lissShapes, IM_ARRAYSIZE(lissShapes))) {
+												if (mainApp) mainApp->sendOscParameter("/gravity/block2/fb2/lissajous/lfo/hueSpreadShape", static_cast<float>(lissajous2HueSpreadLfoShape));
+											}
+											ImGui::TreePop();
+										}
+										ImGui::Unindent();
+									}
 								}
 								else
 								{
@@ -8356,6 +8702,35 @@ void GuiApp::fb1ResetAll(){
 	fb1HMirror=fb1VMirror=fb1RotateMode=fb1HFlip=fb1VFlip=0;
 
 	fb1KeyOrder=fb1MixType=fb1KeyMode=fb1MixOverflow=0;
+
+	// Reset Block 1 Lissajous Curve
+	block1LissajousCurveSwitch = 0;
+	lissajous1XFreq = 0.1f; lissajous1YFreq = 0.2f; lissajous1ZFreq = 0.3f;
+	lissajous1XAmp = 1.0f; lissajous1YAmp = 1.0f; lissajous1ZAmp = 0.5f;
+	lissajous1XPhase = 0.0f; lissajous1YPhase = 0.0f; lissajous1ZPhase = 0.0f;
+	lissajous1XOffset = 0.5f; lissajous1YOffset = 0.5f;
+	lissajous1Speed = 0.5f; lissajous1Size = 0.5f;
+	lissajous1NumPoints = 0.5f; lissajous1LineWidth = 0.2f; lissajous1ColorSpeed = 0.5f;
+	lissajous1Hue = 0.5f; lissajous1HueSpread = 1.0f;
+	lissajous1XShape = 0; lissajous1YShape = 0; lissajous1ZShape = 0;
+	lissajous1XFreqLfoAmp = 0.0f; lissajous1XFreqLfoRate = 0.0f; lissajous1XFreqLfoShape = 0;
+	lissajous1YFreqLfoAmp = 0.0f; lissajous1YFreqLfoRate = 0.0f; lissajous1YFreqLfoShape = 0;
+	lissajous1ZFreqLfoAmp = 0.0f; lissajous1ZFreqLfoRate = 0.0f; lissajous1ZFreqLfoShape = 0;
+	lissajous1XAmpLfoAmp = 0.0f; lissajous1XAmpLfoRate = 0.0f; lissajous1XAmpLfoShape = 0;
+	lissajous1YAmpLfoAmp = 0.0f; lissajous1YAmpLfoRate = 0.0f; lissajous1YAmpLfoShape = 0;
+	lissajous1ZAmpLfoAmp = 0.0f; lissajous1ZAmpLfoRate = 0.0f; lissajous1ZAmpLfoShape = 0;
+	lissajous1XPhaseLfoAmp = 0.0f; lissajous1XPhaseLfoRate = 0.0f; lissajous1XPhaseLfoShape = 0;
+	lissajous1YPhaseLfoAmp = 0.0f; lissajous1YPhaseLfoRate = 0.0f; lissajous1YPhaseLfoShape = 0;
+	lissajous1ZPhaseLfoAmp = 0.0f; lissajous1ZPhaseLfoRate = 0.0f; lissajous1ZPhaseLfoShape = 0;
+	lissajous1XOffsetLfoAmp = 0.0f; lissajous1XOffsetLfoRate = 0.0f; lissajous1XOffsetLfoShape = 0;
+	lissajous1YOffsetLfoAmp = 0.0f; lissajous1YOffsetLfoRate = 0.0f; lissajous1YOffsetLfoShape = 0;
+	lissajous1SpeedLfoAmp = 0.0f; lissajous1SpeedLfoRate = 0.0f; lissajous1SpeedLfoShape = 0;
+	lissajous1SizeLfoAmp = 0.0f; lissajous1SizeLfoRate = 0.0f; lissajous1SizeLfoShape = 0;
+	lissajous1NumPointsLfoAmp = 0.0f; lissajous1NumPointsLfoRate = 0.0f; lissajous1NumPointsLfoShape = 0;
+	lissajous1LineWidthLfoAmp = 0.0f; lissajous1LineWidthLfoRate = 0.0f; lissajous1LineWidthLfoShape = 0;
+	lissajous1ColorSpeedLfoAmp = 0.0f; lissajous1ColorSpeedLfoRate = 0.0f; lissajous1ColorSpeedLfoShape = 0;
+	lissajous1HueLfoAmp = 0.0f; lissajous1HueLfoRate = 0.0f; lissajous1HueLfoShape = 0;
+	lissajous1HueSpreadLfoAmp = 0.0f; lissajous1HueSpreadLfoRate = 0.0f; lissajous1HueSpreadLfoShape = 0;
 }
 
 //-----------------------------------------------------------------------------------
@@ -8416,6 +8791,35 @@ void GuiApp::fb2ResetAll(){
 	fb2HMirror=fb2VMirror=fb2RotateMode=fb2HFlip=fb2VFlip=0;
 
 	fb2KeyOrder=fb2MixType=fb2KeyMode=fb2MixOverflow=0;
+
+	// Reset Block 2 Lissajous Curve
+	block2LissajousCurveSwitch = 0;
+	lissajous2XFreq = 0.1f; lissajous2YFreq = 0.2f; lissajous2ZFreq = 0.3f;
+	lissajous2XAmp = 1.0f; lissajous2YAmp = 1.0f; lissajous2ZAmp = 0.5f;
+	lissajous2XPhase = 0.0f; lissajous2YPhase = 0.0f; lissajous2ZPhase = 0.0f;
+	lissajous2XOffset = 0.5f; lissajous2YOffset = 0.5f;
+	lissajous2Speed = 0.5f; lissajous2Size = 0.5f;
+	lissajous2NumPoints = 0.5f; lissajous2LineWidth = 0.2f; lissajous2ColorSpeed = 0.5f;
+	lissajous2Hue = 0.5f; lissajous2HueSpread = 1.0f;
+	lissajous2XShape = 0; lissajous2YShape = 0; lissajous2ZShape = 0;
+	lissajous2XFreqLfoAmp = 0.0f; lissajous2XFreqLfoRate = 0.0f; lissajous2XFreqLfoShape = 0;
+	lissajous2YFreqLfoAmp = 0.0f; lissajous2YFreqLfoRate = 0.0f; lissajous2YFreqLfoShape = 0;
+	lissajous2ZFreqLfoAmp = 0.0f; lissajous2ZFreqLfoRate = 0.0f; lissajous2ZFreqLfoShape = 0;
+	lissajous2XAmpLfoAmp = 0.0f; lissajous2XAmpLfoRate = 0.0f; lissajous2XAmpLfoShape = 0;
+	lissajous2YAmpLfoAmp = 0.0f; lissajous2YAmpLfoRate = 0.0f; lissajous2YAmpLfoShape = 0;
+	lissajous2ZAmpLfoAmp = 0.0f; lissajous2ZAmpLfoRate = 0.0f; lissajous2ZAmpLfoShape = 0;
+	lissajous2XPhaseLfoAmp = 0.0f; lissajous2XPhaseLfoRate = 0.0f; lissajous2XPhaseLfoShape = 0;
+	lissajous2YPhaseLfoAmp = 0.0f; lissajous2YPhaseLfoRate = 0.0f; lissajous2YPhaseLfoShape = 0;
+	lissajous2ZPhaseLfoAmp = 0.0f; lissajous2ZPhaseLfoRate = 0.0f; lissajous2ZPhaseLfoShape = 0;
+	lissajous2XOffsetLfoAmp = 0.0f; lissajous2XOffsetLfoRate = 0.0f; lissajous2XOffsetLfoShape = 0;
+	lissajous2YOffsetLfoAmp = 0.0f; lissajous2YOffsetLfoRate = 0.0f; lissajous2YOffsetLfoShape = 0;
+	lissajous2SpeedLfoAmp = 0.0f; lissajous2SpeedLfoRate = 0.0f; lissajous2SpeedLfoShape = 0;
+	lissajous2SizeLfoAmp = 0.0f; lissajous2SizeLfoRate = 0.0f; lissajous2SizeLfoShape = 0;
+	lissajous2NumPointsLfoAmp = 0.0f; lissajous2NumPointsLfoRate = 0.0f; lissajous2NumPointsLfoShape = 0;
+	lissajous2LineWidthLfoAmp = 0.0f; lissajous2LineWidthLfoRate = 0.0f; lissajous2LineWidthLfoShape = 0;
+	lissajous2ColorSpeedLfoAmp = 0.0f; lissajous2ColorSpeedLfoRate = 0.0f; lissajous2ColorSpeedLfoShape = 0;
+	lissajous2HueLfoAmp = 0.0f; lissajous2HueLfoRate = 0.0f; lissajous2HueLfoShape = 0;
+	lissajous2HueSpreadLfoAmp = 0.0f; lissajous2HueSpreadLfoRate = 0.0f; lissajous2HueSpreadLfoShape = 0;
 }
 //---------------------------------------------------------------------------------------
 void GuiApp::block3ResetAll(){
@@ -54232,8 +54636,8 @@ void GuiApp::registerOscParam(const std::string& address, int* ptr) {
 void GuiApp::registerBlock1OscParameters() {
     ofLogNotice("OSC") << "Registering Block 1 OSC parameters...";
 
-    // Reserve space for all blocks (approximately 600 parameters total)
-    oscRegistry.reserve(700);
+    // Reserve space for all blocks (approximately 850 parameters total with Lissajous)
+    oscRegistry.reserve(1000);
 
     // ============== CH1 ADJUST (15 sliders) ==============
     registerOscParam("/gravity/block1/ch1/xDisplace", &ch1Adjust[0]);
@@ -54514,6 +54918,85 @@ void GuiApp::registerBlock1OscParameters() {
     registerOscParam("/gravity/block1/fb1/septagram", &block1SevenStarSwitch);
     registerOscParam("/gravity/block1/fb1/dancingLine", &block1LineSwitch);
 
+    // Block 1 Lissajous Curve
+    registerOscParam("/gravity/block1/fb1/lissajousCurve", &block1LissajousCurveSwitch);
+    registerOscParam("/gravity/block1/fb1/lissajous/xFreq", &lissajous1XFreq);
+    registerOscParam("/gravity/block1/fb1/lissajous/yFreq", &lissajous1YFreq);
+    registerOscParam("/gravity/block1/fb1/lissajous/zFreq", &lissajous1ZFreq);
+    registerOscParam("/gravity/block1/fb1/lissajous/xAmp", &lissajous1XAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/yAmp", &lissajous1YAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/zAmp", &lissajous1ZAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/xPhase", &lissajous1XPhase);
+    registerOscParam("/gravity/block1/fb1/lissajous/yPhase", &lissajous1YPhase);
+    registerOscParam("/gravity/block1/fb1/lissajous/zPhase", &lissajous1ZPhase);
+    registerOscParam("/gravity/block1/fb1/lissajous/xOffset", &lissajous1XOffset);
+    registerOscParam("/gravity/block1/fb1/lissajous/yOffset", &lissajous1YOffset);
+    registerOscParam("/gravity/block1/fb1/lissajous/speed", &lissajous1Speed);
+    registerOscParam("/gravity/block1/fb1/lissajous/size", &lissajous1Size);
+    registerOscParam("/gravity/block1/fb1/lissajous/numPoints", &lissajous1NumPoints);
+    registerOscParam("/gravity/block1/fb1/lissajous/lineWidth", &lissajous1LineWidth);
+    registerOscParam("/gravity/block1/fb1/lissajous/colorSpeed", &lissajous1ColorSpeed);
+    registerOscParam("/gravity/block1/fb1/lissajous/hue", &lissajous1Hue);
+    registerOscParam("/gravity/block1/fb1/lissajous/hueSpread", &lissajous1HueSpread);
+    registerOscParam("/gravity/block1/fb1/lissajous/xShape", &lissajous1XShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/yShape", &lissajous1YShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/zShape", &lissajous1ZShape);
+    // Block 1 Lissajous LFO
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/xFreqAmp", &lissajous1XFreqLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/xFreqRate", &lissajous1XFreqLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/xFreqShape", &lissajous1XFreqLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/yFreqAmp", &lissajous1YFreqLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/yFreqRate", &lissajous1YFreqLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/yFreqShape", &lissajous1YFreqLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/zFreqAmp", &lissajous1ZFreqLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/zFreqRate", &lissajous1ZFreqLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/zFreqShape", &lissajous1ZFreqLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/xAmpAmp", &lissajous1XAmpLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/xAmpRate", &lissajous1XAmpLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/xAmpShape", &lissajous1XAmpLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/yAmpAmp", &lissajous1YAmpLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/yAmpRate", &lissajous1YAmpLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/yAmpShape", &lissajous1YAmpLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/zAmpAmp", &lissajous1ZAmpLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/zAmpRate", &lissajous1ZAmpLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/zAmpShape", &lissajous1ZAmpLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/xPhaseAmp", &lissajous1XPhaseLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/xPhaseRate", &lissajous1XPhaseLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/xPhaseShape", &lissajous1XPhaseLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/yPhaseAmp", &lissajous1YPhaseLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/yPhaseRate", &lissajous1YPhaseLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/yPhaseShape", &lissajous1YPhaseLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/zPhaseAmp", &lissajous1ZPhaseLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/zPhaseRate", &lissajous1ZPhaseLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/zPhaseShape", &lissajous1ZPhaseLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/xOffsetAmp", &lissajous1XOffsetLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/xOffsetRate", &lissajous1XOffsetLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/xOffsetShape", &lissajous1XOffsetLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/yOffsetAmp", &lissajous1YOffsetLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/yOffsetRate", &lissajous1YOffsetLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/yOffsetShape", &lissajous1YOffsetLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/speedAmp", &lissajous1SpeedLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/speedRate", &lissajous1SpeedLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/speedShape", &lissajous1SpeedLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/sizeAmp", &lissajous1SizeLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/sizeRate", &lissajous1SizeLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/sizeShape", &lissajous1SizeLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/numPointsAmp", &lissajous1NumPointsLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/numPointsRate", &lissajous1NumPointsLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/numPointsShape", &lissajous1NumPointsLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/lineWidthAmp", &lissajous1LineWidthLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/lineWidthRate", &lissajous1LineWidthLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/lineWidthShape", &lissajous1LineWidthLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/colorSpeedAmp", &lissajous1ColorSpeedLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/colorSpeedRate", &lissajous1ColorSpeedLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/colorSpeedShape", &lissajous1ColorSpeedLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/hueAmp", &lissajous1HueLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/hueRate", &lissajous1HueLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/hueShape", &lissajous1HueLfoShape);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/hueSpreadAmp", &lissajous1HueSpreadLfoAmp);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/hueSpreadRate", &lissajous1HueSpreadLfoRate);
+    registerOscParam("/gravity/block1/fb1/lissajous/lfo/hueSpreadShape", &lissajous1HueSpreadLfoShape);
+
     ofLogNotice("OSC") << "Block 1 registration complete. Parameters: " << oscRegistry.size();
 }
 
@@ -54712,6 +55195,85 @@ void GuiApp::registerBlock2OscParameters() {
     registerOscParam("/gravity/block2/fb2/lissajousBall", &block2LissaBallSwitch);
     registerOscParam("/gravity/block2/fb2/septagram", &block2SevenStarSwitch);
     registerOscParam("/gravity/block2/fb2/dancingLine", &block2LineSwitch);
+
+    // Block 2 Lissajous Curve
+    registerOscParam("/gravity/block2/fb2/lissajousCurve", &block2LissajousCurveSwitch);
+    registerOscParam("/gravity/block2/fb2/lissajous/xFreq", &lissajous2XFreq);
+    registerOscParam("/gravity/block2/fb2/lissajous/yFreq", &lissajous2YFreq);
+    registerOscParam("/gravity/block2/fb2/lissajous/zFreq", &lissajous2ZFreq);
+    registerOscParam("/gravity/block2/fb2/lissajous/xAmp", &lissajous2XAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/yAmp", &lissajous2YAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/zAmp", &lissajous2ZAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/xPhase", &lissajous2XPhase);
+    registerOscParam("/gravity/block2/fb2/lissajous/yPhase", &lissajous2YPhase);
+    registerOscParam("/gravity/block2/fb2/lissajous/zPhase", &lissajous2ZPhase);
+    registerOscParam("/gravity/block2/fb2/lissajous/xOffset", &lissajous2XOffset);
+    registerOscParam("/gravity/block2/fb2/lissajous/yOffset", &lissajous2YOffset);
+    registerOscParam("/gravity/block2/fb2/lissajous/speed", &lissajous2Speed);
+    registerOscParam("/gravity/block2/fb2/lissajous/size", &lissajous2Size);
+    registerOscParam("/gravity/block2/fb2/lissajous/numPoints", &lissajous2NumPoints);
+    registerOscParam("/gravity/block2/fb2/lissajous/lineWidth", &lissajous2LineWidth);
+    registerOscParam("/gravity/block2/fb2/lissajous/colorSpeed", &lissajous2ColorSpeed);
+    registerOscParam("/gravity/block2/fb2/lissajous/hue", &lissajous2Hue);
+    registerOscParam("/gravity/block2/fb2/lissajous/hueSpread", &lissajous2HueSpread);
+    registerOscParam("/gravity/block2/fb2/lissajous/xShape", &lissajous2XShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/yShape", &lissajous2YShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/zShape", &lissajous2ZShape);
+    // Block 2 Lissajous LFO
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/xFreqAmp", &lissajous2XFreqLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/xFreqRate", &lissajous2XFreqLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/xFreqShape", &lissajous2XFreqLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/yFreqAmp", &lissajous2YFreqLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/yFreqRate", &lissajous2YFreqLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/yFreqShape", &lissajous2YFreqLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/zFreqAmp", &lissajous2ZFreqLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/zFreqRate", &lissajous2ZFreqLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/zFreqShape", &lissajous2ZFreqLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/xAmpAmp", &lissajous2XAmpLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/xAmpRate", &lissajous2XAmpLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/xAmpShape", &lissajous2XAmpLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/yAmpAmp", &lissajous2YAmpLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/yAmpRate", &lissajous2YAmpLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/yAmpShape", &lissajous2YAmpLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/zAmpAmp", &lissajous2ZAmpLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/zAmpRate", &lissajous2ZAmpLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/zAmpShape", &lissajous2ZAmpLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/xPhaseAmp", &lissajous2XPhaseLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/xPhaseRate", &lissajous2XPhaseLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/xPhaseShape", &lissajous2XPhaseLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/yPhaseAmp", &lissajous2YPhaseLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/yPhaseRate", &lissajous2YPhaseLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/yPhaseShape", &lissajous2YPhaseLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/zPhaseAmp", &lissajous2ZPhaseLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/zPhaseRate", &lissajous2ZPhaseLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/zPhaseShape", &lissajous2ZPhaseLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/xOffsetAmp", &lissajous2XOffsetLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/xOffsetRate", &lissajous2XOffsetLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/xOffsetShape", &lissajous2XOffsetLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/yOffsetAmp", &lissajous2YOffsetLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/yOffsetRate", &lissajous2YOffsetLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/yOffsetShape", &lissajous2YOffsetLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/speedAmp", &lissajous2SpeedLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/speedRate", &lissajous2SpeedLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/speedShape", &lissajous2SpeedLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/sizeAmp", &lissajous2SizeLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/sizeRate", &lissajous2SizeLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/sizeShape", &lissajous2SizeLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/numPointsAmp", &lissajous2NumPointsLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/numPointsRate", &lissajous2NumPointsLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/numPointsShape", &lissajous2NumPointsLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/lineWidthAmp", &lissajous2LineWidthLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/lineWidthRate", &lissajous2LineWidthLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/lineWidthShape", &lissajous2LineWidthLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/colorSpeedAmp", &lissajous2ColorSpeedLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/colorSpeedRate", &lissajous2ColorSpeedLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/colorSpeedShape", &lissajous2ColorSpeedLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/hueAmp", &lissajous2HueLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/hueRate", &lissajous2HueLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/hueShape", &lissajous2HueLfoShape);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/hueSpreadAmp", &lissajous2HueSpreadLfoAmp);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/hueSpreadRate", &lissajous2HueSpreadLfoRate);
+    registerOscParam("/gravity/block2/fb2/lissajous/lfo/hueSpreadShape", &lissajous2HueSpreadLfoShape);
 
     ofLogNotice("OSC") << "Block 2 registration complete. Total parameters: " << oscRegistry.size();
 }

@@ -535,4 +535,55 @@ class ofApp : public ofBaseApp{
 
 	float radius3Inc = .65;
 	float spiralTheta3Inc = .05;
+
+	// ============== LISSAJOUS CURVE GENERATOR ==============
+	void lissajousCurve1Draw();
+	void lissajousCurve2Draw();
+	float lissajousWave(float theta, int shape);
+
+	// Animation thetas
+	float lissajous1Theta = 0;
+	float lissajous2Theta = 0;
+	float lissajous1ColorTheta = 0;
+	float lissajous2ColorTheta = 0;
+
+	// Block 1 LFO thetas (16)
+	float lissajous1XFreqLfoTheta = 0;
+	float lissajous1YFreqLfoTheta = 0;
+	float lissajous1ZFreqLfoTheta = 0;
+	float lissajous1XAmpLfoTheta = 0;
+	float lissajous1YAmpLfoTheta = 0;
+	float lissajous1ZAmpLfoTheta = 0;
+	float lissajous1XPhaseLfoTheta = 0;
+	float lissajous1YPhaseLfoTheta = 0;
+	float lissajous1ZPhaseLfoTheta = 0;
+	float lissajous1XOffsetLfoTheta = 0;
+	float lissajous1YOffsetLfoTheta = 0;
+	float lissajous1SpeedLfoTheta = 0;
+	float lissajous1SizeLfoTheta = 0;
+	float lissajous1NumPointsLfoTheta = 0;
+	float lissajous1LineWidthLfoTheta = 0;
+	float lissajous1ColorSpeedLfoTheta = 0;
+	float lissajous1HueLfoTheta = 0;
+	float lissajous1HueSpreadLfoTheta = 0;
+
+	// Block 2 LFO thetas (16)
+	float lissajous2XFreqLfoTheta = 0;
+	float lissajous2YFreqLfoTheta = 0;
+	float lissajous2ZFreqLfoTheta = 0;
+	float lissajous2XAmpLfoTheta = 0;
+	float lissajous2YAmpLfoTheta = 0;
+	float lissajous2ZAmpLfoTheta = 0;
+	float lissajous2XPhaseLfoTheta = 0;
+	float lissajous2YPhaseLfoTheta = 0;
+	float lissajous2ZPhaseLfoTheta = 0;
+	float lissajous2XOffsetLfoTheta = 0;
+	float lissajous2YOffsetLfoTheta = 0;
+	float lissajous2SpeedLfoTheta = 0;
+	float lissajous2SizeLfoTheta = 0;
+	float lissajous2NumPointsLfoTheta = 0;
+	float lissajous2LineWidthLfoTheta = 0;
+	float lissajous2ColorSpeedLfoTheta = 0;
+	float lissajous2HueLfoTheta = 0;
+	float lissajous2HueSpreadLfoTheta = 0;
 };

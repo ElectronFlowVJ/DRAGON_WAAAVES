@@ -1584,6 +1584,96 @@ public:
 	bool block1LissaBallSwitch=0;
 	int drawMode=3;
 
+	// ============== LISSAJOUS CURVE - BLOCK 1 ==============
+	bool block1LissajousCurveSwitch = 0;
+
+	// Base parameters (16 floats)
+	float lissajous1XFreq = 0.1f;
+	float lissajous1YFreq = 0.2f;
+	float lissajous1ZFreq = 0.3f;
+	float lissajous1XAmp = 1.0f;
+	float lissajous1YAmp = 1.0f;
+	float lissajous1ZAmp = 0.5f;
+	float lissajous1XPhase = 0.0f;
+	float lissajous1YPhase = 0.0f;
+	float lissajous1ZPhase = 0.0f;
+	float lissajous1XOffset = 0.5f;
+	float lissajous1YOffset = 0.5f;
+	float lissajous1Speed = 0.5f;
+	float lissajous1Size = 0.5f;
+	float lissajous1NumPoints = 0.5f;
+	float lissajous1LineWidth = 0.2f;
+	float lissajous1ColorSpeed = 0.5f;
+
+	// Curve waveshapes (3 ints)
+	int lissajous1XShape = 0;
+	int lissajous1YShape = 0;
+	int lissajous1ZShape = 0;
+
+	// LFO Amplitudes (16 floats)
+	float lissajous1XFreqLfoAmp = 0.0f;
+	float lissajous1YFreqLfoAmp = 0.0f;
+	float lissajous1ZFreqLfoAmp = 0.0f;
+	float lissajous1XAmpLfoAmp = 0.0f;
+	float lissajous1YAmpLfoAmp = 0.0f;
+	float lissajous1ZAmpLfoAmp = 0.0f;
+	float lissajous1XPhaseLfoAmp = 0.0f;
+	float lissajous1YPhaseLfoAmp = 0.0f;
+	float lissajous1ZPhaseLfoAmp = 0.0f;
+	float lissajous1XOffsetLfoAmp = 0.0f;
+	float lissajous1YOffsetLfoAmp = 0.0f;
+	float lissajous1SpeedLfoAmp = 0.0f;
+	float lissajous1SizeLfoAmp = 0.0f;
+	float lissajous1NumPointsLfoAmp = 0.0f;
+	float lissajous1LineWidthLfoAmp = 0.0f;
+	float lissajous1ColorSpeedLfoAmp = 0.0f;
+
+	// LFO Rates (16 floats)
+	float lissajous1XFreqLfoRate = 0.0f;
+	float lissajous1YFreqLfoRate = 0.0f;
+	float lissajous1ZFreqLfoRate = 0.0f;
+	float lissajous1XAmpLfoRate = 0.0f;
+	float lissajous1YAmpLfoRate = 0.0f;
+	float lissajous1ZAmpLfoRate = 0.0f;
+	float lissajous1XPhaseLfoRate = 0.0f;
+	float lissajous1YPhaseLfoRate = 0.0f;
+	float lissajous1ZPhaseLfoRate = 0.0f;
+	float lissajous1XOffsetLfoRate = 0.0f;
+	float lissajous1YOffsetLfoRate = 0.0f;
+	float lissajous1SpeedLfoRate = 0.0f;
+	float lissajous1SizeLfoRate = 0.0f;
+	float lissajous1NumPointsLfoRate = 0.0f;
+	float lissajous1LineWidthLfoRate = 0.0f;
+	float lissajous1ColorSpeedLfoRate = 0.0f;
+
+	// LFO Shapes (16 ints)
+	int lissajous1XFreqLfoShape = 0;
+	int lissajous1YFreqLfoShape = 0;
+	int lissajous1ZFreqLfoShape = 0;
+	int lissajous1XAmpLfoShape = 0;
+	int lissajous1YAmpLfoShape = 0;
+	int lissajous1ZAmpLfoShape = 0;
+	int lissajous1XPhaseLfoShape = 0;
+	int lissajous1YPhaseLfoShape = 0;
+	int lissajous1ZPhaseLfoShape = 0;
+	int lissajous1XOffsetLfoShape = 0;
+	int lissajous1YOffsetLfoShape = 0;
+	int lissajous1SpeedLfoShape = 0;
+	int lissajous1SizeLfoShape = 0;
+	int lissajous1NumPointsLfoShape = 0;
+	int lissajous1LineWidthLfoShape = 0;
+	int lissajous1ColorSpeedLfoShape = 0;
+
+	// Color parameters
+	float lissajous1Hue = 0.5f;
+	float lissajous1HueSpread = 1.0f;
+	float lissajous1HueLfoAmp = 0.0f;
+	float lissajous1HueLfoRate = 0.0f;
+	int lissajous1HueLfoShape = 0;
+	float lissajous1HueSpreadLfoAmp = 0.0f;
+	float lissajous1HueSpreadLfoRate = 0.0f;
+	int lissajous1HueSpreadLfoShape = 0;
+
 
 	//BLOCK2 input
 	void block2ResetAll();
@@ -1703,6 +1793,96 @@ public:
 
 	//lissaball
 	bool block2LissaBallSwitch=0;
+
+	// ============== LISSAJOUS CURVE - BLOCK 2 ==============
+	bool block2LissajousCurveSwitch = 0;
+
+	// Base parameters (16 floats)
+	float lissajous2XFreq = 0.1f;
+	float lissajous2YFreq = 0.2f;
+	float lissajous2ZFreq = 0.3f;
+	float lissajous2XAmp = 1.0f;
+	float lissajous2YAmp = 1.0f;
+	float lissajous2ZAmp = 0.5f;
+	float lissajous2XPhase = 0.0f;
+	float lissajous2YPhase = 0.0f;
+	float lissajous2ZPhase = 0.0f;
+	float lissajous2XOffset = 0.5f;
+	float lissajous2YOffset = 0.5f;
+	float lissajous2Speed = 0.5f;
+	float lissajous2Size = 0.5f;
+	float lissajous2NumPoints = 0.5f;
+	float lissajous2LineWidth = 0.2f;
+	float lissajous2ColorSpeed = 0.5f;
+
+	// Curve waveshapes (3 ints)
+	int lissajous2XShape = 0;
+	int lissajous2YShape = 0;
+	int lissajous2ZShape = 0;
+
+	// LFO Amplitudes (16 floats)
+	float lissajous2XFreqLfoAmp = 0.0f;
+	float lissajous2YFreqLfoAmp = 0.0f;
+	float lissajous2ZFreqLfoAmp = 0.0f;
+	float lissajous2XAmpLfoAmp = 0.0f;
+	float lissajous2YAmpLfoAmp = 0.0f;
+	float lissajous2ZAmpLfoAmp = 0.0f;
+	float lissajous2XPhaseLfoAmp = 0.0f;
+	float lissajous2YPhaseLfoAmp = 0.0f;
+	float lissajous2ZPhaseLfoAmp = 0.0f;
+	float lissajous2XOffsetLfoAmp = 0.0f;
+	float lissajous2YOffsetLfoAmp = 0.0f;
+	float lissajous2SpeedLfoAmp = 0.0f;
+	float lissajous2SizeLfoAmp = 0.0f;
+	float lissajous2NumPointsLfoAmp = 0.0f;
+	float lissajous2LineWidthLfoAmp = 0.0f;
+	float lissajous2ColorSpeedLfoAmp = 0.0f;
+
+	// LFO Rates (16 floats)
+	float lissajous2XFreqLfoRate = 0.0f;
+	float lissajous2YFreqLfoRate = 0.0f;
+	float lissajous2ZFreqLfoRate = 0.0f;
+	float lissajous2XAmpLfoRate = 0.0f;
+	float lissajous2YAmpLfoRate = 0.0f;
+	float lissajous2ZAmpLfoRate = 0.0f;
+	float lissajous2XPhaseLfoRate = 0.0f;
+	float lissajous2YPhaseLfoRate = 0.0f;
+	float lissajous2ZPhaseLfoRate = 0.0f;
+	float lissajous2XOffsetLfoRate = 0.0f;
+	float lissajous2YOffsetLfoRate = 0.0f;
+	float lissajous2SpeedLfoRate = 0.0f;
+	float lissajous2SizeLfoRate = 0.0f;
+	float lissajous2NumPointsLfoRate = 0.0f;
+	float lissajous2LineWidthLfoRate = 0.0f;
+	float lissajous2ColorSpeedLfoRate = 0.0f;
+
+	// LFO Shapes (16 ints)
+	int lissajous2XFreqLfoShape = 0;
+	int lissajous2YFreqLfoShape = 0;
+	int lissajous2ZFreqLfoShape = 0;
+	int lissajous2XAmpLfoShape = 0;
+	int lissajous2YAmpLfoShape = 0;
+	int lissajous2ZAmpLfoShape = 0;
+	int lissajous2XPhaseLfoShape = 0;
+	int lissajous2YPhaseLfoShape = 0;
+	int lissajous2ZPhaseLfoShape = 0;
+	int lissajous2XOffsetLfoShape = 0;
+	int lissajous2YOffsetLfoShape = 0;
+	int lissajous2SpeedLfoShape = 0;
+	int lissajous2SizeLfoShape = 0;
+	int lissajous2NumPointsLfoShape = 0;
+	int lissajous2LineWidthLfoShape = 0;
+	int lissajous2ColorSpeedLfoShape = 0;
+
+	// Color parameters
+	float lissajous2Hue = 0.5f;
+	float lissajous2HueSpread = 1.0f;
+	float lissajous2HueLfoAmp = 0.0f;
+	float lissajous2HueLfoRate = 0.0f;
+	int lissajous2HueLfoShape = 0;
+	float lissajous2HueSpreadLfoAmp = 0.0f;
+	float lissajous2HueSpreadLfoRate = 0.0f;
+	int lissajous2HueSpreadLfoShape = 0;
 
 	//BLOCK3
 
