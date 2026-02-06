@@ -8315,12 +8315,11 @@ void GuiApp::loadEverything(){
 	block1LineSwitch=loadBuffer["BLOCK_1"]["b1GeometricalAnimations"][1];
 	block1SevenStarSwitch=loadBuffer["BLOCK_1"]["b1GeometricalAnimations"][2];
 	block1LissaBallSwitch=loadBuffer["BLOCK_1"]["b1GeometricalAnimations"][3];
-	if (loadBuffer["BLOCK_1"]["b1GeometricalAnimations"].size() > 4) {
-		block1LissajousCurveSwitch=loadBuffer["BLOCK_1"]["b1GeometricalAnimations"][4];
-	}
 
 	// Load Block 1 Lissajous Curve parameters (if they exist in preset)
 	if (loadBuffer["BLOCK_1"].contains("b1Lissajous")) {
+		// New preset format - load switch from array index 4
+		block1LissajousCurveSwitch=loadBuffer["BLOCK_1"]["b1GeometricalAnimations"][4];
 		lissajous1XFreq=loadBuffer["BLOCK_1"]["b1Lissajous"]["xFreq"];
 		lissajous1YFreq=loadBuffer["BLOCK_1"]["b1Lissajous"]["yFreq"];
 		lissajous1ZFreq=loadBuffer["BLOCK_1"]["b1Lissajous"]["zFreq"];
@@ -8485,12 +8484,11 @@ void GuiApp::loadEverything(){
 	block2LineSwitch=loadBuffer["BLOCK_2"]["b2GeometricalAnimations"][1];
 	block2SevenStarSwitch=loadBuffer["BLOCK_2"]["b2GeometricalAnimations"][2];
 	block2LissaBallSwitch=loadBuffer["BLOCK_2"]["b2GeometricalAnimations"][3];
-	if (loadBuffer["BLOCK_2"]["b2GeometricalAnimations"].size() > 4) {
-		block2LissajousCurveSwitch=loadBuffer["BLOCK_2"]["b2GeometricalAnimations"][4];
-	}
 
 	// Load Block 2 Lissajous Curve parameters (if they exist in preset)
 	if (loadBuffer["BLOCK_2"].contains("b2Lissajous")) {
+		// New preset format - load switch from array index 4
+		block2LissajousCurveSwitch=loadBuffer["BLOCK_2"]["b2GeometricalAnimations"][4];
 		lissajous2XFreq=loadBuffer["BLOCK_2"]["b2Lissajous"]["xFreq"];
 		lissajous2YFreq=loadBuffer["BLOCK_2"]["b2Lissajous"]["yFreq"];
 		lissajous2ZFreq=loadBuffer["BLOCK_2"]["b2Lissajous"]["zFreq"];
