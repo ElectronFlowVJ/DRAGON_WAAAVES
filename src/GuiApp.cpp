@@ -7025,6 +7025,85 @@ void GuiApp::saveEverything(){
 	saveBuffer["BLOCK_1"]["b1GeometricalAnimations"][1]=block1LineSwitch;
 	saveBuffer["BLOCK_1"]["b1GeometricalAnimations"][2]=block1SevenStarSwitch;
 	saveBuffer["BLOCK_1"]["b1GeometricalAnimations"][3]=block1LissaBallSwitch;
+	saveBuffer["BLOCK_1"]["b1GeometricalAnimations"][4]=block1LissajousCurveSwitch;
+
+	// Block 1 Lissajous Curve parameters
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["xFreq"]=lissajous1XFreq;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["yFreq"]=lissajous1YFreq;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["zFreq"]=lissajous1ZFreq;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["xAmp"]=lissajous1XAmp;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["yAmp"]=lissajous1YAmp;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["zAmp"]=lissajous1ZAmp;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["xPhase"]=lissajous1XPhase;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["yPhase"]=lissajous1YPhase;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["zPhase"]=lissajous1ZPhase;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["xOffset"]=lissajous1XOffset;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["yOffset"]=lissajous1YOffset;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["speed"]=lissajous1Speed;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["size"]=lissajous1Size;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["numPoints"]=lissajous1NumPoints;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["lineWidth"]=lissajous1LineWidth;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["colorSpeed"]=lissajous1ColorSpeed;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["hue"]=lissajous1Hue;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["hueSpread"]=lissajous1HueSpread;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["xShape"]=lissajous1XShape;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["yShape"]=lissajous1YShape;
+	saveBuffer["BLOCK_1"]["b1Lissajous"]["zShape"]=lissajous1ZShape;
+	// Block 1 Lissajous LFO parameters
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["xFreqAmp"]=lissajous1XFreqLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["xFreqRate"]=lissajous1XFreqLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["xFreqShape"]=lissajous1XFreqLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["yFreqAmp"]=lissajous1YFreqLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["yFreqRate"]=lissajous1YFreqLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["yFreqShape"]=lissajous1YFreqLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["zFreqAmp"]=lissajous1ZFreqLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["zFreqRate"]=lissajous1ZFreqLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["zFreqShape"]=lissajous1ZFreqLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["xAmpAmp"]=lissajous1XAmpLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["xAmpRate"]=lissajous1XAmpLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["xAmpShape"]=lissajous1XAmpLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["yAmpAmp"]=lissajous1YAmpLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["yAmpRate"]=lissajous1YAmpLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["yAmpShape"]=lissajous1YAmpLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["zAmpAmp"]=lissajous1ZAmpLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["zAmpRate"]=lissajous1ZAmpLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["zAmpShape"]=lissajous1ZAmpLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["xPhaseAmp"]=lissajous1XPhaseLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["xPhaseRate"]=lissajous1XPhaseLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["xPhaseShape"]=lissajous1XPhaseLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["yPhaseAmp"]=lissajous1YPhaseLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["yPhaseRate"]=lissajous1YPhaseLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["yPhaseShape"]=lissajous1YPhaseLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["zPhaseAmp"]=lissajous1ZPhaseLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["zPhaseRate"]=lissajous1ZPhaseLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["zPhaseShape"]=lissajous1ZPhaseLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["xOffsetAmp"]=lissajous1XOffsetLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["xOffsetRate"]=lissajous1XOffsetLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["xOffsetShape"]=lissajous1XOffsetLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["yOffsetAmp"]=lissajous1YOffsetLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["yOffsetRate"]=lissajous1YOffsetLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["yOffsetShape"]=lissajous1YOffsetLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["speedAmp"]=lissajous1SpeedLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["speedRate"]=lissajous1SpeedLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["speedShape"]=lissajous1SpeedLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["sizeAmp"]=lissajous1SizeLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["sizeRate"]=lissajous1SizeLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["sizeShape"]=lissajous1SizeLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["numPointsAmp"]=lissajous1NumPointsLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["numPointsRate"]=lissajous1NumPointsLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["numPointsShape"]=lissajous1NumPointsLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["lineWidthAmp"]=lissajous1LineWidthLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["lineWidthRate"]=lissajous1LineWidthLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["lineWidthShape"]=lissajous1LineWidthLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["colorSpeedAmp"]=lissajous1ColorSpeedLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["colorSpeedRate"]=lissajous1ColorSpeedLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["colorSpeedShape"]=lissajous1ColorSpeedLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["hueAmp"]=lissajous1HueLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["hueRate"]=lissajous1HueLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["hueShape"]=lissajous1HueLfoShape;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["hueSpreadAmp"]=lissajous1HueSpreadLfoAmp;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["hueSpreadRate"]=lissajous1HueSpreadLfoRate;
+	saveBuffer["BLOCK_1"]["b1LissajousLfo"]["hueSpreadShape"]=lissajous1HueSpreadLfoShape;
 
 	//extra things to add
 
@@ -7090,6 +7169,85 @@ void GuiApp::saveEverything(){
 	saveBuffer["BLOCK_2"]["b2GeometricalAnimations"][1]=block2LineSwitch;
 	saveBuffer["BLOCK_2"]["b2GeometricalAnimations"][2]=block2SevenStarSwitch;
 	saveBuffer["BLOCK_2"]["b2GeometricalAnimations"][3]=block2LissaBallSwitch;
+	saveBuffer["BLOCK_2"]["b2GeometricalAnimations"][4]=block2LissajousCurveSwitch;
+
+	// Block 2 Lissajous Curve parameters
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["xFreq"]=lissajous2XFreq;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["yFreq"]=lissajous2YFreq;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["zFreq"]=lissajous2ZFreq;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["xAmp"]=lissajous2XAmp;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["yAmp"]=lissajous2YAmp;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["zAmp"]=lissajous2ZAmp;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["xPhase"]=lissajous2XPhase;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["yPhase"]=lissajous2YPhase;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["zPhase"]=lissajous2ZPhase;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["xOffset"]=lissajous2XOffset;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["yOffset"]=lissajous2YOffset;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["speed"]=lissajous2Speed;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["size"]=lissajous2Size;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["numPoints"]=lissajous2NumPoints;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["lineWidth"]=lissajous2LineWidth;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["colorSpeed"]=lissajous2ColorSpeed;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["hue"]=lissajous2Hue;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["hueSpread"]=lissajous2HueSpread;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["xShape"]=lissajous2XShape;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["yShape"]=lissajous2YShape;
+	saveBuffer["BLOCK_2"]["b2Lissajous"]["zShape"]=lissajous2ZShape;
+	// Block 2 Lissajous LFO parameters
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["xFreqAmp"]=lissajous2XFreqLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["xFreqRate"]=lissajous2XFreqLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["xFreqShape"]=lissajous2XFreqLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["yFreqAmp"]=lissajous2YFreqLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["yFreqRate"]=lissajous2YFreqLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["yFreqShape"]=lissajous2YFreqLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["zFreqAmp"]=lissajous2ZFreqLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["zFreqRate"]=lissajous2ZFreqLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["zFreqShape"]=lissajous2ZFreqLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["xAmpAmp"]=lissajous2XAmpLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["xAmpRate"]=lissajous2XAmpLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["xAmpShape"]=lissajous2XAmpLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["yAmpAmp"]=lissajous2YAmpLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["yAmpRate"]=lissajous2YAmpLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["yAmpShape"]=lissajous2YAmpLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["zAmpAmp"]=lissajous2ZAmpLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["zAmpRate"]=lissajous2ZAmpLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["zAmpShape"]=lissajous2ZAmpLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["xPhaseAmp"]=lissajous2XPhaseLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["xPhaseRate"]=lissajous2XPhaseLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["xPhaseShape"]=lissajous2XPhaseLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["yPhaseAmp"]=lissajous2YPhaseLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["yPhaseRate"]=lissajous2YPhaseLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["yPhaseShape"]=lissajous2YPhaseLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["zPhaseAmp"]=lissajous2ZPhaseLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["zPhaseRate"]=lissajous2ZPhaseLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["zPhaseShape"]=lissajous2ZPhaseLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["xOffsetAmp"]=lissajous2XOffsetLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["xOffsetRate"]=lissajous2XOffsetLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["xOffsetShape"]=lissajous2XOffsetLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["yOffsetAmp"]=lissajous2YOffsetLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["yOffsetRate"]=lissajous2YOffsetLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["yOffsetShape"]=lissajous2YOffsetLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["speedAmp"]=lissajous2SpeedLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["speedRate"]=lissajous2SpeedLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["speedShape"]=lissajous2SpeedLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["sizeAmp"]=lissajous2SizeLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["sizeRate"]=lissajous2SizeLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["sizeShape"]=lissajous2SizeLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["numPointsAmp"]=lissajous2NumPointsLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["numPointsRate"]=lissajous2NumPointsLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["numPointsShape"]=lissajous2NumPointsLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["lineWidthAmp"]=lissajous2LineWidthLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["lineWidthRate"]=lissajous2LineWidthLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["lineWidthShape"]=lissajous2LineWidthLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["colorSpeedAmp"]=lissajous2ColorSpeedLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["colorSpeedRate"]=lissajous2ColorSpeedLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["colorSpeedShape"]=lissajous2ColorSpeedLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["hueAmp"]=lissajous2HueLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["hueRate"]=lissajous2HueLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["hueShape"]=lissajous2HueLfoShape;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["hueSpreadAmp"]=lissajous2HueSpreadLfoAmp;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["hueSpreadRate"]=lissajous2HueSpreadLfoRate;
+	saveBuffer["BLOCK_2"]["b2LissajousLfo"]["hueSpreadShape"]=lissajous2HueSpreadLfoShape;
 
 	//extra things to add
 
@@ -8157,6 +8315,91 @@ void GuiApp::loadEverything(){
 	block1LineSwitch=loadBuffer["BLOCK_1"]["b1GeometricalAnimations"][1];
 	block1SevenStarSwitch=loadBuffer["BLOCK_1"]["b1GeometricalAnimations"][2];
 	block1LissaBallSwitch=loadBuffer["BLOCK_1"]["b1GeometricalAnimations"][3];
+	if (loadBuffer["BLOCK_1"]["b1GeometricalAnimations"].size() > 4) {
+		block1LissajousCurveSwitch=loadBuffer["BLOCK_1"]["b1GeometricalAnimations"][4];
+	}
+
+	// Load Block 1 Lissajous Curve parameters (if they exist in preset)
+	if (loadBuffer["BLOCK_1"].contains("b1Lissajous")) {
+		lissajous1XFreq=loadBuffer["BLOCK_1"]["b1Lissajous"]["xFreq"];
+		lissajous1YFreq=loadBuffer["BLOCK_1"]["b1Lissajous"]["yFreq"];
+		lissajous1ZFreq=loadBuffer["BLOCK_1"]["b1Lissajous"]["zFreq"];
+		lissajous1XAmp=loadBuffer["BLOCK_1"]["b1Lissajous"]["xAmp"];
+		lissajous1YAmp=loadBuffer["BLOCK_1"]["b1Lissajous"]["yAmp"];
+		lissajous1ZAmp=loadBuffer["BLOCK_1"]["b1Lissajous"]["zAmp"];
+		lissajous1XPhase=loadBuffer["BLOCK_1"]["b1Lissajous"]["xPhase"];
+		lissajous1YPhase=loadBuffer["BLOCK_1"]["b1Lissajous"]["yPhase"];
+		lissajous1ZPhase=loadBuffer["BLOCK_1"]["b1Lissajous"]["zPhase"];
+		lissajous1XOffset=loadBuffer["BLOCK_1"]["b1Lissajous"]["xOffset"];
+		lissajous1YOffset=loadBuffer["BLOCK_1"]["b1Lissajous"]["yOffset"];
+		lissajous1Speed=loadBuffer["BLOCK_1"]["b1Lissajous"]["speed"];
+		lissajous1Size=loadBuffer["BLOCK_1"]["b1Lissajous"]["size"];
+		lissajous1NumPoints=loadBuffer["BLOCK_1"]["b1Lissajous"]["numPoints"];
+		lissajous1LineWidth=loadBuffer["BLOCK_1"]["b1Lissajous"]["lineWidth"];
+		lissajous1ColorSpeed=loadBuffer["BLOCK_1"]["b1Lissajous"]["colorSpeed"];
+		lissajous1Hue=loadBuffer["BLOCK_1"]["b1Lissajous"]["hue"];
+		lissajous1HueSpread=loadBuffer["BLOCK_1"]["b1Lissajous"]["hueSpread"];
+		lissajous1XShape=loadBuffer["BLOCK_1"]["b1Lissajous"]["xShape"];
+		lissajous1YShape=loadBuffer["BLOCK_1"]["b1Lissajous"]["yShape"];
+		lissajous1ZShape=loadBuffer["BLOCK_1"]["b1Lissajous"]["zShape"];
+	}
+	if (loadBuffer["BLOCK_1"].contains("b1LissajousLfo")) {
+		lissajous1XFreqLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["xFreqAmp"];
+		lissajous1XFreqLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["xFreqRate"];
+		lissajous1XFreqLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["xFreqShape"];
+		lissajous1YFreqLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["yFreqAmp"];
+		lissajous1YFreqLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["yFreqRate"];
+		lissajous1YFreqLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["yFreqShape"];
+		lissajous1ZFreqLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["zFreqAmp"];
+		lissajous1ZFreqLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["zFreqRate"];
+		lissajous1ZFreqLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["zFreqShape"];
+		lissajous1XAmpLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["xAmpAmp"];
+		lissajous1XAmpLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["xAmpRate"];
+		lissajous1XAmpLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["xAmpShape"];
+		lissajous1YAmpLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["yAmpAmp"];
+		lissajous1YAmpLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["yAmpRate"];
+		lissajous1YAmpLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["yAmpShape"];
+		lissajous1ZAmpLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["zAmpAmp"];
+		lissajous1ZAmpLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["zAmpRate"];
+		lissajous1ZAmpLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["zAmpShape"];
+		lissajous1XPhaseLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["xPhaseAmp"];
+		lissajous1XPhaseLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["xPhaseRate"];
+		lissajous1XPhaseLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["xPhaseShape"];
+		lissajous1YPhaseLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["yPhaseAmp"];
+		lissajous1YPhaseLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["yPhaseRate"];
+		lissajous1YPhaseLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["yPhaseShape"];
+		lissajous1ZPhaseLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["zPhaseAmp"];
+		lissajous1ZPhaseLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["zPhaseRate"];
+		lissajous1ZPhaseLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["zPhaseShape"];
+		lissajous1XOffsetLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["xOffsetAmp"];
+		lissajous1XOffsetLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["xOffsetRate"];
+		lissajous1XOffsetLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["xOffsetShape"];
+		lissajous1YOffsetLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["yOffsetAmp"];
+		lissajous1YOffsetLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["yOffsetRate"];
+		lissajous1YOffsetLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["yOffsetShape"];
+		lissajous1SpeedLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["speedAmp"];
+		lissajous1SpeedLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["speedRate"];
+		lissajous1SpeedLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["speedShape"];
+		lissajous1SizeLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["sizeAmp"];
+		lissajous1SizeLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["sizeRate"];
+		lissajous1SizeLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["sizeShape"];
+		lissajous1NumPointsLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["numPointsAmp"];
+		lissajous1NumPointsLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["numPointsRate"];
+		lissajous1NumPointsLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["numPointsShape"];
+		lissajous1LineWidthLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["lineWidthAmp"];
+		lissajous1LineWidthLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["lineWidthRate"];
+		lissajous1LineWidthLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["lineWidthShape"];
+		lissajous1ColorSpeedLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["colorSpeedAmp"];
+		lissajous1ColorSpeedLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["colorSpeedRate"];
+		lissajous1ColorSpeedLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["colorSpeedShape"];
+		lissajous1HueLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["hueAmp"];
+		lissajous1HueLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["hueRate"];
+		lissajous1HueLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["hueShape"];
+		lissajous1HueSpreadLfoAmp=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["hueSpreadAmp"];
+		lissajous1HueSpreadLfoRate=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["hueSpreadRate"];
+		lissajous1HueSpreadLfoShape=loadBuffer["BLOCK_1"]["b1LissajousLfo"]["hueSpreadShape"];
+	}
+
 	//extra things to add
 
 	fb1DelayTime=loadBuffer["BLOCK_1"]["b1_extraWhatever"][0];
@@ -8242,6 +8485,91 @@ void GuiApp::loadEverything(){
 	block2LineSwitch=loadBuffer["BLOCK_2"]["b2GeometricalAnimations"][1];
 	block2SevenStarSwitch=loadBuffer["BLOCK_2"]["b2GeometricalAnimations"][2];
 	block2LissaBallSwitch=loadBuffer["BLOCK_2"]["b2GeometricalAnimations"][3];
+	if (loadBuffer["BLOCK_2"]["b2GeometricalAnimations"].size() > 4) {
+		block2LissajousCurveSwitch=loadBuffer["BLOCK_2"]["b2GeometricalAnimations"][4];
+	}
+
+	// Load Block 2 Lissajous Curve parameters (if they exist in preset)
+	if (loadBuffer["BLOCK_2"].contains("b2Lissajous")) {
+		lissajous2XFreq=loadBuffer["BLOCK_2"]["b2Lissajous"]["xFreq"];
+		lissajous2YFreq=loadBuffer["BLOCK_2"]["b2Lissajous"]["yFreq"];
+		lissajous2ZFreq=loadBuffer["BLOCK_2"]["b2Lissajous"]["zFreq"];
+		lissajous2XAmp=loadBuffer["BLOCK_2"]["b2Lissajous"]["xAmp"];
+		lissajous2YAmp=loadBuffer["BLOCK_2"]["b2Lissajous"]["yAmp"];
+		lissajous2ZAmp=loadBuffer["BLOCK_2"]["b2Lissajous"]["zAmp"];
+		lissajous2XPhase=loadBuffer["BLOCK_2"]["b2Lissajous"]["xPhase"];
+		lissajous2YPhase=loadBuffer["BLOCK_2"]["b2Lissajous"]["yPhase"];
+		lissajous2ZPhase=loadBuffer["BLOCK_2"]["b2Lissajous"]["zPhase"];
+		lissajous2XOffset=loadBuffer["BLOCK_2"]["b2Lissajous"]["xOffset"];
+		lissajous2YOffset=loadBuffer["BLOCK_2"]["b2Lissajous"]["yOffset"];
+		lissajous2Speed=loadBuffer["BLOCK_2"]["b2Lissajous"]["speed"];
+		lissajous2Size=loadBuffer["BLOCK_2"]["b2Lissajous"]["size"];
+		lissajous2NumPoints=loadBuffer["BLOCK_2"]["b2Lissajous"]["numPoints"];
+		lissajous2LineWidth=loadBuffer["BLOCK_2"]["b2Lissajous"]["lineWidth"];
+		lissajous2ColorSpeed=loadBuffer["BLOCK_2"]["b2Lissajous"]["colorSpeed"];
+		lissajous2Hue=loadBuffer["BLOCK_2"]["b2Lissajous"]["hue"];
+		lissajous2HueSpread=loadBuffer["BLOCK_2"]["b2Lissajous"]["hueSpread"];
+		lissajous2XShape=loadBuffer["BLOCK_2"]["b2Lissajous"]["xShape"];
+		lissajous2YShape=loadBuffer["BLOCK_2"]["b2Lissajous"]["yShape"];
+		lissajous2ZShape=loadBuffer["BLOCK_2"]["b2Lissajous"]["zShape"];
+	}
+	if (loadBuffer["BLOCK_2"].contains("b2LissajousLfo")) {
+		lissajous2XFreqLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["xFreqAmp"];
+		lissajous2XFreqLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["xFreqRate"];
+		lissajous2XFreqLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["xFreqShape"];
+		lissajous2YFreqLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["yFreqAmp"];
+		lissajous2YFreqLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["yFreqRate"];
+		lissajous2YFreqLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["yFreqShape"];
+		lissajous2ZFreqLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["zFreqAmp"];
+		lissajous2ZFreqLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["zFreqRate"];
+		lissajous2ZFreqLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["zFreqShape"];
+		lissajous2XAmpLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["xAmpAmp"];
+		lissajous2XAmpLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["xAmpRate"];
+		lissajous2XAmpLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["xAmpShape"];
+		lissajous2YAmpLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["yAmpAmp"];
+		lissajous2YAmpLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["yAmpRate"];
+		lissajous2YAmpLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["yAmpShape"];
+		lissajous2ZAmpLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["zAmpAmp"];
+		lissajous2ZAmpLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["zAmpRate"];
+		lissajous2ZAmpLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["zAmpShape"];
+		lissajous2XPhaseLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["xPhaseAmp"];
+		lissajous2XPhaseLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["xPhaseRate"];
+		lissajous2XPhaseLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["xPhaseShape"];
+		lissajous2YPhaseLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["yPhaseAmp"];
+		lissajous2YPhaseLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["yPhaseRate"];
+		lissajous2YPhaseLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["yPhaseShape"];
+		lissajous2ZPhaseLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["zPhaseAmp"];
+		lissajous2ZPhaseLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["zPhaseRate"];
+		lissajous2ZPhaseLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["zPhaseShape"];
+		lissajous2XOffsetLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["xOffsetAmp"];
+		lissajous2XOffsetLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["xOffsetRate"];
+		lissajous2XOffsetLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["xOffsetShape"];
+		lissajous2YOffsetLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["yOffsetAmp"];
+		lissajous2YOffsetLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["yOffsetRate"];
+		lissajous2YOffsetLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["yOffsetShape"];
+		lissajous2SpeedLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["speedAmp"];
+		lissajous2SpeedLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["speedRate"];
+		lissajous2SpeedLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["speedShape"];
+		lissajous2SizeLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["sizeAmp"];
+		lissajous2SizeLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["sizeRate"];
+		lissajous2SizeLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["sizeShape"];
+		lissajous2NumPointsLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["numPointsAmp"];
+		lissajous2NumPointsLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["numPointsRate"];
+		lissajous2NumPointsLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["numPointsShape"];
+		lissajous2LineWidthLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["lineWidthAmp"];
+		lissajous2LineWidthLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["lineWidthRate"];
+		lissajous2LineWidthLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["lineWidthShape"];
+		lissajous2ColorSpeedLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["colorSpeedAmp"];
+		lissajous2ColorSpeedLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["colorSpeedRate"];
+		lissajous2ColorSpeedLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["colorSpeedShape"];
+		lissajous2HueLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["hueAmp"];
+		lissajous2HueLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["hueRate"];
+		lissajous2HueLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["hueShape"];
+		lissajous2HueSpreadLfoAmp=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["hueSpreadAmp"];
+		lissajous2HueSpreadLfoRate=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["hueSpreadRate"];
+		lissajous2HueSpreadLfoShape=loadBuffer["BLOCK_2"]["b2LissajousLfo"]["hueSpreadShape"];
+	}
+
 	//extra things to add
 
 	fb2DelayTime=loadBuffer["BLOCK_2"]["b2_extraWhatever"][0];
