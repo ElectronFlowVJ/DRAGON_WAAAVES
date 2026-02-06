@@ -8611,12 +8611,12 @@ void GuiApp::allButtonsClear(){
 	fb1HueInvert=fb1SaturationInvert=fb1BrightInvert=0;
 	fb1HMirror=fb1VMirror=fb1RotateMode=fb1HFlip=fb1VFlip=0;
 
-	block1HypercubeSwitch=block1LineSwitch=block1SevenStarSwitch=block1LissaBallSwitch=0;
+	block1HypercubeSwitch=block1LineSwitch=block1SevenStarSwitch=block1LissaBallSwitch=block1LissajousCurveSwitch=0;
 
 	block2InputVMirror=block2InputHMirror=block2InputVFlip=block2InputHFlip=block2InputHueInvert=0;
 	block2InputSaturationInvert=block2InputBrightInvert=block2InputRGBInvert=block2InputSolarize=0;
 
-	block2HypercubeSwitch=block2LineSwitch=block2SevenStarSwitch=block2LissaBallSwitch=0;
+	block2HypercubeSwitch=block2LineSwitch=block2SevenStarSwitch=block2LissaBallSwitch=block2LissajousCurveSwitch=0;
 
 	fb2HueInvert=fb2SaturationInvert=fb2BrightInvert=0;
 	fb2HMirror=fb2VMirror=fb2RotateMode=fb2HFlip=fb2VFlip=0;
