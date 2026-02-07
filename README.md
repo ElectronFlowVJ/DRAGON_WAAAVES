@@ -22,7 +22,7 @@ my art mostly
 
 **This is NOT an official port of Gravity Waaaves.** The original creator, Andrei Jay, will not provide any support whatsoever for this software. 
 
-This source code is distributed AS-IS, there is no guarenteed continuing support. Please contact ElectronFlow on discord with any questions, make sure you let me know what it's about.
+This source code is distributed AS-IS, there is no guaranteed continuing support. Please contact ElectronFlow on discord with any questions, make sure you let me know what it's about.
 
 ## Distribution
 
