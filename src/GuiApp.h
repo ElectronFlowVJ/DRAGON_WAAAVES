@@ -150,6 +150,7 @@ public:
 
 	// Name input for save
 	char newPresetNameBuffer[128] = "";
+	std::string originalPresetName = "";  // Track original name for rename detection
 
 	// UI Scale (labels: 200%/250%/300%, actual: 2.0/2.5/3.0)
 	int uiScaleIndex = 0;  // Default "200%" (2.0x actual scale)
@@ -162,6 +163,7 @@ public:
 	void indexSavePresets();
 	void indexLoadPresets();
 	void savePresetAs(const std::string& name);
+	bool renamePreset(int presetIndex, const std::string& newName);
 	std::string cleanDisplayName(const std::string& filename);
 	void migrateOldSaveStates();
 

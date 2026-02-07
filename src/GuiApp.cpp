@@ -171,7 +171,7 @@ void GuiApp::indexSaveStateNames(){
 }
 
 //-------------------------------------------------------------------------------
-// Clean display name - strip gwSaveState### prefix and .json extension
+// Clean display name - strip numeric prefix (###_) and gwSaveState### prefix, and .json extension
 std::string GuiApp::cleanDisplayName(const std::string& filename) {
 	std::string name = filename;
 
@@ -181,17 +181,26 @@ std::string GuiApp::cleanDisplayName(const std::string& filename) {
 		name = name.substr(0, dotPos);
 	}
 
-	// Remove gwSaveState<NNN> prefix (pattern: gwSaveState followed by digits)
-	if (name.find("gwSaveState") == 0) {
-		size_t pos = 11; // Length of "gwSaveState"
-		// Skip any following digits
-		while (pos < name.length() && isdigit(name[pos])) {
-			pos++;
-		}
-		name = name.substr(pos);
+	// Remove numeric prefix pattern: digits followed by underscore (e.g., "001_")
+	size_t pos = 0;
+	while (pos < name.length() && isdigit(name[pos])) {
+		pos++;
+	}
+	if (pos > 0 && pos < name.length() && name[pos] == '_') {
+		name = name.substr(pos + 1);  // Skip digits and underscore
 	}
 
-	// If result is empty (e.g., "gwSaveState026.json"), use numeric suffix
+	// Remove gwSaveState<NNN> prefix (pattern: gwSaveState followed by digits) - legacy support
+	if (name.find("gwSaveState") == 0) {
+		size_t gwPos = 11; // Length of "gwSaveState"
+		// Skip any following digits
+		while (gwPos < name.length() && isdigit(name[gwPos])) {
+			gwPos++;
+		}
+		name = name.substr(gwPos);
+	}
+
+	// If result is empty (e.g., "gwSaveState026.json" or "001_.json"), use numeric suffix
 	if (name.empty()) {
 		// Extract number from original filename
 		if (filename.find("gwSaveState") == 0) {
@@ -407,8 +416,29 @@ void GuiApp::savePresetAs(const std::string& presetName) {
 		}
 	}
 
+	// Find the next available numeric prefix by scanning existing files
+	int maxPrefix = 0;
+	for (const auto& fileName : savePresetFileNames) {
+		// Check if file starts with digits followed by underscore
+		size_t pos = 0;
+		while (pos < fileName.length() && isdigit(fileName[pos])) {
+			pos++;
+		}
+		if (pos > 0 && pos < fileName.length() && fileName[pos] == '_') {
+			int prefix = std::stoi(fileName.substr(0, pos));
+			if (prefix > maxPrefix) {
+				maxPrefix = prefix;
+			}
+		}
+	}
+
+	// Create filename with numeric prefix (3 digits, zero-padded)
+	char prefixStr[8];
+	snprintf(prefixStr, sizeof(prefixStr), "%03d_", maxPrefix + 1);
+	std::string prefixedName = std::string(prefixStr) + sanitized;
+
 	// Build full path
-	std::string fullPath = saveBankPath + "/" + sanitized + ".json";
+	std::string fullPath = saveBankPath + "/" + prefixedName + ".json";
 
 	// Save the preset (reuse existing save logic)
 	ofSaveJson(fullPath, saveBuffer);
@@ -418,7 +448,7 @@ void GuiApp::savePresetAs(const std::string& presetName) {
 
 	// Find and select the new preset
 	for (int i = 0; i < savePresetCount; i++) {
-		if (savePresetFileNames[i] == sanitized + ".json") {
+		if (savePresetFileNames[i] == prefixedName + ".json") {
 			saveStateSelectSwitch = i;
 			break;
 		}
@@ -428,6 +458,93 @@ void GuiApp::savePresetAs(const std::string& presetName) {
 	memset(newPresetNameBuffer, 0, sizeof(newPresetNameBuffer));
 
 	ofLogNotice("Preset") << "Saved new preset: " << fullPath;
+}
+
+//-------------------------------------------------------------------------------
+// Rename an existing preset (preserves numeric prefix for ordering)
+bool GuiApp::renamePreset(int presetIndex, const std::string& newName) {
+	if (presetIndex < 0 || presetIndex >= savePresetCount || newName.empty()) {
+		return false;
+	}
+
+	// Sanitize new name
+	std::string sanitized = newName;
+	for (char& c : sanitized) {
+		if (c == '/' || c == '\\' || c == ':' || c == '*' ||
+			c == '?' || c == '"' || c == '<' || c == '>' || c == '|') {
+			c = '_';
+		}
+	}
+
+	// Extract numeric prefix from original filename (e.g., "001_" from "001_MyPreset.json")
+	// If no prefix exists, assign the next available number
+	std::string oldFileName = savePresetFileNames[presetIndex];
+	std::string numericPrefix = "";
+	size_t pos = 0;
+	while (pos < oldFileName.length() && isdigit(oldFileName[pos])) {
+		pos++;
+	}
+	if (pos > 0 && pos < oldFileName.length() && oldFileName[pos] == '_') {
+		numericPrefix = oldFileName.substr(0, pos + 1);  // Include the underscore
+	} else {
+		// No prefix exists - find the highest existing prefix and use next number
+		int maxPrefix = 0;
+		for (const auto& fileName : savePresetFileNames) {
+			size_t fpos = 0;
+			while (fpos < fileName.length() && isdigit(fileName[fpos])) {
+				fpos++;
+			}
+			if (fpos > 0 && fpos < fileName.length() && fileName[fpos] == '_') {
+				int prefix = std::stoi(fileName.substr(0, fpos));
+				if (prefix > maxPrefix) {
+					maxPrefix = prefix;
+				}
+			}
+		}
+		char prefixStr[8];
+		snprintf(prefixStr, sizeof(prefixStr), "%03d_", maxPrefix + 1);
+		numericPrefix = prefixStr;
+	}
+
+	// Build new filename with preserved prefix
+	std::string newFileName = numericPrefix + sanitized + ".json";
+	std::string oldPath = saveBankPath + "/" + oldFileName;
+	std::string newPath = saveBankPath + "/" + newFileName;
+
+	// Check if names are the same (no rename needed)
+	if (oldPath == newPath) {
+		return true;
+	}
+
+	// Check if target already exists
+	ofFile targetFile(newPath);
+	if (targetFile.exists()) {
+		ofLogWarning("Preset") << "Cannot rename: a preset named '" << sanitized << "' already exists";
+		return false;
+	}
+
+	// Rename the file
+	ofFile oldFile(oldPath);
+	if (oldFile.exists()) {
+		bool success = oldFile.renameTo(newPath);
+		if (success) {
+			ofLogNotice("Preset") << "Renamed preset from " << oldFileName << " to " << newFileName;
+			indexSavePresets();
+			indexLoadPresets();  // In case same bank is used for load
+
+			// Find and select the renamed preset
+			for (int i = 0; i < savePresetCount; i++) {
+				if (savePresetFileNames[i] == newFileName) {
+					saveStateSelectSwitch = i;
+					break;
+				}
+			}
+			return true;
+		}
+	}
+
+	ofLogError("Preset") << "Failed to rename preset";
+	return false;
 }
 
 //-------------------------------------------------------------------------------
@@ -763,8 +880,9 @@ void GuiApp::draw(){
 		if (savePresetCount > 0) {
 			if (ImGui::Combo("##selectSavePreset", &item_saveState, savePresetDisplayNamesChar.data(), savePresetCount)) {
 				saveStateSelectSwitch = item_saveState;
-				// Copy name to input buffer for editing
+				// Copy name to input buffer for editing and track original
 				strncpy(newPresetNameBuffer, savePresetDisplayNames[item_saveState].c_str(), sizeof(newPresetNameBuffer)-1);
+				originalPresetName = savePresetDisplayNames[item_saveState];
 				if (mainApp) mainApp->sendOscParameter("/gravity/preset/selectSave", static_cast<float>(saveStateSelectSwitch));
 			}
 		}
@@ -779,10 +897,34 @@ void GuiApp::draw(){
 
 		ImGui::SameLine();
 
-		// Save Button (overwrites selected)
+		// Save Button (overwrites selected, renames if name changed)
 		if (ImGui::Button("save")) {
-			saveALL=1;
-			ImGui::OpenPopup("save successful");
+			std::string currentName = newPresetNameBuffer;
+			bool renamed = false;
+
+			// Check if name was changed and rename if needed
+			if (!originalPresetName.empty() && currentName != originalPresetName && !currentName.empty()) {
+				renamed = renamePreset(saveStateSelectSwitch, currentName);
+				if (!renamed) {
+					ImGui::OpenPopup("rename failed");
+				}
+			}
+
+			if (renamed || originalPresetName.empty() || currentName == originalPresetName) {
+				saveALL = 1;
+				// Update tracked name and buffer to match the actual display name
+				if (savePresetCount > 0 && saveStateSelectSwitch < savePresetCount) {
+					originalPresetName = savePresetDisplayNames[saveStateSelectSwitch];
+					strncpy(newPresetNameBuffer, originalPresetName.c_str(), sizeof(newPresetNameBuffer)-1);
+				}
+				ImGui::OpenPopup("save successful");
+			}
+		}
+		if(ImGui::BeginPopupModal("rename failed")){
+			ImGui::Text("Could not rename preset. A preset with that name may already exist.");
+			if(ImGui::Button("okay")){ImGui::CloseCurrentPopup();}
+			ImGui::SetItemDefaultFocus();
+			ImGui::EndPopup();
 		}
 		if(ImGui::BeginPopupModal("save successful")){
 			string success = (savePresetCount > 0 && saveStateSelectSwitch < savePresetCount)
