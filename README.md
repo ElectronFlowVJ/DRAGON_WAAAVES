@@ -1,3 +1,9 @@
+known issues: 
+- scaling weirdness on Jetson around 300%.
+- Openbox window config on jetson
+- ofxSpout is hard to add to the project
+- FPS slider behavior is a bit hit or miss
+
 # DRAGON_WAAAVES v1.0
 
 **An updated/modified port of the original VSEJET GRAVITY_WAAAVES from Andrei Jay**
