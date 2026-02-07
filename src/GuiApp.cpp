@@ -706,21 +706,40 @@ void GuiApp::draw(){
 
 		ImGui::PushItemWidth(windowWidthHalf);
 
-		//trying to make the top line all fit
-		int windowWidthQuarter=720*.25f+80;  // Increased for better readability at high scale
+		// ========== DYNAMIC WIDTH CALCULATION ==========
+		float availableWidth = ofGetWindowWidth();
+		float currentScale = uiScaleValues[uiScaleIndex];
+
+		// Element widths scale with UI scale (base values at 2.0 scale)
+		float scaleFactor = currentScale / 2.0f;
+		int windowWidthQuarter = (int)(180.0f * scaleFactor);  // For draw mode and presets
+		int bankWidth = (int)(130.0f * scaleFactor);           // For bank dropdowns
+		int inputWidth = (int)(100.0f * scaleFactor);          // For name input and scale
+
+		// Dynamic spacer: fills remaining space after fixed elements
+		// Buttons/text also scale with font
+		float buttonWidth = 600.0f * scaleFactor;
+		float fixedContentWidth = (windowWidthQuarter * 3 + bankWidth * 2 + inputWidth * 2) + buttonWidth;
+		float spacerPixels = (availableWidth - fixedContentWidth) / 2.0f;
+		if (spacerPixels < 5.0f) spacerPixels = 5.0f;
+		float charWidth = ImGui::GetFontSize() * 0.5f;
+		int spacerChars = (int)(spacerPixels / charWidth);
+		if (spacerChars < 1) spacerChars = 1;
+		if (spacerChars > 30) spacerChars = 30;
+		std::string spacer(spacerChars, '+');
+
 		ImGui::PushItemWidth(windowWidthQuarter);
-		//ImGui::SliderFloat("just a test", &testParameter, 0.0f, 1.0f);
 		const char* items10[] = { "draw BLOCK1","draw BLOCK2","draw BLOCK3","drawAllBLOCKS" };
 		static int item_drawOutput = 2;
 		ImGui::Combo("##what gets drawn", &item_drawOutput, items10, IM_ARRAYSIZE(items10));
 		drawMode=item_drawOutput;
 		ImGui::SameLine();
-		ImGui::Text("+++++");
+		ImGui::Text("%s", spacer.c_str());
 		ImGui::SameLine();
 
 		// ========== SAVE SECTION ==========
 		// Save Bank Dropdown
-		ImGui::PushItemWidth(180);
+		ImGui::PushItemWidth(bankWidth);
 		static int item_saveBank = 0;
 		if (item_saveBank != saveBankIndex) {
 			item_saveBank = saveBankIndex;
@@ -754,7 +773,7 @@ void GuiApp::draw(){
 		ImGui::SameLine();
 
 		// Preset Name Input
-		ImGui::PushItemWidth(120);
+		ImGui::PushItemWidth(inputWidth);
 		ImGui::InputText("##presetName", newPresetNameBuffer, sizeof(newPresetNameBuffer));
 		ImGui::PopItemWidth();
 
@@ -821,7 +840,7 @@ void GuiApp::draw(){
 
 		// ========== LOAD SECTION ==========
 		// Load Bank Dropdown
-		ImGui::PushItemWidth(180);
+		ImGui::PushItemWidth(bankWidth);
 		static int item_loadBank = 0;
 		if (item_loadBank != loadBankIndex) {
 			item_loadBank = loadBankIndex;
@@ -857,7 +876,7 @@ void GuiApp::draw(){
 		}
 
 		ImGui::SameLine();
-		ImGui::Text("+++++");
+		ImGui::Text("%s", spacer.c_str());
 
 		ImGui::SameLine();
 		if (ImGui::Button("reset all")) {
@@ -867,7 +886,7 @@ void GuiApp::draw(){
 		ImGui::SameLine();
 
 		// ========== UI SCALE DROPDOWN ==========
-		ImGui::PushItemWidth(120);
+		ImGui::PushItemWidth(inputWidth);
 		const char* scaleItems[] = { "200%", "250%", "300%" };
 		static int item_scale = 0;  // Default to 200% (2.0x actual scale)
 		if (item_scale != uiScaleIndex) {
