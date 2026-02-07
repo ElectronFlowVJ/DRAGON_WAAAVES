@@ -46,6 +46,7 @@ void ofApp::setup(){
 	ofEnableNormalizedTexCoords();
 	ofLogNotice("Shader") << "Normalized Tex Coords: " << (ofGetUsingNormalizedTexCoords() ? "ON" : "OFF");
 	ofSetFrameRate(30);
+	ofSetVerticalSync(false);
 	ofBackground(0);
 	ofHideCursor();
 
