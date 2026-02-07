@@ -6373,7 +6373,7 @@ void GuiApp::draw(){
 					ImGui::Separator();
 					ImGui::Spacing();
 
-					if (ImGui::Button("Close", ImVec2(120, 30))) {
+					if (ImGui::Button("Close")) {
 						showAttributionsPopup = false;
 						ImGui::CloseCurrentPopup();
 					}
@@ -6415,7 +6415,7 @@ void GuiApp::draw(){
 
 				// Receive Settings
 				ImGui::Text("RECEIVE SETTINGS");
-				ImGui::PushItemWidth(150);
+				ImGui::PushItemWidth(180);
 				if (ImGui::InputInt("Receive Port", &oscReceivePort)) {
 					// Validate port range
 					if (oscReceivePort < 1024) oscReceivePort = 1024;
@@ -6432,7 +6432,7 @@ void GuiApp::draw(){
 				ImGui::InputText("Send IP Address", oscSendIP, 64);
 				ImGui::PopItemWidth();
 
-				ImGui::PushItemWidth(150);
+				ImGui::PushItemWidth(180);
 				if (ImGui::InputInt("Send Port", &oscSendPort)) {
 					// Validate port range
 					if (oscSendPort < 1024) oscSendPort = 1024;
@@ -6460,13 +6460,13 @@ void GuiApp::draw(){
 				ImGui::Spacing();
 				ImGui::Text("SEND ALL PARAMETERS");
 				ImGui::Text("Send all current values over OSC");
-				if (ImGui::Button("SEND ALL VALUES", ImVec2(220, 30))) {
+				if (ImGui::Button("SEND ALL VALUES")) {
 					sendAllOscValues = true;
 				}
 				ImGui::Spacing();
 
 				// Apply/Restart button
-				if (ImGui::Button("APPLY SETTINGS", ImVec2(200, 30))) {
+				if (ImGui::Button("APPLY SETTINGS")) {
 					if (mainApp) {
 						mainApp->reloadOscSettings();
 					}
@@ -55304,6 +55304,7 @@ void GuiApp::macroDataResetEverything(){
 // Update local IP address for OSC display
 void GuiApp::updateLocalIP() {
     localIPs.clear();
+    std::vector<std::string> fallbackIPs; // For 172.x.x.x addresses
 
 #ifdef _WIN32
     // Windows implementation - get all network interfaces
@@ -55320,20 +55321,38 @@ void GuiApp::updateLocalIP() {
                 char ip[INET_ADDRSTRLEN];
                 inet_ntop(AF_INET, &(addr->sin_addr), ip, INET_ADDRSTRLEN);
                 string ipStr = string(ip);
+
+                // Skip loopback
+                if (ipStr == "127.0.0.1") continue;
+
                 // Avoid duplicates
                 bool found = false;
                 for (const auto& existing : localIPs) {
-                    if (existing == ipStr) {
-                        found = true;
-                        break;
-                    }
+                    if (existing == ipStr) { found = true; break; }
                 }
+                for (const auto& existing : fallbackIPs) {
+                    if (existing == ipStr) { found = true; break; }
+                }
+
                 if (!found) {
+                    // Filter 172.16.x.x - 172.31.x.x (private range, often Docker/VPN)
+                    if (ipStr.substr(0, 4) == "172.") {
+                        int second = 0;
+                        sscanf(ipStr.c_str(), "172.%d", &second);
+                        if (second >= 16 && second <= 31) {
+                            fallbackIPs.push_back(ipStr); // Save as fallback
+                            continue;
+                        }
+                    }
                     localIPs.push_back(ipStr);
                 }
             }
             freeaddrinfo(result);
         }
+    }
+    // Use fallback IPs if no primary IPs found
+    if (localIPs.empty() && !fallbackIPs.empty()) {
+        localIPs = fallbackIPs;
     }
     if (localIPs.empty()) {
         localIPs.push_back("127.0.0.1");
@@ -55350,16 +55369,42 @@ void GuiApp::updateLocalIP() {
             size_t pos = 0;
             while ((pos = ips.find(' ')) != std::string::npos) {
                 std::string ip = ips.substr(0, pos);
-                if (!ip.empty()) {
+                // Skip IPv6 (contains colons), loopback, and empty
+                if (!ip.empty() && ip != "127.0.0.1" && ip.find(':') == std::string::npos) {
+                    // Filter 172.16.x.x - 172.31.x.x
+                    if (ip.substr(0, 4) == "172.") {
+                        int second = 0;
+                        sscanf(ip.c_str(), "172.%d", &second);
+                        if (second >= 16 && second <= 31) {
+                            fallbackIPs.push_back(ip);
+                            ips.erase(0, pos + 1);
+                            continue;
+                        }
+                    }
                     localIPs.push_back(ip);
                 }
                 ips.erase(0, pos + 1);
             }
-            if (!ips.empty()) {
-                localIPs.push_back(ips);
+            // Skip IPv6 for final token too
+            if (!ips.empty() && ips != "127.0.0.1" && ips.find(':') == std::string::npos) {
+                if (ips.substr(0, 4) == "172.") {
+                    int second = 0;
+                    sscanf(ips.c_str(), "172.%d", &second);
+                    if (second >= 16 && second <= 31) {
+                        fallbackIPs.push_back(ips);
+                    } else {
+                        localIPs.push_back(ips);
+                    }
+                } else {
+                    localIPs.push_back(ips);
+                }
             }
         }
         pclose(pipe);
+    }
+    // Use fallback IPs if no primary IPs found
+    if (localIPs.empty() && !fallbackIPs.empty()) {
+        localIPs = fallbackIPs;
     }
     if (localIPs.empty()) {
         localIPs.push_back("Unknown");
