@@ -6,6 +6,7 @@ bin/*
 !/bin/data
 !/bin/data/*
 !/bin/OSC_Parameters_Reference.txt
+!/bin/DRAGON_WAAAVES.tosc
 bin/data/settings.json
 /bin/settings.json
 .claude/
