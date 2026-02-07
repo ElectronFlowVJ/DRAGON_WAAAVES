@@ -204,7 +204,7 @@ public:
 	float fb2DelayTimeMacroBuffer=0;
 
 	// OSC Settings
-	bool oscEnabled = true;
+	bool oscEnabled = false;
 	int oscReceivePort = 7000;
 	char oscSendIP[64] = "127.0.0.1";
 	int oscSendPort = 7001;

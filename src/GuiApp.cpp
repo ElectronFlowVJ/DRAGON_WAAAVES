@@ -56799,6 +56799,7 @@ void GuiApp::loadVideoOscSettings() {
     if (settings.contains("osc")) {
         if (settings["osc"].contains("enabled")) {
             oscEnabled = settings["osc"]["enabled"];
+            oscConnected = oscEnabled;  // Sync connection status with loaded setting
         }
         if (settings["osc"].contains("receivePort")) {
             oscReceivePort = settings["osc"]["receivePort"];
