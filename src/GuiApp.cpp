@@ -803,7 +803,7 @@ void GuiApp::draw(){
 	ImGui::SetNextWindowPos(ImVec2(0,0), ImGuiCond_Always);
 
 	// Generate dynamic title bar that fills the window width
-	std::string centerText = "G*R*A*V*I*T*Y**W*A*A*A*V*E*S v 1.50";
+	std::string centerText = "//D*R*A*G*O*N**W*A*A*A*V*E*S v1.0\\";
 	std::string pattern = "--++--++";
 	float charWidth = ImGui::GetFontSize() * 0.5f; // Approximate character width
 	float windowWidth = ofGetWindowWidth();
