@@ -1,18 +1,18 @@
 # DRAGON_WAAAVES v1.0
 
-If you like the work I've done here, please consider supporting me on Ko-fi @ ko-fi.com/electronflow. 
+If you like the work I've done here, please consider supporting me on Ko-fi @ https://ko-fi.com/electronflow. 
 
-Please also consider supporting Andrei Jay either on Patreon, or his Ko-fi @ ko-fi.com/andreijay as this would not have been possible without the amazing groundwork he has laid out, and his willingness to open source his projects.
+Please also consider supporting Andrei Jay either on Patreon, or his Ko-fi @ https://ko-fi.com/andreijay as this would not have been possible without the amazing groundwork he has laid out, and his willingness to open source his projects.
 
-**Andrei's website:** videosynthecosphere.com
+**Andrei's website:** https://videosynthecosphere.com
 
 You can download WPDSK here, which is a good introduction to the concepts present in this application, you can also buy GW-DSK there, which you should do. PLEASE GO SUPPORT HIM.
 
-**Andrei's other website:** andreijaycreativecoding.com
+**Andrei's other website:** https://andreijaycreativecoding.com
 
 A wealth of knowledge and resources about video synthesis, feedback, and programming these sorts of things.
 
-**ElectronFlow's Website:** electronflow.tv
+**ElectronFlow's Website:** https://electronflow.tv
 
 my art mostly
 
@@ -53,7 +53,7 @@ A real-time video effects processor and synthesizer built with openFrameworks. D
   - ofxMidi
   - ofxNDI - https://github.com/leadedge/ofxNDI
   - ofxOsc
-  - ofxSpout - https://github.com/leadedge/Spout2 (Windows only) this will likely give you issues adding to the openFrameworks project using Project Generator, just download and add to the addOns folder, everything else should already be in place.
+  - ofxSpout - https://github.com/elliotwoods/ofxSpout (Windows only) this will likely give you issues adding to the openFrameworks project using Project Generator, just download and add to the addOns folder, everything else should already be in place.
 
 
 ## Usage Tips
