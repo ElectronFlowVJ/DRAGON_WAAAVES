@@ -1,5 +1,7 @@
 # DRAGON_WAAAVES v1.0
 
+**An updated/modified port of the original VSEJET GRAVITY_WAAAVES from Andrei Jay**
+
 If you like the work I've done here, please consider supporting me on Ko-fi @ https://ko-fi.com/electronflow. 
 
 Please also consider supporting Andrei Jay either on Patreon, or his Ko-fi @ https://ko-fi.com/andreijay as this would not have been possible without the amazing groundwork he has laid out, and his willingness to open source his projects.
@@ -20,7 +22,7 @@ my art mostly
 
 **This is NOT an official port of Gravity Waaaves.** The original creator, Andrei Jay, will not provide any support whatsoever for this software. 
 
-This software is distributed AS-IS, there is no guarenteed continuing support. Please contact ElectronFlow on discord with any questions, make sure you let me know what it's about.
+This source code is distributed AS-IS, there is no guarenteed continuing support. Please contact ElectronFlow on discord with any questions, make sure you let me know what it's about.
 
 ## Distribution
 
