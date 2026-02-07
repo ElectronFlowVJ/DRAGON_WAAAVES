@@ -3,6 +3,7 @@ known issues:
 - Openbox window config on jetson
 - ofxSpout is hard to add to the project
 - FPS slider behavior is a bit hit or miss
+- touchOSC file still needs some work
 
 # DRAGON_WAAAVES v1.0
 
