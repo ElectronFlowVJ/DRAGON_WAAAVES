@@ -1,9 +1,9 @@
 {
     "osc": {
         "enabled": true,
-        "receivePort": 12000,
-        "sendIP": "192.168.1.12",
-        "sendPort": 12001
+        "receivePort": 9000,
+        "sendIP": "127.0.0.1",
+        "sendPort": 9001
     },
     "video": {
         "input1": {
@@ -11,7 +11,7 @@
             "ndiSourceName": "LIGHTING (Remote Connection 1)",
             "sourceType": 0,
             "spoutSourceIndex": 0,
-            "spoutSourceName": "",
+            "spoutSourceName": "Synesthesia",
             "webcamDeviceID": 4
         },
         "input2": {
@@ -19,13 +19,13 @@
             "ndiSourceName": "LIGHTING (Remote Connection 1)",
             "sourceType": 0,
             "spoutSourceIndex": 0,
-            "spoutSourceName": "",
+            "spoutSourceName": "Synesthesia",
             "webcamDeviceID": 1
         },
         "ndiOutput": {
             "sendBlock1": false,
             "sendBlock2": false,
-            "sendBlock3": true
+            "sendBlock3": false
         },
         "resolution": {
             "input1Height": 1080,
@@ -34,17 +34,17 @@
             "input2Width": 1920,
             "internalHeight": 1080,
             "internalWidth": 1920,
-            "ndiSendHeight": 1080,
-            "ndiSendWidth": 1920,
+            "ndiSendHeight": 720,
+            "ndiSendWidth": 1280,
             "outputHeight": 1080,
             "outputWidth": 1920,
-            "spoutSendHeight": 1080,
-            "spoutSendWidth": 1920
+            "spoutSendHeight": 720,
+            "spoutSendWidth": 1280
         },
         "spoutOutput": {
             "sendBlock1": false,
             "sendBlock2": false,
-            "sendBlock3": true
+            "sendBlock3": false
         },
         "targetFPS": 30
     }

@@ -3659,6 +3659,59 @@ bool ofApp::processOscPresetCommands(const string& address, const ofxOscMessage&
     else if (address == "/gravity/preset/save") {
         gui->saveALL = 1;
     }
+    // Bank switching commands - Save Bank
+    else if (address == "/gravity/preset/saveBank/index") {
+        if (m.getNumArgs() > 0) {
+            int bankIndex = static_cast<int>(m.getArgAsFloat(0));
+            gui->switchSaveBank(bankIndex);
+        }
+    }
+    else if (address == "/gravity/preset/saveBank/name") {
+        if (m.getNumArgs() > 0 && m.getArgType(0) == OFXOSC_TYPE_STRING) {
+            std::string bankName = m.getArgAsString(0);
+            for (size_t i = 0; i < gui->bankNames.size(); i++) {
+                if (gui->bankNames[i] == bankName) {
+                    gui->switchSaveBank(i);
+                    break;
+                }
+            }
+        }
+    }
+    // Bank switching commands - Load Bank
+    else if (address == "/gravity/preset/loadBank/index") {
+        if (m.getNumArgs() > 0) {
+            int bankIndex = static_cast<int>(m.getArgAsFloat(0));
+            gui->switchLoadBank(bankIndex);
+        }
+    }
+    else if (address == "/gravity/preset/loadBank/name") {
+        if (m.getNumArgs() > 0 && m.getArgType(0) == OFXOSC_TYPE_STRING) {
+            std::string bankName = m.getArgAsString(0);
+            for (size_t i = 0; i < gui->bankNames.size(); i++) {
+                if (gui->bankNames[i] == bankName) {
+                    gui->switchLoadBank(i);
+                    break;
+                }
+            }
+        }
+    }
+    // Save preset with custom name
+    else if (address == "/gravity/preset/saveAs") {
+        if (m.getNumArgs() > 0 && m.getArgType(0) == OFXOSC_TYPE_STRING) {
+            std::string presetName = m.getArgAsString(0);
+            gui->saveALL = 1;  // Populate saveBuffer
+            gui->savePresetAs(presetName);
+        }
+    }
+    // UI Scale control
+    else if (address == "/gravity/ui/scale") {
+        if (m.getNumArgs() > 0) {
+            int scaleIndex = static_cast<int>(m.getArgAsFloat(0));
+            if (scaleIndex >= 0 && scaleIndex <= 2) {
+                gui->uiScaleIndex = scaleIndex;
+            }
+        }
+    }
     else return false;
     return true;
 }

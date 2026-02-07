@@ -7,6 +7,8 @@
 
 #include "GuiApp.h"
 #include <GLFW/glfw3.h>  // For window decoration toggling (F10)
+#include <algorithm>     // For std::sort, std::find
+#include <cstring>       // For strncpy, strlen, memset
 
 // ===== OSC-ENABLED SLIDER MACRO =====
 // This macro wraps ImGui::SliderFloat to automatically send OSC when values change
@@ -100,6 +102,9 @@ void GuiApp::setup(){
 
 	//turn this all into a procedure.  to start with we only run this on start up
 	// but update whenever someone saves a new savestate?
+	// Initialize preset bank system - scan banks first
+	scanBanks();
+	// Also call legacy function for compatibility
 	indexSaveStateNames();
 	initializeNames();
 
@@ -107,7 +112,12 @@ void GuiApp::setup(){
 	refreshVideoDevices();
 
 	// Load saved video/OSC settings (if file exists)
+	// This may update bank indices and paths
 	loadVideoOscSettings();
+
+	// Now index presets with the correct bank paths from settings
+	indexSavePresets();
+	indexLoadPresets();
 
 	// Trigger source refresh and apply loaded settings on startup
 	refreshNdiSources = true;
@@ -158,6 +168,266 @@ void GuiApp::indexSaveStateNames(){
 			cout<<dir.getName(i)<<" was not loaded"<<endl;
 		}
 	}
+}
+
+//-------------------------------------------------------------------------------
+// Clean display name - strip gwSaveState### prefix and .json extension
+std::string GuiApp::cleanDisplayName(const std::string& filename) {
+	std::string name = filename;
+
+	// Remove .json extension
+	size_t dotPos = name.find_last_of(".");
+	if (dotPos != std::string::npos) {
+		name = name.substr(0, dotPos);
+	}
+
+	// Remove gwSaveState<NNN> prefix (pattern: gwSaveState followed by digits)
+	if (name.find("gwSaveState") == 0) {
+		size_t pos = 11; // Length of "gwSaveState"
+		// Skip any following digits
+		while (pos < name.length() && isdigit(name[pos])) {
+			pos++;
+		}
+		name = name.substr(pos);
+	}
+
+	// If result is empty (e.g., "gwSaveState026.json"), use numeric suffix
+	if (name.empty()) {
+		// Extract number from original filename
+		if (filename.find("gwSaveState") == 0) {
+			size_t numStart = 11;
+			size_t numEnd = numStart;
+			while (numEnd < filename.length() && isdigit(filename[numEnd])) {
+				numEnd++;
+			}
+			name = "Preset " + filename.substr(numStart, numEnd - numStart);
+		} else {
+			name = filename; // Fallback to original
+		}
+	}
+
+	return name;
+}
+
+//-------------------------------------------------------------------------------
+// Migrate old saveStates folder to new presets/Default structure
+void GuiApp::migrateOldSaveStates() {
+	ofDirectory presetsDir("presets");
+	ofDirectory oldDir("saveStates");
+
+	// Check if new structure already exists
+	if (presetsDir.exists()) {
+		ofLogNotice("Preset Migration") << "presets/ folder already exists, skipping migration";
+		return;
+	}
+
+	// Create new presets folder
+	ofDirectory::createDirectory("presets", false, true);
+
+	if (oldDir.exists()) {
+		ofLogNotice("Preset Migration") << "Migrating saveStates to presets/Default...";
+
+		// Create Default folder and copy files
+		ofDirectory::createDirectory("presets/Default", false, true);
+
+		oldDir.allowExt("json");
+		oldDir.listDir();
+
+		for (int i = 0; i < oldDir.size(); i++) {
+			std::string srcPath = oldDir.getPath(i);
+			std::string fileName = oldDir.getName(i);
+			std::string dstPath = "presets/Default/" + fileName;
+
+			ofFile srcFile(srcPath);
+			srcFile.copyTo(dstPath);
+			ofLogNotice("Preset Migration") << "Copied: " << fileName;
+		}
+
+		ofLogNotice("Preset Migration") << "Migration complete! " << oldDir.size() << " presets copied.";
+	} else {
+		// No old folder, just create empty Default bank
+		ofDirectory::createDirectory("presets/Default", false, true);
+		ofLogNotice("Preset Migration") << "Created empty presets/Default folder";
+	}
+}
+
+//-------------------------------------------------------------------------------
+// Scan presets folder for bank subdirectories
+void GuiApp::scanBanks() {
+	// Ensure migration has happened
+	migrateOldSaveStates();
+
+	bankNames.clear();
+	bankNamesChar.clear();
+
+	ofDirectory presetsDir("presets");
+	presetsDir.listDir();
+
+	for (int i = 0; i < presetsDir.size(); i++) {
+		if (presetsDir.getFile(i).isDirectory()) {
+			std::string dirName = presetsDir.getName(i);
+			bankNames.push_back(dirName);
+		}
+	}
+
+	// Sort alphabetically
+	std::sort(bankNames.begin(), bankNames.end());
+
+	// Build C-string pointers for ImGui
+	bankNamesChar.resize(bankNames.size());
+	for (size_t i = 0; i < bankNames.size(); i++) {
+		bankNamesChar[i] = bankNames[i].c_str();
+	}
+
+	// Set default bank if available
+	if (!bankNames.empty()) {
+		// Try to find "Default" as default, else use first
+		auto it = std::find(bankNames.begin(), bankNames.end(), "Default");
+		if (it != bankNames.end()) {
+			saveBankIndex = std::distance(bankNames.begin(), it);
+			loadBankIndex = saveBankIndex;
+		} else {
+			saveBankIndex = 0;
+			loadBankIndex = 0;
+		}
+		saveBankPath = "presets/" + bankNames[saveBankIndex];
+		loadBankPath = "presets/" + bankNames[loadBankIndex];
+	}
+
+	ofLogNotice("Preset Banks") << "Found " << bankNames.size() << " banks";
+}
+
+//-------------------------------------------------------------------------------
+// Index presets in save bank
+void GuiApp::indexSavePresets() {
+	savePresetDisplayNames.clear();
+	savePresetDisplayNamesChar.clear();
+	savePresetFileNames.clear();
+
+	ofDirectory dir(saveBankPath);
+	dir.allowExt("json");
+	dir.listDir();
+	dir.sort();
+
+	savePresetCount = dir.size();
+
+	for (int i = 0; i < savePresetCount; i++) {
+		std::string fileName = dir.getName(i);
+		savePresetFileNames.push_back(fileName);
+
+		std::string displayName = cleanDisplayName(fileName);
+		savePresetDisplayNames.push_back(displayName);
+	}
+
+	// Build C-string pointers
+	savePresetDisplayNamesChar.resize(savePresetCount);
+	for (int i = 0; i < savePresetCount; i++) {
+		savePresetDisplayNamesChar[i] = savePresetDisplayNames[i].c_str();
+	}
+
+	// Reset selection if out of bounds
+	if (saveStateSelectSwitch >= savePresetCount) {
+		saveStateSelectSwitch = 0;
+	}
+
+	ofLogNotice("Save Presets") << "Indexed " << savePresetCount << " presets in " << saveBankPath;
+}
+
+//-------------------------------------------------------------------------------
+// Index presets in load bank
+void GuiApp::indexLoadPresets() {
+	loadPresetDisplayNames.clear();
+	loadPresetDisplayNamesChar.clear();
+	loadPresetFileNames.clear();
+
+	ofDirectory dir(loadBankPath);
+	dir.allowExt("json");
+	dir.listDir();
+	dir.sort();
+
+	loadPresetCount = dir.size();
+
+	for (int i = 0; i < loadPresetCount; i++) {
+		std::string fileName = dir.getName(i);
+		loadPresetFileNames.push_back(fileName);
+
+		std::string displayName = cleanDisplayName(fileName);
+		loadPresetDisplayNames.push_back(displayName);
+	}
+
+	// Build C-string pointers
+	loadPresetDisplayNamesChar.resize(loadPresetCount);
+	for (int i = 0; i < loadPresetCount; i++) {
+		loadPresetDisplayNamesChar[i] = loadPresetDisplayNames[i].c_str();
+	}
+
+	// Reset selection if out of bounds
+	if (loadStateSelectSwitch >= loadPresetCount) {
+		loadStateSelectSwitch = 0;
+	}
+
+	ofLogNotice("Load Presets") << "Indexed " << loadPresetCount << " presets in " << loadBankPath;
+}
+
+//-------------------------------------------------------------------------------
+// Switch save bank
+void GuiApp::switchSaveBank(int bankIndex) {
+	if (bankIndex >= 0 && bankIndex < (int)bankNames.size()) {
+		saveBankIndex = bankIndex;
+		saveBankPath = "presets/" + bankNames[bankIndex];
+		indexSavePresets();
+		saveStateSelectSwitch = 0;
+		ofLogNotice("Save Bank") << "Switched to: " << bankNames[bankIndex];
+	}
+}
+
+//-------------------------------------------------------------------------------
+// Switch load bank
+void GuiApp::switchLoadBank(int bankIndex) {
+	if (bankIndex >= 0 && bankIndex < (int)bankNames.size()) {
+		loadBankIndex = bankIndex;
+		loadBankPath = "presets/" + bankNames[bankIndex];
+		indexLoadPresets();
+		loadStateSelectSwitch = 0;
+		ofLogNotice("Load Bank") << "Switched to: " << bankNames[bankIndex];
+	}
+}
+
+//-------------------------------------------------------------------------------
+// Save preset with custom name
+void GuiApp::savePresetAs(const std::string& presetName) {
+	if (presetName.empty()) return;
+
+	// Sanitize name (remove invalid characters)
+	std::string sanitized = presetName;
+	for (char& c : sanitized) {
+		if (c == '/' || c == '\\' || c == ':' || c == '*' ||
+			c == '?' || c == '"' || c == '<' || c == '>' || c == '|') {
+			c = '_';
+		}
+	}
+
+	// Build full path
+	std::string fullPath = saveBankPath + "/" + sanitized + ".json";
+
+	// Save the preset (reuse existing save logic)
+	ofSaveJson(fullPath, saveBuffer);
+
+	// Refresh preset list
+	indexSavePresets();
+
+	// Find and select the new preset
+	for (int i = 0; i < savePresetCount; i++) {
+		if (savePresetFileNames[i] == sanitized + ".json") {
+			saveStateSelectSwitch = i;
+			break;
+		}
+	}
+
+	// Clear input buffer
+	memset(newPresetNameBuffer, 0, sizeof(newPresetNameBuffer));
+
+	ofLogNotice("Preset") << "Saved new preset: " << fullPath;
 }
 
 //-------------------------------------------------------------------------------
@@ -396,7 +666,8 @@ void GuiApp::draw(){
 
 	//strangely enough, when i switched to ImGui::Begin from ImGui::BeginWindow, that seemed to really
 	//bonk up the fontGlobalScale thing...
-	io.FontGlobalScale=2.0f;
+	// Apply UI scale from selector (0=100%, 1=150%, 2=200%)
+	io.FontGlobalScale = uiScaleValues[uiScaleIndex];
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	float block2Hue=.52;
 	if(blockSelectHsb==1){
@@ -410,15 +681,33 @@ void GuiApp::draw(){
 	}
 	bool value=true;
 	bool* p_open =&value;
-	ImGui::SetNextWindowSize(ImVec2(1280,720-debugAdjust),ImGuiCond_Once);
-	ImGui::SetNextWindowPos(ImVec2(0,0),ImGuiCond_Once);
+	// Full-screen window sizing - fills the entire window dynamically
+	ImGui::SetNextWindowSize(ImVec2(ofGetWindowWidth(), ofGetWindowHeight()-debugAdjust), ImGuiCond_Always);
+	ImGui::SetNextWindowPos(ImVec2(0,0), ImGuiCond_Always);
+
+	// Generate dynamic title bar that fills the window width
+	std::string centerText = "G*R*A*V*I*T*Y**W*A*A*A*V*E*S v 1.50";
+	std::string pattern = "--++--++";
+	float charWidth = ImGui::GetFontSize() * 0.5f; // Approximate character width
+	float windowWidth = ofGetWindowWidth();
+	float titleAreaWidth = windowWidth - 60; // Account for window controls
+	int centerLen = centerText.length();
+	int patternLen = pattern.length();
+	int totalChars = (int)(titleAreaWidth / charWidth);
+	int sideChars = (totalChars - centerLen - 4) / 2; // -4 for spaces and asterisks
+	int patternReps = std::max(1, sideChars / patternLen);
+
+	std::string sidePattern = "*";
+	for (int i = 0; i < patternReps; i++) sidePattern += pattern;
+	std::string dynamicTitle = sidePattern + " " + centerText + " " + sidePattern;
+
 	//if (ofxImGui::BeginWindow("++--++--++--++--++--++--++--G*R*A*V*I*T*Y**W*A*A*A*V*E*S--++--++--++--++--++--++", mainSettings, false)) {
-	if( ImGui::Begin("*--++--++--++--++--++--++--++--G*R*A*V*I*T*Y**W*A*A*A*V*E*S v 1.50 --++--++--++--++--++--++--*", p_open ,window_flags)   ) {
+	if( ImGui::Begin(dynamicTitle.c_str(), p_open ,window_flags)   ) {
 
 		ImGui::PushItemWidth(windowWidthHalf);
 
 		//trying to make the top line all fit
-		int windowWidthQuarter=720*.25f+50;
+		int windowWidthQuarter=720*.25f+80;  // Increased for better readability at high scale
 		ImGui::PushItemWidth(windowWidthQuarter);
 		//ImGui::SliderFloat("just a test", &testParameter, 0.0f, 1.0f);
 		const char* items10[] = { "draw BLOCK1","draw BLOCK2","draw BLOCK3","drawAllBLOCKS" };
@@ -428,32 +717,58 @@ void GuiApp::draw(){
 		ImGui::SameLine();
 		ImGui::Text("+++++");
 		ImGui::SameLine();
-		const char* saveStateSelectItems[saveStateLimit];
-		for(int i=0;i<saveStateLimit;i++){
-			saveStateSelectItems[i]=saveStateNamesChar[i];
-		}
 
+		// ========== SAVE SECTION ==========
+		// Save Bank Dropdown
+		ImGui::PushItemWidth(180);
+		static int item_saveBank = 0;
+		if (item_saveBank != saveBankIndex) {
+			item_saveBank = saveBankIndex;
+		}
+		if (!bankNamesChar.empty()) {
+			if (ImGui::Combo("##selectSaveBank", &item_saveBank, bankNamesChar.data(), bankNamesChar.size())) {
+				switchSaveBank(item_saveBank);
+				if (mainApp) mainApp->sendOscParameter("/gravity/preset/saveBank/index", static_cast<float>(saveBankIndex));
+			}
+		}
+		ImGui::PopItemWidth();
+
+		ImGui::SameLine();
+
+		// Save Preset Dropdown
+		ImGui::PushItemWidth(windowWidthQuarter);
 		static int item_saveState = 0;
-		// Sync GUI dropdown with OSC-updated value
 		if (item_saveState != saveStateSelectSwitch) {
 			item_saveState = saveStateSelectSwitch;
 		}
-		if (ImGui::Combo("##select a save state", &item_saveState, saveStateSelectItems, IM_ARRAYSIZE(saveStateSelectItems))) {
-			saveStateSelectSwitch=item_saveState;
-			if (mainApp) mainApp->sendOscParameter("/gravity/preset/selectSave", static_cast<float>(saveStateSelectSwitch));
+		if (savePresetCount > 0) {
+			if (ImGui::Combo("##selectSavePreset", &item_saveState, savePresetDisplayNamesChar.data(), savePresetCount)) {
+				saveStateSelectSwitch = item_saveState;
+				// Copy name to input buffer for editing
+				strncpy(newPresetNameBuffer, savePresetDisplayNames[item_saveState].c_str(), sizeof(newPresetNameBuffer)-1);
+				if (mainApp) mainApp->sendOscParameter("/gravity/preset/selectSave", static_cast<float>(saveStateSelectSwitch));
+			}
 		}
-		saveStateSelectSwitch=item_saveState;
-		ImGui::SameLine();
-		ImGui::Text(" ");
+		ImGui::PopItemWidth();
 
 		ImGui::SameLine();
-		//add savestate select here
+
+		// Preset Name Input
+		ImGui::PushItemWidth(120);
+		ImGui::InputText("##presetName", newPresetNameBuffer, sizeof(newPresetNameBuffer));
+		ImGui::PopItemWidth();
+
+		ImGui::SameLine();
+
+		// Save Button (overwrites selected)
 		if (ImGui::Button("save")) {
 			saveALL=1;
 			ImGui::OpenPopup("save successful");
 		}
 		if(ImGui::BeginPopupModal("save successful")){
-			string success=saveStateNames[saveStateSelectSwitch]+ " saved successfully!";
+			string success = (savePresetCount > 0 && saveStateSelectSwitch < savePresetCount)
+				? savePresetDisplayNames[saveStateSelectSwitch] + " saved!"
+				: "Preset saved!";
 			ImGui::Text(success.c_str());
 			if(ImGui::Button("okay")){ImGui::CloseCurrentPopup();}
 			ImGui::SetItemDefaultFocus();
@@ -461,25 +776,80 @@ void GuiApp::draw(){
 		}
 
 		ImGui::SameLine();
-		ImGui::Text(" ");
-		ImGui::SameLine();
-		const char* loadStateSelectItems[saveStateLimit];
-		for(int i=0;i<saveStateLimit;i++){
-			loadStateSelectItems[i]=saveStateNamesChar[i];
+
+		// New Button (saves with input name)
+		if (ImGui::Button("new")) {
+			if (strlen(newPresetNameBuffer) > 0) {
+				// Populate saveBuffer before saving
+				saveALL = 1;
+				savePresetAs(newPresetNameBuffer);
+				ImGui::OpenPopup("save as successful");
+			} else {
+				ImGui::OpenPopup("name required");
+			}
 		}
+		if(ImGui::BeginPopupModal("save as successful")){
+			ImGui::Text("New preset created!");
+			if(ImGui::Button("okay")){ImGui::CloseCurrentPopup();}
+			ImGui::SetItemDefaultFocus();
+			ImGui::EndPopup();
+		}
+		if(ImGui::BeginPopupModal("name required")){
+			ImGui::Text("Please enter a preset name first.");
+			if(ImGui::Button("okay")){ImGui::CloseCurrentPopup();}
+			ImGui::SetItemDefaultFocus();
+			ImGui::EndPopup();
+		}
+
+		ImGui::SameLine();
+		ImGui::Text("|");
+		ImGui::SameLine();
+
+		// Refresh Banks Button
+		if (ImGui::Button("R##refreshBanks")) {
+			scanBanks();
+			indexSavePresets();
+			indexLoadPresets();
+		}
+		if (ImGui::IsItemHovered()) {
+			ImGui::SetTooltip("Refresh preset banks");
+		}
+
+		ImGui::SameLine();
+		ImGui::Text("|");
+		ImGui::SameLine();
+
+		// ========== LOAD SECTION ==========
+		// Load Bank Dropdown
+		ImGui::PushItemWidth(180);
+		static int item_loadBank = 0;
+		if (item_loadBank != loadBankIndex) {
+			item_loadBank = loadBankIndex;
+		}
+		if (!bankNamesChar.empty()) {
+			if (ImGui::Combo("##selectLoadBank", &item_loadBank, bankNamesChar.data(), bankNamesChar.size())) {
+				switchLoadBank(item_loadBank);
+				if (mainApp) mainApp->sendOscParameter("/gravity/preset/loadBank/index", static_cast<float>(loadBankIndex));
+			}
+		}
+		ImGui::PopItemWidth();
+
+		ImGui::SameLine();
+
+		// Load Preset Dropdown
+		ImGui::PushItemWidth(windowWidthQuarter);
 		static int item_loadState = 0;
-		// Sync GUI dropdown with OSC-updated value
 		if (item_loadState != loadStateSelectSwitch) {
 			item_loadState = loadStateSelectSwitch;
 		}
-		if (ImGui::Combo("##select a load state", &item_loadState, loadStateSelectItems, IM_ARRAYSIZE(loadStateSelectItems))) {
-			loadStateSelectSwitch=item_loadState;
-			if (mainApp) mainApp->sendOscParameter("/gravity/preset/selectLoad", static_cast<float>(loadStateSelectSwitch));
+		if (loadPresetCount > 0) {
+			if (ImGui::Combo("##selectLoadPreset", &item_loadState, loadPresetDisplayNamesChar.data(), loadPresetCount)) {
+				loadStateSelectSwitch = item_loadState;
+				if (mainApp) mainApp->sendOscParameter("/gravity/preset/selectLoad", static_cast<float>(loadStateSelectSwitch));
+			}
 		}
-		loadStateSelectSwitch=item_loadState;
+		ImGui::PopItemWidth();
 
-		ImGui::SameLine();
-		ImGui::Text(" ");
 		ImGui::SameLine();
 
 		if (ImGui::Button("load")) {
@@ -493,6 +863,20 @@ void GuiApp::draw(){
 		if (ImGui::Button("reset all")) {
 			resetAll();
 		}
+
+		ImGui::SameLine();
+
+		// ========== UI SCALE DROPDOWN ==========
+		ImGui::PushItemWidth(120);
+		const char* scaleItems[] = { "200%", "250%", "300%" };
+		static int item_scale = 0;  // Default to 200% (2.0x actual scale)
+		if (item_scale != uiScaleIndex) {
+			item_scale = uiScaleIndex;
+		}
+		if (ImGui::Combo("##uiScale", &item_scale, scaleItems, IM_ARRAYSIZE(scaleItems))) {
+			uiScaleIndex = item_scale;
+		}
+		ImGui::PopItemWidth();
 
 		ImGui::PopItemWidth();
 
@@ -5519,13 +5903,14 @@ void GuiApp::draw(){
 				ImGui::Separator();
 				ImGui::Spacing();
 
-				// ========== INPUT 1 ==========
+				// ========== INPUT 1 & INPUT 2 SIDE BY SIDE ==========
+				float columnWidth = (ImGui::GetContentRegionAvail().x - 20) / 2;
+
+				ImGui::BeginGroup();
 				ImGui::Text("INPUT 1");
 				ImGui::Spacing();
 
 				// Source type selector
-				ImGui::Text("Source Type:");
-				ImGui::SameLine();
 				if (ImGui::RadioButton("Webcam##1", input1SourceType == 0)) {
 					input1SourceType = 0;
 				}
@@ -5541,6 +5926,7 @@ void GuiApp::draw(){
 #endif
 
 				// Show appropriate dropdown based on source type
+				ImGui::SetNextItemWidth(columnWidth);
 				if (input1SourceType == 0) {
 					// Webcam dropdown
 					if (videoDeviceNames.size() > 0) {
@@ -5599,21 +5985,18 @@ void GuiApp::draw(){
 						}
 					} else {
 						ImGui::Text("No Spout senders found");
-						ImGui::TextDisabled("Click 'Refresh Spout Sources'");
 					}
 				}
 #endif
-				ImGui::Spacing();
-				ImGui::Separator();
-				ImGui::Spacing();
+				ImGui::EndGroup();
 
-				// ========== INPUT 2 ==========
+				ImGui::SameLine(0, 20);
+
+				ImGui::BeginGroup();
 				ImGui::Text("INPUT 2");
 				ImGui::Spacing();
 
 				// Source type selector
-				ImGui::Text("Source Type:");
-				ImGui::SameLine();
 				if (ImGui::RadioButton("Webcam##2", input2SourceType == 0)) {
 					input2SourceType = 0;
 				}
@@ -5629,6 +6012,7 @@ void GuiApp::draw(){
 #endif
 
 				// Show appropriate dropdown based on source type
+				ImGui::SetNextItemWidth(columnWidth);
 				if (input2SourceType == 0) {
 					// Webcam dropdown
 					if (videoDeviceNames.size() > 0) {
@@ -5687,17 +6071,18 @@ void GuiApp::draw(){
 						}
 					} else {
 						ImGui::Text("No Spout senders found");
-						ImGui::TextDisabled("Click 'Refresh Spout Sources'");
 					}
 				}
 #endif
+				ImGui::EndGroup();
+
 				ImGui::Spacing();
 				ImGui::Separator();
 				ImGui::Spacing();
 
 				// Reinitialize button
 				ImGui::Text("Apply Changes");
-				if (ImGui::Button("REINITIALIZE INPUTS", ImVec2(220, 30))) {
+				if (ImGui::Button("REINITIALIZE INPUTS")) {
 					reinitializeInputs = true;
 				}
 				ImGui::Spacing();
@@ -5711,33 +6096,38 @@ void GuiApp::draw(){
 				ImGui::Separator();
 				ImGui::Spacing();
 
+				// ========== SPOUT & NDI OUTPUT ==========
 #if OFAPP_HAS_SPOUT
-				// ========== SPOUT OUTPUT ==========
 				ImGui::Text("SPOUT OUTPUT");
-				ImGui::Spacing();
-
-				ImGui::Checkbox("Send Block 1 (GwBlock1)", &spoutSendBlock1);
-				ImGui::Checkbox("Send Block 2 (GwBlock2)", &spoutSendBlock2);
-				ImGui::Checkbox("Send Block 3 - Final (GwBlock3)", &spoutSendBlock3);
-
-				ImGui::Spacing();
-				ImGui::TextDisabled("Enable to share framebuffers via Spout");
-
-				ImGui::Spacing();
-				ImGui::Separator();
-				ImGui::Spacing();
+				ImGui::SameLine(columnWidth + 20);
 #endif
-
-				// ========== NDI OUTPUT ==========
 				ImGui::Text("NDI OUTPUT");
 				ImGui::Spacing();
 
+#if OFAPP_HAS_SPOUT
+				ImGui::Checkbox("Send Block 1 (GwBlock1)", &spoutSendBlock1);
+				ImGui::SameLine(columnWidth + 20);
+#endif
 				ImGui::Checkbox("Send Block 1 (GwBlock1)##ndi", &ndiSendBlock1);
+
+#if OFAPP_HAS_SPOUT
+				ImGui::Checkbox("Send Block 2 (GwBlock2)", &spoutSendBlock2);
+				ImGui::SameLine(columnWidth + 20);
+#endif
 				ImGui::Checkbox("Send Block 2 (GwBlock2)##ndi", &ndiSendBlock2);
+
+#if OFAPP_HAS_SPOUT
+				ImGui::Checkbox("Send Block 3 - Final (GwBlock3)", &spoutSendBlock3);
+				ImGui::SameLine(columnWidth + 20);
+#endif
 				ImGui::Checkbox("Send Block 3 - Final (GwBlock3)##ndi", &ndiSendBlock3);
 
 				ImGui::Spacing();
+#if OFAPP_HAS_SPOUT
+				ImGui::TextDisabled("Enable to share framebuffers via Spout/NDI");
+#else
 				ImGui::TextDisabled("Enable to share framebuffers via NDI");
+#endif
 
 				ImGui::Spacing();
 				ImGui::Separator();
@@ -5747,74 +6137,76 @@ void GuiApp::draw(){
 				ImGui::Text("RESOLUTION SETTINGS");
 				ImGui::Spacing();
 
-				// Input 1 Resolution
-				ImGui::Text("Input 1 Resolution:");
-				ImGui::SetNextItemWidth(80);
+				// Scale input width with font size (4 digits worth)
+				float resInputWidth = ImGui::GetFontSize() * 4.0f;
+
+				// Input 1 & Input 2 Resolutions on same line
+				ImGui::Text("Input 1:");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(resInputWidth);
 				ImGui::InputScalar("##in1Width", ImGuiDataType_S32, &input1Width);
 				ImGui::SameLine();
 				ImGui::Text("x");
 				ImGui::SameLine();
-				ImGui::SetNextItemWidth(80);
+				ImGui::SetNextItemWidth(resInputWidth);
 				ImGui::InputScalar("##in1Height", ImGuiDataType_S32, &input1Height);
-
-				// Input 2 Resolution
-				ImGui::Text("Input 2 Resolution:");
-				ImGui::SetNextItemWidth(80);
+				ImGui::SameLine(columnWidth + 20);
+				ImGui::Text("Input 2:");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(resInputWidth);
 				ImGui::InputScalar("##in2Width", ImGuiDataType_S32, &input2Width);
 				ImGui::SameLine();
 				ImGui::Text("x");
 				ImGui::SameLine();
-				ImGui::SetNextItemWidth(80);
+				ImGui::SetNextItemWidth(resInputWidth);
 				ImGui::InputScalar("##in2Height", ImGuiDataType_S32, &input2Height);
 
 				ImGui::Spacing();
 
-				// Internal Resolution
-				ImGui::Text("Internal Resolution (Feedback Buffers):");
-				ImGui::SetNextItemWidth(80);
+				// Internal & Output Resolutions on same line
+				ImGui::Text("Internal:");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(resInputWidth);
 				ImGui::InputScalar("##intWidth", ImGuiDataType_S32, &internalWidth);
 				ImGui::SameLine();
 				ImGui::Text("x");
 				ImGui::SameLine();
-				ImGui::SetNextItemWidth(80);
+				ImGui::SetNextItemWidth(resInputWidth);
 				ImGui::InputScalar("##intHeight", ImGuiDataType_S32, &internalHeight);
-
-				ImGui::Spacing();
-
-				// Output Resolution
-				ImGui::Text("Output Resolution:");
-				ImGui::SetNextItemWidth(80);
+				ImGui::SameLine(columnWidth + 20);
+				ImGui::Text("Output:");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(resInputWidth);
 				ImGui::InputScalar("##outWidth", ImGuiDataType_S32, &outputWidth);
 				ImGui::SameLine();
 				ImGui::Text("x");
 				ImGui::SameLine();
-				ImGui::SetNextItemWidth(80);
+				ImGui::SetNextItemWidth(resInputWidth);
 				ImGui::InputScalar("##outHeight", ImGuiDataType_S32, &outputHeight);
 
 				ImGui::Spacing();
-				ImGui::Separator();
-				ImGui::Spacing();
 
+				// Spout & NDI Send Resolutions on same line
 #if OFAPP_HAS_SPOUT
-				// Spout Send Resolution
-				ImGui::Text("Spout Send Resolution:");
-				ImGui::SetNextItemWidth(80);
+				ImGui::Text("Spout:");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(resInputWidth);
 				ImGui::InputScalar("##spoutWidth", ImGuiDataType_S32, &spoutSendWidth);
 				ImGui::SameLine();
 				ImGui::Text("x");
 				ImGui::SameLine();
-				ImGui::SetNextItemWidth(80);
+				ImGui::SetNextItemWidth(resInputWidth);
 				ImGui::InputScalar("##spoutHeight", ImGuiDataType_S32, &spoutSendHeight);
+				ImGui::SameLine(columnWidth + 20);
 #endif
-
-				// NDI Send Resolution
-				ImGui::Text("NDI Send Resolution:");
-				ImGui::SetNextItemWidth(80);
+				ImGui::Text("NDI:");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(resInputWidth);
 				ImGui::InputScalar("##ndiWidth", ImGuiDataType_S32, &ndiSendWidth);
 				ImGui::SameLine();
 				ImGui::Text("x");
 				ImGui::SameLine();
-				ImGui::SetNextItemWidth(80);
+				ImGui::SetNextItemWidth(resInputWidth);
 				ImGui::InputScalar("##ndiHeight", ImGuiDataType_S32, &ndiSendHeight);
 
 				// Clamp all values
@@ -5865,7 +6257,7 @@ void GuiApp::draw(){
 				// ========== SAVE SETTINGS ==========
 				ImGui::Text("SAVE/LOAD SETTINGS");
 				ImGui::Spacing();
-				if (ImGui::Button("Save Video & OSC Settings", ImVec2(260, 30))) {
+				if (ImGui::Button("Save Video & OSC Settings")) {
 					saveVideoOscSettings();
 				}
 				ImGui::Spacing();
@@ -5879,7 +6271,7 @@ void GuiApp::draw(){
 				// ========== ATTRIBUTIONS ==========
 				ImGui::Text("ATTRIBUTIONS");
 				ImGui::Spacing();
-				if (ImGui::Button("View Attributions", ImVec2(260, 30))) {
+				if (ImGui::Button("View Attributions")) {
 					showAttributionsPopup = true;
 				}
 				ImGui::Spacing();
@@ -7334,7 +7726,13 @@ void GuiApp::saveEverything(){
 	//saveBuffer["BLOCK_3"]["b3_extraWhatever"][0]=finalKeyOrder;
 
 
-	ofSaveJson("saveStates/"+saveStateNames[saveStateSelectSwitch]+".json",saveBuffer);
+	// Save to current save bank using new path structure
+	if (savePresetCount > 0 && saveStateSelectSwitch < savePresetCount) {
+		ofSaveJson(saveBankPath + "/" + savePresetFileNames[saveStateSelectSwitch], saveBuffer);
+	} else {
+		// Fallback to legacy path if no presets in bank
+		ofSaveJson("saveStates/"+saveStateNames[saveStateSelectSwitch]+".json",saveBuffer);
+	}
 }
 
 
@@ -7343,8 +7741,13 @@ void GuiApp::loadEverything(){
 	ofJson loadBuffer;
 	//heres where we put some logic for multiple save states
 	ofFile f1;
-	//heres where we put some logic for multiple save states
-	f1.open("saveStates/"+saveStateNames[loadStateSelectSwitch]+".json");
+	// Load from current load bank using new path structure
+	if (loadPresetCount > 0 && loadStateSelectSwitch < loadPresetCount) {
+		f1.open(loadBankPath + "/" + loadPresetFileNames[loadStateSelectSwitch]);
+	} else {
+		// Fallback to legacy path if no presets in bank
+		f1.open("saveStates/"+saveStateNames[loadStateSelectSwitch]+".json");
+	}
 	f1>>loadBuffer;
 	//fb1FramebufferClearSwitch=1;
 	//didn't feel like fucking around with extra procedures
@@ -56024,6 +56427,15 @@ void GuiApp::saveVideoOscSettings() {
     settings["osc"]["sendIP"] = std::string(oscSendIP);
     settings["osc"]["sendPort"] = oscSendPort;
 
+    // ========== PRESET BANK SETTINGS ==========
+    settings["presets"]["uiScaleIndex"] = uiScaleIndex;
+    if (!bankNames.empty()) {
+        settings["presets"]["saveBankName"] = bankNames[saveBankIndex];
+        settings["presets"]["loadBankName"] = bankNames[loadBankIndex];
+    }
+    settings["presets"]["savePresetIndex"] = saveStateSelectSwitch;
+    settings["presets"]["loadPresetIndex"] = loadStateSelectSwitch;
+
     // Save to file
     ofFile file("settings.json", ofFile::WriteOnly);
     file << settings.dump(4);
@@ -56192,6 +56604,43 @@ void GuiApp::loadVideoOscSettings() {
         }
         if (settings["osc"].contains("sendPort")) {
             oscSendPort = settings["osc"]["sendPort"];
+        }
+    }
+
+    // ========== PRESET BANK SETTINGS ==========
+    if (settings.contains("presets")) {
+        if (settings["presets"].contains("uiScaleIndex")) {
+            uiScaleIndex = settings["presets"]["uiScaleIndex"];
+            // Clamp to valid range
+            if (uiScaleIndex < 0) uiScaleIndex = 0;
+            if (uiScaleIndex > 2) uiScaleIndex = 2;
+        }
+        if (settings["presets"].contains("saveBankName")) {
+            std::string savedBankName = settings["presets"]["saveBankName"];
+            // Find bank index by name (applied after scanBanks())
+            for (size_t i = 0; i < bankNames.size(); i++) {
+                if (bankNames[i] == savedBankName) {
+                    saveBankIndex = i;
+                    saveBankPath = "presets/" + savedBankName;
+                    break;
+                }
+            }
+        }
+        if (settings["presets"].contains("loadBankName")) {
+            std::string savedBankName = settings["presets"]["loadBankName"];
+            for (size_t i = 0; i < bankNames.size(); i++) {
+                if (bankNames[i] == savedBankName) {
+                    loadBankIndex = i;
+                    loadBankPath = "presets/" + savedBankName;
+                    break;
+                }
+            }
+        }
+        if (settings["presets"].contains("savePresetIndex")) {
+            saveStateSelectSwitch = settings["presets"]["savePresetIndex"];
+        }
+        if (settings["presets"].contains("loadPresetIndex")) {
+            loadStateSelectSwitch = settings["presets"]["loadPresetIndex"];
         }
     }
 

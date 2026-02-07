@@ -125,6 +125,47 @@ public:
 	int saveStateSelectSwitch=0;
 	int loadStateSelectSwitch=0;
 
+	// ========== PRESET BANK SYSTEM ==========
+	// Bank management
+	std::vector<std::string> bankNames;
+	std::vector<const char*> bankNamesChar;
+
+	// Separate bank indices for save and load
+	int saveBankIndex = 0;
+	int loadBankIndex = 0;
+	std::string saveBankPath = "presets/Default";
+	std::string loadBankPath = "presets/Default";
+
+	// Save bank presets (clean display names)
+	std::vector<std::string> savePresetDisplayNames;
+	std::vector<const char*> savePresetDisplayNamesChar;
+	std::vector<std::string> savePresetFileNames;
+	int savePresetCount = 0;
+
+	// Load bank presets (clean display names)
+	std::vector<std::string> loadPresetDisplayNames;
+	std::vector<const char*> loadPresetDisplayNamesChar;
+	std::vector<std::string> loadPresetFileNames;
+	int loadPresetCount = 0;
+
+	// Name input for save
+	char newPresetNameBuffer[128] = "";
+
+	// UI Scale (labels: 200%/250%/300%, actual: 2.0/2.5/3.0)
+	int uiScaleIndex = 0;  // Default "200%" (2.0x actual scale)
+	float uiScaleValues[3] = {2.0f, 2.5f, 3.0f};
+
+	// Preset bank functions
+	void scanBanks();
+	void switchSaveBank(int bankIndex);
+	void switchLoadBank(int bankIndex);
+	void indexSavePresets();
+	void indexLoadPresets();
+	void savePresetAs(const std::string& name);
+	std::string cleanDisplayName(const std::string& filename);
+	void migrateOldSaveStates();
+
+	// Legacy function (kept for compatibility)
 	void indexSaveStateNames();
 
 	void saveBLOCK_1();
