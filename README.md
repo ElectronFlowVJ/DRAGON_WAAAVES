@@ -4,7 +4,7 @@
 
 If you like the work I've done here, please consider supporting me on Ko-fi @ https://ko-fi.com/electronflow. 
 
-Please also consider supporting Andrei Jay either on Patreon, or his Ko-fi @ https://ko-fi.com/andreijay as this would not have been possible without the amazing groundwork he has laid out, and his willingness to open source his projects.
+Please also consider supporting Andrei either on Patreon, or his Ko-fi @ https://ko-fi.com/andreijay as this would not have been possible without the amazing groundwork he has laid out, and his willingness to open source his projects.
 
 **Andrei's website:** https://videosynthecosphere.com
 
