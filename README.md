@@ -44,25 +44,23 @@ A real-time video effects processor and synthesizer built with openFrameworks. D
 
 ## Requirements
 
+- NewTek NDI: ndi.video
+- Spout2: spout.zeal.co
+
 - openFrameworks 0.12+
 - Required addons (see `addons.make`):
   - ofxImGui (develop branch)
   - ofxMidi
-  - ofxNDI
+  - ofxNDI - https://github.com/leadedge/ofxNDI
   - ofxOsc
-  - ofxSpout (Windows only) this will likely give you issues adding to the openFrameworks project using Project Generator, just download and add to the addOns folder, everything else should already be in place.
+  - ofxSpout - https://github.com/leadedge/Spout2 (Windows only) this will likely give you issues adding to the openFrameworks project using Project Generator, just download and add to the addOns folder, everything else should already be in place.
 
-## Building
-
-**Windows:** Open `GRAVITY_WAAAVES OSC.vcxproj` in Visual Studio and build.
-
-Ensure all required addons are installed in your openFrameworks addons folder.
 
 ## Usage Tips
 
-- The application runs with two windows: a control window (GUI) and an output window
+- The application runs with two windows: a control window (GUI) and an output window, but can also be used on single display, not recommended though.
 - FPS is configurable from 1-60 (default 30)
-- The output window can be set to fullscreen for production use
+- The output window can be set to fullscreen for production using F11, deocrations can be toggled with F10
 - Presets are stored in `bin/data/presets/`
 
 ## OSC Reference
