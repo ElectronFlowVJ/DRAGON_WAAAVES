@@ -1,0 +1,1425 @@
+================================================================================
+GRAVITY_WAAAVES OSC - OSC PARAMETER REFERENCE
+================================================================================
+
+Generated: February 2026
+Total OSC Addresses: 762
+Organized by Processing Block and GUI Tab Structure
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+
+BLOCK 1 - INPUT PROCESSING & MIXING
+  Tab: ch1 adjust
+  Tab: ch2 mix and key
+  Tab: ch2 adjust
+  Tab: fb1 parameters
+
+BLOCK 2 - SECONDARY FRAME BUFFER
+  Tab: input adjust
+  Tab: fb2 parameters
+
+BLOCK 3 - FINAL COMPOSITING & OUTPUT
+  Tab: B_1 parameters
+  Tab: B_2 parameters
+  Tab: matrix mixer
+  Tab: final mix and key
+
+GLOBAL COMMANDS
+SYSTEM SETTINGS
+
+================================================================================
+BLOCK 1 - INPUT PROCESSING & MIXING
+================================================================================
+
+################################################################################
+TAB: ch1 adjust
+OSC Namespace: /gravity/block1/ch1/
+################################################################################
+
+--- Continuous Parameters ---
+
+Geometry (4 params):
+  /gravity/block1/ch1/xDisplace            Horizontal displacement
+  /gravity/block1/ch1/yDisplace            Vertical displacement
+  /gravity/block1/ch1/zDisplace            Depth/Z-axis displacement
+  /gravity/block1/ch1/rotate               Rotation angle
+
+Color (3 params):
+  /gravity/block1/ch1/hueOffset            Hue color shift
+  /gravity/block1/ch1/saturationOffset     Saturation adjustment
+  /gravity/block1/ch1/brightOffset         Brightness adjustment
+
+Effects (3 params):
+  /gravity/block1/ch1/posterize            Posterization intensity
+  /gravity/block1/ch1/kaleidoscopeAmount   Kaleidoscope intensity
+  /gravity/block1/ch1/kaleidoscopeSlice    Kaleidoscope segments
+
+Filters (5 params):
+  /gravity/block1/ch1/blurAmount           Blur intensity
+  /gravity/block1/ch1/blurRadius           Blur radius
+  /gravity/block1/ch1/sharpenAmount        Sharpen intensity
+  /gravity/block1/ch1/sharpenRadius        Sharpen radius
+  /gravity/block1/ch1/filtersBoost         Filter boost/gain
+
+--- LFO Parameters ---
+
+  /gravity/block1/ch1/lfo/xDisplaceAmp     X displacement modulation depth
+  /gravity/block1/ch1/lfo/xDisplaceRate    X displacement modulation speed
+  /gravity/block1/ch1/lfo/yDisplaceAmp     Y displacement modulation depth
+  /gravity/block1/ch1/lfo/yDisplaceRate    Y displacement modulation speed
+  /gravity/block1/ch1/lfo/zDisplaceAmp     Z displacement modulation depth
+  /gravity/block1/ch1/lfo/zDisplaceRate    Z displacement modulation speed
+  /gravity/block1/ch1/lfo/rotateAmp        Rotation modulation depth
+  /gravity/block1/ch1/lfo/rotateRate       Rotation modulation speed
+  /gravity/block1/ch1/lfo/hueOffsetAmp     Hue modulation depth
+  /gravity/block1/ch1/lfo/hueOffsetRate    Hue modulation speed
+  /gravity/block1/ch1/lfo/saturationOffsetAmp   Saturation modulation depth
+  /gravity/block1/ch1/lfo/saturationOffsetRate  Saturation modulation speed
+  /gravity/block1/ch1/lfo/brightOffsetAmp  Brightness modulation depth
+  /gravity/block1/ch1/lfo/brightOffsetRate Brightness modulation speed
+  /gravity/block1/ch1/lfo/kaleidoscopeSliceAmp   Kaleidoscope modulation depth
+  /gravity/block1/ch1/lfo/kaleidoscopeSliceRate  Kaleidoscope modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block1/ch1/inputSelect          INT - Input source (0=Webcam, 1=NDI, 2=Spout)
+  /gravity/block1/ch1/geoOverflow          INT - Geometry overflow mode
+  /gravity/block1/ch1/hMirror              BOOL - Horizontal mirror
+  /gravity/block1/ch1/vMirror              BOOL - Vertical mirror
+  /gravity/block1/ch1/hFlip                BOOL - Horizontal flip
+  /gravity/block1/ch1/vFlip                BOOL - Vertical flip
+  /gravity/block1/ch1/hueInvert            BOOL - Invert hue
+  /gravity/block1/ch1/saturationInvert     BOOL - Invert saturation
+  /gravity/block1/ch1/brightInvert         BOOL - Invert brightness
+  /gravity/block1/ch1/rgbInvert            BOOL - Invert RGB
+  /gravity/block1/ch1/solarize             BOOL - Solarize effect
+
+--- Reset Commands ---
+
+  /gravity/block1/ch1/resetAdjust          Reset all ch1 adjust parameters
+  /gravity/block1/ch1/lfo/resetAdjust      Reset ch1 LFO parameters
+
+################################################################################
+TAB: ch2 mix and key
+OSC Namespace: /gravity/block1/ch2/
+################################################################################
+
+--- Continuous Parameters ---
+
+Mix (1 param):
+  /gravity/block1/ch2/mixAmount            Mix amount between Ch1 and Ch2
+
+Chroma Key (5 params):
+  /gravity/block1/ch2/keyRed               Key color - Red channel
+  /gravity/block1/ch2/keyGreen             Key color - Green channel
+  /gravity/block1/ch2/keyBlue              Key color - Blue channel
+  /gravity/block1/ch2/keyThreshold         Key threshold sensitivity
+  /gravity/block1/ch2/keySoft              Key edge softness
+
+--- LFO Parameters ---
+
+  /gravity/block1/ch2/lfo/mixAmountAmp     Mix modulation depth
+  /gravity/block1/ch2/lfo/mixAmountRate    Mix modulation speed
+  /gravity/block1/ch2/lfo/keyThresholdAmp  Key threshold modulation depth
+  /gravity/block1/ch2/lfo/keyThresholdRate Key threshold modulation speed
+  /gravity/block1/ch2/lfo/keySoftAmp       Key softness modulation depth
+  /gravity/block1/ch2/lfo/keySoftRate      Key softness modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block1/ch2/inputSelect          INT - Input source
+  /gravity/block1/ch2/keyMode              INT - Keying mode
+  /gravity/block1/ch2/keyOrder             INT - Key order (before/after mix)
+  /gravity/block1/ch2/mixType              INT - Mix blending mode
+  /gravity/block1/ch2/mixOverflow          INT - Mix overflow handling
+
+--- Reset Commands ---
+
+  /gravity/block1/ch2/resetMixAndKey       Reset mix and key parameters
+  /gravity/block1/ch2/lfo/resetMixAndKey   Reset mix and key LFO parameters
+
+################################################################################
+TAB: ch2 adjust
+OSC Namespace: /gravity/block1/ch2/
+################################################################################
+
+--- Continuous Parameters ---
+
+Geometry (4 params):
+  /gravity/block1/ch2/xDisplace            Horizontal displacement
+  /gravity/block1/ch2/yDisplace            Vertical displacement
+  /gravity/block1/ch2/zDisplace            Depth/Z-axis displacement
+  /gravity/block1/ch2/rotate               Rotation angle
+
+Color (3 params):
+  /gravity/block1/ch2/hueOffset            Hue color shift
+  /gravity/block1/ch2/saturationOffset     Saturation adjustment
+  /gravity/block1/ch2/brightOffset         Brightness adjustment
+
+Effects (3 params):
+  /gravity/block1/ch2/posterize            Posterization intensity
+  /gravity/block1/ch2/kaleidoscopeAmount   Kaleidoscope intensity
+  /gravity/block1/ch2/kaleidoscopeSlice    Kaleidoscope segments
+
+Filters (5 params):
+  /gravity/block1/ch2/blurAmount           Blur intensity
+  /gravity/block1/ch2/blurRadius           Blur radius
+  /gravity/block1/ch2/sharpenAmount        Sharpen intensity
+  /gravity/block1/ch2/sharpenRadius        Sharpen radius
+  /gravity/block1/ch2/filtersBoost         Filter boost/gain
+
+--- LFO Parameters ---
+
+  /gravity/block1/ch2/lfo/xDisplaceAmp     X displacement modulation depth
+  /gravity/block1/ch2/lfo/xDisplaceRate    X displacement modulation speed
+  /gravity/block1/ch2/lfo/yDisplaceAmp     Y displacement modulation depth
+  /gravity/block1/ch2/lfo/yDisplaceRate    Y displacement modulation speed
+  /gravity/block1/ch2/lfo/zDisplaceAmp     Z displacement modulation depth
+  /gravity/block1/ch2/lfo/zDisplaceRate    Z displacement modulation speed
+  /gravity/block1/ch2/lfo/rotateAmp        Rotation modulation depth
+  /gravity/block1/ch2/lfo/rotateRate       Rotation modulation speed
+  /gravity/block1/ch2/lfo/hueOffsetAmp     Hue modulation depth
+  /gravity/block1/ch2/lfo/hueOffsetRate    Hue modulation speed
+  /gravity/block1/ch2/lfo/saturationOffsetAmp   Saturation modulation depth
+  /gravity/block1/ch2/lfo/saturationOffsetRate  Saturation modulation speed
+  /gravity/block1/ch2/lfo/brightOffsetAmp  Brightness modulation depth
+  /gravity/block1/ch2/lfo/brightOffsetRate Brightness modulation speed
+  /gravity/block1/ch2/lfo/kaleidoscopeSliceAmp   Kaleidoscope modulation depth
+  /gravity/block1/ch2/lfo/kaleidoscopeSliceRate  Kaleidoscope modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block1/ch2/geoOverflow          INT - Geometry overflow mode
+  /gravity/block1/ch2/hMirror              BOOL - Horizontal mirror
+  /gravity/block1/ch2/vMirror              BOOL - Vertical mirror
+  /gravity/block1/ch2/hFlip                BOOL - Horizontal flip
+  /gravity/block1/ch2/vFlip                BOOL - Vertical flip
+  /gravity/block1/ch2/hueInvert            BOOL - Invert hue
+  /gravity/block1/ch2/saturationInvert     BOOL - Invert saturation
+  /gravity/block1/ch2/brightInvert         BOOL - Invert brightness
+  /gravity/block1/ch2/rgbInvert            BOOL - Invert RGB
+  /gravity/block1/ch2/solarize             BOOL - Solarize effect
+
+--- Reset Commands ---
+
+  /gravity/block1/ch2/resetAdjust          Reset ch2 adjust parameters
+  /gravity/block1/ch2/lfo/resetAdjust      Reset ch2 adjust LFO parameters
+
+################################################################################
+TAB: fb1 parameters
+OSC Namespace: /gravity/block1/fb1/
+################################################################################
+
+=======================================
+TreeNode: fb1 mix and key
+=======================================
+
+--- Continuous Parameters ---
+
+  /gravity/block1/fb1/mixAmount            Feedback mix amount
+  /gravity/block1/fb1/keyRed               Key color - Red channel
+  /gravity/block1/fb1/keyGreen             Key color - Green channel
+  /gravity/block1/fb1/keyBlue              Key color - Blue channel
+  /gravity/block1/fb1/keyThreshold         Key threshold sensitivity
+  /gravity/block1/fb1/keySoft              Key edge softness
+
+--- LFO Parameters ---
+
+  /gravity/block1/fb1/lfo/mixAmountAmp     Mix modulation depth
+  /gravity/block1/fb1/lfo/mixAmountRate    Mix modulation speed
+  /gravity/block1/fb1/lfo/keyThresholdAmp  Key threshold modulation depth
+  /gravity/block1/fb1/lfo/keyThresholdRate Key threshold modulation speed
+  /gravity/block1/fb1/lfo/keySoftAmp       Key softness modulation depth
+  /gravity/block1/fb1/lfo/keySoftRate      Key softness modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block1/fb1/keyMode              INT - Keying mode
+  /gravity/block1/fb1/keyOrder             INT - Key order
+  /gravity/block1/fb1/mixType              INT - Mix blending mode
+  /gravity/block1/fb1/mixOverflow          INT - Mix overflow handling
+
+--- Reset Commands ---
+
+  /gravity/block1/fb1/resetMixAndKey       Reset mix and key parameters
+  /gravity/block1/fb1/lfo/resetMixAndKey   Reset mix and key LFO parameters
+
+=======================================
+TreeNode: fb1 geometry
+=======================================
+
+--- Continuous Parameters ---
+
+Displacement (3 params):
+  /gravity/block1/fb1/xDisplace            X-axis displacement
+  /gravity/block1/fb1/yDisplace            Y-axis displacement
+  /gravity/block1/fb1/zDisplace            Z-axis displacement
+
+Rotation (1 param):
+  /gravity/block1/fb1/rotate               Rotation angle
+
+Shear (2 params):
+  /gravity/block1/fb1/xShear               Horizontal shear
+  /gravity/block1/fb1/yShear               Vertical shear
+
+Stretch (2 params):
+  /gravity/block1/fb1/xStretch             Horizontal stretch
+  /gravity/block1/fb1/yStretch             Vertical stretch
+
+Kaleidoscope (2 params):
+  /gravity/block1/fb1/kaleidoscopeAmount   Kaleidoscope intensity
+  /gravity/block1/fb1/kaleidoscopeSlice    Kaleidoscope segments
+
+--- LFO Parameters (Geo LFO 1) ---
+
+  /gravity/block1/fb1/lfo/xDisplaceAmp     X displacement modulation depth
+  /gravity/block1/fb1/lfo/xDisplaceRate    X displacement modulation speed
+  /gravity/block1/fb1/lfo/yDisplaceAmp     Y displacement modulation depth
+  /gravity/block1/fb1/lfo/yDisplaceRate    Y displacement modulation speed
+  /gravity/block1/fb1/lfo/zDisplaceAmp     Z displacement modulation depth
+  /gravity/block1/fb1/lfo/zDisplaceRate    Z displacement modulation speed
+  /gravity/block1/fb1/lfo/rotateAmp        Rotation modulation depth
+  /gravity/block1/fb1/lfo/rotateRate       Rotation modulation speed
+
+--- LFO Parameters (Geo LFO 2) ---
+
+  /gravity/block1/fb1/lfo/xStretchAmp      X stretch modulation depth
+  /gravity/block1/fb1/lfo/xStretchRate     X stretch modulation speed
+  /gravity/block1/fb1/lfo/yStretchAmp      Y stretch modulation depth
+  /gravity/block1/fb1/lfo/yStretchRate     Y stretch modulation speed
+  /gravity/block1/fb1/lfo/xShearAmp        X shear modulation depth
+  /gravity/block1/fb1/lfo/xShearRate       X shear modulation speed
+  /gravity/block1/fb1/lfo/yShearAmp        Y shear modulation depth
+  /gravity/block1/fb1/lfo/yShearRate       Y shear modulation speed
+  /gravity/block1/fb1/lfo/kaleidoscopeSliceAmp   Kaleidoscope modulation depth
+  /gravity/block1/fb1/lfo/kaleidoscopeSliceRate  Kaleidoscope modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block1/fb1/geoOverflow          INT - Geometry overflow mode
+  /gravity/block1/fb1/rotateMode           BOOL - Rotation mode
+  /gravity/block1/fb1/hMirror              BOOL - Horizontal mirror
+  /gravity/block1/fb1/vMirror              BOOL - Vertical mirror
+  /gravity/block1/fb1/hFlip                BOOL - Horizontal flip
+  /gravity/block1/fb1/vFlip                BOOL - Vertical flip
+  /gravity/block1/fb1/delayTime            INT - Feedback delay (frames)
+
+--- Reset Commands ---
+
+  /gravity/block1/fb1/resetGeo             Reset geometry parameters
+  /gravity/block1/fb1/lfo/resetGeo1        Reset geometry LFO 1
+  /gravity/block1/fb1/lfo/resetGeo2        Reset geometry LFO 2
+
+=======================================
+TreeNode: fb1 color eq
+=======================================
+
+--- Continuous Parameters ---
+
+Color Offset (3 params):
+  /gravity/block1/fb1/hueOffset            Hue offset
+  /gravity/block1/fb1/saturationOffset     Saturation offset
+  /gravity/block1/fb1/brightOffset         Brightness offset
+
+Color Multiply (3 params):
+  /gravity/block1/fb1/hueMultiply          Hue multiply
+  /gravity/block1/fb1/saturationMultiply   Saturation multiply
+  /gravity/block1/fb1/brightMultiply       Brightness multiply
+
+Color Power Map (3 params):
+  /gravity/block1/fb1/huePowmap            Hue power curve
+  /gravity/block1/fb1/saturationPowmap     Saturation power curve
+  /gravity/block1/fb1/brightPowmap         Brightness power curve
+
+Effects (2 params):
+  /gravity/block1/fb1/hueShaper            Hue shaper
+  /gravity/block1/fb1/posterize            Posterization
+
+--- LFO Parameters ---
+
+  /gravity/block1/fb1/lfo/huePowmapAmp     Hue powmap modulation depth
+  /gravity/block1/fb1/lfo/huePowmapRate    Hue powmap modulation speed
+  /gravity/block1/fb1/lfo/saturationPowmapAmp   Saturation powmap modulation depth
+  /gravity/block1/fb1/lfo/saturationPowmapRate  Saturation powmap modulation speed
+  /gravity/block1/fb1/lfo/brightPowmapAmp  Brightness powmap modulation depth
+  /gravity/block1/fb1/lfo/brightPowmapRate Brightness powmap modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block1/fb1/hueInvert            BOOL - Invert hue
+  /gravity/block1/fb1/saturationInvert     BOOL - Invert saturation
+  /gravity/block1/fb1/brightInvert         BOOL - Invert brightness
+
+--- Reset Commands ---
+
+  /gravity/block1/fb1/resetColor           Reset color parameters
+  /gravity/block1/fb1/lfo/resetColor       Reset color LFO
+
+=======================================
+TreeNode: fb1 filters
+=======================================
+
+--- Continuous Parameters ---
+
+Blur (2 params):
+  /gravity/block1/fb1/blurAmount           Blur intensity
+  /gravity/block1/fb1/blurRadius           Blur radius
+
+Sharpen (2 params):
+  /gravity/block1/fb1/sharpenAmount        Sharpen intensity
+  /gravity/block1/fb1/sharpenRadius        Sharpen radius
+
+Experimental (4 params):
+  /gravity/block1/fb1/temp1Amount          Temp parameter 1 amount
+  /gravity/block1/fb1/temp1q               Temp parameter 1 Q
+  /gravity/block1/fb1/temp2Amount          Temp parameter 2 amount
+  /gravity/block1/fb1/temp2q               Temp parameter 2 Q
+
+General (1 param):
+  /gravity/block1/fb1/filtersBoost         Filter boost/gain
+
+--- Reset Commands ---
+
+  /gravity/block1/fb1/resetFilters         Reset filter parameters
+
+=======================================
+TreeNode: fb1 geometrical animations
+=======================================
+
+--- Toggle Switches ---
+
+  /gravity/block1/fb1/clear                BOOL - Clear feedback buffer
+  /gravity/block1/fb1/hypercube            BOOL - Hypercube animation
+  /gravity/block1/fb1/dancingLine          BOOL - Dancing line animation
+  /gravity/block1/fb1/septagram            BOOL - Septagram animation
+  /gravity/block1/fb1/lissajousBall        BOOL - Lissajous ball animation
+  /gravity/block1/fb1/lissajousCurve       BOOL - Lissajous curve animation
+
+--- Lissajous Curve Parameters ---
+OSC Namespace: /gravity/block1/fb1/lissajous/
+
+X Axis (4 params):
+  /gravity/block1/fb1/lissajous/xFreq      X frequency
+  /gravity/block1/fb1/lissajous/xAmp       X amplitude
+  /gravity/block1/fb1/lissajous/xPhase     X phase
+  /gravity/block1/fb1/lissajous/xShape     INT - X waveform shape
+
+Y Axis (4 params):
+  /gravity/block1/fb1/lissajous/yFreq      Y frequency
+  /gravity/block1/fb1/lissajous/yAmp       Y amplitude
+  /gravity/block1/fb1/lissajous/yPhase     Y phase
+  /gravity/block1/fb1/lissajous/yShape     INT - Y waveform shape
+
+Z Axis (4 params):
+  /gravity/block1/fb1/lissajous/zFreq      Z frequency
+  /gravity/block1/fb1/lissajous/zAmp       Z amplitude
+  /gravity/block1/fb1/lissajous/zPhase     Z phase
+  /gravity/block1/fb1/lissajous/zShape     INT - Z waveform shape
+
+Position Offset (2 params):
+  /gravity/block1/fb1/lissajous/xOffset    X position offset
+  /gravity/block1/fb1/lissajous/yOffset    Y position offset
+
+Display (7 params):
+  /gravity/block1/fb1/lissajous/speed      Animation speed
+  /gravity/block1/fb1/lissajous/size       Curve size
+  /gravity/block1/fb1/lissajous/numPoints  Number of points
+  /gravity/block1/fb1/lissajous/lineWidth  Line width
+  /gravity/block1/fb1/lissajous/colorSpeed Color cycle speed
+  /gravity/block1/fb1/lissajous/hue        Base hue
+  /gravity/block1/fb1/lissajous/hueSpread  Hue spread
+
+--- Lissajous Curve LFO Parameters ---
+OSC Namespace: /gravity/block1/fb1/lissajous/lfo/
+
+X Frequency LFO:
+  /gravity/block1/fb1/lissajous/lfo/xFreqAmp
+  /gravity/block1/fb1/lissajous/lfo/xFreqRate
+  /gravity/block1/fb1/lissajous/lfo/xFreqShape
+
+X Amplitude LFO:
+  /gravity/block1/fb1/lissajous/lfo/xAmpAmp
+  /gravity/block1/fb1/lissajous/lfo/xAmpRate
+  /gravity/block1/fb1/lissajous/lfo/xAmpShape
+
+X Phase LFO:
+  /gravity/block1/fb1/lissajous/lfo/xPhaseAmp
+  /gravity/block1/fb1/lissajous/lfo/xPhaseRate
+  /gravity/block1/fb1/lissajous/lfo/xPhaseShape
+
+Y Frequency LFO:
+  /gravity/block1/fb1/lissajous/lfo/yFreqAmp
+  /gravity/block1/fb1/lissajous/lfo/yFreqRate
+  /gravity/block1/fb1/lissajous/lfo/yFreqShape
+
+Y Amplitude LFO:
+  /gravity/block1/fb1/lissajous/lfo/yAmpAmp
+  /gravity/block1/fb1/lissajous/lfo/yAmpRate
+  /gravity/block1/fb1/lissajous/lfo/yAmpShape
+
+Y Phase LFO:
+  /gravity/block1/fb1/lissajous/lfo/yPhaseAmp
+  /gravity/block1/fb1/lissajous/lfo/yPhaseRate
+  /gravity/block1/fb1/lissajous/lfo/yPhaseShape
+
+Z Frequency LFO:
+  /gravity/block1/fb1/lissajous/lfo/zFreqAmp
+  /gravity/block1/fb1/lissajous/lfo/zFreqRate
+  /gravity/block1/fb1/lissajous/lfo/zFreqShape
+
+Z Amplitude LFO:
+  /gravity/block1/fb1/lissajous/lfo/zAmpAmp
+  /gravity/block1/fb1/lissajous/lfo/zAmpRate
+  /gravity/block1/fb1/lissajous/lfo/zAmpShape
+
+Z Phase LFO:
+  /gravity/block1/fb1/lissajous/lfo/zPhaseAmp
+  /gravity/block1/fb1/lissajous/lfo/zPhaseRate
+  /gravity/block1/fb1/lissajous/lfo/zPhaseShape
+
+X Offset LFO:
+  /gravity/block1/fb1/lissajous/lfo/xOffsetAmp
+  /gravity/block1/fb1/lissajous/lfo/xOffsetRate
+  /gravity/block1/fb1/lissajous/lfo/xOffsetShape
+
+Y Offset LFO:
+  /gravity/block1/fb1/lissajous/lfo/yOffsetAmp
+  /gravity/block1/fb1/lissajous/lfo/yOffsetRate
+  /gravity/block1/fb1/lissajous/lfo/yOffsetShape
+
+Speed LFO:
+  /gravity/block1/fb1/lissajous/lfo/speedAmp
+  /gravity/block1/fb1/lissajous/lfo/speedRate
+  /gravity/block1/fb1/lissajous/lfo/speedShape
+
+Size LFO:
+  /gravity/block1/fb1/lissajous/lfo/sizeAmp
+  /gravity/block1/fb1/lissajous/lfo/sizeRate
+  /gravity/block1/fb1/lissajous/lfo/sizeShape
+
+Num Points LFO:
+  /gravity/block1/fb1/lissajous/lfo/numPointsAmp
+  /gravity/block1/fb1/lissajous/lfo/numPointsRate
+  /gravity/block1/fb1/lissajous/lfo/numPointsShape
+
+Line Width LFO:
+  /gravity/block1/fb1/lissajous/lfo/lineWidthAmp
+  /gravity/block1/fb1/lissajous/lfo/lineWidthRate
+  /gravity/block1/fb1/lissajous/lfo/lineWidthShape
+
+Color Speed LFO:
+  /gravity/block1/fb1/lissajous/lfo/colorSpeedAmp
+  /gravity/block1/fb1/lissajous/lfo/colorSpeedRate
+  /gravity/block1/fb1/lissajous/lfo/colorSpeedShape
+
+Hue LFO:
+  /gravity/block1/fb1/lissajous/lfo/hueAmp
+  /gravity/block1/fb1/lissajous/lfo/hueRate
+  /gravity/block1/fb1/lissajous/lfo/hueShape
+
+Hue Spread LFO:
+  /gravity/block1/fb1/lissajous/lfo/hueSpreadAmp
+  /gravity/block1/fb1/lissajous/lfo/hueSpreadRate
+  /gravity/block1/fb1/lissajous/lfo/hueSpreadShape
+
+--- Block 1 Master Reset ---
+
+  /gravity/block1/fb1/resetAll             Reset all FB1 parameters
+  /gravity/block1/resetAll                 Reset all Block 1 parameters
+  /gravity/block1/resetInputs              Reset Block 1 input selections
+
+================================================================================
+BLOCK 2 - SECONDARY FRAME BUFFER
+================================================================================
+
+################################################################################
+TAB: input adjust
+OSC Namespace: /gravity/block2/input/
+################################################################################
+
+--- Continuous Parameters ---
+
+Geometry (4 params):
+  /gravity/block2/input/xDisplace          Horizontal displacement
+  /gravity/block2/input/yDisplace          Vertical displacement
+  /gravity/block2/input/zDisplace          Depth/Z-axis displacement
+  /gravity/block2/input/rotate             Rotation angle
+
+Color (3 params):
+  /gravity/block2/input/hueOffset          Hue color shift
+  /gravity/block2/input/saturationOffset   Saturation adjustment
+  /gravity/block2/input/brightOffset       Brightness adjustment
+
+Effects (3 params):
+  /gravity/block2/input/posterize          Posterization intensity
+  /gravity/block2/input/kaleidoscopeAmount Kaleidoscope intensity
+  /gravity/block2/input/kaleidoscopeSlice  Kaleidoscope segments
+
+Filters (5 params):
+  /gravity/block2/input/blurAmount         Blur intensity
+  /gravity/block2/input/blurRadius         Blur radius
+  /gravity/block2/input/sharpenAmount      Sharpen intensity
+  /gravity/block2/input/sharpenRadius      Sharpen radius
+  /gravity/block2/input/filtersBoost       Filter boost/gain
+
+--- LFO Parameters ---
+
+  /gravity/block2/input/lfo/xDisplaceAmp   X displacement modulation depth
+  /gravity/block2/input/lfo/xDisplaceRate  X displacement modulation speed
+  /gravity/block2/input/lfo/yDisplaceAmp   Y displacement modulation depth
+  /gravity/block2/input/lfo/yDisplaceRate  Y displacement modulation speed
+  /gravity/block2/input/lfo/zDisplaceAmp   Z displacement modulation depth
+  /gravity/block2/input/lfo/zDisplaceRate  Z displacement modulation speed
+  /gravity/block2/input/lfo/rotateAmp      Rotation modulation depth
+  /gravity/block2/input/lfo/rotateRate     Rotation modulation speed
+  /gravity/block2/input/lfo/hueOffsetAmp   Hue modulation depth
+  /gravity/block2/input/lfo/hueOffsetRate  Hue modulation speed
+  /gravity/block2/input/lfo/saturationOffsetAmp   Saturation modulation depth
+  /gravity/block2/input/lfo/saturationOffsetRate  Saturation modulation speed
+  /gravity/block2/input/lfo/brightOffsetAmp  Brightness modulation depth
+  /gravity/block2/input/lfo/brightOffsetRate Brightness modulation speed
+  /gravity/block2/input/lfo/kaleidoscopeSliceAmp   Kaleidoscope modulation depth
+  /gravity/block2/input/lfo/kaleidoscopeSliceRate  Kaleidoscope modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block2/input/inputSelect        INT - Input source selection
+  /gravity/block2/input/geoOverflow        INT - Geometry overflow mode
+  /gravity/block2/input/hMirror            BOOL - Horizontal mirror
+  /gravity/block2/input/vMirror            BOOL - Vertical mirror
+  /gravity/block2/input/hFlip              BOOL - Horizontal flip
+  /gravity/block2/input/vFlip              BOOL - Vertical flip
+  /gravity/block2/input/hueInvert          BOOL - Invert hue
+  /gravity/block2/input/saturationInvert   BOOL - Invert saturation
+  /gravity/block2/input/brightInvert       BOOL - Invert brightness
+  /gravity/block2/input/rgbInvert          BOOL - Invert RGB
+  /gravity/block2/input/solarize           BOOL - Solarize effect
+
+--- Reset Commands ---
+
+  /gravity/block2/input/resetAdjust        Reset input adjust parameters
+  /gravity/block2/input/lfo/resetAdjust    Reset input adjust LFO parameters
+
+################################################################################
+TAB: fb2 parameters
+OSC Namespace: /gravity/block2/fb2/
+################################################################################
+
+=======================================
+TreeNode: fb2 mix and key
+=======================================
+
+--- Continuous Parameters ---
+
+  /gravity/block2/fb2/mixAmount            Feedback mix amount
+  /gravity/block2/fb2/keyRed               Key color - Red channel
+  /gravity/block2/fb2/keyGreen             Key color - Green channel
+  /gravity/block2/fb2/keyBlue              Key color - Blue channel
+  /gravity/block2/fb2/keyThreshold         Key threshold sensitivity
+  /gravity/block2/fb2/keySoft              Key edge softness
+
+--- LFO Parameters ---
+
+  /gravity/block2/fb2/lfo/mixAmountAmp     Mix modulation depth
+  /gravity/block2/fb2/lfo/mixAmountRate    Mix modulation speed
+  /gravity/block2/fb2/lfo/keyThresholdAmp  Key threshold modulation depth
+  /gravity/block2/fb2/lfo/keyThresholdRate Key threshold modulation speed
+  /gravity/block2/fb2/lfo/keySoftAmp       Key softness modulation depth
+  /gravity/block2/fb2/lfo/keySoftRate      Key softness modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block2/fb2/keyMode              INT - Keying mode
+  /gravity/block2/fb2/keyOrder             INT - Key order
+  /gravity/block2/fb2/mixType              INT - Mix blending mode
+  /gravity/block2/fb2/mixOverflow          INT - Mix overflow handling
+
+--- Reset Commands ---
+
+  /gravity/block2/fb2/resetMixAndKey       Reset mix and key parameters
+  /gravity/block2/fb2/lfo/resetMixAndKey   Reset mix and key LFO parameters
+
+=======================================
+TreeNode: fb2 geometry
+=======================================
+
+--- Continuous Parameters ---
+
+Displacement (3 params):
+  /gravity/block2/fb2/xDisplace            X-axis displacement
+  /gravity/block2/fb2/yDisplace            Y-axis displacement
+  /gravity/block2/fb2/zDisplace            Z-axis displacement
+
+Rotation (1 param):
+  /gravity/block2/fb2/rotate               Rotation angle
+
+Shear (2 params):
+  /gravity/block2/fb2/xShear               Horizontal shear
+  /gravity/block2/fb2/yShear               Vertical shear
+
+Stretch (2 params):
+  /gravity/block2/fb2/xStretch             Horizontal stretch
+  /gravity/block2/fb2/yStretch             Vertical stretch
+
+Kaleidoscope (2 params):
+  /gravity/block2/fb2/kaleidoscopeAmount   Kaleidoscope intensity
+  /gravity/block2/fb2/kaleidoscopeSlice    Kaleidoscope segments
+
+--- LFO Parameters (Geo LFO 1) ---
+
+  /gravity/block2/fb2/lfo/xDisplaceAmp     X displacement modulation depth
+  /gravity/block2/fb2/lfo/xDisplaceRate    X displacement modulation speed
+  /gravity/block2/fb2/lfo/yDisplaceAmp     Y displacement modulation depth
+  /gravity/block2/fb2/lfo/yDisplaceRate    Y displacement modulation speed
+  /gravity/block2/fb2/lfo/zDisplaceAmp     Z displacement modulation depth
+  /gravity/block2/fb2/lfo/zDisplaceRate    Z displacement modulation speed
+  /gravity/block2/fb2/lfo/rotateAmp        Rotation modulation depth
+  /gravity/block2/fb2/lfo/rotateRate       Rotation modulation speed
+
+--- LFO Parameters (Geo LFO 2) ---
+
+  /gravity/block2/fb2/lfo/xStretchAmp      X stretch modulation depth
+  /gravity/block2/fb2/lfo/xStretchRate     X stretch modulation speed
+  /gravity/block2/fb2/lfo/yStretchAmp      Y stretch modulation depth
+  /gravity/block2/fb2/lfo/yStretchRate     Y stretch modulation speed
+  /gravity/block2/fb2/lfo/xShearAmp        X shear modulation depth
+  /gravity/block2/fb2/lfo/xShearRate       X shear modulation speed
+  /gravity/block2/fb2/lfo/yShearAmp        Y shear modulation depth
+  /gravity/block2/fb2/lfo/yShearRate       Y shear modulation speed
+  /gravity/block2/fb2/lfo/kaleidoscopeSliceAmp   Kaleidoscope modulation depth
+  /gravity/block2/fb2/lfo/kaleidoscopeSliceRate  Kaleidoscope modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block2/fb2/geoOverflow          INT - Geometry overflow mode
+  /gravity/block2/fb2/rotateMode           BOOL - Rotation mode
+  /gravity/block2/fb2/hMirror              BOOL - Horizontal mirror
+  /gravity/block2/fb2/vMirror              BOOL - Vertical mirror
+  /gravity/block2/fb2/hFlip                BOOL - Horizontal flip
+  /gravity/block2/fb2/vFlip                BOOL - Vertical flip
+  /gravity/block2/fb2/delayTime            INT - Feedback delay (frames)
+
+--- Reset Commands ---
+
+  /gravity/block2/fb2/resetGeo             Reset geometry parameters
+  /gravity/block2/fb2/lfo/resetGeo1        Reset geometry LFO 1
+  /gravity/block2/fb2/lfo/resetGeo2        Reset geometry LFO 2
+
+=======================================
+TreeNode: fb2 color eq
+=======================================
+
+--- Continuous Parameters ---
+
+Color Offset (3 params):
+  /gravity/block2/fb2/hueOffset            Hue offset
+  /gravity/block2/fb2/saturationOffset     Saturation offset
+  /gravity/block2/fb2/brightOffset         Brightness offset
+
+Color Multiply (3 params):
+  /gravity/block2/fb2/hueMultiply          Hue multiply
+  /gravity/block2/fb2/saturationMultiply   Saturation multiply
+  /gravity/block2/fb2/brightMultiply       Brightness multiply
+
+Color Power Map (3 params):
+  /gravity/block2/fb2/huePowmap            Hue power curve
+  /gravity/block2/fb2/saturationPowmap     Saturation power curve
+  /gravity/block2/fb2/brightPowmap         Brightness power curve
+
+Effects (2 params):
+  /gravity/block2/fb2/hueShaper            Hue shaper
+  /gravity/block2/fb2/posterize            Posterization
+
+--- LFO Parameters ---
+
+  /gravity/block2/fb2/lfo/huePowmapAmp     Hue powmap modulation depth
+  /gravity/block2/fb2/lfo/huePowmapRate    Hue powmap modulation speed
+  /gravity/block2/fb2/lfo/saturationPowmapAmp   Saturation powmap modulation depth
+  /gravity/block2/fb2/lfo/saturationPowmapRate  Saturation powmap modulation speed
+  /gravity/block2/fb2/lfo/brightPowmapAmp  Brightness powmap modulation depth
+  /gravity/block2/fb2/lfo/brightPowmapRate Brightness powmap modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block2/fb2/hueInvert            BOOL - Invert hue
+  /gravity/block2/fb2/saturationInvert     BOOL - Invert saturation
+  /gravity/block2/fb2/brightInvert         BOOL - Invert brightness
+
+--- Reset Commands ---
+
+  /gravity/block2/fb2/resetColor           Reset color parameters
+  /gravity/block2/fb2/lfo/resetColor       Reset color LFO
+
+=======================================
+TreeNode: fb2 filters
+=======================================
+
+--- Continuous Parameters ---
+
+Blur (2 params):
+  /gravity/block2/fb2/blurAmount           Blur intensity
+  /gravity/block2/fb2/blurRadius           Blur radius
+
+Sharpen (2 params):
+  /gravity/block2/fb2/sharpenAmount        Sharpen intensity
+  /gravity/block2/fb2/sharpenRadius        Sharpen radius
+
+Experimental (4 params):
+  /gravity/block2/fb2/temp1Amount          Temp parameter 1 amount
+  /gravity/block2/fb2/temp1q               Temp parameter 1 Q
+  /gravity/block2/fb2/temp2Amount          Temp parameter 2 amount
+  /gravity/block2/fb2/temp2q               Temp parameter 2 Q
+
+General (1 param):
+  /gravity/block2/fb2/filtersBoost         Filter boost/gain
+
+--- Reset Commands ---
+
+  /gravity/block2/fb2/resetFilters         Reset filter parameters
+
+=======================================
+TreeNode: fb2 geometrical animations
+=======================================
+
+--- Toggle Switches ---
+
+  /gravity/block2/fb2/clear                BOOL - Clear feedback buffer
+  /gravity/block2/fb2/hypercube            BOOL - Hypercube animation
+  /gravity/block2/fb2/dancingLine          BOOL - Dancing line animation
+  /gravity/block2/fb2/septagram            BOOL - Septagram animation
+  /gravity/block2/fb2/lissajousBall        BOOL - Lissajous ball animation
+  /gravity/block2/fb2/lissajousCurve       BOOL - Lissajous curve animation
+
+--- Lissajous Curve Parameters ---
+OSC Namespace: /gravity/block2/fb2/lissajous/
+
+X Axis (4 params):
+  /gravity/block2/fb2/lissajous/xFreq      X frequency
+  /gravity/block2/fb2/lissajous/xAmp       X amplitude
+  /gravity/block2/fb2/lissajous/xPhase     X phase
+  /gravity/block2/fb2/lissajous/xShape     INT - X waveform shape
+
+Y Axis (4 params):
+  /gravity/block2/fb2/lissajous/yFreq      Y frequency
+  /gravity/block2/fb2/lissajous/yAmp       Y amplitude
+  /gravity/block2/fb2/lissajous/yPhase     Y phase
+  /gravity/block2/fb2/lissajous/yShape     INT - Y waveform shape
+
+Z Axis (4 params):
+  /gravity/block2/fb2/lissajous/zFreq      Z frequency
+  /gravity/block2/fb2/lissajous/zAmp       Z amplitude
+  /gravity/block2/fb2/lissajous/zPhase     Z phase
+  /gravity/block2/fb2/lissajous/zShape     INT - Z waveform shape
+
+Position Offset (2 params):
+  /gravity/block2/fb2/lissajous/xOffset    X position offset
+  /gravity/block2/fb2/lissajous/yOffset    Y position offset
+
+Display (7 params):
+  /gravity/block2/fb2/lissajous/speed      Animation speed
+  /gravity/block2/fb2/lissajous/size       Curve size
+  /gravity/block2/fb2/lissajous/numPoints  Number of points
+  /gravity/block2/fb2/lissajous/lineWidth  Line width
+  /gravity/block2/fb2/lissajous/colorSpeed Color cycle speed
+  /gravity/block2/fb2/lissajous/hue        Base hue
+  /gravity/block2/fb2/lissajous/hueSpread  Hue spread
+
+--- Lissajous Curve LFO Parameters ---
+OSC Namespace: /gravity/block2/fb2/lissajous/lfo/
+
+X Frequency LFO:
+  /gravity/block2/fb2/lissajous/lfo/xFreqAmp
+  /gravity/block2/fb2/lissajous/lfo/xFreqRate
+  /gravity/block2/fb2/lissajous/lfo/xFreqShape
+
+X Amplitude LFO:
+  /gravity/block2/fb2/lissajous/lfo/xAmpAmp
+  /gravity/block2/fb2/lissajous/lfo/xAmpRate
+  /gravity/block2/fb2/lissajous/lfo/xAmpShape
+
+X Phase LFO:
+  /gravity/block2/fb2/lissajous/lfo/xPhaseAmp
+  /gravity/block2/fb2/lissajous/lfo/xPhaseRate
+  /gravity/block2/fb2/lissajous/lfo/xPhaseShape
+
+Y Frequency LFO:
+  /gravity/block2/fb2/lissajous/lfo/yFreqAmp
+  /gravity/block2/fb2/lissajous/lfo/yFreqRate
+  /gravity/block2/fb2/lissajous/lfo/yFreqShape
+
+Y Amplitude LFO:
+  /gravity/block2/fb2/lissajous/lfo/yAmpAmp
+  /gravity/block2/fb2/lissajous/lfo/yAmpRate
+  /gravity/block2/fb2/lissajous/lfo/yAmpShape
+
+Y Phase LFO:
+  /gravity/block2/fb2/lissajous/lfo/yPhaseAmp
+  /gravity/block2/fb2/lissajous/lfo/yPhaseRate
+  /gravity/block2/fb2/lissajous/lfo/yPhaseShape
+
+Z Frequency LFO:
+  /gravity/block2/fb2/lissajous/lfo/zFreqAmp
+  /gravity/block2/fb2/lissajous/lfo/zFreqRate
+  /gravity/block2/fb2/lissajous/lfo/zFreqShape
+
+Z Amplitude LFO:
+  /gravity/block2/fb2/lissajous/lfo/zAmpAmp
+  /gravity/block2/fb2/lissajous/lfo/zAmpRate
+  /gravity/block2/fb2/lissajous/lfo/zAmpShape
+
+Z Phase LFO:
+  /gravity/block2/fb2/lissajous/lfo/zPhaseAmp
+  /gravity/block2/fb2/lissajous/lfo/zPhaseRate
+  /gravity/block2/fb2/lissajous/lfo/zPhaseShape
+
+X Offset LFO:
+  /gravity/block2/fb2/lissajous/lfo/xOffsetAmp
+  /gravity/block2/fb2/lissajous/lfo/xOffsetRate
+  /gravity/block2/fb2/lissajous/lfo/xOffsetShape
+
+Y Offset LFO:
+  /gravity/block2/fb2/lissajous/lfo/yOffsetAmp
+  /gravity/block2/fb2/lissajous/lfo/yOffsetRate
+  /gravity/block2/fb2/lissajous/lfo/yOffsetShape
+
+Speed LFO:
+  /gravity/block2/fb2/lissajous/lfo/speedAmp
+  /gravity/block2/fb2/lissajous/lfo/speedRate
+  /gravity/block2/fb2/lissajous/lfo/speedShape
+
+Size LFO:
+  /gravity/block2/fb2/lissajous/lfo/sizeAmp
+  /gravity/block2/fb2/lissajous/lfo/sizeRate
+  /gravity/block2/fb2/lissajous/lfo/sizeShape
+
+Num Points LFO:
+  /gravity/block2/fb2/lissajous/lfo/numPointsAmp
+  /gravity/block2/fb2/lissajous/lfo/numPointsRate
+  /gravity/block2/fb2/lissajous/lfo/numPointsShape
+
+Line Width LFO:
+  /gravity/block2/fb2/lissajous/lfo/lineWidthAmp
+  /gravity/block2/fb2/lissajous/lfo/lineWidthRate
+  /gravity/block2/fb2/lissajous/lfo/lineWidthShape
+
+Color Speed LFO:
+  /gravity/block2/fb2/lissajous/lfo/colorSpeedAmp
+  /gravity/block2/fb2/lissajous/lfo/colorSpeedRate
+  /gravity/block2/fb2/lissajous/lfo/colorSpeedShape
+
+Hue LFO:
+  /gravity/block2/fb2/lissajous/lfo/hueAmp
+  /gravity/block2/fb2/lissajous/lfo/hueRate
+  /gravity/block2/fb2/lissajous/lfo/hueShape
+
+Hue Spread LFO:
+  /gravity/block2/fb2/lissajous/lfo/hueSpreadAmp
+  /gravity/block2/fb2/lissajous/lfo/hueSpreadRate
+  /gravity/block2/fb2/lissajous/lfo/hueSpreadShape
+
+--- Block 2 Master Reset ---
+
+  /gravity/block2/fb2/resetAll             Reset all FB2 parameters
+  /gravity/block2/resetAll                 Reset all Block 2 parameters
+  /gravity/block2/resetInput               Reset Block 2 input selection
+
+================================================================================
+BLOCK 3 - FINAL COMPOSITING & OUTPUT
+================================================================================
+
+################################################################################
+TAB: B_1 parameters
+OSC Namespace: /gravity/block3/b1/
+################################################################################
+
+=======================================
+TreeNode: B_1 geometry
+=======================================
+
+--- Continuous Parameters ---
+
+Displacement (3 params):
+  /gravity/block3/b1/xDisplace             X-axis displacement
+  /gravity/block3/b1/yDisplace             Y-axis displacement
+  /gravity/block3/b1/zDisplace             Z-axis displacement
+
+Rotation (1 param):
+  /gravity/block3/b1/rotate                Rotation angle
+
+Shear (2 params):
+  /gravity/block3/b1/xShear                Horizontal shear
+  /gravity/block3/b1/yShear                Vertical shear
+
+Stretch (2 params):
+  /gravity/block3/b1/xStretch              Horizontal stretch
+  /gravity/block3/b1/yStretch              Vertical stretch
+
+Kaleidoscope (2 params):
+  /gravity/block3/b1/kaleidoscopeAmount    Kaleidoscope intensity
+  /gravity/block3/b1/kaleidoscopeSlice     Kaleidoscope segments
+
+--- LFO Parameters (Geo LFO 1) ---
+
+  /gravity/block3/lfo/b1/xDisplaceAmp      X displacement modulation depth
+  /gravity/block3/lfo/b1/xDisplaceRate     X displacement modulation speed
+  /gravity/block3/lfo/b1/yDisplaceAmp      Y displacement modulation depth
+  /gravity/block3/lfo/b1/yDisplaceRate     Y displacement modulation speed
+  /gravity/block3/lfo/b1/zDisplaceAmp      Z displacement modulation depth
+  /gravity/block3/lfo/b1/zDisplaceRate     Z displacement modulation speed
+  /gravity/block3/lfo/b1/rotateAmp         Rotation modulation depth
+  /gravity/block3/lfo/b1/rotateRate        Rotation modulation speed
+
+--- LFO Parameters (Geo LFO 2) ---
+
+  /gravity/block3/lfo/b1/xStretchAmp       X stretch modulation depth
+  /gravity/block3/lfo/b1/xStretchRate      X stretch modulation speed
+  /gravity/block3/lfo/b1/yStretchAmp       Y stretch modulation depth
+  /gravity/block3/lfo/b1/yStretchRate      Y stretch modulation speed
+  /gravity/block3/lfo/b1/xShearAmp         X shear modulation depth
+  /gravity/block3/lfo/b1/xShearRate        X shear modulation speed
+  /gravity/block3/lfo/b1/yShearAmp         Y shear modulation depth
+  /gravity/block3/lfo/b1/yShearRate        Y shear modulation speed
+  /gravity/block3/lfo/b1/kaleidoscopeSliceAmp    Kaleidoscope modulation depth
+  /gravity/block3/lfo/b1/kaleidoscopeSliceRate   Kaleidoscope modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block3/b1/geoOverflow           INT - Geometry overflow mode
+  /gravity/block3/b1/rotateMode            INT - Rotation mode
+  /gravity/block3/b1/hMirror               BOOL - Horizontal mirror
+  /gravity/block3/b1/vMirror               BOOL - Vertical mirror
+  /gravity/block3/b1/hFlip                 BOOL - Horizontal flip
+  /gravity/block3/b1/vFlip                 BOOL - Vertical flip
+
+--- Reset Commands ---
+
+  /gravity/block3/b1/resetGeo              Reset geometry parameters
+  /gravity/block3/b1/lfo/resetGeo1         Reset geometry LFO 1
+  /gravity/block3/b1/lfo/resetGeo2         Reset geometry LFO 2
+
+=======================================
+TreeNode: B_1 colorize
+=======================================
+
+--- Continuous Parameters ---
+
+Band 1 (3 params):
+  /gravity/block3/b1/colorize/hueBand1         Hue band 1
+  /gravity/block3/b1/colorize/saturationBand1  Saturation band 1
+  /gravity/block3/b1/colorize/brightBand1      Brightness band 1
+
+Band 2 (3 params):
+  /gravity/block3/b1/colorize/hueBand2         Hue band 2
+  /gravity/block3/b1/colorize/saturationBand2  Saturation band 2
+  /gravity/block3/b1/colorize/brightBand2      Brightness band 2
+
+Band 3 (3 params):
+  /gravity/block3/b1/colorize/hueBand3         Hue band 3
+  /gravity/block3/b1/colorize/saturationBand3  Saturation band 3
+  /gravity/block3/b1/colorize/brightBand3      Brightness band 3
+
+Band 4 (3 params):
+  /gravity/block3/b1/colorize/hueBand4         Hue band 4
+  /gravity/block3/b1/colorize/saturationBand4  Saturation band 4
+  /gravity/block3/b1/colorize/brightBand4      Brightness band 4
+
+Band 5 (3 params):
+  /gravity/block3/b1/colorize/hueBand5         Hue band 5
+  /gravity/block3/b1/colorize/saturationBand5  Saturation band 5
+  /gravity/block3/b1/colorize/brightBand5      Brightness band 5
+
+--- LFO Parameters (Colorize LFO 1 - Bands 1-2) ---
+
+  /gravity/block3/lfo/b1/hueBand1Amp           Hue band 1 modulation depth
+  /gravity/block3/lfo/b1/hueBand1Rate          Hue band 1 modulation speed
+  /gravity/block3/lfo/b1/saturationBand1Amp    Saturation band 1 modulation depth
+  /gravity/block3/lfo/b1/saturationBand1Rate   Saturation band 1 modulation speed
+  /gravity/block3/lfo/b1/brightBand1Amp        Brightness band 1 modulation depth
+  /gravity/block3/lfo/b1/brightBand1Rate       Brightness band 1 modulation speed
+  /gravity/block3/lfo/b1/hueBand2Amp           Hue band 2 modulation depth
+  /gravity/block3/lfo/b1/hueBand2Rate          Hue band 2 modulation speed
+  /gravity/block3/lfo/b1/saturationBand2Amp    Saturation band 2 modulation depth
+  /gravity/block3/lfo/b1/saturationBand2Rate   Saturation band 2 modulation speed
+  /gravity/block3/lfo/b1/brightBand2Amp        Brightness band 2 modulation depth
+  /gravity/block3/lfo/b1/brightBand2Rate       Brightness band 2 modulation speed
+
+--- LFO Parameters (Colorize LFO 2 - Bands 3-4) ---
+
+  /gravity/block3/lfo/b1/hueBand3Amp           Hue band 3 modulation depth
+  /gravity/block3/lfo/b1/hueBand3Rate          Hue band 3 modulation speed
+  /gravity/block3/lfo/b1/saturationBand3Amp    Saturation band 3 modulation depth
+  /gravity/block3/lfo/b1/saturationBand3Rate   Saturation band 3 modulation speed
+  /gravity/block3/lfo/b1/brightBand3Amp        Brightness band 3 modulation depth
+  /gravity/block3/lfo/b1/brightBand3Rate       Brightness band 3 modulation speed
+  /gravity/block3/lfo/b1/hueBand4Amp           Hue band 4 modulation depth
+  /gravity/block3/lfo/b1/hueBand4Rate          Hue band 4 modulation speed
+  /gravity/block3/lfo/b1/saturationBand4Amp    Saturation band 4 modulation depth
+  /gravity/block3/lfo/b1/saturationBand4Rate   Saturation band 4 modulation speed
+  /gravity/block3/lfo/b1/brightBand4Amp        Brightness band 4 modulation depth
+  /gravity/block3/lfo/b1/brightBand4Rate       Brightness band 4 modulation speed
+
+--- LFO Parameters (Colorize LFO 3 - Band 5) ---
+
+  /gravity/block3/lfo/b1/hueBand5Amp           Hue band 5 modulation depth
+  /gravity/block3/lfo/b1/hueBand5Rate          Hue band 5 modulation speed
+  /gravity/block3/lfo/b1/saturationBand5Amp    Saturation band 5 modulation depth
+  /gravity/block3/lfo/b1/saturationBand5Rate   Saturation band 5 modulation speed
+  /gravity/block3/lfo/b1/brightBand5Amp        Brightness band 5 modulation depth
+  /gravity/block3/lfo/b1/brightBand5Rate       Brightness band 5 modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block3/b1/colorize/active           BOOL - Enable colorize
+  /gravity/block3/b1/colorize/colorspace       INT - Color space (HSB/RGB)
+
+--- Reset Commands ---
+
+  /gravity/block3/b1/resetColorize         Reset colorize parameters
+  /gravity/block3/b1/lfo/resetColorize1    Reset colorize LFO 1
+  /gravity/block3/b1/lfo/resetColorize2    Reset colorize LFO 2
+  /gravity/block3/b1/lfo/resetColorize3    Reset colorize LFO 3
+
+=======================================
+TreeNode: B_1 filters
+=======================================
+
+--- Continuous Parameters ---
+
+Blur (2 params):
+  /gravity/block3/b1/blurAmount            Blur intensity
+  /gravity/block3/b1/blurRadius            Blur radius
+
+Sharpen (2 params):
+  /gravity/block3/b1/sharpenAmount         Sharpen intensity
+  /gravity/block3/b1/sharpenRadius         Sharpen radius
+
+General (1 param):
+  /gravity/block3/b1/filtersBoost          Filter boost/gain
+
+--- Reset Commands ---
+
+  /gravity/block3/b1/resetFilters          Reset filter parameters
+
+################################################################################
+TAB: B_2 parameters
+OSC Namespace: /gravity/block3/b2/
+################################################################################
+
+=======================================
+TreeNode: B_2 geometry
+=======================================
+
+--- Continuous Parameters ---
+
+Displacement (3 params):
+  /gravity/block3/b2/xDisplace             X-axis displacement
+  /gravity/block3/b2/yDisplace             Y-axis displacement
+  /gravity/block3/b2/zDisplace             Z-axis displacement
+
+Rotation (1 param):
+  /gravity/block3/b2/rotate                Rotation angle
+
+Shear (2 params):
+  /gravity/block3/b2/xShear                Horizontal shear
+  /gravity/block3/b2/yShear                Vertical shear
+
+Stretch (2 params):
+  /gravity/block3/b2/xStretch              Horizontal stretch
+  /gravity/block3/b2/yStretch              Vertical stretch
+
+Kaleidoscope (2 params):
+  /gravity/block3/b2/kaleidoscopeAmount    Kaleidoscope intensity
+  /gravity/block3/b2/kaleidoscopeSlice     Kaleidoscope segments
+
+--- LFO Parameters (Geo LFO 1) ---
+
+  /gravity/block3/lfo/b2/xDisplaceAmp      X displacement modulation depth
+  /gravity/block3/lfo/b2/xDisplaceRate     X displacement modulation speed
+  /gravity/block3/lfo/b2/yDisplaceAmp      Y displacement modulation depth
+  /gravity/block3/lfo/b2/yDisplaceRate     Y displacement modulation speed
+  /gravity/block3/lfo/b2/zDisplaceAmp      Z displacement modulation depth
+  /gravity/block3/lfo/b2/zDisplaceRate     Z displacement modulation speed
+  /gravity/block3/lfo/b2/rotateAmp         Rotation modulation depth
+  /gravity/block3/lfo/b2/rotateRate        Rotation modulation speed
+
+--- LFO Parameters (Geo LFO 2) ---
+
+  /gravity/block3/lfo/b2/xStretchAmp       X stretch modulation depth
+  /gravity/block3/lfo/b2/xStretchRate      X stretch modulation speed
+  /gravity/block3/lfo/b2/yStretchAmp       Y stretch modulation depth
+  /gravity/block3/lfo/b2/yStretchRate      Y stretch modulation speed
+  /gravity/block3/lfo/b2/xShearAmp         X shear modulation depth
+  /gravity/block3/lfo/b2/xShearRate        X shear modulation speed
+  /gravity/block3/lfo/b2/yShearAmp         Y shear modulation depth
+  /gravity/block3/lfo/b2/yShearRate        Y shear modulation speed
+  /gravity/block3/lfo/b2/kaleidoscopeSliceAmp    Kaleidoscope modulation depth
+  /gravity/block3/lfo/b2/kaleidoscopeSliceRate   Kaleidoscope modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block3/b2/geoOverflow           INT - Geometry overflow mode
+  /gravity/block3/b2/rotateMode            INT - Rotation mode
+  /gravity/block3/b2/hMirror               BOOL - Horizontal mirror
+  /gravity/block3/b2/vMirror               BOOL - Vertical mirror
+  /gravity/block3/b2/hFlip                 BOOL - Horizontal flip
+  /gravity/block3/b2/vFlip                 BOOL - Vertical flip
+
+--- Reset Commands ---
+
+  /gravity/block3/b2/resetGeo              Reset geometry parameters
+  /gravity/block3/b2/lfo/resetGeo1         Reset geometry LFO 1
+  /gravity/block3/b2/lfo/resetGeo2         Reset geometry LFO 2
+
+=======================================
+TreeNode: B_2 colorize
+=======================================
+
+--- Continuous Parameters ---
+
+Band 1 (3 params):
+  /gravity/block3/b2/colorize/hueBand1         Hue band 1
+  /gravity/block3/b2/colorize/saturationBand1  Saturation band 1
+  /gravity/block3/b2/colorize/brightBand1      Brightness band 1
+
+Band 2 (3 params):
+  /gravity/block3/b2/colorize/hueBand2         Hue band 2
+  /gravity/block3/b2/colorize/saturationBand2  Saturation band 2
+  /gravity/block3/b2/colorize/brightBand2      Brightness band 2
+
+Band 3 (3 params):
+  /gravity/block3/b2/colorize/hueBand3         Hue band 3
+  /gravity/block3/b2/colorize/saturationBand3  Saturation band 3
+  /gravity/block3/b2/colorize/brightBand3      Brightness band 3
+
+Band 4 (3 params):
+  /gravity/block3/b2/colorize/hueBand4         Hue band 4
+  /gravity/block3/b2/colorize/saturationBand4  Saturation band 4
+  /gravity/block3/b2/colorize/brightBand4      Brightness band 4
+
+Band 5 (3 params):
+  /gravity/block3/b2/colorize/hueBand5         Hue band 5
+  /gravity/block3/b2/colorize/saturationBand5  Saturation band 5
+  /gravity/block3/b2/colorize/brightBand5      Brightness band 5
+
+--- LFO Parameters (Colorize LFO 1 - Bands 1-2) ---
+
+  /gravity/block3/lfo/b2/hueBand1Amp           Hue band 1 modulation depth
+  /gravity/block3/lfo/b2/hueBand1Rate          Hue band 1 modulation speed
+  /gravity/block3/lfo/b2/saturationBand1Amp    Saturation band 1 modulation depth
+  /gravity/block3/lfo/b2/saturationBand1Rate   Saturation band 1 modulation speed
+  /gravity/block3/lfo/b2/brightBand1Amp        Brightness band 1 modulation depth
+  /gravity/block3/lfo/b2/brightBand1Rate       Brightness band 1 modulation speed
+  /gravity/block3/lfo/b2/hueBand2Amp           Hue band 2 modulation depth
+  /gravity/block3/lfo/b2/hueBand2Rate          Hue band 2 modulation speed
+  /gravity/block3/lfo/b2/saturationBand2Amp    Saturation band 2 modulation depth
+  /gravity/block3/lfo/b2/saturationBand2Rate   Saturation band 2 modulation speed
+  /gravity/block3/lfo/b2/brightBand2Amp        Brightness band 2 modulation depth
+  /gravity/block3/lfo/b2/brightBand2Rate       Brightness band 2 modulation speed
+
+--- LFO Parameters (Colorize LFO 2 - Bands 3-4) ---
+
+  /gravity/block3/lfo/b2/hueBand3Amp           Hue band 3 modulation depth
+  /gravity/block3/lfo/b2/hueBand3Rate          Hue band 3 modulation speed
+  /gravity/block3/lfo/b2/saturationBand3Amp    Saturation band 3 modulation depth
+  /gravity/block3/lfo/b2/saturationBand3Rate   Saturation band 3 modulation speed
+  /gravity/block3/lfo/b2/brightBand3Amp        Brightness band 3 modulation depth
+  /gravity/block3/lfo/b2/brightBand3Rate       Brightness band 3 modulation speed
+  /gravity/block3/lfo/b2/hueBand4Amp           Hue band 4 modulation depth
+  /gravity/block3/lfo/b2/hueBand4Rate          Hue band 4 modulation speed
+  /gravity/block3/lfo/b2/saturationBand4Amp    Saturation band 4 modulation depth
+  /gravity/block3/lfo/b2/saturationBand4Rate   Saturation band 4 modulation speed
+  /gravity/block3/lfo/b2/brightBand4Amp        Brightness band 4 modulation depth
+  /gravity/block3/lfo/b2/brightBand4Rate       Brightness band 4 modulation speed
+
+--- LFO Parameters (Colorize LFO 3 - Band 5) ---
+
+  /gravity/block3/lfo/b2/hueBand5Amp           Hue band 5 modulation depth
+  /gravity/block3/lfo/b2/hueBand5Rate          Hue band 5 modulation speed
+  /gravity/block3/lfo/b2/saturationBand5Amp    Saturation band 5 modulation depth
+  /gravity/block3/lfo/b2/saturationBand5Rate   Saturation band 5 modulation speed
+  /gravity/block3/lfo/b2/brightBand5Amp        Brightness band 5 modulation depth
+  /gravity/block3/lfo/b2/brightBand5Rate       Brightness band 5 modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block3/b2/colorize/active           BOOL - Enable colorize
+  /gravity/block3/b2/colorize/colorspace       INT - Color space (HSB/RGB)
+
+--- Reset Commands ---
+
+  /gravity/block3/b2/resetColorize         Reset colorize parameters
+  /gravity/block3/b2/lfo/resetColorize1    Reset colorize LFO 1
+  /gravity/block3/b2/lfo/resetColorize2    Reset colorize LFO 2
+  /gravity/block3/b2/lfo/resetColorize3    Reset colorize LFO 3
+
+=======================================
+TreeNode: B_2 filters
+=======================================
+
+--- Continuous Parameters ---
+
+Blur (2 params):
+  /gravity/block3/b2/blurAmount            Blur intensity
+  /gravity/block3/b2/blurRadius            Blur radius
+
+Sharpen (2 params):
+  /gravity/block3/b2/sharpenAmount         Sharpen intensity
+  /gravity/block3/b2/sharpenRadius         Sharpen radius
+
+General (1 param):
+  /gravity/block3/b2/filtersBoost          Filter boost/gain
+
+--- Reset Commands ---
+
+  /gravity/block3/b2/resetFilters          Reset filter parameters
+
+################################################################################
+TAB: matrix mixer
+OSC Namespace: /gravity/block3/matrixMix/
+################################################################################
+
+--- Continuous Parameters ---
+
+Red Channel Routing (3 params):
+  /gravity/block3/matrixMix/b1RedToB2Red       B1 Red to B2 Red
+  /gravity/block3/matrixMix/b1RedToB2Green     B1 Red to B2 Green
+  /gravity/block3/matrixMix/b1RedToB2Blue      B1 Red to B2 Blue
+
+Green Channel Routing (3 params):
+  /gravity/block3/matrixMix/b1GreenToB2Red     B1 Green to B2 Red
+  /gravity/block3/matrixMix/b1GreenToB2Green   B1 Green to B2 Green
+  /gravity/block3/matrixMix/b1GreenToB2Blue    B1 Green to B2 Blue
+
+Blue Channel Routing (3 params):
+  /gravity/block3/matrixMix/b1BlueToB2Red      B1 Blue to B2 Red
+  /gravity/block3/matrixMix/b1BlueToB2Green    B1 Blue to B2 Green
+  /gravity/block3/matrixMix/b1BlueToB2Blue     B1 Blue to B2 Blue
+
+--- LFO Parameters (Matrix Mix LFO 1) ---
+
+  /gravity/block3/lfo/matrixMix/b1RedToB2RedAmp      Red-Red modulation depth
+  /gravity/block3/lfo/matrixMix/b1RedToB2RedRate     Red-Red modulation speed
+  /gravity/block3/lfo/matrixMix/b1RedToB2GreenAmp    Red-Green modulation depth
+  /gravity/block3/lfo/matrixMix/b1RedToB2GreenRate   Red-Green modulation speed
+  /gravity/block3/lfo/matrixMix/b1RedToB2BlueAmp     Red-Blue modulation depth
+  /gravity/block3/lfo/matrixMix/b1RedToB2BlueRate    Red-Blue modulation speed
+  /gravity/block3/lfo/matrixMix/b1GreenToB2RedAmp    Green-Red modulation depth
+  /gravity/block3/lfo/matrixMix/b1GreenToB2RedRate   Green-Red modulation speed
+  /gravity/block3/lfo/matrixMix/b1GreenToB2GreenAmp  Green-Green modulation depth
+  /gravity/block3/lfo/matrixMix/b1GreenToB2GreenRate Green-Green modulation speed
+  /gravity/block3/lfo/matrixMix/b1GreenToB2BlueAmp   Green-Blue modulation depth
+  /gravity/block3/lfo/matrixMix/b1GreenToB2BlueRate  Green-Blue modulation speed
+
+--- LFO Parameters (Matrix Mix LFO 2) ---
+
+  /gravity/block3/lfo/matrixMix/b1BlueToB2RedAmp     Blue-Red modulation depth
+  /gravity/block3/lfo/matrixMix/b1BlueToB2RedRate    Blue-Red modulation speed
+  /gravity/block3/lfo/matrixMix/b1BlueToB2GreenAmp   Blue-Green modulation depth
+  /gravity/block3/lfo/matrixMix/b1BlueToB2GreenRate  Blue-Green modulation speed
+  /gravity/block3/lfo/matrixMix/b1BlueToB2BlueAmp    Blue-Blue modulation depth
+  /gravity/block3/lfo/matrixMix/b1BlueToB2BlueRate   Blue-Blue modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block3/matrixMix/mixType        INT - Matrix mix blending type
+  /gravity/block3/matrixMix/overflow       INT - Matrix overflow handling
+
+--- Reset Commands ---
+
+  /gravity/block3/matrixMix/reset          Reset matrix mix parameters
+  /gravity/block3/matrixMix/lfo/reset1     Reset matrix mix LFO 1
+  /gravity/block3/matrixMix/lfo/reset2     Reset matrix mix LFO 2
+
+################################################################################
+TAB: final mix and key
+OSC Namespace: /gravity/block3/final/
+################################################################################
+
+--- Continuous Parameters ---
+
+Mix (1 param):
+  /gravity/block3/final/mixAmount          Final mix amount
+
+Chroma Key (5 params):
+  /gravity/block3/final/keyRed             Key color - Red channel
+  /gravity/block3/final/keyGreen           Key color - Green channel
+  /gravity/block3/final/keyInvert          Key invert amount
+  /gravity/block3/final/keyThreshold       Key threshold sensitivity
+  /gravity/block3/final/keySoft            Key edge softness
+
+--- LFO Parameters ---
+
+  /gravity/block3/lfo/final/mixAmountAmp       Mix modulation depth
+  /gravity/block3/lfo/final/mixAmountRate      Mix modulation speed
+  /gravity/block3/lfo/final/keyThresholdAmp    Key threshold modulation depth
+  /gravity/block3/lfo/final/keyThresholdRate   Key threshold modulation speed
+  /gravity/block3/lfo/final/keySoftAmp         Key softness modulation depth
+  /gravity/block3/lfo/final/keySoftRate        Key softness modulation speed
+
+--- Discrete/Boolean Settings ---
+
+  /gravity/block3/final/keyMode            INT - Final keying mode
+  /gravity/block3/final/keyOrder           INT - Final key order
+  /gravity/block3/final/mixType            INT - Final mix blending type
+  /gravity/block3/final/overflow           INT - Final mix overflow
+
+--- Reset Commands ---
+
+  /gravity/block3/final/resetMixAndKey     Reset final mix and key
+  /gravity/block3/final/lfo/reset          Reset final mix LFO
+
+--- Block 3 Master Reset ---
+
+  /gravity/block3/resetAll                 Reset all Block 3 parameters
+
+================================================================================
+GLOBAL COMMANDS
+================================================================================
+
+--- System-Wide Controls ---
+
+  /gravity/resetAll                        Reset ALL parameters in entire system
+  /gravity/sendAll                         Broadcast all current parameter values
+
+--- Preset Management ---
+
+  /gravity/preset/selectLoad               INT - Select preset slot to load
+  /gravity/preset/selectSave               INT - Select preset slot to save
+  /gravity/preset/load                     TRIGGER - Load selected preset
+  /gravity/preset/save                     TRIGGER - Save to selected preset
+  /gravity/preset/saveAs                   STRING - Save preset with custom name
+  /gravity/preset/saveBank/index           INT - Switch save bank by index
+  /gravity/preset/saveBank/name            STRING - Switch save bank by name
+  /gravity/preset/loadBank/index           INT - Switch load bank by index
+  /gravity/preset/loadBank/name            STRING - Switch load bank by name
+
+--- Macro Management ---
+
+  /gravity/macro/reset                     Reset macro data
+  /gravity/macro/resetAssignments          Reset macro assignments
+
+--- UI Control ---
+
+  /gravity/ui/scale                        INT - UI scale (0-2)
+
+================================================================================
+SYSTEM SETTINGS
+================================================================================
+
+--- Video Settings ---
+
+  /gravity/settings/fps                    INT - Target frame rate (1-60)
+
+Note: Video input device selection, resolution, and streaming options
+are controlled via GUI only.
+
+--- OSC Settings ---
+
+Note: OSC enable/disable, IP addresses, and port configurations
+are managed through the GUI only.
+
+================================================================================
+END OF OSC PARAMETER REFERENCE
+================================================================================
