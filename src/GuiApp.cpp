@@ -6377,7 +6377,7 @@ void GuiApp::draw(){
 				ImGui::SetNextItemWidth(resInputWidth);
 				ImGui::InputScalar("##intHeight", ImGuiDataType_S32, &internalHeight);
 				ImGui::SameLine(columnWidth + 20);
-				ImGui::Text("Output:");
+				ImGui::Text("Comp/Geo:");
 				ImGui::SameLine();
 				ImGui::SetNextItemWidth(resInputWidth);
 				ImGui::InputScalar("##outWidth", ImGuiDataType_S32, &outputWidth);
