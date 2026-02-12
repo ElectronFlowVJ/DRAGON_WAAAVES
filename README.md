@@ -50,7 +50,7 @@ A dual-channel, 2 input video effects processor and synthesizer built with openF
 - MIDI macro mapping (16 macros per parameter group)
 - Streaming output via NDI and Spout
 - Preset bank system with save/load functionality
-- Built in Lassjous Shape Generator
+- Built in Lissajous Shape Generator
 
 ## Requirements
 
