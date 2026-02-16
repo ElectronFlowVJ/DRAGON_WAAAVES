@@ -20,7 +20,7 @@ If you like the work I've done here, please consider supporting me on Ko-fi @ ht
 
 Please also consider supporting Andrei either on Patreon @ https://www.patreon.com/c/andrei_jay, or his Ko-fi @ https://ko-fi.com/andreijay as this would not have been possible without the amazing groundwork he has laid out, and his willingness to open source his projects.
 
-**Andrei's website:** https://videosynthecosphere.com
+**Andrei's website:** [https://videosynthecosphere.com](https://videosynthesisecosphere.com)
 
 You can download WPDSK here, which is a good introduction to the concepts present in this application, you can also buy GW-DSK there, which you should do. PLEASE GO SUPPORT HIM.
 
