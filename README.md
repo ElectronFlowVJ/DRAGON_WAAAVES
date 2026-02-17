@@ -1,5 +1,5 @@
 known issues: 
-- scaling weirdness on Jetson around 300%.
+- GUI scaling weirdness, will probably just make this a user input field
 - Openbox window config on jetson
 - FPS slider behavior is a bit hit or miss
 - touchOSC file still needs some (read: lots of) work
